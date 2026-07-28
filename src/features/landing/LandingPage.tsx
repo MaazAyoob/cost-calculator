@@ -100,9 +100,8 @@ export const LandingPage: React.FC = () => {
               </Button>
               <Button
                 size="lg"
-                variant="outline"
                 onClick={() => navigate('/dashboard')}
-                className="border-slate-700 text-slate-200 hover:bg-slate-800 hover:text-white h-14 px-8"
+                className="bg-slate-900 border border-slate-700 text-slate-100 hover:bg-slate-800 hover:border-slate-600 hover:text-white h-14 px-8"
                 rightIcon={<ChevronRight className="w-4 h-4" />}
               >
                 Explore Sample Workspace

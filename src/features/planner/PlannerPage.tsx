@@ -55,7 +55,7 @@ export const PlannerPage: React.FC = () => {
       {/* Page Header */}
       {currentStep < 10 && (
         <PageHeader
-          title="Tesla-Style Home Planning Configurator"
+          title="Home Planning Configurator"
           subtitle="Configure location, plot dimensions, floor plans, and material tiers in real time."
           breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Planning Configurator' }]}
         />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../../store/useUIStore';
 import { useProjectStore } from '../../store/useProjectStore';
 import { Menu, Search, Bell, ChevronDown, Building2, SlidersHorizontal, Sparkles } from 'lucide-react';
@@ -7,6 +8,7 @@ import { Button } from '../ui/Button';
 export const TopNavigation: React.FC = () => {
   const { toggleSidebar, isSidebarCollapsed, toggleSidebarCollapse, openModal } = useUIStore();
   const { project } = useProjectStore();
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200/80 shadow-soft-xs flex items-center justify-between px-4 lg:px-6">
@@ -35,16 +37,20 @@ export const TopNavigation: React.FC = () => {
           </div>
         </div>
 
-        {/* Project Quick Switcher */}
+        {/* Project Quick Switcher — click to reconfigure project */}
         <div className="hidden md:flex items-center gap-2 pl-4 border-l border-slate-200">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200/80 hover:bg-slate-100 cursor-pointer transition-colors">
+          <button
+            onClick={() => navigate('/planner')}
+            title="Click to reconfigure your project"
+            className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200/80 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 cursor-pointer transition-colors group"
+          >
             <Building2 className="w-4 h-4 text-blue-600" />
             <div className="text-left">
-              <div className="text-xs font-bold text-slate-800 leading-tight">{project.name}</div>
+              <div className="text-xs font-bold text-slate-800 leading-tight group-hover:text-blue-700 transition-colors">{project.name}</div>
               <div className="text-[10px] text-slate-400">{project.location.city} • {project.builtUpAreaSqFt} sq ft</div>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
-          </div>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1 group-hover:text-blue-500 transition-colors" />
+          </button>
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { cn } from '../../utils/cn';
 
 export interface PageHeaderProps {
@@ -23,9 +24,18 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {breadcrumbs.map((crumb, idx) => (
             <React.Fragment key={idx}>
               {idx > 0 && <span className="text-slate-300">/</span>}
-              <span className={cn(idx === breadcrumbs.length - 1 ? 'font-medium text-slate-800' : 'hover:text-slate-700 cursor-pointer')}>
-                {crumb.label}
-              </span>
+              {crumb.href && idx < breadcrumbs.length - 1 ? (
+                <Link
+                  to={crumb.href}
+                  className="hover:text-blue-600 hover:underline cursor-pointer transition-colors font-medium"
+                >
+                  {crumb.label}
+                </Link>
+              ) : (
+                <span className={cn(idx === breadcrumbs.length - 1 ? 'font-medium text-slate-800' : 'hover:text-slate-700 cursor-pointer')}>
+                  {crumb.label}
+                </span>
+              )}
             </React.Fragment>
           ))}
         </nav>
