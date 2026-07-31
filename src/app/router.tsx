@@ -59,6 +59,16 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'calculator',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <PlannerPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
         path: 'dashboard',
         element: (
           <ErrorBoundary>
@@ -70,6 +80,16 @@ export const router = createBrowserRouter([
       },
       {
         path: 'report',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <ReportPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'reports',
         element: (
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
