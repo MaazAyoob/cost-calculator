@@ -9,14 +9,56 @@ import { QualityTier, CityLocation, HouseType, RoomCounts, MaterialBrandSelectio
 // INPUT MODEL
 // ────────────────────────────────────────────────────────────
 
+export interface ZoneFlooringSelection {
+  living: 'Vitrified Tiles 800x800mm' | 'Granite Slab' | 'Italian Marble';
+  kitchenDining: 'Vitrified Tiles' | 'Granite' | 'Matte Anti-Skid Vitrified';
+  bedrooms: 'Vitrified Tiles' | 'Wooden Laminate' | 'Granite';
+  bathrooms: 'Anti-skid Ceramic Tiles' | 'Matte Finish Vitrified';
+  parkingUtility: 'Heavy-Duty Parking Tiles' | 'Flamed Granite';
+  balconies: 'Anti-skid Ceramic' | 'Wooden Finish Tiles';
+}
+
+export interface WallCladdingSelection {
+  kitchenDadoHeight: '2 ft' | '4 ft';
+  bathroomTileHeight: '7 ft (Lintel)' | 'Full Height (Ceiling)';
+}
+
+export interface DoorSelection {
+  mainDoor: 'Premium Teak' | 'Normal Teak';
+  internalDoor: 'Flush Door' | 'Laminate Door';
+  bathroomDoor: 'WPC Door' | 'FRP / ERP Door';
+}
+
+export interface WindowSelection {
+  primaryMaterial: 'uPVC' | 'Wood' | 'Aluminium';
+  subGrade: string;
+}
+
+export interface ElectricalSelection {
+  conduit: 'Heavy-Duty ISI Marked PVC';
+  wireTier: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)';
+}
+
+export interface BathroomFittingSelection {
+  sanitaryTier: 'Mass Market (Cera / Hindware / Parryware)' | 'Premium (Jaquar / Kohler / Grohe)' | 'Luxury (Toto / Duravit)';
+  cpvcBrand: 'Ashirwad' | 'Supreme' | 'Astral';
+}
+
+export interface PaintingSelection {
+  baseLayer: 'Putty + Primer';
+  internalPaint: 'Tractor Emulsion' | 'Premium Emulsion' | 'Royale Luxury Emulsion';
+  externalPaint: 'Ultima Weather Proof' | 'Texture Finish';
+  brand: 'Asian Paints' | 'Berger Paints' | 'Dulux';
+}
+
 export interface EngineInput {
   city: CityLocation;
   authority: string;
-  plotLength: number; // ft
-  plotWidth: number;  // ft
+  plotLength: number; // ft (10-200)
+  plotWidth: number;  // ft (10-200)
   houseType: HouseType;
-  floors: number;     // total floor count incl. Ground (1 = G, 2 = G+1 ...)
-  parkingType: 'Normal Parking' | 'Stilt Parking';
+  floors: number;     // 1=G, 2=G+1, 3=G+2, 4=G+3, 5=G+4
+  parkingType: 'Stilt' | 'Stilt Parking' | 'Normal Ground' | 'EV Charging Ready';
   carCount: number;
   bikeCount: number;
   evCharging: boolean;
@@ -24,6 +66,14 @@ export interface EngineInput {
   rooms: RoomCounts;
   qualityTier: QualityTier;
   materialBrands: MaterialBrandSelection;
+  // Granular client selections
+  flooringZones: ZoneFlooringSelection;
+  wallCladding: WallCladdingSelection;
+  doors: DoorSelection;
+  windows: WindowSelection;
+  electrical: ElectricalSelection;
+  bathroomFittings: BathroomFittingSelection;
+  painting: PaintingSelection;
 }
 
 // ────────────────────────────────────────────────────────────

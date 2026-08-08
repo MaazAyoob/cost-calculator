@@ -4,7 +4,7 @@ import { EngineInput } from '../types';
 
 const mockInput: EngineInput = {
   city: 'Bangalore',
-  authority: 'BBMP',
+  authority: 'BBMP/BDA',
   plotLength: 60,
   plotWidth: 40,
   houseType: 'Duplex',
@@ -17,6 +17,7 @@ const mockInput: EngineInput = {
   rooms: {
     bedrooms: 4,
     bathrooms: 4,
+    commonToilets: 1,
     kitchen: 1,
     dining: 1,
     living: 2,
@@ -28,14 +29,49 @@ const mockInput: EngineInput = {
   },
   qualityTier: 'Premium',
   materialBrands: {
-    steel: 'Tata Tiscon Fe 550D',
-    cement: 'UltraTech OPC 53',
+    steel: 'Tata Tiscon',
+    cement: 'UltraTech',
     doors: 'Teakwood Custom Joinery',
-    windows: 'Fenesta uPVC Double Glaze',
-    flooring: 'Italian Marble Statuario',
-    bathroom: 'Kohler Concealed Thermostatic',
-    electrical: 'Schneider Electric & Finolex',
-    paint: 'Asian Paints Royale Luxury',
+    windows: 'Fenesta uPVC',
+    flooring: 'Italian Marble',
+    bathroom: 'Kohler',
+    electrical: 'Finolex',
+    paint: 'Asian Paints Royale',
+  },
+  flooringZones: {
+    living: 'Italian Marble',
+    kitchenDining: 'Granite',
+    bedrooms: 'Vitrified Tiles',
+    bathrooms: 'Anti-skid Ceramic Tiles',
+    parkingUtility: 'Heavy-Duty Parking Tiles',
+    balconies: 'Anti-skid Ceramic',
+  },
+  wallCladding: {
+    kitchenDadoHeight: '2 ft',
+    bathroomTileHeight: '7 ft (Lintel)',
+  },
+  doors: {
+    mainDoor: 'Premium Teak',
+    internalDoor: 'Flush Door',
+    bathroomDoor: 'WPC Door',
+  },
+  windows: {
+    primaryMaterial: 'uPVC',
+    subGrade: 'Standard uPVC',
+  },
+  electrical: {
+    conduit: 'Heavy-Duty ISI Marked PVC',
+    wireTier: 'Mid-range (V-Guard)',
+  },
+  bathroomFittings: {
+    sanitaryTier: 'Premium (Jaquar / Kohler / Grohe)',
+    cpvcBrand: 'Ashirwad',
+  },
+  painting: {
+    baseLayer: 'Putty + Primer',
+    internalPaint: 'Premium Emulsion',
+    externalPaint: 'Ultima Weather Proof',
+    brand: 'Asian Paints',
   },
 };
 

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, ShieldCheck, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
@@ -8,19 +8,19 @@ export const WebsiteFooter: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const bg = isDark ? '#0F172A' : '#FAFAF8';
-  const surface = isDark ? '#111827' : '#FFFFFF';
-  const border = isDark ? '#1F2937' : '#E5E7EB';
-  const textPrimary = isDark ? '#F8FAFC' : '#111827';
-  const textSecondary = isDark ? '#94A3B8' : '#6B7280';
-  const brandColor = isDark ? '#14B8A6' : '#0F766E';
+  const bg = isDark ? '#0F172A' : '#F9FAFB';
+  const surface = isDark ? '#1E293B' : '#FFFFFF';
+  const border = isDark ? '#334155' : '#E2E8F0';
+  const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
+  const textSecondary = isDark ? '#94A3B8' : '#64748B';
+  const brandColor = isDark ? '#3B82F6' : '#2563EB';
 
   return (
     <footer style={{ backgroundColor: bg, borderTopColor: border }} className="border-t pt-16 pb-12 relative overflow-hidden">
       {/* Subtle background glow */}
       <div
         className="absolute bottom-0 right-1/4 w-[600px] h-[300px] rounded-full blur-[120px] pointer-events-none opacity-40"
-        style={{ backgroundColor: isDark ? 'rgba(15,118,110,0.08)' : 'rgba(15,118,110,0.06)' }}
+        style={{ backgroundColor: isDark ? 'rgba(37,99,235,0.08)' : 'rgba(37,99,235,0.06)' }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
@@ -30,15 +30,15 @@ export const WebsiteFooter: React.FC = () => {
           {/* Col 1: Brand */}
           <div className="lg:col-span-2 space-y-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0F766E] to-[#0D9488] flex items-center justify-center shadow-[0_4px_14px_rgba(15,118,110,0.35)]">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] flex items-center justify-center shadow-[0_4px_14px_rgba(37,99,235,0.30)]">
                 <Building2 className="w-5 h-5 text-white" />
               </div>
               <div>
                 <span className="font-extrabold text-xl tracking-tight block" style={{ color: textPrimary }}>
-                  Cost Calculator
+                  BuildPlan AI
                 </span>
                 <span className="text-xs font-semibold" style={{ color: brandColor }}>
-                  Engineering Cost Intelligence
+                  Engineering Cost Intelligence by Rightcon
                 </span>
               </div>
             </div>
@@ -65,9 +65,9 @@ export const WebsiteFooter: React.FC = () => {
             <h4 className="text-xs font-extrabold uppercase tracking-widest" style={{ color: textPrimary }}>Platform</h4>
             <ul className="space-y-2.5">
               {[
-                { label: 'Cost Configurator', action: () => navigate('/calculator') },
+                { label: 'Cost Calculator', action: () => navigate('/calculator') },
                 { label: 'Sample Dashboard', action: () => navigate('/dashboard') },
-                { label: 'Bank-Ready Reports', action: () => navigate('/reports') },
+                { label: 'Bank-Ready Reports', action: () => navigate('/report') },
                 { label: 'Interactive Demo', action: () => {}, href: '#demo' },
                 { label: 'Construction Packages', action: () => {}, href: '#packages' },
               ].map(({ label, action, href }) => (
@@ -77,7 +77,7 @@ export const WebsiteFooter: React.FC = () => {
                       {label}
                     </a>
                   ) : (
-                    <button onClick={action} className="text-sm font-medium transition-colors hover:underline text-left" style={{ color: textSecondary }}>
+                    <button onClick={action} className="text-sm font-medium transition-colors hover:underline text-left cursor-pointer" style={{ color: textSecondary }}>
                       {label}
                     </button>
                   )}
@@ -118,7 +118,7 @@ export const WebsiteFooter: React.FC = () => {
                 className="w-full h-9 px-3 text-xs rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#0F766E]/40 transition-all"
                 style={{ backgroundColor: surface, borderColor: border, color: textPrimary }}
               />
-              <button className="bg-[#0F766E] hover:bg-[#0D6560] text-white rounded-xl px-3 shrink-0 transition-colors">
+              <button className="bg-[#0F766E] hover:bg-[#0D6560] text-white rounded-xl px-3 shrink-0 transition-colors cursor-pointer">
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

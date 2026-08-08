@@ -1,7 +1,7 @@
 // ============================================================
 // CALCULATION STORE
 // Central Zustand store for all engine outputs.
-// Call recalculate() whenever wizard inputs change.
+// Automatically recalculates whenever useWizardStore state changes!
 // ============================================================
 
 import { create } from 'zustand';
@@ -9,32 +9,35 @@ import { CalculationResult, EngineInput } from '../calculation-engine/types';
 import { runCalculator } from '../calculation-engine/calculator';
 import {
   useWizardStore,
-  QualityTier,
-  CityLocation,
-  HouseType,
-  RoomCounts,
-  MaterialBrandSelection,
 } from './useWizardStore';
 
 // Build EngineInput from the wizard store state
 function buildInput(): EngineInput {
   const s = useWizardStore.getState();
-  return {
-    city:            s.city,
-    authority:       s.authority,
-    plotLength:      s.plotLength,
-    plotWidth:       s.plotWidth,
-    houseType:       s.houseType,
-    floors:          s.floors,
-    parkingType:     s.parkingType,
-    carCount:        s.carCount,
-    bikeCount:       s.bikeCount,
-    evCharging:      s.evCharging,
-    liftRequired:    s.liftRequired,
+  const input: EngineInput = {
+    city:            s.city || 'Bangalore',
+    authority:       s.authority || 'BBMP/BDA',
+    plotLength:      s.plotLength || 0,
+    plotWidth:       s.plotWidth || 0,
+    houseType:       s.houseType || 'Duplex',
+    floors:          s.floors || 0,
+    parkingType:     (s.parkingType as any) || 'Normal Ground',
+    carCount:        s.carCount || 0,
+    bikeCount:       s.bikeCount || 0,
+    evCharging:      s.evCharging || false,
+    liftRequired:    s.liftRequired || false,
     rooms:           s.rooms,
-    qualityTier:     s.qualityTier,
+    qualityTier:     s.qualityTier || 'Premium',
     materialBrands:  s.materialBrands,
+    flooringZones:   s.flooringZones,
+    wallCladding:    s.wallCladding,
+    doors:           s.doors,
+    windows:         s.windows,
+    electrical:      s.electrical,
+    bathroomFittings: s.bathroomFittings,
+    painting:        s.painting,
   };
+  return input;
 }
 
 // Generate initial calculation immediately
@@ -45,7 +48,7 @@ interface CalculationStore {
   result: CalculationResult;
   isCalculating: boolean;
   lastCalculatedAt: string;
-  recalculate: () => void;
+  recalculate: () => CalculationResult;
 }
 
 export const useCalculationStore = create<CalculationStore>((set) => ({
@@ -54,16 +57,21 @@ export const useCalculationStore = create<CalculationStore>((set) => ({
   lastCalculatedAt:  initialResult.calculatedAt,
 
   recalculate: () => {
-    set({ isCalculating: true });
-    // Synchronous run – < 2ms. Wrapped in setTimeout(0) to allow
-    // the calling setter to complete its own state update first.
-    setTimeout(() => {
-      const input = buildInput();
-      const result = runCalculator(input);
-      set({ result, isCalculating: false, lastCalculatedAt: result.calculatedAt });
-    }, 0);
+    const input = buildInput();
+    const result = runCalculator(input);
+    // IMPORTANT: Do NOT call useWizardStore.setState() here!
+    // That would trigger the subscribe() listener again → infinite loop.
+    set({ result, isCalculating: false, lastCalculatedAt: result.calculatedAt });
+    return result;
   },
 }));
+
+// Automatically subscribe to any change in useWizardStore!
+// Whenever user updates plot, rooms, steel, cement, flooring, doors, windows, etc.,
+// useCalculationStore instantly recalculates synchronously!
+useWizardStore.subscribe(() => {
+  useCalculationStore.getState().recalculate();
+});
 
 // ── Selector helpers (for clean component usage) ──────────
 export const useArea           = () => useCalculationStore((s) => s.result.area);

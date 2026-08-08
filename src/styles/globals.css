@@ -1,34 +1,34 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Cost Calculator — Global CSS Variable Bridge
-   Light Mode is PRIMARY. [data-theme="dark"] overrides below.
+   BuildPlan AI — PRD Color Palette System (PRD Section 10)
+   Background:    #F9FAFB (Slate 50)
+   Surface/Cards: #FFFFFF
+   Primary Text:  #0F172A (Slate 900)
+   Accent Brand:  #2563EB (Electric Blue)
+   Active Border: #2563EB (Electric Blue)
    ============================================================ */
 
 @layer base {
-  /* ----------------------------------------------------------
-     LIGHT THEME (default / :root)
-     Design reference: Apple · Stripe · Linear · Framer · Notion
-     ---------------------------------------------------------- */
   :root {
     color-scheme: light;
 
     /* Backgrounds */
-    --cc-bg:            #FAFAF8;
+    --cc-bg:            #F9FAFB;
     --cc-surface:       #FFFFFF;
-    --cc-surface-muted: #F4F4F0;
+    --cc-surface-muted: #F1F5F9;
 
     /* Text */
-    --cc-text-primary:   #111827;
-    --cc-text-secondary: #6B7280;
-    --cc-text-disabled:  #9CA3AF;
+    --cc-text-primary:   #0F172A;
+    --cc-text-secondary: #64748B;
+    --cc-text-disabled:  #94A3B8;
 
-    /* Brand */
-    --cc-brand:          #0F766E; /* Deep Emerald */
-    --cc-brand-light:    #CCFBF1;
-    --cc-brand-hover:    #0D6560;
-    --cc-accent:         #C6A75E; /* Construction Gold */
-    --cc-accent-light:   #FEF3C7;
+    /* Brand (PRD Electric Blue) */
+    --cc-brand:          #2563EB;
+    --cc-brand-light:    #EFF6FF;
+    --cc-brand-hover:    #1D4ED8;
+    --cc-accent:         #2563EB;
+    --cc-accent-light:   #DBEAFE;
 
     /* Status */
     --cc-success:        #16A34A;
@@ -39,13 +39,13 @@
     --cc-error-light:    #FEE2E2;
 
     /* Borders */
-    --cc-border:         #E5E7EB;
-    --cc-border-strong:  #D1D5DB;
+    --cc-border:         #E2E8F0;
+    --cc-border-strong:  #CBD5E1;
 
     /* Overlay */
-    --cc-overlay:        rgba(17,24,39,0.40);
+    --cc-overlay:        rgba(15,23,42,0.40);
 
-    /* Radii */
+    /* Radii (PRD Card 16px, Btn 12px, Container Max 720px) */
     --cc-radius-card:    16px;
     --cc-radius-btn:     12px;
     --cc-radius-input:   12px;
@@ -53,17 +53,17 @@
     --cc-radius-sheet:   24px;
     --cc-radius-pill:    9999px;
 
-    /* Shadows (light-optimised — soft, multi-layer) */
-    --cc-shadow-xs:      0 1px 2px 0 rgba(17,24,39,0.04);
-    --cc-shadow-sm:      0 2px 6px 0 rgba(17,24,39,0.06), 0 1px 2px -1px rgba(17,24,39,0.04);
-    --cc-shadow-md:      0 4px 12px -2px rgba(17,24,39,0.08), 0 2px 4px -2px rgba(17,24,39,0.04);
-    --cc-shadow-lg:      0 12px 24px -4px rgba(17,24,39,0.10), 0 4px 8px -2px rgba(17,24,39,0.04);
-    --cc-shadow-xl:      0 20px 40px -8px rgba(17,24,39,0.12), 0 8px 16px -4px rgba(17,24,39,0.06);
-    --cc-shadow-brand:   0 8px 24px -4px rgba(15,118,110,0.30);
-    --cc-shadow-accent:  0 8px 24px -4px rgba(198,167,94,0.25);
+    /* Shadows (Soft clean multi-layer) */
+    --cc-shadow-xs:      0 1px 2px 0 rgba(15,23,42,0.04);
+    --cc-shadow-sm:      0 2px 6px 0 rgba(15,23,42,0.06), 0 1px 2px -1px rgba(15,23,42,0.04);
+    --cc-shadow-md:      0 4px 12px -2px rgba(15,23,42,0.08), 0 2px 4px -2px rgba(15,23,42,0.04);
+    --cc-shadow-lg:      0 12px 24px -4px rgba(15,23,42,0.10), 0 4px 8px -2px rgba(15,23,42,0.04);
+    --cc-shadow-xl:      0 20px 40px -8px rgba(15,23,42,0.12), 0 8px 16px -4px rgba(15,23,42,0.06);
+    --cc-shadow-brand:   0 8px 24px -4px rgba(37,99,235,0.25);
+    --cc-shadow-accent:  0 8px 24px -4px rgba(37,99,235,0.20);
     --cc-shadow-glass:   0 4px 16px rgba(255,255,255,0.60), inset 0 1px 0 rgba(255,255,255,0.80);
 
-    /* Legacy aliases kept so existing components don't break */
+    /* Legacy aliases */
     --bg-main:           var(--cc-bg);
     --surface-card:      var(--cc-surface);
     --accent-primary:    var(--cc-brand);
@@ -79,26 +79,22 @@
     --radius-sheet:      var(--cc-radius-sheet);
   }
 
-  /* ----------------------------------------------------------
-     DARK THEME — overrides via data-theme attribute
-     Applied by useTheme() hook to <html data-theme="dark">
-     ---------------------------------------------------------- */
   [data-theme="dark"] {
     color-scheme: dark;
 
     --cc-bg:             #0F172A;
-    --cc-surface:        #111827;
-    --cc-surface-muted:  #1E293B;
+    --cc-surface:        #1E293B;
+    --cc-surface-muted:  #334155;
 
     --cc-text-primary:   #F8FAFC;
     --cc-text-secondary: #94A3B8;
     --cc-text-disabled:  #64748B;
 
-    --cc-brand:          #14B8A6;
-    --cc-brand-light:    #134E4A;
-    --cc-brand-hover:    #0D9488;
-    --cc-accent:         #D4A847;
-    --cc-accent-light:   #44381A;
+    --cc-brand:          #3B82F6;
+    --cc-brand-light:    #1E3A8A;
+    --cc-brand-hover:    #2563EB;
+    --cc-accent:         #3B82F6;
+    --cc-accent-light:   #1E3A8A;
 
     --cc-success:        #22C55E;
     --cc-success-light:  #14532D;
@@ -107,8 +103,8 @@
     --cc-error:          #EF4444;
     --cc-error-light:    #450A0A;
 
-    --cc-border:         #1F2937;
-    --cc-border-strong:  #374151;
+    --cc-border:         #334155;
+    --cc-border-strong:  #475569;
 
     --cc-overlay:        rgba(0,0,0,0.60);
 
@@ -117,11 +113,10 @@
     --cc-shadow-md:      0 4px 12px -2px rgba(0,0,0,0.50);
     --cc-shadow-lg:      0 12px 24px -4px rgba(0,0,0,0.60);
     --cc-shadow-xl:      0 20px 40px -8px rgba(0,0,0,0.70);
-    --cc-shadow-brand:   0 8px 24px -4px rgba(20,184,166,0.25);
-    --cc-shadow-accent:  0 8px 24px -4px rgba(212,168,71,0.20);
+    --cc-shadow-brand:   0 8px 24px -4px rgba(59,130,246,0.25);
+    --cc-shadow-accent:  0 8px 24px -4px rgba(59,130,246,0.20);
     --cc-shadow-glass:   0 4px 16px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.05);
 
-    /* Update legacy aliases for dark */
     --bg-main:        var(--cc-bg);
     --surface-card:   var(--cc-surface);
     --accent-primary: var(--cc-brand);
@@ -130,15 +125,11 @@
     --color-danger:   var(--cc-error);
   }
 
-  /* ----------------------------------------------------------
-     Base HTML resets
-     ---------------------------------------------------------- */
   *, *::before, *::after {
     box-sizing: border-box;
   }
 
   html {
-    /* Smooth theme transitions — only on colour properties */
     transition: background-color 0.25s ease, color 0.25s ease;
   }
 
@@ -152,7 +143,6 @@
     line-height: 1.6;
   }
 
-  /* Selection colours */
   ::selection {
     background-color: var(--cc-brand);
     color: #fff;
@@ -160,9 +150,10 @@
 }
 
 /* ============================================================
-   TYPOGRAPHY UTILITIES
+   TYPOGRAPHY UTILITIES — Plus Jakarta Sans & Inter
    ============================================================ */
 .heading-display {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2.5rem, 6vw, 4rem);
   line-height: 1.08;
   font-weight: 900;
@@ -171,6 +162,7 @@
 }
 
 .heading-xl {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.10;
   font-weight: 800;
@@ -179,25 +171,28 @@
 }
 
 .heading-lg {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.875rem;
   line-height: 1.20;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--cc-text-primary);
 }
 
 .heading-md {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.5rem;
   line-height: 1.30;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.015em;
   color: var(--cc-text-primary);
 }
 
 .heading-sm {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.25rem;
   line-height: 1.40;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--cc-text-primary);
 }
@@ -241,7 +236,7 @@
 }
 
 /* ============================================================
-   SHADOW UTILITIES — token-mapped
+   SHADOW UTILITIES
    ============================================================ */
 .shadow-cc-xs    { box-shadow: var(--cc-shadow-xs); }
 .shadow-cc-sm    { box-shadow: var(--cc-shadow-sm); }
@@ -252,7 +247,6 @@
 .shadow-cc-accent{ box-shadow: var(--cc-shadow-accent); }
 .shadow-cc-glass { box-shadow: var(--cc-shadow-glass); }
 
-/* Legacy aliases */
 .shadow-soft-xs  { box-shadow: var(--cc-shadow-xs); }
 .shadow-soft-sm  { box-shadow: var(--cc-shadow-sm); }
 .shadow-soft-md  { box-shadow: var(--cc-shadow-md); }
@@ -286,7 +280,7 @@
 }
 
 [data-theme="dark"] .cc-glass {
-  background: rgba(17,24,39,0.75);
+  background: rgba(30,41,59,0.75);
   border-color: rgba(255,255,255,0.06);
 }
 
@@ -303,7 +297,7 @@
   color: var(--cc-brand);
   font-size: 0.75rem;
   font-weight: 700;
-  border: 1px solid rgba(15,118,110,0.20);
+  border: 1px solid rgba(37,99,235,0.20);
 }
 
 .cc-badge-accent {
@@ -316,7 +310,7 @@
   color: var(--cc-accent);
   font-size: 0.75rem;
   font-weight: 700;
-  border: 1px solid rgba(198,167,94,0.25);
+  border: 1px solid rgba(37,99,235,0.25);
 }
 
 /* ============================================================
@@ -341,7 +335,7 @@
 }
 .cc-btn-primary:hover {
   background-color: var(--cc-brand-hover);
-  box-shadow: 0 12px 28px -4px rgba(15,118,110,0.40);
+  box-shadow: 0 12px 28px -4px rgba(37,99,235,0.35);
   transform: translateY(-1px);
 }
 

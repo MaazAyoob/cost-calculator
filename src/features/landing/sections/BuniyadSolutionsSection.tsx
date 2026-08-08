@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Layers, Cpu, FileText, Compass, Sparkles, Building2, Sliders, ChevronRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Cpu, FileText, Compass, Sparkles, Sliders, ChevronRight } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 
 export const BuniyadSolutionsSection: React.FC = () => {
@@ -11,62 +11,60 @@ export const BuniyadSolutionsSection: React.FC = () => {
   const steps = [
     {
       step: '01',
-      title: 'Enter Plot & Floor Details',
-      subtitle: 'Input dimensions (e.g. 30x40, 40x60), setback rules, and target floor plan (G+1, G+2, G+3).',
-      detail: 'Cost Calculator calculates total ground coverage, super built-up area, balcony extensions, and FAR ratios compliant with BBMP / BDA and Karnataka regional bylaws.',
+      title: 'Enter Plot & Basic Info',
+      subtitle: 'Input dimensions (10-200 ft), floor count (G to G+4), and parking configuration.',
+      detail: 'Cost Calculator calculates total ground coverage, super built-up area, setback rules, and FAR ratios compliant with BBMP / BDA and MUDA bylaws.',
       tag: 'Plot & Geometry',
-      icon: <Compass className="w-5 h-5 text-[var(--cc-brand)]" />,
-      features: ['Automatic FAR & Built-up Area Calculation', 'Setback & Parking Area Allocation', 'Multi-Floor Structural Layouts'],
+      icon: <Compass className="w-5 h-5 text-blue-600" />,
+      features: ['Automatic FAR & Built-up Area Calculation', 'Setback & Parking Allocation', 'Floor Count & Stilt Constraints'],
     },
     {
       step: '02',
-      title: 'Choose Material Specifications',
-      subtitle: 'Select quality grade (Essential, Premium, Luxury) and brand matrix for cement, steel, and fittings.',
-      detail: 'Compare UltraTech vs ACC cement, Tata Tiscon 550D vs JSW steel, Kohler vs Jaquar sanitaryware, and Asian Paints Royale with live cost impacts.',
-      tag: 'Material Matrix',
-      icon: <Sliders className="w-5 h-5 text-indigo-400" />,
-      features: ['UltraTech, ACC & Dalmia Cement Pricing', 'Tata Tiscon 550D TMT Steel Quantities', 'Kohler, Grohe & Jaquar Fixture Tiers'],
+      title: 'Define Space Requirements',
+      subtitle: 'Specify room counts (bedrooms, bathrooms, kitchens, balconies) and elevator provision.',
+      detail: 'Directly drives downstream engineering quantities for plumbing, wiring, doors, windows, and room flooring.',
+      tag: 'Space Layout',
+      icon: <Sliders className="w-5 h-5 text-indigo-600" />,
+      features: ['1-10 Bedrooms & 1-12 Bathrooms', 'Kitchen & Living Room Allocation', 'Elevator & Balcony Specifications'],
     },
     {
       step: '03',
-      title: 'IS 456 Engineering Computation',
-      subtitle: 'Our engine applies Indian Standard structural formulas across 13 construction stages.',
-      detail: 'Computes exact bags of cement, metric tons of steel, cubic feet of coarse aggregate, m2 plastering, and AAC block counts for earthwork to handover.',
-      tag: 'IS Code Engine',
-      icon: <Cpu className="w-5 h-5 text-[var(--cc-brand)]" />,
-      features: ['13 Stage Structural BOQ Itemization', 'IS 456 M20/M25 RMC Concrete Ratios', 'Plastering, Tiling & MEP Stage Work'],
+      title: 'Select Material Brands & Grades',
+      subtitle: 'Choose TMT steel, cement, flooring, cladding, doors, windows, electrical, and paint brands.',
+      detail: 'Compare Tata Tiscon vs JSW steel, UltraTech vs ACC cement, uPVC vs Wooden windows, and Finolex vs V-Guard wiring with live cost impacts.',
+      tag: 'Material Matrix',
+      icon: <Cpu className="w-5 h-5 text-emerald-600" />,
+      features: ['Tata Tiscon & UltraTech Material Rates', 'Zone-Specific Flooring & Wall Cladding', 'uPVC Window Sub-Grades & Sanitary Tiers'],
     },
     {
       step: '04',
-      title: 'Receive Bank-Ready Reports',
-      subtitle: 'Generate itemized BOQ, milestone payment schedule, and PDF export in under 3 minutes.',
+      title: 'Receive Bank-Ready BOQ & Reports',
+      subtitle: 'Generate itemized BOQ, milestone payment schedule, and 22-section PDF report in under 3 minutes.',
       detail: 'Download bank-compliant estimates ready for home loan sanctioning (SBI, HDFC, ICICI) and contractor tender comparison.',
       tag: 'Bank BOQ Export',
-      icon: <FileText className="w-5 h-5 text-cyan-400" />,
-      features: ['6-Milestone Payment Schedule', 'Home Loan Bank Audit Certified Format', 'Instant PDF & Excel Data Exports'],
+      icon: <FileText className="w-5 h-5 text-cyan-600" />,
+      features: ['10-Stage Milestone Payment Schedule', 'Home Loan Bank Audit Certified Format', 'Instant PDF & CSV Exports'],
     },
   ];
 
   return (
-    <section id="solutions" className="bg-[var(--cc-bg)] py-20 border-b border-[var(--cc-border)] relative overflow-hidden">
+    <section id="solutions" className="bg-slate-50 py-20 border-b border-slate-200 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--cc-brand)]/10 border border-[var(--cc-brand)]/30 text-[var(--cc-brand)] text-xs font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-blue-700 text-xs font-extrabold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" /> How Cost Calculator Solves It
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black text-[var(--cc-text-primary)] tracking-tight">
-            From Plot Dimensions to Bank-Ready BOQ in 4 Steps.
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+            From Plot Dimensions to Bank-Ready BOQ in 4 Simple Steps.
           </h2>
-          <p className="text-[var(--cc-text-secondary)] text-base leading-relaxed">
-            Experience our 10-step guided configurator that translates your dream home vision into exact engineering and financial clarity.
+          <p className="text-slate-600 text-base leading-relaxed font-medium">
+            Experience our 11-step guided configurator that translates your dream home vision into exact engineering and financial clarity.
           </p>
         </div>
 
         {/* Interactive Step Tabs */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
           {/* Left Navigation Steps */}
           <div className="lg:col-span-5 space-y-3">
             {steps.map((s, idx) => {
@@ -76,22 +74,27 @@ export const BuniyadSolutionsSection: React.FC = () => {
                   key={idx}
                   onClick={() => setActiveStep(idx)}
                   className={`p-5 rounded-2xl border transition-all cursor-pointer text-left ${
-                    isActive ? 'bg-[var(--cc-surface)] border-teal-500/80 shadow-lg shadow-teal-900/5'
-                      : 'bg-[var(--cc-bg)]/60 border-[var(--cc-border)]/80 hover:bg-[var(--cc-surface)]/60 hover:border-[var(--cc-border)]'
+                    isActive
+                      ? 'bg-white border-blue-600 shadow-soft-md ring-2 ring-blue-500/20'
+                      : 'bg-white/60 border-slate-200 hover:bg-white hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black ${
-                        isActive ? 'bg-[var(--cc-brand)] text-white' : 'bg-[var(--cc-surface-muted)] text-[var(--cc-text-secondary)]'
-                      }`}>
+                      <span
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black ${
+                          isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
                         {s.step}
                       </span>
-                      <h3 className={`text-base font-bold ${isActive ? 'text-[var(--cc-text-primary)]' : 'text-[var(--cc-text-secondary)]'}`}>
+                      <h3 className={`text-base font-extrabold ${isActive ? 'text-slate-900' : 'text-slate-700'}`}>
                         {s.title}
                       </h3>
                     </div>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? 'text-[var(--cc-brand)] rotate-90' : 'text-slate-600'}`} />
+                    <ChevronRight
+                      className={`w-4 h-4 transition-transform ${isActive ? 'text-blue-600 rotate-90' : 'text-slate-400'}`}
+                    />
                   </div>
                 </div>
               );
@@ -101,10 +104,10 @@ export const BuniyadSolutionsSection: React.FC = () => {
               <Button
                 size="lg"
                 onClick={() => navigate('/calculator')}
-                rightIcon={<ArrowRight className="w-5 h-5" />}
-                className="w-full bg-[var(--cc-brand)] hover:bg-[var(--cc-brand)] text-white font-bold text-sm h-13 shadow-lg shadow-teal-900/10"
+                rightIcon={<ArrowRight className="w-5 h-5 text-white" />}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm h-13 shadow-soft-md cursor-pointer"
               >
-                Start Free Estimate Now
+                Start Free Estimate Now →
               </Button>
             </div>
           </div>
@@ -118,33 +121,38 @@ export const BuniyadSolutionsSection: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="p-8 rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border border-[var(--cc-border)] space-y-6 shadow-2xl relative overflow-hidden"
+                className="p-8 rounded-3xl bg-slate-900 text-white border border-slate-800 space-y-6 shadow-soft-xl relative overflow-hidden"
               >
-                <div className="flex items-center justify-between border-b border-[var(--cc-border)] pb-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-xl bg-[var(--cc-bg)] border border-[var(--cc-border)]">
+                    <div className="p-3 rounded-xl bg-white/10 border border-white/10">
                       {steps[activeStep].icon}
                     </div>
                     <div>
-                      <span className="text-xs font-bold text-[var(--cc-text-secondary)] uppercase tracking-widest block">Step {steps[activeStep].step}</span>
-                      <h4 className="text-xl font-extrabold text-[var(--cc-text-primary)]">{steps[activeStep].title}</h4>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">
+                        Step {steps[activeStep].step}
+                      </span>
+                      <h4 className="text-xl font-extrabold text-white">{steps[activeStep].title}</h4>
                     </div>
                   </div>
-                  <span className="px-3 py-1 text-xs font-bold bg-[var(--cc-brand)]/10 text-[var(--cc-brand)] border border-[var(--cc-brand)]/30 rounded-full">
+                  <span className="px-3 py-1 text-xs font-extrabold bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full">
                     {steps[activeStep].tag}
                   </span>
                 </div>
 
-                <p className="text-[var(--cc-text-secondary)] text-sm leading-relaxed">
+                <p className="text-slate-300 text-sm leading-relaxed font-medium">
                   {steps[activeStep].detail}
                 </p>
 
                 <div className="space-y-3 pt-2">
-                  <span className="text-xs font-extrabold text-[var(--cc-text-primary)] uppercase tracking-wider block">Key Deliverables</span>
+                  <span className="text-xs font-extrabold text-white uppercase tracking-wider block">Key Deliverables</span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {steps[activeStep].features.map((feat, fIdx) => (
-                      <div key={fIdx} className="flex items-center gap-2 text-xs text-[var(--cc-text-secondary)] bg-[var(--cc-surface)]/80 p-2.5 rounded-xl border border-[var(--cc-border)]">
-                        <CheckCircle2 className="w-4 h-4 text-[var(--cc-brand)] shrink-0" />
+                      <div
+                        key={fIdx}
+                        className="flex items-center gap-2 text-xs text-slate-200 bg-white/10 p-2.5 rounded-xl border border-white/10 font-semibold"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                         <span>{feat}</span>
                       </div>
                     ))}
@@ -153,11 +161,8 @@ export const BuniyadSolutionsSection: React.FC = () => {
               </motion.div>
             </AnimatePresence>
           </div>
-
         </div>
-
       </div>
     </section>
   );
 };
-

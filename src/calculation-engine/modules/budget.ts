@@ -1,4 +1,5 @@
-// Budget Module
+// Budget Module — Restored from RC1 (a2620e3)
+// Simple bua * baseRate formula. Always calculates. No progressive gating.
 import { EngineInput, AreaResult, BudgetResult, BudgetHead } from '../types';
 import { BUDGET_ALLOCATION, BUDGET_HEAD_COLORS } from '../data/qualityTiers';
 import {
@@ -13,33 +14,57 @@ import {
 } from '../data/locationRates';
 
 export function calculateBudget(input: EngineInput, area: AreaResult): BudgetResult {
-  const { city, qualityTier, parkingType, carCount, liftRequired, evCharging } = input;
+  const {
+    city,
+    qualityTier,
+    parkingType,
+    carCount,
+    liftRequired,
+    evCharging,
+    materialBrands,
+  } = input;
 
   const bua = area.totalBUASqFt;
-  const baseRate = BASE_RATE_PER_SQFT[city][qualityTier];
+
+  // Safe fallbacks so calculation works before city is selected
+  const resolvedCity = city || 'Bangalore';
+  const resolvedTier = qualityTier || 'Premium';
+
+  const baseRate = BASE_RATE_PER_SQFT[resolvedCity]?.[resolvedTier] ?? 2450;
   const baseConstructionCost = Math.round(bua * baseRate);
 
-  // Add-ons
-  const parkingCost = parkingType === 'Stilt Parking'
-    ? carCount * STILT_PARKING_COST_PER_CAR[city]
-    : carCount * 60000; // Normal parking (open / covered slab)
+  // Material brand multiplier (from RC1 materialBrands.steel / cement)
+  let brandMultiplier = 1.0;
+  const steel = materialBrands?.steel as string | undefined;
+  const cement = materialBrands?.cement as string | undefined;
+  if (steel === 'Tata Tiscon' || steel === 'Tata Tiscon Fe 550D') brandMultiplier += 0.02;
+  else if (steel === 'JSW Neosteel') brandMultiplier += 0.01;
+  if (cement === 'UltraTech' || cement === 'UltraTech OPC 53') brandMultiplier += 0.015;
+  else if (cement === 'ACC Cement') brandMultiplier += 0.005;
 
-  const liftCost = liftRequired ? LIFT_COST[city][qualityTier] : 0;
+  const adjustedConstructionCost = Math.round(baseConstructionCost * brandMultiplier);
+
+  // Add-ons
+  const parkingCost = (parkingType === 'Stilt Parking' || parkingType === 'Stilt')
+    ? (carCount || 0) * (STILT_PARKING_COST_PER_CAR[resolvedCity] ?? 180000)
+    : (carCount || 0) * 60000;
+
+  const liftCost = liftRequired ? (LIFT_COST[resolvedCity]?.[resolvedTier] ?? 450000) : 0;
   const evCost   = evCharging   ? EV_CHARGING_COST : 0;
 
-  const constructionWithAddons = baseConstructionCost + parkingCost + liftCost + evCost;
+  const constructionWithAddons = adjustedConstructionCost + parkingCost + liftCost + evCost;
 
-  // Professional fees, margin, contingency
-  const professionalFees = Math.round(constructionWithAddons * PROFESSIONAL_FEES[qualityTier]);
-  const contractorMargin = Math.round(constructionWithAddons * CONTRACTOR_MARGIN[qualityTier]);
-  const contingency      = Math.round(constructionWithAddons * CONTINGENCY_RATE[qualityTier]);
+  // Professional fees, margin, contingency, GST
+  const professionalFees = Math.round(constructionWithAddons * (PROFESSIONAL_FEES[resolvedTier] ?? 0.05));
+  const contractorMargin = Math.round(constructionWithAddons * (CONTRACTOR_MARGIN[resolvedTier] ?? 0.10));
+  const contingency      = Math.round(constructionWithAddons * (CONTINGENCY_RATE[resolvedTier] ?? 0.05));
   const gstAmount        = Math.round((constructionWithAddons + professionalFees) * GST_RATE);
 
   const totalProjectCost = constructionWithAddons + professionalFees + contractorMargin + contingency + gstAmount;
-  const costPerSqFt      = Math.round(totalProjectCost / bua);
+  const costPerSqFt      = bua > 0 ? Math.round(totalProjectCost / bua) : 0;
 
   // Budget head breakdown
-  const alloc = BUDGET_ALLOCATION[qualityTier];
+  const alloc = BUDGET_ALLOCATION[resolvedTier] ?? BUDGET_ALLOCATION['Premium'];
   const headDefs = [
     { key: 'foundationStructure',    label: 'Foundation & Structure',  pct: alloc.foundationStructure },
     { key: 'masonry',                label: 'Masonry',                 pct: alloc.masonry },
@@ -54,7 +79,7 @@ export function calculateBudget(input: EngineInput, area: AreaResult): BudgetRes
     { key: 'contingencyGST',         label: 'Contingency & GST',       pct: alloc.contingencyGST },
   ];
 
-  const heads: BudgetHead[] = headDefs.map((h, idx) => ({
+  const heads: BudgetHead[] = headDefs.map((h) => ({
     id:              h.key,
     name:            h.label,
     percentage:      Math.round(h.pct * 100),
@@ -75,7 +100,7 @@ export function calculateBudget(input: EngineInput, area: AreaResult): BudgetRes
     professionalFees,
     contingency,
     gstAmount,
-    baseConstructionCost,
+    baseConstructionCost: adjustedConstructionCost,
     totalProjectCost,
     costPerSqFt,
   };

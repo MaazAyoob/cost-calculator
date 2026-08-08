@@ -78,7 +78,7 @@ export const OverviewTab: React.FC = () => {
           unit="Tonnes"
           icon={<Layers className="w-4 h-4" />}
           colorScheme="slate"
-          badge={input.materialBrands.steel.split(' ')[0]}
+          badge={input.materialBrands.steel ? input.materialBrands.steel.split(' ')[0] : 'TMT Steel'}
         />
         <MetricCard
           title="Cement Bags"
@@ -86,7 +86,7 @@ export const OverviewTab: React.FC = () => {
           unit="Bags"
           icon={<TrendingUp className="w-4 h-4" />}
           colorScheme="amber"
-          badge={input.materialBrands.cement.split(' ')[0]}
+          badge={input.materialBrands.cement ? input.materialBrands.cement.split(' ')[0] : 'PPC Cement'}
         />
       </motion.div>
 

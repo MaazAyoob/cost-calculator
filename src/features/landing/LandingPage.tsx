@@ -2,11 +2,10 @@ import React from 'react';
 import { HeroSection } from './sections/HeroSection';
 import { TrustStatsSection } from './sections/TrustStatsSection';
 import { WhyPlanningSection } from './sections/WhyPlanningSection';
-import { CostProblemsSection } from './sections/CostProblemsSection';
-import { BuniyadSolutionsSection } from './sections/BuniyadSolutionsSection';
+import { CalculatorSolutionsSection } from './sections/CalculatorSolutionsSection';
 import { InteractiveDemoSection } from './sections/InteractiveDemoSection';
-import { EngineeringStandardsSection } from './sections/EngineeringStandardsSection';
 import { FeatureShowcaseSection } from './sections/FeatureShowcaseSection';
+import { EngineeringStandardsSection } from './sections/EngineeringStandardsSection';
 import { PackagesSection } from './sections/PackagesSection';
 import { ProjectGallerySection } from './sections/ProjectGallerySection';
 import { TestimonialsSection } from './sections/TestimonialsSection';
@@ -16,46 +15,42 @@ import { FinalCtaSection } from './sections/FinalCtaSection';
 export const LandingPage: React.FC = () => {
   return (
     <div
-      className="w-full min-h-screen font-sans"
-      style={{ backgroundColor: 'var(--cc-bg)', color: 'var(--cc-text-primary)' }}
+      className="w-full min-h-screen font-sans bg-slate-50 text-slate-900"
     >
       {/* 1. Hero */}
       <HeroSection />
 
-      {/* 2. Trust Stats */}
+      {/* 2. Trust Stats / Credibility */}
       <TrustStatsSection />
 
-      {/* 3. Why Build Without Planning? */}
+      {/* 3. Why Planning Matters */}
       <WhyPlanningSection />
 
-      {/* 4. Construction Cost Problems */}
-      <CostProblemsSection />
+      {/* 4. How It Works */}
+      <CalculatorSolutionsSection />
 
-      {/* 5. How Cost Calculator Solves Them */}
-      <BuniyadSolutionsSection />
-
-      {/* 6. Interactive Calculator Demo */}
+      {/* 5. Interactive Calculator Preview */}
       <InteractiveDemoSection />
+
+      {/* 6. Features Showcase */}
+      <FeatureShowcaseSection />
 
       {/* 7. Engineering Standards */}
       <EngineeringStandardsSection />
 
-      {/* 8. Feature Showcase */}
-      <FeatureShowcaseSection />
-
-      {/* 9. Construction Packages */}
+      {/* 8. Construction Packages */}
       <PackagesSection />
 
-      {/* 10. Project Gallery */}
+      {/* 9. Project Gallery */}
       <ProjectGallerySection />
 
-      {/* 11. Testimonials */}
+      {/* 10. Testimonials */}
       <TestimonialsSection />
 
-      {/* 12. FAQ */}
+      {/* 11. FAQ */}
       <FaqSection />
 
-      {/* 13. Final CTA */}
+      {/* 12. Final CTA */}
       <FinalCtaSection />
     </div>
   );

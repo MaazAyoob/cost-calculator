@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layout, BarChart3, FileSpreadsheet, Calendar, FileCheck2, ArrowRight, CheckCircle2, Sparkles, Building2, ChevronRight } from 'lucide-react';
+import { Layout, BarChart3, FileSpreadsheet, Calendar, FileCheck2, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 
 export const InteractiveDemoSection: React.FC = () => {
@@ -22,10 +22,10 @@ export const InteractiveDemoSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" /> Interactive Product Experience
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black text-[var(--cc-text-primary)] tracking-tight">
+          <h2 className="heading-xl tracking-tight text-[var(--cc-text-primary)]">
             See the Flagship Engine in Action.
           </h2>
           <p className="text-[var(--cc-text-secondary)] text-base leading-relaxed">
@@ -42,8 +42,8 @@ export const InteractiveDemoSection: React.FC = () => {
                 key={t.id}
                 onClick={() => setActiveTab(t.id as any)}
                 className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  isSelected ? 'bg-[var(--cc-brand)] text-white shadow-lg shadow-teal-900/10 scale-105 border border-[var(--cc-brand)]/40'
-                    : 'bg-[var(--cc-surface)]/80 text-[var(--cc-text-secondary)] border border-[var(--cc-border)] hover:text-[var(--cc-text-primary)] hover:bg-[var(--cc-surface-muted)]'
+                  isSelected ? 'bg-[var(--cc-brand)] text-white shadow-soft-md border border-[var(--cc-brand)]'
+                    : 'bg-[var(--cc-surface)] text-[var(--cc-text-secondary)] border border-[var(--cc-border)] hover:text-[var(--cc-text-primary)] hover:bg-[var(--cc-surface-muted)]'
                 }`}
               >
                 {t.icon}
@@ -54,7 +54,7 @@ export const InteractiveDemoSection: React.FC = () => {
         </div>
 
         {/* Tab Showcase Card */}
-        <div className="rounded-3xl p-1 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 border border-[var(--cc-border)] shadow-2xl overflow-hidden">
+        <div className="rounded-3xl p-1 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 border border-[var(--cc-border)] shadow-soft-xl overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -62,35 +62,35 @@ export const InteractiveDemoSection: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3 }}
-              className="p-6 sm:p-10 bg-[var(--cc-bg)] rounded-[22px] text-left space-y-8"
+              className="p-6 sm:p-10 bg-[var(--cc-surface)] rounded-[22px] text-left space-y-8"
             >
               {activeTab === 'wizard' && (
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
                     <div>
                       <span className="text-xs font-bold text-[var(--cc-brand)] uppercase tracking-widest block">Step 08 of 10</span>
-                      <h3 className="text-xl font-bold text-[var(--cc-text-primary)]">Material Brand Selection Matrix</h3>
+                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">Material Brand Selection Matrix</h3>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-[var(--cc-brand)] text-white font-bold text-xs">
-                      Try Wizard â†’
+                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-[var(--cc-brand)] text-white font-bold text-xs cursor-pointer">
+                      Try Wizard →
                     </Button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-brand)]/50 space-y-2">
-                      <div className="text-xs font-bold text-[var(--cc-brand)] uppercase">Cement Grade</div>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)] space-y-2">
+                      <div className="text-xs font-bold text-blue-600 uppercase">Cement Grade</div>
                       <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">UltraTech Super PPC</div>
-                      <div className="text-[11px] text-[var(--cc-text-secondary)]">1,056 Bags • ₹390 / bag</div>
+                      <div className="text-[11px] text-[var(--cc-text-secondary)]">1,056 Bags &bull; ₹390 / bag</div>
                     </div>
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-indigo-500/50 space-y-2">
-                      <div className="text-xs font-bold text-indigo-400 uppercase">TMT Steel Grade</div>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)] space-y-2">
+                      <div className="text-xs font-bold text-indigo-600 uppercase">TMT Steel Grade</div>
                       <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">Tata Tiscon 550D Fe</div>
-                      <div className="text-[11px] text-[var(--cc-text-secondary)]">9.6 Metric Tons • ₹68,500 / Ton</div>
+                      <div className="text-[11px] text-[var(--cc-text-secondary)]">9.6 Metric Tons &bull; ₹78 / kg</div>
                     </div>
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-cyan-500/50 space-y-2">
-                      <div className="text-xs font-bold text-cyan-400 uppercase">Sanitaryware</div>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)] space-y-2">
+                      <div className="text-xs font-bold text-emerald-600 uppercase">Sanitaryware</div>
                       <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">Kohler / Grohe Premium</div>
-                      <div className="text-[11px] text-[var(--cc-text-secondary)]">CPVC Astral • Kohler Fittings</div>
+                      <div className="text-[11px] text-[var(--cc-text-secondary)]">CPVC Ashirwad &bull; Kohler Fittings</div>
                     </div>
                   </div>
                 </div>
@@ -101,29 +101,29 @@ export const InteractiveDemoSection: React.FC = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
                     <div>
                       <span className="text-xs font-bold text-[var(--cc-brand)] uppercase tracking-widest block">Real-time Financial Overview</span>
-                      <h3 className="text-xl font-bold text-[var(--cc-text-primary)]">Executive Project Summary Dashboard</h3>
+                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">Executive Project Summary Dashboard</h3>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/dashboard')} className="bg-emerald-600 text-[var(--cc-text-primary)] font-bold text-xs">
-                      Open Live Workspace â†’
+                    <Button size="sm" onClick={() => navigate('/dashboard')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
+                      Open Live Workspace →
                     </Button>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium">Estimated Project Cost</span>
-                      <span className="text-lg font-black text-[var(--cc-brand)]">₹68₹40₹000</span>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Estimated Cost</span>
+                      <span className="text-lg font-black text-blue-600">₹68.4 Lakhs</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium">Base Rate / Sq.Ft</span>
-                      <span className="text-lg font-black text-[var(--cc-text-primary)]">₹2₹850 / sq.ft</span>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Base Rate / Sq.Ft</span>
+                      <span className="text-lg font-black text-[var(--cc-text-primary)]">₹2,850 / sq.ft</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium">Total Built-up Area</span>
-                      <span className="text-lg font-black text-[var(--cc-text-primary)]">2₹400 sq.ft</span>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Built-up Area</span>
+                      <span className="text-lg font-black text-[var(--cc-text-primary)]">2,400 sq.ft</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium">Build Duration</span>
-                      <span className="text-lg font-black text-[var(--cc-brand)]">10 Months</span>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Build Duration</span>
+                      <span className="text-lg font-black text-emerald-600">10 Months</span>
                     </div>
                   </div>
                 </div>
@@ -133,26 +133,26 @@ export const InteractiveDemoSection: React.FC = () => {
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
                     <div>
-                      <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest block">IS Code Itemization</span>
-                      <h3 className="text-xl font-bold text-[var(--cc-text-primary)]">13 Construction Stages BOQ Matrix</h3>
+                      <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest block">IS Code Itemization</span>
+                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">13 Construction Stages BOQ Matrix</h3>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-[var(--cc-brand)] text-white font-bold text-xs">
-                      View Full BOQ â†’
+                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
+                      View Full BOQ →
                     </Button>
                   </div>
 
                   <div className="space-y-2 text-xs">
-                    <div className="flex justify-between p-3 rounded-lg bg-[var(--cc-surface)] border border-[var(--cc-border)] text-[var(--cc-text-secondary)] font-bold">
-                      <span>Stage 01: Excavation & Footing Concrete (M20)</span>
-                      <span className="text-[var(--cc-brand)]">₹4₹20₹000</span>
+                    <div className="flex justify-between p-3 rounded-lg bg-slate-50 border border-[var(--cc-border)] font-bold">
+                      <span className="text-slate-800">Stage 01: Excavation & Footing Concrete (M20)</span>
+                      <span className="text-blue-600 font-extrabold">₹4,20,000</span>
                     </div>
-                    <div className="flex justify-between p-3 rounded-lg bg-[var(--cc-surface)] border border-[var(--cc-border)] text-[var(--cc-text-secondary)] font-bold">
-                      <span>Stage 02: Plinth Beam & RCC Columns (Tata 550D)</span>
-                      <span className="text-[var(--cc-brand)]">₹8₹60₹000</span>
+                    <div className="flex justify-between p-3 rounded-lg bg-slate-50 border border-[var(--cc-border)] font-bold">
+                      <span className="text-slate-800">Stage 02: Plinth Beam & RCC Columns (Tata 550D)</span>
+                      <span className="text-blue-600 font-extrabold">₹8,60,000</span>
                     </div>
-                    <div className="flex justify-between p-3 rounded-lg bg-[var(--cc-surface)] border border-[var(--cc-border)] text-[var(--cc-text-secondary)] font-bold">
-                      <span>Stage 03: AAC Block Masonry & Lintels</span>
-                      <span className="text-[var(--cc-brand)]">₹5₹40₹000</span>
+                    <div className="flex justify-between p-3 rounded-lg bg-slate-50 border border-[var(--cc-border)] font-bold">
+                      <span className="text-slate-800">Stage 03: AAC Block Masonry & Lintels</span>
+                      <span className="text-blue-600 font-extrabold">₹5,40,000</span>
                     </div>
                   </div>
                 </div>
@@ -162,29 +162,29 @@ export const InteractiveDemoSection: React.FC = () => {
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
                     <div>
-                      <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest block">Milestone Roadmap</span>
-                      <h3 className="text-xl font-bold text-[var(--cc-text-primary)]">10-Month Milestone Schedule</h3>
+                      <span className="text-xs font-bold text-cyan-600 uppercase tracking-widest block">Milestone Roadmap</span>
+                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">10-Month Milestone Schedule</h3>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-cyan-600 text-[var(--cc-text-primary)] font-bold text-xs">
-                      Configure Timeline â†’
+                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
+                      Configure Timeline →
                     </Button>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3.5 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <div className="font-bold text-cyan-400">Month 1-2</div>
-                      <div className="text-[var(--cc-text-primary)] font-extrabold">Substructure & Foundation</div>
-                      <div className="text-[var(--cc-text-secondary)] text-[11px]">Advance 15% • Sump & Footing</div>
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <div className="font-bold text-cyan-600 uppercase text-[10px]">Month 1-2</div>
+                      <div className="text-[var(--cc-text-primary)] font-extrabold text-sm">Substructure & Foundation</div>
+                      <div className="text-[var(--cc-text-secondary)] text-[11px] mt-1">Advance 15% &bull; Sump & Footing</div>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <div className="font-bold text-cyan-400">Month 3-5</div>
-                      <div className="text-[var(--cc-text-primary)] font-extrabold">Superstructure Slabs</div>
-                      <div className="text-[var(--cc-text-secondary)] text-[11px]">Milestone 25% • G+1/G+2 Slabs</div>
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <div className="font-bold text-cyan-600 uppercase text-[10px]">Month 3-5</div>
+                      <div className="text-[var(--cc-text-primary)] font-extrabold text-sm">Superstructure Slabs</div>
+                      <div className="text-[var(--cc-text-secondary)] text-[11px] mt-1">Milestone 25% &bull; G+1/G+2 Slabs</div>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-[var(--cc-surface)] border border-[var(--cc-border)]">
-                      <div className="font-bold text-cyan-400">Month 6-10</div>
-                      <div className="text-[var(--cc-text-primary)] font-extrabold">Finishes & Handover</div>
-                      <div className="text-[var(--cc-text-secondary)] text-[11px]">Milestone 60% • Plaster & Paint</div>
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
+                      <div className="font-bold text-cyan-600 uppercase text-[10px]">Month 6-10</div>
+                      <div className="text-[var(--cc-text-primary)] font-extrabold text-sm">Finishes & Handover</div>
+                      <div className="text-[var(--cc-text-secondary)] text-[11px] mt-1">Milestone 60% &bull; Plaster & Paint</div>
                     </div>
                   </div>
                 </div>
@@ -194,23 +194,23 @@ export const InteractiveDemoSection: React.FC = () => {
                 <div className="space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
                     <div>
-                      <span className="text-xs font-bold text-[var(--cc-brand)] uppercase tracking-widest block">Loan Approval Ready</span>
-                      <h3 className="text-xl font-bold text-[var(--cc-text-primary)]">Bank Home Loan Certified Reports</h3>
+                      <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block">Loan Approval Ready</span>
+                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">Bank Home Loan Certified Reports</h3>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/reports')} className="bg-emerald-600 text-[var(--cc-text-primary)] font-bold text-xs">
-                      Export Sample PDF â†’
+                    <Button size="sm" onClick={() => navigate('/report')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
+                      Export Sample PDF →
                     </Button>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-[var(--cc-surface)] border border-[var(--cc-border)] flex items-center justify-between flex-wrap gap-4">
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-[var(--cc-border)] flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
-                      <FileCheck2 className="w-8 h-8 text-[var(--cc-brand)] shrink-0" />
+                      <FileCheck2 className="w-8 h-8 text-blue-600 shrink-0" />
                       <div>
                         <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">Bank_Disbursement_BOQ_Report.pdf</div>
-                        <div className="text-xs text-[var(--cc-text-secondary)]">SBI / HDFC / ICICI Certified Structural Format • 14 Pages</div>
+                        <div className="text-xs text-[var(--cc-text-secondary)]">SBI / HDFC / ICICI Certified Structural Format &bull; 22 Sections</div>
                       </div>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/reports')} className="bg-[var(--cc-brand)] text-white font-bold text-xs">
+                    <Button size="sm" onClick={() => navigate('/report')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
                       Download Sample PDF
                     </Button>
                   </div>
@@ -224,4 +224,3 @@ export const InteractiveDemoSection: React.FC = () => {
     </section>
   );
 };
-

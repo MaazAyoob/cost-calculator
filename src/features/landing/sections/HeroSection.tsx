@@ -3,22 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Sparkles, ShieldCheck, CheckCircle2, Calculator } from 'lucide-react';
 import { useTheme } from '../../../hooks/useTheme';
+import { useWizardStore } from '../../../store/useWizardStore';
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const bg         = isDark ? '#0F172A' : '#FAFAF8';
+  const bg         = isDark ? '#0F172A' : '#F9FAFB';
   const surface    = isDark ? '#1E293B' : '#FFFFFF';
-  const textPri    = isDark ? '#F8FAFC' : '#111827';
-  const textSec    = isDark ? '#94A3B8' : '#6B7280';
-  const border     = isDark ? '#1F2937' : '#E5E7EB';
-  const brand      = isDark ? '#14B8A6' : '#0F766E';
-  const brandLight = isDark ? '#134E4A' : '#CCFBF1';
+  const textPri    = isDark ? '#F8FAFC' : '#0F172A';
+  const textSec    = isDark ? '#94A3B8' : '#64748B';
+  const border     = isDark ? '#334155' : '#E2E8F0';
+  const brand      = isDark ? '#3B82F6' : '#2563EB';
+  const brandLight = isDark ? '#1E3A8A' : '#EFF6FF';
 
   const statItems = [
-    { value: '₹6.4L', label: 'Avg. savings per project' },
+    { value: '₹6.4 L', label: 'Avg. savings per project' },
     { value: '98.4%', label: 'Estimation accuracy' },
     { value: '13-Stage', label: 'BOQ breakdown depth' },
     { value: 'SBI / HDFC', label: 'Bank-approved format' },
@@ -55,7 +56,7 @@ export const HeroSection: React.FC = () => {
                 style={{ backgroundColor: brandLight, color: brand, borderColor: brand + '30' }}
               >
                 <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                Cost Calculator by Rightcon
+                BuildPlan AI by Rightcon
               </span>
               <span
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border"
@@ -67,43 +68,38 @@ export const HeroSection: React.FC = () => {
 
             {/* Headline */}
             <div className="space-y-4">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.07]" style={{ color: textPri }}>
-                Plan Your Dream Home{' '}
-                <span
-                  style={{
-                    background: 'linear-gradient(135deg, ' + brand + ' 0%, #C6A75E 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-slate-900">
+                Plan Your Home{' '}
+                <span className="text-blue-600">
                   Before You Build It.
                 </span>
               </h1>
-              <p className="text-lg sm:text-xl leading-relaxed max-w-2xl font-normal" style={{ color: textSec }}>
-                Estimate construction costs, explore material requirements, understand your timeline,
-                and make fully informed decisions before ground break.
+              <p className="text-base sm:text-lg leading-relaxed max-w-2xl text-slate-600 font-normal">
+                Estimate construction costs, materials, timelines and project requirements before construction begins.
               </p>
             </div>
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4">
               <button
-                onClick={() => navigate('/calculator')}
-                className="inline-flex items-center gap-2 text-[var(--cc-text-primary)] text-sm font-bold px-7 py-3.5 rounded-2xl transition-all hover:-translate-y-px"
-                style={{ backgroundColor: brand, boxShadow: '0 6px 20px ' + brand + '45' }}
+                onClick={() => {
+                  useWizardStore.getState().startNewProject();
+                  navigate('/calculator');
+                }}
+                className="inline-flex items-center gap-2 text-white text-sm font-extrabold px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 transition-all cursor-pointer shadow-soft-md"
               >
                 Start Free Estimate <ArrowRight className="w-4 h-4" />
               </button>
 
-              <a
-                href="#demo"
-                className="inline-flex items-center gap-2 text-sm font-semibold px-6 py-3.5 rounded-2xl border transition-all hover:-translate-y-px"
-                style={{ backgroundColor: surface, borderColor: border, color: textPri }}
+              <button
+                onClick={() => {
+                  document.querySelector('#how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="inline-flex items-center gap-2 text-sm font-bold px-6 py-3.5 rounded-2xl border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
               >
-                <Play className="w-4 h-4" style={{ color: brand, fill: brand }} />
-                Watch Interactive Demo
-              </a>
+                <Play className="w-4 h-4 text-blue-600 fill-blue-600" />
+                See How It Works
+              </button>
             </div>
 
             {/* Trust micro-stats */}
@@ -130,7 +126,7 @@ export const HeroSection: React.FC = () => {
           >
             {/* Outer gradient ring */}
             <div
-              className="rounded-3xl p-px"
+              className="rounded-3xl p-px shadow-soft-xl"
               style={{
                 background: isDark ? 'linear-gradient(135deg, #0F766E40, #C6A75E30, transparent)'
                   : 'linear-gradient(135deg, #0F766E25, #C6A75E20, #E5E7EB)',
@@ -138,7 +134,7 @@ export const HeroSection: React.FC = () => {
             >
               <div
                 className="rounded-[calc(24px-1px)] overflow-hidden"
-                style={{ backgroundColor: surface, boxShadow: isDark ? '0 24px 48px rgba(0, 0, 0, 0.50)' : '0 24px 48px rgba(17, 24, 39, 0.10)' }}
+                style={{ backgroundColor: surface }}
               >
                 {/* Header bar */}
                 <div
@@ -153,30 +149,30 @@ export const HeroSection: React.FC = () => {
                       <Calculator className="w-4 h-4" style={{ color: brand }} />
                     </div>
                     <div>
-                      <p className="text-xs font-bold" style={{ color: textPri }}>30 × 40 Luxury Duplex Villa</p>
-                      <p className="text-[10px] font-medium" style={{ color: textSec }}>Whitefield, Bangalore • G+2</p>
+                      <p className="text-xs font-extrabold" style={{ color: textPri }}>30 × 40 Luxury Duplex Villa</p>
+                      <p className="text-[10px] font-medium" style={{ color: textSec }}>Bangalore • BBMP Sanction • G+2</p>
                     </div>
                   </div>
                   <span
                     className="text-[10px] font-bold px-2.5 py-1 rounded-full border"
                     style={{ backgroundColor: isDark ? '#14532D' : '#DCFCE7', color: '#16A34A', borderColor: '#16A34A25' }}
                   >
-                    Live Estimate
+                    Live Preview
                   </span>
                 </div>
 
                 {/* Metric grid */}
                 <div className="p-6 grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Total Built-up Area', value: '2₹400 sq.ft', highlight: false },
-                    { label: 'Estimated Project Cost', value: '₹68₹40₹000', highlight: true },
-                    { label: 'Cement (UltraTech)', value: '1₹056 Bags', highlight: false },
-                    { label: 'TMT Steel (Tata 550D)', value: '9.6 MT', highlight: false },
+                    { label: 'Total Built-up Area', value: '2,400 sq.ft', highlight: false },
+                    { label: 'Estimated Project Cost', value: '₹68.4 Lakhs', highlight: true },
+                    { label: 'Cement (UltraTech)', value: '1,056 Bags', highlight: false },
+                    { label: 'TMT Steel (Tata 550D)', value: '9.6 Tonnes', highlight: false },
                   ].map(({ label, value, highlight }) => (
                     <div
                       key={label}
-                      className="p-3 rounded-2xl border"
-                      style={{ backgroundColor: isDark ? '#1E293B' : '#F4F4F0', borderColor: border }}
+                      className="p-3.5 rounded-2xl border"
+                      style={{ backgroundColor: isDark ? '#1E293B' : '#F8FAFC', borderColor: border }}
                     >
                       <p className="text-[10px] font-medium mb-1" style={{ color: textSec }}>{label}</p>
                       <p
@@ -190,13 +186,11 @@ export const HeroSection: React.FC = () => {
                 </div>
 
                 {/* Stat bar */}
-                <div
-                  className="px-6 pb-6 grid grid-cols-2 gap-3"
-                >
+                <div className="px-6 pb-6 grid grid-cols-2 gap-3">
                   {statItems.map(({ value, label }) => (
                     <div
                       key={label}
-                      className="text-center p-2 rounded-xl border"
+                      className="text-center p-2.5 rounded-xl border"
                       style={{ borderColor: border }}
                     >
                       <p className="text-sm font-black" style={{ color: brand }}>{value}</p>
@@ -216,7 +210,7 @@ export const HeroSection: React.FC = () => {
                   </span>
                   <button
                     onClick={() => navigate('/calculator')}
-                    className="text-xs font-bold hover:underline transition-colors"
+                    className="text-xs font-extrabold hover:underline transition-colors cursor-pointer"
                     style={{ color: brand }}
                   >
                     Configure Yours →
@@ -230,4 +224,3 @@ export const HeroSection: React.FC = () => {
     </section>
   );
 };
-

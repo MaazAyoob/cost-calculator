@@ -1,9 +1,20 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import {
+  ZoneFlooringSelection,
+  WallCladdingSelection,
+  DoorSelection,
+  WindowSelection,
+  ElectricalSelection,
+  BathroomFittingSelection,
+  PaintingSelection,
+} from '../calculation-engine/types';
 
 export type QualityTier = 'Essential' | 'Premium' | 'Luxury';
 export type CityLocation = 'Bangalore' | 'Mysore';
-export type AuthorityOption = 'BBMP' | 'BDA' | 'Gram Panchayat' | 'Future Ready';
-export type HouseType = 'Villa' | 'Duplex' | 'Triplex' | 'Rental' | 'Mixed Use';
+export type AuthorityOption = 'BBMP/BDA' | 'MUDA';
+export type HouseType = 'Duplex' | 'Triplex' | 'Rental Units' | 'Mixed Use';
+export type ParkingTypeOption = 'Stilt' | 'Normal Ground' | 'EV Charging Ready';
 
 export interface RoomCounts {
   bedrooms: number;
@@ -12,6 +23,7 @@ export interface RoomCounts {
   dining: number;
   living: number;
   balcony: number;
+  commonToilets: number;
   office: number;
   pooja: number;
   utility: number;
@@ -19,8 +31,8 @@ export interface RoomCounts {
 }
 
 export interface MaterialBrandSelection {
-  steel: string;
-  cement: string;
+  steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT';
+  cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat';
   doors: string;
   windows: string;
   flooring: string;
@@ -30,213 +42,334 @@ export interface MaterialBrandSelection {
 }
 
 export interface ConfiguratorState {
-  currentStep: number; // 1 to 10
+  // Session & Steps (00 = Splash, 01-11 = Steps)
+  sessionId: string;
+  currentStep: number;
   totalSteps: number;
+  hasStartedSelection: boolean;
 
-  // Step 1: Location
-  city: CityLocation;
-  
-  // Step 2: Authority
-  authority: AuthorityOption;
-
-  // Step 3: Plot
-  plotLength: number; // ft
-  plotWidth: number; // ft
-
-  // Step 4: House
-  houseType: HouseType;
-  floors: number; // 1 (Ground), 2 (G+1), 3 (G+2), 4 (G+3)
-
-  // Step 5: Parking & Tech
-  parkingType: 'Normal Parking' | 'Stilt Parking';
+  // Screen 01: Basic Project Info (Starts null/0)
+  city: CityLocation | null;
+  authority: AuthorityOption | null;
+  plotLength: number;
+  plotWidth: number;
+  floors: number;
+  houseType: HouseType | null;
+  parkingType: ParkingTypeOption | null;
   carCount: number;
   bikeCount: number;
   evCharging: boolean;
+
+  // Screen 02: Space Requirements (Starts 0/null)
+  rooms: RoomCounts;
   liftRequired: boolean;
 
-  // Step 6: Room Planning
-  rooms: RoomCounts;
-
-  // Step 7: Quality Tier
+  // Screen 03 to 10: Material & Finishing Selections (Starts null)
   qualityTier: QualityTier;
-
-  // Step 8: Material Brands
   materialBrands: MaterialBrandSelection;
+  flooringZones: ZoneFlooringSelection;
+  wallCladding: WallCladdingSelection;
+  doors: DoorSelection;
+  windows: WindowSelection;
+  electrical: ElectricalSelection;
+  bathroomFittings: BathroomFittingSelection;
+  painting: PaintingSelection;
 
-  // Computed Live Preview Metrics
+  // Computed Live Preview Metrics (Synced from engine)
   calculatedAreaSqFt: number;
   calculatedBuildableAreaSqFt: number;
   calculatedCostINR: number;
   calculatedSteelTonnes: number;
   calculatedCementBags: number;
 
-  // Actions
+  // Actions & Mutators
+  startNewProject: () => void;
+  startSelection: () => void;
   setStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
+
   setCity: (city: CityLocation) => void;
-  setAuthority: (authority: AuthorityOption) => void;
   setPlotDimensions: (length: number, width: number) => void;
   setHouseConfig: (type: HouseType, floors: number) => void;
-  setParkingConfig: (parkingType: 'Normal Parking' | 'Stilt Parking', cars: number, bikes: number, ev: boolean, lift: boolean) => void;
+  setParkingConfig: (parkingType: ParkingTypeOption, carCount: number, bikeCount: number, evCharging: boolean) => void;
   updateRoomCount: (room: keyof RoomCounts, delta: number) => void;
+  setLiftRequired: (required: boolean) => void;
+  setCoreMaterials: (steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT', cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat') => void;
+  setFlooringZone: (zone: keyof ZoneFlooringSelection, choice: any) => void;
+  setWallCladding: (kitchenDadoHeight: '2 ft' | '4 ft', bathroomTileHeight: '7 ft (Lintel)' | 'Full Height (Ceiling)') => void;
+  setDoorSelection: (category: keyof DoorSelection, choice: any) => void;
+  setWindowSelection: (primaryMaterial: 'uPVC' | 'Wood' | 'Aluminium', subGrade?: string) => void;
+  setElectricalSelection: (wireTier: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)') => void;
+  setBathroomFittingSelection: (sanitaryTier: any, cpvcBrand: any) => void;
+  setPaintingSelection: (internalPaint: any, externalPaint: any, brand: any) => void;
   setQualityTier: (tier: QualityTier) => void;
-  setMaterialBrand: (category: keyof MaterialBrandSelection, brand: string) => void;
-  recalculateMetrics: () => void;
+
   resetConfigurator: () => void;
 }
 
-const initialRooms: RoomCounts = {
-  bedrooms: 4,
-  bathrooms: 4,
-  kitchen: 1,
-  dining: 1,
-  living: 2,
-  balcony: 2,
-  office: 1,
-  pooja: 1,
-  utility: 1,
-  storeRoom: 1,
-};
+export function getFreshZeroState() {
+  return {
+    sessionId: 'sess_' + Math.random().toString(36).substring(2, 9),
+    currentStep: 1,
+    totalSteps: 11,
+    hasStartedSelection: false,
 
-const initialBrands: MaterialBrandSelection = {
-  steel: 'Tata Tiscon Fe 550D',
-  cement: 'UltraTech OPC 53',
-  doors: 'Teakwood Custom Joinery',
-  windows: 'Fenesta uPVC Double Glaze',
-  flooring: 'Italian Marble Statuario',
-  bathroom: 'Kohler Concealed Thermostatic',
-  electrical: 'Schneider Electric & Finolex',
-  paint: 'Asian Paints Royale Luxury',
-};
+    // Basic Info: completely unselected
+    city: null as any,
+    authority: null as any,
+    plotLength: 0,
+    plotWidth: 0,
+    floors: 0,
+    houseType: null as any,
+    parkingType: null as any,
+    carCount: 0,
+    bikeCount: 0,
+    evCharging: false,
 
-export const useWizardStore = create<ConfiguratorState>((set, get) => ({
-  currentStep: 1,
-  totalSteps: 10,
+    // Space Requirements: zeroed
+    rooms: {
+      bedrooms: 0,
+      bathrooms: 0,
+      kitchen: 0,
+      dining: 0,
+      living: 0,
+      balcony: 0,
+      commonToilets: 0,
+      office: 0,
+      pooja: 0,
+      utility: 0,
+      storeRoom: 0,
+    },
+    liftRequired: false,
 
-  city: 'Bangalore',
-  authority: 'BBMP',
-  plotLength: 60,
-  plotWidth: 40,
+    // Material Selections: completely unselected (null)
+    qualityTier: 'Premium' as QualityTier,
+    materialBrands: {
+      steel: null as any,
+      cement: null as any,
+      doors: null as any,
+      windows: null as any,
+      flooring: null as any,
+      bathroom: null as any,
+      electrical: null as any,
+      paint: null as any,
+    },
+    flooringZones: {
+      living: null as any,
+      kitchenDining: null as any,
+      bedrooms: null as any,
+      bathrooms: null as any,
+      parkingUtility: null as any,
+      balconies: null as any,
+    },
+    wallCladding: {
+      kitchenDadoHeight: null as any,
+      bathroomTileHeight: null as any,
+    },
+    doors: {
+      mainDoor: null as any,
+      internalDoor: null as any,
+      bathroomDoor: null as any,
+    },
+    windows: {
+      primaryMaterial: null as any,
+      subGrade: null as any,
+    },
+    electrical: {
+      conduit: 'Heavy-Duty ISI Marked PVC' as const,
+      wireTier: null as any,
+    },
+    bathroomFittings: {
+      sanitaryTier: null as any,
+      cpvcBrand: null as any,
+    },
+    painting: {
+      baseLayer: 'Putty + Primer' as const,
+      internalPaint: null as any,
+      externalPaint: null as any,
+      brand: null as any,
+    },
 
-  houseType: 'Duplex',
-  floors: 3, // G+2
+    // Computed metrics: 0
+    calculatedAreaSqFt: 0,
+    calculatedBuildableAreaSqFt: 0,
+    calculatedCostINR: 0,
+    calculatedSteelTonnes: 0,
+    calculatedCementBags: 0,
+  };
+}
 
-  parkingType: 'Stilt Parking',
-  carCount: 2,
-  bikeCount: 2,
-  evCharging: true,
-  liftRequired: true,
+export const useWizardStore = create<ConfiguratorState>()(
+  persist(
+    (set, get) => ({
+      ...getFreshZeroState(),
 
-  rooms: initialRooms,
-  qualityTier: 'Premium',
-  materialBrands: initialBrands,
-
-  calculatedAreaSqFt: 2400,
-  calculatedBuildableAreaSqFt: 3850,
-  calculatedCostINR: 9405000,
-  calculatedSteelTonnes: 18.5,
-  calculatedCementBags: 1450,
-
-  setStep: (step) => {
-    set({ currentStep: Math.min(Math.max(1, step), 10) });
-    get().recalculateMetrics();
-  },
-  nextStep: () => {
-    set((state) => ({ currentStep: Math.min(state.currentStep + 1, 10) }));
-    get().recalculateMetrics();
-  },
-  prevStep: () => {
-    set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) }));
-    get().recalculateMetrics();
-  },
-
-  setCity: (city) => {
-    set({ city });
-    get().recalculateMetrics();
-  },
-  setAuthority: (authority) => {
-    set({ authority });
-    get().recalculateMetrics();
-  },
-  setPlotDimensions: (length, width) => {
-    set({ plotLength: length, plotWidth: width });
-    get().recalculateMetrics();
-  },
-  setHouseConfig: (houseType, floors) => {
-    set({ houseType, floors });
-    get().recalculateMetrics();
-  },
-  setParkingConfig: (parkingType, carCount, bikeCount, evCharging, liftRequired) => {
-    set({ parkingType, carCount, bikeCount, evCharging, liftRequired });
-    get().recalculateMetrics();
-  },
-  updateRoomCount: (room, delta) => {
-    set((state) => ({
-      rooms: {
-        ...state.rooms,
-        [room]: Math.max(0, state.rooms[room] + delta),
+      startNewProject: () => {
+        try {
+          localStorage.removeItem('cost_calculator_wizard_state_v4');
+          localStorage.removeItem('buildplan_wizard_state');
+        } catch {}
+        set(getFreshZeroState());
       },
-    }));
-    get().recalculateMetrics();
-  },
-  setQualityTier: (qualityTier) => {
-    set({ qualityTier });
-    get().recalculateMetrics();
-  },
-  setMaterialBrand: (category, brand) => {
-    set((state) => ({
-      materialBrands: { ...state.materialBrands, [category]: brand },
-    }));
-    get().recalculateMetrics();
-  },
 
-  recalculateMetrics: () => {
-    // Update wizard preview metrics from the real calculation engine
-    const { plotLength, plotWidth, floors, qualityTier } = get();
-    const plotArea = plotLength * plotWidth;
-    const groundCoverage = plotArea * 0.60;
-    const builtUpArea = Math.round(groundCoverage * 0.92 * floors);
+      startSelection: () => {
+        set({ hasStartedSelection: true });
+      },
 
-    // Sync quick-preview fields from the engine (full sync via useCalculationStore)
-    // Import lazily to avoid circular dependency at module level
-    try {
-      const { useCalculationStore } = require('./useCalculationStore');
-      useCalculationStore.getState().recalculate();
-      const result = useCalculationStore.getState().result;
-      set({
-        calculatedAreaSqFt:            result.area.plotAreaSqFt,
-        calculatedBuildableAreaSqFt:   result.area.totalBUASqFt,
-        calculatedCostINR:             result.budget.totalProjectCost,
-        calculatedSteelTonnes:         result.quantities.steelTonnes,
-        calculatedCementBags:          result.quantities.cementBags,
-      });
-    } catch {
-      // Fallback quick estimate if store not yet available
-      const buaFallback = Math.round(plotArea * 0.60 * 0.92 * floors);
-      set({
-        calculatedAreaSqFt:            plotArea,
-        calculatedBuildableAreaSqFt:   buaFallback,
-        calculatedCostINR:             Math.round(buaFallback * (qualityTier === 'Luxury' ? 3400 : qualityTier === 'Premium' ? 2450 : 1750)),
-        calculatedSteelTonnes:         parseFloat(((buaFallback * 4.5) / 1000).toFixed(1)),
-        calculatedCementBags:          Math.round(buaFallback * 0.44),
-      });
+      setStep: (step) => {
+        set({ currentStep: Math.min(Math.max(0, step), 11) });
+        if (step > 0) set({ hasStartedSelection: true });
+      },
+      nextStep: () => {
+        set((state) => ({ currentStep: Math.min(state.currentStep + 1, 11), hasStartedSelection: true }));
+      },
+      prevStep: () => {
+        set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) }));
+      },
+
+      // Rule 1: Bangalore -> BBMP/BDA, Mysore -> MUDA
+      setCity: (city) => {
+        const authority: AuthorityOption = city === 'Bangalore' ? 'BBMP/BDA' : 'MUDA';
+        set({ city, authority, hasStartedSelection: true });
+      },
+
+      setPlotDimensions: (length, width) => {
+        const plotLength = Math.max(0, Math.min(200, length));
+        const plotWidth = Math.max(0, Math.min(200, width));
+        set({ plotLength, plotWidth, hasStartedSelection: true });
+      },
+
+      // Rule 2 & Rule 4 enforcement:
+      // Parking Stilt -> min floors = 2 (G+1)
+      // Floors >= 4 (G+3) -> Lift defaults to Yes
+      setHouseConfig: (houseType, floorsInput) => {
+        const { parkingType } = get();
+        let floors = floorsInput;
+        if (parkingType === 'Stilt' && floors < 2) {
+          floors = 2; // Min G+1 for stilt
+        }
+        const liftRequired = floors >= 4 ? true : get().liftRequired;
+        set({ houseType, floors, liftRequired, hasStartedSelection: true });
+      },
+
+      setParkingConfig: (parkingType, carCount, bikeCount, evCharging) => {
+        let floors = get().floors;
+        if (parkingType === 'Stilt' && (floors || 0) < 2) {
+          floors = 2; // Min G+1
+        }
+        set({ parkingType, carCount, bikeCount, evCharging, floors, hasStartedSelection: true });
+      },
+
+      updateRoomCount: (room, delta) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          rooms: {
+            ...state.rooms,
+            [room]: Math.max(0, state.rooms[room] + delta),
+          },
+        }));
+      },
+
+      setLiftRequired: (liftRequired) => {
+        set({ liftRequired, hasStartedSelection: true });
+      },
+
+      setCoreMaterials: (steel, cement) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          materialBrands: {
+            ...state.materialBrands,
+            steel,
+            cement,
+          },
+        }));
+      },
+
+      setFlooringZone: (zone, choice) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          flooringZones: {
+            ...state.flooringZones,
+            [zone]: choice,
+          },
+        }));
+      },
+
+      setWallCladding: (kitchenDadoHeight, bathroomTileHeight) => {
+        set({
+          hasStartedSelection: true,
+          wallCladding: { kitchenDadoHeight, bathroomTileHeight },
+        });
+      },
+
+      setDoorSelection: (category, choice) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          doors: {
+            ...state.doors,
+            [category]: choice,
+          },
+        }));
+      },
+
+      // Rule 3: Dynamic Window Sub-grades
+      setWindowSelection: (primaryMaterial, subGradeInput) => {
+        let subGrade = subGradeInput;
+        if (!subGrade) {
+          if (primaryMaterial === 'uPVC') subGrade = 'Standard uPVC';
+          else if (primaryMaterial === 'Wood') subGrade = 'Teak Wood Frame';
+          else subGrade = 'Anodized Aluminium';
+        }
+        set({
+          hasStartedSelection: true,
+          windows: { primaryMaterial, subGrade },
+        });
+      },
+
+      setElectricalSelection: (wireTier) => {
+        set({
+          hasStartedSelection: true,
+          electrical: { conduit: 'Heavy-Duty ISI Marked PVC' as const, wireTier },
+        });
+      },
+
+      setBathroomFittingSelection: (sanitaryTier, cpvcBrand) => {
+        set({
+          hasStartedSelection: true,
+          bathroomFittings: { sanitaryTier, cpvcBrand },
+        });
+      },
+
+      setPaintingSelection: (internalPaint, externalPaint, brand) => {
+        set({
+          hasStartedSelection: true,
+          painting: { baseLayer: 'Putty + Primer' as const, internalPaint, externalPaint, brand },
+        });
+      },
+
+      setQualityTier: (qualityTier) => {
+        set({ qualityTier, hasStartedSelection: true });
+      },
+
+      resetConfigurator: () => {
+        try {
+          localStorage.removeItem('cost_calculator_wizard_state_v4');
+          localStorage.removeItem('buildplan_wizard_state');
+        } catch {}
+        set(getFreshZeroState());
+      },
+    }),
+    {
+      name: 'cost_calculator_wizard_state_v4',
+      version: 4,
+      storage: createJSONStorage(() => localStorage),
+      migrate: (persistedState: any, version: number) => {
+        if (version < 4 || !persistedState || !persistedState.hasStartedSelection) {
+          return getFreshZeroState();
+        }
+        return persistedState;
+      },
     }
-  },
-
-  resetConfigurator: () => {
-    set({
-      currentStep: 1,
-      city: 'Bangalore',
-      authority: 'BBMP',
-      plotLength: 60,
-      plotWidth: 40,
-      houseType: 'Duplex',
-      floors: 3,
-      rooms: initialRooms,
-      qualityTier: 'Premium',
-      materialBrands: initialBrands,
-    });
-    get().recalculateMetrics();
-  },
-}));
+  )
+);

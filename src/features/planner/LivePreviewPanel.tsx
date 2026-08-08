@@ -1,112 +1,181 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWizardStore } from '../../store/useWizardStore';
-import { AnimatedCounter } from '../../components/common/AnimatedCounter';
-import { Card, CardContent } from '../../components/ui/Card';
-import { ProgressIndicator } from '../../components/common/ProgressIndicator';
-import { Building2, DollarSign, Layers, HardHat, Compass, Sparkles, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { useBudgetResult, useArea, useQuantities } from '../../store/useCalculationStore';
+import { Card } from '../../components/ui/Card';
+import { ArrowRight, X } from 'lucide-react';
+import { formatCurrency } from '../../utils/cn';
 
 export const LivePreviewPanel: React.FC = () => {
   const {
-    currentStep,
-    totalSteps,
-    city,
-    authority,
-    houseType,
-    floors,
-    qualityTier,
-    calculatedBuildableAreaSqFt,
-    calculatedCostINR,
-    calculatedSteelTonnes,
-    calculatedCementBags,
+    materialBrands,
+    flooringZones,
+    wallCladding,
+    doors,
+    windows,
+    electrical,
+    bathroomFittings,
+    painting,
   } = useWizardStore();
 
-  const progressPercentage = Math.round((currentStep / totalSteps) * 100);
+  const budget = useBudgetResult();
+  const area = useArea();
+  const quantities = useQuantities();
+
+  const [showBreakdownModal, setShowBreakdownModal] = useState(false);
+
+  // Count active selections made by user
+  let selectionCount = 0;
+  if (materialBrands?.steel) selectionCount++;
+  if (materialBrands?.cement) selectionCount++;
+  if (flooringZones?.living) selectionCount++;
+  if (flooringZones?.bedrooms) selectionCount++;
+  if (flooringZones?.bathrooms) selectionCount++;
+  if (wallCladding?.kitchenDadoHeight) selectionCount++;
+  if (doors?.mainDoor) selectionCount++;
+  if (windows?.primaryMaterial) selectionCount++;
+  if (electrical?.wireTier) selectionCount++;
+  if (bathroomFittings?.sanitaryTier) selectionCount++;
+  if (painting?.brand || painting?.internalPaint) selectionCount++;
+
+  const calculatedCostINR           = budget.totalProjectCost || 0;
+  const calculatedBuildableAreaSqFt = area.totalBUASqFt || 0;
+  const ratePerSqFt                 = budget.costPerSqFt || 0;
+
+  const isComplete = selectionCount >= 8;
+
+  // Status subtext message
+  let statusText = 'Select options to build your estimate';
+  if (isComplete) {
+    statusText = 'Estimate ready';
+  } else if (calculatedCostINR > 0 || selectionCount > 0) {
+    statusText = 'Updated from your selections';
+  }
 
   return (
-    <aside className="w-full lg:w-[380px] xl:w-[420px] bg-white border border-slate-200/80 rounded-2xl p-6 shadow-soft-md shrink-0 space-y-6 self-start sticky top-24">
-      {/* Header & Progress */}
-      <div className="space-y-3 pb-4 border-b border-slate-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-              <Compass className="w-4 h-4" />
+    <>
+      <div className="w-full max-w-4xl mx-auto my-3 sticky top-3 z-30 px-2 sm:px-0">
+        <Card className="p-4 sm:p-5 bg-white border border-slate-200 shadow-soft-md rounded-[20px] transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            
+            {/* Left Column: Primary Cost Metric */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">
+                Estimated Project Cost
+              </span>
+
+              <div className="flex items-baseline gap-2">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={calculatedCostINR}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight"
+                  >
+                    {calculatedCostINR > 0 ? (
+                      <span className="text-blue-600 font-black">{formatCurrency(calculatedCostINR)}</span>
+                    ) : (
+                      <span className="text-slate-900">₹0</span>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <span className="text-[11px] font-semibold text-slate-500 block">
+                {statusText}
+              </span>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Live Project Estimate</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Real-time Engineering Calculation</p>
+
+            {/* Right Column: Built-up Area & Rate Metrics + Action */}
+            <div className="flex flex-col items-start sm:items-end justify-between gap-2.5 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+              <div className="flex items-center gap-4 sm:gap-6 text-left sm:text-right">
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">
+                    Built-Up Area
+                  </span>
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-900">
+                    {calculatedBuildableAreaSqFt > 0 ? `${calculatedBuildableAreaSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+                  </span>
+                </div>
+
+                <div className="border-l border-slate-200 pl-4 sm:pl-6">
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">
+                    Rate
+                  </span>
+                  <span className="text-xs sm:text-sm font-extrabold text-blue-600">
+                    {ratePerSqFt > 0 ? `₹${ratePerSqFt.toLocaleString()} / sq.ft` : '₹0 / sq.ft'}
+                  </span>
+                </div>
+              </div>
+
+              {/* View breakdown text button */}
+              <button
+                type="button"
+                onClick={() => setShowBreakdownModal(true)}
+                className="text-xs font-extrabold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1 cursor-pointer pt-0.5"
+              >
+                View breakdown <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
+
           </div>
-          <span className="px-2.5 py-0.5 text-xs font-extrabold bg-blue-50 text-blue-700 rounded-full border border-blue-200/60">
-            {progressPercentage}% Complete
-          </span>
-        </div>
-        <ProgressIndicator value={progressPercentage} size="sm" color="bg-blue-600" />
+        </Card>
       </div>
 
-      {/* House Schematic Illustration */}
-      <div className="relative h-44 w-full bg-slate-900 rounded-xl overflow-hidden p-4 flex flex-col justify-between text-white border border-slate-800 shadow-soft-sm">
-        <div className="flex justify-between items-center z-10">
-          <span className="text-[10px] font-extrabold tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2 py-0.5 rounded uppercase">
-            {houseType} • G+{floors - 1}
-          </span>
-          <span className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> {qualityTier} Grade
-          </span>
-        </div>
+      {/* Detailed Breakdown Modal */}
+      {showBreakdownModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white rounded-3xl p-6 max-w-md w-full shadow-soft-2xl border border-slate-200 space-y-5"
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">Cost &amp; Quantity Summary</h3>
+                <p className="text-xs text-slate-500">Live configuration breakdown</p>
+              </div>
+              <button
+                onClick={() => setShowBreakdownModal(false)}
+                className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-        {/* Vector SVG Vector Architectural House Illustration */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
-          <svg viewBox="0 0 200 120" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 100 H180" stroke="#38BDF8" strokeWidth="2" />
-            <rect x="40" y="40" width="120" height="60" stroke="#38BDF8" strokeWidth="2" strokeDasharray="3 3" />
-            <polygon points="30,40 100,10 170,40" stroke="#38BDF8" strokeWidth="2" />
-            <line x1="100" y1="40" x2="100" y2="100" stroke="#38BDF8" strokeWidth="1" strokeDasharray="2 2" />
-          </svg>
-        </div>
+            <div className="space-y-3">
+              <div className="p-3 bg-slate-50 rounded-2xl flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-semibold">Active Selections</span>
+                <span className="font-extrabold text-blue-600">{selectionCount} configured</span>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-semibold">Steel Quantity</span>
+                <span className="font-extrabold text-slate-900">{quantities.steelTonnes} Tonnes</span>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-semibold">Cement Bags</span>
+                <span className="font-extrabold text-slate-900">{quantities.cementBags.toLocaleString()} Bags</span>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-semibold">Base Construction Rate</span>
+                <span className="font-extrabold text-blue-600">₹{ratePerSqFt.toLocaleString()} / sq.ft</span>
+              </div>
+            </div>
 
-        <div className="z-10 space-y-0.5">
-          <span className="text-[11px] text-slate-400 font-medium">{city} ({authority} Authority)</span>
-          <div className="text-2xl font-extrabold text-white tracking-tight">
-            <AnimatedCounter value={calculatedCostINR} isCurrency />
-          </div>
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setShowBreakdownModal(false)}
+                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-extrabold hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </div>
-
-      {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Built-Up Area</span>
-          <div className="text-base font-extrabold text-slate-900">
-            <AnimatedCounter value={calculatedBuildableAreaSqFt} /> <span className="text-xs font-medium text-slate-500">Sq Ft</span>
-          </div>
-        </div>
-
-        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Est. Steel</span>
-          <div className="text-base font-extrabold text-blue-600">
-            {calculatedSteelTonnes} <span className="text-xs font-medium text-slate-500">Tonnes</span>
-          </div>
-        </div>
-
-        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Est. Cement</span>
-          <div className="text-base font-extrabold text-slate-900">
-            <AnimatedCounter value={calculatedCementBags} /> <span className="text-xs font-medium text-slate-500">Bags</span>
-          </div>
-        </div>
-
-        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 space-y-1">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Quality Grade</span>
-          <div className="text-base font-extrabold text-emerald-600">{qualityTier}</div>
-        </div>
-      </div>
-
-      {/* Instant Impact Assurance */}
-      <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200/60 text-emerald-900 text-xs flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-        <span>Every choice updates your BOQ & budget in real time.</span>
-      </div>
-    </aside>
+      )}
+    </>
   );
 };

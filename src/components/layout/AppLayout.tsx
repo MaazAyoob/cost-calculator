@@ -33,9 +33,9 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans antialiased text-slate-900 selection:bg-blue-600 selection:text-white">
-      {/* Top Header */}
-      {isCalculatorRoute ? <WebsiteHeader /> : <TopNavigation />}
+    <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-sans antialiased text-slate-900 selection:bg-blue-600 selection:text-white">
+      {/* Top Header — only render TopNavigation for internal app routes, calculator wizard manages its own minimalist header */}
+      {!isCalculatorRoute && <TopNavigation />}
 
       <div className="flex-1 flex relative overflow-hidden">
         {/* Left Sidebar — hidden on calculator wizard routes */}
@@ -44,12 +44,12 @@ export const AppLayout: React.FC = () => {
         {/* Main Workspace */}
         <main
           className={cn(
-            'flex-1 transition-all duration-300 min-w-0 pb-20 lg:pb-10 pt-6 px-4 lg:px-8',
+            'flex-1 transition-all duration-300 min-w-0 pb-20 lg:pb-10',
             isCalculatorRoute
-              ? 'lg:ml-0' // full width for wizard
+              ? 'lg:ml-0 pt-0 px-0 sm:px-4' // full width flush for calculator
               : isSidebarCollapsed
-              ? 'lg:ml-16'
-              : 'lg:ml-64'
+              ? 'lg:ml-16 pt-6 px-4 lg:px-8'
+              : 'lg:ml-64 pt-6 px-4 lg:px-8'
           )}
         >
           <div className={cn('mx-auto', isCalculatorRoute ? 'max-w-[1440px]' : 'max-w-7xl')}>

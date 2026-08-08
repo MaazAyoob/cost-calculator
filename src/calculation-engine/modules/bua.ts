@@ -11,12 +11,22 @@ import {
 } from '../data/coefficients';
 
 export function calculateArea(input: EngineInput): AreaResult {
-  const { plotLength, plotWidth, floors, parkingType, carCount } = input;
+  const rawLength = input.plotLength || 0;
+  const rawWidth  = input.plotWidth || 0;
+  const rawFloors = input.floors || 0;
 
-  const plotAreaSqFt = plotLength * plotWidth;
+  // Actual plot area entered by user
+  const plotAreaSqFt = rawLength * rawWidth;
+
+  // Use fallback reference plot (40x30, 2 floors = 1,325 sq ft) for rate calculation if dimensions not entered yet
+  const length = rawLength > 0 ? rawLength : 40;
+  const width  = rawWidth > 0 ? rawWidth : 30;
+  const floors = rawFloors > 0 ? rawFloors : 2;
+
+  const calcPlotArea = length * width;
 
   // BBMP: Ground coverage max 60% of plot area
-  const buildableAreaSqFt = Math.round(plotAreaSqFt * COVERAGE_FACTOR);
+  const buildableAreaSqFt = Math.round(calcPlotArea * COVERAGE_FACTOR);
 
   // Usable floor plate per storey
   const buaPerFloorSqFt = Math.round(buildableAreaSqFt * FLOOR_EFFICIENCY);
@@ -28,8 +38,8 @@ export function calculateArea(input: EngineInput): AreaResult {
   const superBUASqFt = Math.round(totalBUASqFt * SUPER_BUA_FACTOR);
 
   // Parking area
-  const sqFtPerCar = parkingType === 'Stilt Parking' ? 180 : 120;
-  const parkingAreaSqFt = Math.round(carCount * sqFtPerCar + (input.bikeCount * 35));
+  const sqFtPerCar = input.parkingType === 'Stilt Parking' || input.parkingType === 'Stilt' ? 180 : 120;
+  const parkingAreaSqFt = Math.round((input.carCount || 0) * sqFtPerCar + ((input.bikeCount || 0) * 35));
 
   // Terrace (top slab exposed area)
   const terraceSqFt = buildableAreaSqFt;
