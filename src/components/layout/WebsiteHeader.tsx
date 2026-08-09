@@ -62,16 +62,16 @@ export const WebsiteHeader: React.FC = () => {
           onClick={() => navigate('/')}
           className="flex items-center gap-3 cursor-pointer group shrink-0"
           role="link"
-          aria-label="BuildPlan AI by Rightcon — Home"
+          aria-label="Cost Calculator by Rightcon — Home"
         >
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-soft-xs">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm">
             <Building2 className="w-5 h-5" />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="font-black tracking-tight text-slate-900 text-base">
-              BuildPlan AI
+            <span className="font-bold tracking-tight text-slate-900 text-base">
+              Cost Calculator
             </span>
-            <span className="text-[10px] font-extrabold tracking-wider text-slate-500 mt-0.5 uppercase">
+            <span className="text-[10px] font-semibold tracking-wider text-slate-500 mt-0.5 uppercase">
               by Rightcon
             </span>
           </div>

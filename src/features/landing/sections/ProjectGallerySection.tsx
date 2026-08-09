@@ -1,127 +1,85 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { MapPin, Building2, ArrowRight } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
 
 export const ProjectGallerySection: React.FC = () => {
   const navigate = useNavigate();
 
   const projects = [
     {
-      title: 'The Whitefield Sanctuary',
-      location: 'Whitefield, Bangalore',
-      plot: '30 × 40 Plot',
-      area: '2,400 sq.ft Built-up',
-      floors: 'G+2 Duplex Villa',
-      cost: '₹68.4L Total Build Cost',
-      tier: 'Premium Tier',
-      status: 'Completed',
+      name: 'WHITEFIELD',
+      type: 'Modern Duplex Villa',
+      area: '3,800 sq.ft',
+      cost: '₹88.5L',
     },
     {
-      title: 'Indiranagar Urban Residence',
-      location: 'Indiranagar 100ft Road, Bangalore',
-      plot: '40 × 60 Plot',
-      area: '4,200 sq.ft Built-up',
-      floors: 'G+3 Modern Residence',
-      cost: '₹1.20 Cr Total Build Cost',
-      tier: 'Luxury Tier',
-      status: 'Completed',
+      name: 'INDIRANAGAR',
+      type: 'Urban Residence',
+      area: '4,200 sq.ft',
+      cost: '₹1.20 Cr',
     },
     {
-      title: 'HSR Skylight Duplex',
-      location: 'HSR Layout Sector 3, Bangalore',
-      plot: '30 × 50 Plot',
-      area: '3,050 sq.ft Built-up',
-      floors: 'G+2 Family Villa',
-      cost: '₹89.7L Total Build Cost',
-      tier: 'Premium Tier',
-      status: 'Completed',
+      name: 'HSR LAYOUT',
+      type: 'Skylight Family Home',
+      area: '3,050 sq.ft',
+      cost: '₹89.7L',
     },
     {
-      title: 'Hebbal Lakeview Manor',
-      location: 'Hebbal Near Manyata, Bangalore',
-      plot: '50 × 80 Plot',
-      area: '6,400 sq.ft Built-up',
-      floors: 'G+3 Architectural Build',
-      cost: '₹2.30 Cr Total Build Cost',
-      tier: 'Luxury Tier',
-      status: 'In Progress',
+      name: 'HEBBAL',
+      type: 'Architectural Manor',
+      area: '6,400 sq.ft',
+      cost: '₹2.30 Cr',
     },
   ];
 
   return (
-    <section id="projects" className="bg-[var(--cc-bg)] py-20 border-b border-[var(--cc-border)] relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="projects" className="py-24 bg-slate-50 border-b border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-          <div className="space-y-4 max-w-2xl text-left">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
-              <Building2 className="w-3.5 h-3.5" /> Project Portfolio
+        {/* Section Heading */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="max-w-2xl space-y-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+              Architectural Portfolio
             </span>
-            <h2 className="heading-xl tracking-tight text-[var(--cc-text-primary)]">
-              Engineered Homes Built with Cost Calculator.
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+              Homes Planned with Cost Calculator.
             </h2>
-            <p className="text-[var(--cc-text-secondary)] text-base leading-relaxed font-medium">
-              Explore completed and ongoing homes across Bangalore engineered with our 13-stage BOQ matrix.
+            <p className="text-base text-slate-600 leading-relaxed font-normal">
+              Real residential projects engineered with line-item precision before construction.
             </p>
           </div>
 
-          <Button
-            size="lg"
+          <button
             onClick={() => navigate('/calculator')}
-            rightIcon={<ArrowRight className="w-4 h-4 text-white" />}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shrink-0 cursor-pointer shadow-soft-md"
+            className="inline-flex items-center gap-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-900 text-sm font-semibold px-5 py-3 rounded-xl transition-all shrink-0 cursor-pointer"
           >
-            Estimate Your Project
-          </Button>
+            Start Your Project <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {projects.map((proj, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="p-7 rounded-3xl bg-[var(--cc-surface)] border border-[var(--cc-border)] shadow-soft-sm hover:shadow-soft-md transition-all space-y-5 text-left group"
-            >
-              <div className="flex items-center justify-between">
-                <span className={`px-3 py-1 text-xs font-extrabold rounded-full ${
-                  proj.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : 'bg-blue-50 text-blue-700 border border-blue-200'
-                }`}>
-                  {proj.status}
+        {/* Portfolio Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {projects.map((proj) => (
+            <div key={proj.name} className="bg-white rounded-2xl p-8 border border-slate-200 space-y-4 hover:border-slate-300 transition-all">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <span className="text-xs font-bold text-blue-600 tracking-wider">
+                  {proj.name}
                 </span>
-                <span className="text-xs font-bold text-[var(--cc-text-secondary)] bg-slate-100 px-3 py-1 rounded-full border border-[var(--cc-border)]">
-                  {proj.tier}
+                <span className="text-xs font-medium text-slate-500">
+                  {proj.area}
                 </span>
               </div>
 
-              <div>
-                <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)] group-hover:text-blue-600 transition-colors">
-                  {proj.title}
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-slate-900">
+                  {proj.type}
                 </h3>
-                <div className="flex items-center gap-1.5 text-xs text-[var(--cc-text-secondary)] mt-1">
-                  <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                  <span>{proj.location}</span>
-                </div>
+                <p className="text-sm font-semibold text-slate-700">
+                  Total Estimated Cost: {proj.cost}
+                </p>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                  <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Plot & Built-up</span>
-                  <span className="text-xs font-bold text-[var(--cc-text-primary)]">{proj.plot} &bull; {proj.area}</span>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                  <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Structure & Cost</span>
-                  <span className="text-xs font-bold text-blue-600">{proj.floors} &bull; {proj.cost}</span>
-                </div>
-              </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 

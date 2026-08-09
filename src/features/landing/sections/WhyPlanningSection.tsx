@@ -1,104 +1,122 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ShieldAlert, CheckCircle2, XCircle, TrendingDown, DollarSign, Clock, AlertTriangle, Lightbulb } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 
 export const WhyPlanningSection: React.FC = () => {
   return (
-    <section id="why-planning" className="bg-[var(--cc-bg)] py-20 border-b border-[var(--cc-border)] relative">
+    <section id="why-planning" className="py-24 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider">
-            <Lightbulb className="w-3.5 h-3.5" /> Homeowner Empowerment
+        {/* Section Heading */}
+        <div className="max-w-3xl mb-16 space-y-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+            Why Planning Matters
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black text-[var(--cc-text-primary)] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
             Why Build Without Planning is a Risk You Shouldn't Take.
           </h2>
-          <p className="text-[var(--cc-text-secondary)] text-base leading-relaxed">
+          <p className="text-base text-slate-600 leading-relaxed">
             In India, 78% of home construction projects suffer from 20% to 45% budget overruns due to inaccurate initial estimates, hidden contractor markups, and uncalculated material waste.
           </p>
         </div>
 
-        {/* Comparison Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+        {/* 2-Column Comparison Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           
-          {/* Unplanned Construction (The Risk) */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="p-8 rounded-3xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/40 space-y-6 relative overflow-hidden"
-          >
-            <div className="flex items-center gap-3 border-b border-rose-200/60 dark:border-rose-900/30 pb-4">
-              <div className="p-3 rounded-2xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-200/50 dark:border-rose-800/40">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-rose-950 dark:text-rose-200">Traditional Unplanned Building</h3>
-                <p className="text-xs text-rose-700 dark:text-rose-400 font-medium">Relying solely on informal contractor lump-sum quotes</p>
-              </div>
+          {/* Left: Building Without Planning */}
+          <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 space-y-6">
+            <div className="pb-4 border-b border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900">Building Without Planning</h3>
+              <p className="text-xs text-slate-500 mt-1">Relying on informal lump-sum estimates</p>
             </div>
 
-            <ul className="space-y-4 text-xs sm:text-sm text-slate-750 dark:text-[var(--cc-text-secondary)]">
+            <ul className="space-y-4 text-sm text-slate-700">
               <li className="flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
-                <span><strong className="text-rose-900 dark:text-rose-200">Surprise Cost Overruns:</strong> Lump-sum rates jump by ₹400-₹700/sq.ft halfway through the build when structural extras arise.</span>
+                <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <X className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Budget Uncertainty</strong>
+                  Initial quotes jump by 20-40% halfway through ground construction.
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
-                <span><strong className="text-rose-900 dark:text-rose-200">Unverified Material Tiers:</strong> Contractors swap premium steel & cement grades for non-certified regional brands without notice.</span>
+                <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <X className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Material Waste & Substitution</strong>
+                  Unspecified structural grades lead to unaccounted steel and cement waste.
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
-                <span><strong className="text-rose-900 dark:text-rose-200">Loan Approval Friction:</strong> Banks reject informal handwritten contractor estimates during home loan disbursement audits.</span>
+                <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <X className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Unexpected Scope Changes</strong>
+                  No written line-item BOQ for room dimensions, structural slabs, or finishes.
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
-                <span><strong className="text-rose-900 dark:text-rose-200">Undefined Milestones:</strong> Paying large upfront advances without stage-wise physical verification checkpoints.</span>
+                <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <X className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Payment Surprises</strong>
+                  Disbursing large upfront advances without tied construction milestones.
+                </div>
               </li>
             </ul>
-          </motion.div>
+          </div>
 
-          {/* Cost Calculator-Planned Building (The Solution) */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="p-8 rounded-3xl bg-teal-50/50 dark:bg-teal-950/20 border border-teal-200/80 dark:border-teal-900/40 space-y-6 relative overflow-hidden shadow-xl"
-          >
-            <div className="flex items-center gap-3 border-b border-teal-200/60 dark:border-teal-900/30 pb-4">
-              <div className="p-3 rounded-2xl bg-teal-100/80 dark:bg-[var(--cc-brand)]/20 text-[var(--cc-brand)] border border-teal-200/50 dark:border-[var(--cc-brand)]/30">
-                <ShieldAlert className="w-6 h-6 text-[var(--cc-brand)]" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-teal-950 dark:text-[var(--cc-text-primary)]">Cost Calculator Engineered Planning</h3>
-                <p className="text-xs text-teal-700 dark:text-[var(--cc-brand)] font-bold">IS 456 compliant pre-construction calculation matrix</p>
-              </div>
+          {/* Right: Building With Cost Calculator */}
+          <div className="bg-blue-50/50 rounded-2xl p-8 border border-blue-200/80 space-y-6">
+            <div className="pb-4 border-b border-blue-200">
+              <h3 className="text-xl font-bold text-slate-900">Building with Cost Calculator</h3>
+              <p className="text-xs text-blue-700 font-medium mt-1">IS 456 engineered calculation matrix</p>
             </div>
 
-            <ul className="space-y-4 text-xs sm:text-sm text-slate-750 dark:text-[var(--cc-text-primary)]">
+            <ul className="space-y-4 text-sm text-slate-800">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-[var(--cc-brand)] shrink-0 mt-0.5" />
-                <span><strong className="text-teal-900 dark:text-[var(--cc-text-primary)]">100% Itemized BOQ:</strong> Know exact bags of UltraTech cement, tons of Tata steel, and AAC block units needed for all 13 stages.</span>
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Clear & Accurate Estimate</strong>
+                  Instant live cost calculations based on exact plot geometry and floor count.
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-[var(--cc-brand)] shrink-0 mt-0.5" />
-                <span><strong className="text-teal-900 dark:text-[var(--cc-text-primary)]">Material Brand Transparency:</strong> Compare Standard, Premium, and Luxury brand matrices (Kohler, Asian Paints, Grohe) in real time.</span>
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Precise Material Planning</strong>
+                  Calculates exact bags of cement, tonnes of TMT steel, and flooring units needed.
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-[var(--cc-brand)] shrink-0 mt-0.5" />
-                <span><strong className="text-teal-900 dark:text-[var(--cc-text-primary)]">Bank-Ready BOQ Reports:</strong> Instant downloadable PDF reports compliant with SBI, HDFC, and ICICI home loan disbursement standards.</span>
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Itemized BOQ & Specifications</strong>
+                  Complete breakdown across structural, finishing, electrical, and plumbing trades.
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-[var(--cc-brand)] shrink-0 mt-0.5" />
-                <span><strong className="text-teal-900 dark:text-[var(--cc-text-primary)]">Stage-Linked Payment Schedule:</strong> 6-milestone payment roadmap tying payments strictly to verified construction completion.</span>
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3.5 h-3.5" />
+                </span>
+                <div>
+                  <strong className="font-semibold text-slate-900 block">Milestone Payment Roadmap</strong>
+                  Structured 6-stage disbursement plan aligned with bank loan standards.
+                </div>
               </li>
             </ul>
-          </motion.div>
+          </div>
 
         </div>
-
       </div>
     </section>
   );

@@ -23,9 +23,13 @@ import { Step10LoadingExperience } from './steps/Step10LoadingExperience';
 import { ArrowLeft, ArrowRight, Save, Sparkles, Check, ChevronLeft, RotateCcw } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
+import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsModal';
+import { useState } from 'react';
+
 export const PlannerPage: React.FC = () => {
   const { currentStep, totalSteps, nextStep, prevStep, setStep, startNewProject } = useWizardStore();
   const { addToast } = useUIStore();
+  const [showSavedModal, setShowSavedModal] = useState(false);
 
   const handleSaveProgress = () => {
     addToast({
@@ -54,7 +58,7 @@ export const PlannerPage: React.FC = () => {
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-sm font-extrabold text-slate-900 leading-tight">BuildPlan AI</h1>
+                <h1 className="text-sm font-bold text-slate-900 leading-tight">Cost Calculator</h1>
                 <p className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">by Rightcon</p>
               </div>
             </div>
@@ -70,11 +74,11 @@ export const PlannerPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleSaveProgress}
+                onClick={() => setShowSavedModal(true)}
                 className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>Save</span>
+                <span>Save Projects</span>
               </button>
 
               <button
@@ -166,6 +170,12 @@ export const PlannerPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Saved Estimations Modal */}
+      <SavedEstimationsModal
+        isOpen={showSavedModal}
+        onClose={() => setShowSavedModal(false)}
+      />
     </motion.div>
   );
 };

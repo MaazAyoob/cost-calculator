@@ -1,251 +1,236 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { containerStaggerVariant, itemFadeUpVariant } from '../../animations/variants';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProjectStore } from '../../store/useProjectStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { CONSTRUCTION_STAGES } from '../../constants/constructionStages';
-import { MetricCard } from './MetricCard';
-import { ChartContainer } from '../charts/ChartContainer';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { ProgressIndicator } from '../common/ProgressIndicator';
-import { StatusBadge } from '../common/StatusBadge';
 import { formatCurrency } from '../../utils/cn';
-import {
-  DollarSign,
-  Building2,
-  Calendar,
-  ShieldCheck,
-  Layers,
-  Droplet,
-  Zap,
-  TrendingUp,
-} from 'lucide-react';
+import { ArrowRight, Sliders, FolderOpen } from 'lucide-react';
+import { WhatIfComparisonModal } from '../modals/WhatIfComparisonModal';
+import { SavedEstimationsModal } from '../modals/SavedEstimationsModal';
 
 export const OverviewTab: React.FC = () => {
+  const navigate = useNavigate();
   const { project } = useProjectStore();
   const { result } = useCalculationStore();
-  const { budget, area, quantities, timeline, paymentPlan, input } = result;
+  const { budget, area, quantities, timeline, paymentPlan } = result;
 
-  const completedStages = CONSTRUCTION_STAGES.filter((s) => s.status === 'Completed').length;
-  const inProgressStages = CONSTRUCTION_STAGES.filter((s) => s.status === 'In Progress').length;
-  const overallProgress = Math.round((completedStages / 13) * 100);
+  const [showWhatIfModal, setShowWhatIfModal] = useState(false);
+  const [showSavedModal, setShowSavedModal] = useState(false);
 
-  const chartData = budget.heads.map((h) => ({
-    name: h.name,
-    value: h.allocatedAmount,
-  }));
+  const totalCost = budget.totalProjectCost || 0;
+  const buaSqFt = area.totalBUASqFt || 0;
+  const ratePerSqFt = budget.costPerSqFt || 0;
 
-  const stageTimelineColors: Record<string, string> = {
-    Completed: 'bg-emerald-500',
-    'In Progress': 'bg-blue-500',
-    Pending: 'bg-slate-200',
-  };
-
-  const stageStatusColor: Record<string, 'success' | 'warning' | 'neutral'> = {
-    Completed: 'success',
-    'In Progress': 'warning',
-    Pending: 'neutral',
-  };
+  // Top 5 BOQ items preview
+  const topBoqItems = [
+    { name: 'TMT Steel (Fe 550D)', quantity: `${quantities.steelTonnes} Tonnes`, cost: budget.heads.find(h => h.id === 'steel')?.allocatedAmount || 0 },
+    { name: 'Cement (UltraTech/PPC)', quantity: `${quantities.cementBags.toLocaleString()} Bags`, cost: budget.heads.find(h => h.id === 'cement')?.allocatedAmount || 0 },
+    { name: 'AAC Masonry Blocks', quantity: 'Line Item', cost: budget.heads.find(h => h.id === 'masonry')?.allocatedAmount || 0 },
+    { name: 'Flooring & Tiling', quantity: 'Zone Configured', cost: budget.heads.find(h => h.id === 'finishing')?.allocatedAmount || 0 },
+    { name: 'Electrical & Plumbing', quantity: 'FRLS & CPVC', cost: (budget.heads.find(h => h.id === 'electrical')?.allocatedAmount || 0) + (budget.heads.find(h => h.id === 'plumbing')?.allocatedAmount || 0) },
+  ];
 
   return (
-    <motion.div
-      variants={containerStaggerVariant}
-      initial="hidden"
-      animate="show"
-      className="p-4 lg:p-6 space-y-6"
-    >
-      {/* ── Metric Cards Grid ── */}
-      <motion.div variants={itemFadeUpVariant} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <MetricCard
-          title="Total Est. Cost"
-          value={budget.totalProjectCost}
-          isCurrency
-          icon={<DollarSign className="w-4 h-4" />}
-          colorScheme="blue"
-          trend={{ value: 'IS Code Calc', isPositive: true }}
-        />
-        <MetricCard
-          title="Built-up Area"
-          value={area.totalBUASqFt}
-          unit="Sq Ft"
-          icon={<Building2 className="w-4 h-4" />}
-          colorScheme="emerald"
-          subtitle={`Plot: ${area.plotAreaSqFt} Sq Ft`}
-        />
-        <MetricCard
-          title="Steel Quantity"
-          value={quantities.steelTonnes}
-          unit="Tonnes"
-          icon={<Layers className="w-4 h-4" />}
-          colorScheme="slate"
-          badge={input.materialBrands.steel ? input.materialBrands.steel.split(' ')[0] : 'TMT Steel'}
-        />
-        <MetricCard
-          title="Cement Bags"
-          value={quantities.cementBags}
-          unit="Bags"
-          icon={<TrendingUp className="w-4 h-4" />}
-          colorScheme="amber"
-          badge={input.materialBrands.cement ? input.materialBrands.cement.split(' ')[0] : 'PPC Cement'}
-        />
-      </motion.div>
-
-      <motion.div variants={itemFadeUpVariant} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <MetricCard
-          title="Build Timeline"
-          value={timeline.totalMonths}
-          unit="Months"
-          icon={<Calendar className="w-4 h-4" />}
-          colorScheme="indigo"
-          subtitle={`${timeline.constructionStartDate} - ${timeline.estimatedHandoverDate}`}
-        />
-        <MetricCard
-          title="Plumbing Pipe"
-          value={quantities.cpvcSupplyMetres + quantities.swrDrainMetres}
-          unit="Metres"
-          icon={<Droplet className="w-4 h-4" />}
-          colorScheme="blue"
-          subtitle="CPVC + SWR total"
-        />
-        <MetricCard
-          title="Electrical Wire"
-          value={quantities.electricalWireMetres}
-          unit="Metres"
-          icon={<Zap className="w-4 h-4" />}
-          colorScheme="amber"
-          badge="FRLS Copper"
-        />
-        <MetricCard
-          title="Cost per Sq Ft"
-          value={budget.costPerSqFt}
-          unit="₹ / Sq Ft"
-          icon={<ShieldCheck className="w-4 h-4" />}
-          colorScheme="emerald"
-          badge={input.qualityTier}
-        />
-      </motion.div>
-
-      {/* ── Charts + Stage Timeline Row ── */}
-      <motion.div variants={itemFadeUpVariant} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Budget Donut */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Budget Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer type="donut" data={chartData} height={240} />
-            <div className="mt-4 space-y-2">
-              {budget.heads.map((cat) => (
-                <div key={cat.id} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                    <span className="text-slate-700 font-medium">{cat.name}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-slate-500">{cat.percentage}%</span>
-                    <span className="font-bold text-slate-900">{formatCurrency(cat.allocatedAmount)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Stage Timeline Card */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Construction Stage Progress</CardTitle>
-              <div className="flex items-center gap-3 text-xs font-semibold text-slate-500">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" />{completedStages} Done</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" />{inProgressStages} Active</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-300" />{13 - completedStages - inProgressStages} Pending</span>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-2.5">
-            {/* Overall progress bar */}
-            <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200/60 mb-4">
-              <div className="flex justify-between items-center mb-1.5">
-                <span className="text-xs font-bold text-blue-800">Overall Construction Progress</span>
-                <span className="text-xs font-extrabold text-blue-600">{overallProgress}%</span>
-              </div>
-              <ProgressIndicator value={overallProgress} color="bg-blue-600" size="sm" />
+    <>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-12 bg-[#F9FAFB]">
+        
+        {/* 1. PROJECT OVERVIEW HERO */}
+        <div className="space-y-4 pb-8 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Project Overview
+              </span>
+              <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+                {project.name || 'Modern Residence'}
+              </h1>
+              <p className="text-sm text-slate-600">
+                {typeof project.location === 'string' ? project.location : (project.location?.city || 'Bengaluru')} • {buaSqFt > 0 ? `${buaSqFt.toLocaleString()} sq.ft` : 'Plot Dimensions Configured'}
+              </p>
             </div>
 
-            {CONSTRUCTION_STAGES.slice(0, 8).map((stage) => (
-              <div key={stage.id} className="flex items-center gap-3 text-xs">
-                <span className="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                  {stage.number}
+            {/* Quick Actions for What-If & Saved Estimations */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowWhatIfModal(true)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              >
+                <Sliders className="w-3.5 h-3.5 text-blue-600" />
+                <span>What-If Analysis</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowSavedModal(true)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              >
+                <FolderOpen className="w-3.5 h-3.5 text-blue-600" />
+                <span>Saved Projects</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Primary Total Estimate Box */}
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Estimated Construction Cost
+            </span>
+            <div className="flex flex-wrap items-baseline gap-4">
+              <span className="text-4xl font-extrabold text-slate-900">
+                {formatCurrency(totalCost)}
+              </span>
+              {ratePerSqFt > 0 && (
+                <span className="text-sm font-semibold text-blue-600">
+                  ₹{ratePerSqFt.toLocaleString()} / sq.ft
                 </span>
-                <span className="text-slate-700 font-medium flex-1 truncate">{stage.title}</span>
-                <ProgressIndicator
-                  value={stage.progress}
-                  color={stageTimelineColors[stage.status]}
-                  size="sm"
-                />
-                <StatusBadge
-                  status={stageStatusColor[stage.status]}
-                  label={stage.status === 'In Progress' ? 'Active' : stage.status}
-                />
+              )}
+            </div>
+            <p className="text-xs text-slate-500">
+              Calculated based on your selected materials and IS 456 structural standards.
+            </p>
+          </div>
+        </div>
+
+        {/* 2. BUDGET BREAKDOWN VISUAL */}
+        <div className="space-y-4 pb-8 border-b border-slate-200">
+          <h2 className="text-lg font-bold text-slate-900">
+            Budget Allocation
+          </h2>
+
+          {/* Single Horizontal Breakdown Bar */}
+          <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden flex">
+            {budget.heads.map((head) => (
+              <div
+                key={head.id}
+                style={{ width: `${head.percentage}%`, backgroundColor: head.color }}
+                className="h-full transition-all"
+                title={`${head.name}: ${head.percentage}%`}
+              />
+            ))}
+          </div>
+
+          {/* Categories List */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+            {budget.heads.map((head) => (
+              <div key={head.id} className="space-y-1">
+                <div className="flex items-center gap-2 text-xs text-slate-600">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: head.color }} />
+                  <span>{head.name}</span>
+                  <span className="font-semibold text-slate-900 ml-auto">{head.percentage}%</span>
+                </div>
+                <div className="text-sm font-bold text-slate-900 pl-4">
+                  {formatCurrency(head.allocatedAmount)}
+                </div>
               </div>
             ))}
-            <p className="text-[11px] text-slate-400 pt-2 font-medium">
-              + {13 - 8} more stages pending execution...
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+        </div>
 
-      {/* ── Payment Milestone Summary ── */}
-      <motion.div variants={itemFadeUpVariant}>
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Payment Milestone Summary</CardTitle>
-              <span className="text-xs font-bold text-slate-500">
-                Total: {formatCurrency(budget.totalProjectCost)}
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {paymentPlan.map((m) => (
-                <div
-                  key={m.stage}
-                  className={`p-3.5 rounded-xl border text-xs space-y-2 ${
-                    m.status === 'Completed'
-                      ? 'bg-emerald-50/60 border-emerald-200'
-                      : m.status === 'Due'
-                      ? 'bg-amber-50/60 border-amber-200'
-                      : 'bg-slate-50 border-slate-200/80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-blue-600">Stage {m.stage}</span>
-                    <StatusBadge
-                      status={
-                        m.status === 'Completed'
-                          ? 'success'
-                          : m.status === 'Due'
-                          ? 'warning'
-                          : 'neutral'
-                      }
-                      label={m.status}
-                    />
-                  </div>
-                  <div className="font-bold text-slate-900">{m.title}</div>
-                  <div className="text-slate-500 leading-relaxed">{m.description}</div>
-                  <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
-                    <span className="text-slate-500">{m.percentage}% release</span>
-                    <span className="font-extrabold text-blue-600">{formatCurrency(m.amount)}</span>
-                  </div>
+        {/* 3. CONSTRUCTION PROGRESS TIMELINE */}
+        <div className="space-y-4 pb-8 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-900">
+              Construction Timeline
+            </h2>
+            <span className="text-xs font-semibold text-slate-500">
+              Estimated Duration: {timeline.totalMonths || 12} Months
+            </span>
+          </div>
+
+          <div className="divide-y divide-slate-100 bg-white rounded-2xl border border-slate-200">
+            {CONSTRUCTION_STAGES.slice(0, 6).map((stage) => (
+              <div key={stage.id} className="p-4 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-slate-100 font-bold text-slate-700 flex items-center justify-center text-[11px]">
+                    {stage.number}
+                  </span>
+                  <span className="font-semibold text-slate-900">{stage.title}</span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+                <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${
+                  stage.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' :
+                  stage.status === 'In Progress' ? 'bg-blue-50 text-blue-700' :
+                  'bg-slate-100 text-slate-600'
+                }`}>
+                  {stage.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. TOP MATERIAL BOQ PREVIEW */}
+        <div className="space-y-4 pb-8 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-900">
+              Bill of Quantities Preview
+            </h2>
+            <button
+              onClick={() => navigate('/report')}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 cursor-pointer"
+            >
+              View Full BOQ <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100">
+            {topBoqItems.map((item) => (
+              <div key={item.name} className="p-4 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-semibold text-slate-900 block">{item.name}</span>
+                  <span className="text-slate-500 text-[11px]">{item.quantity}</span>
+                </div>
+                <span className="font-bold text-slate-900">
+                  {formatCurrency(item.cost)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 5. PAYMENT SCHEDULE */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">
+            Payment Milestone Roadmap
+          </h2>
+
+          <div className="space-y-3">
+            {paymentPlan.map((m) => (
+              <div key={m.stage} className="bg-white rounded-xl p-4 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div>
+                  <span className="font-bold text-blue-600 block">Stage {m.stage} • {m.percentage}% Release</span>
+                  <span className="font-semibold text-slate-900 text-sm">{m.title}</span>
+                  <p className="text-slate-500 mt-0.5">{m.description}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-sm font-extrabold text-slate-900 block">
+                    {formatCurrency(m.amount)}
+                  </span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    m.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' :
+                    m.status === 'Due' ? 'bg-amber-50 text-amber-700' :
+                    'bg-slate-100 text-slate-600'
+                  }`}>
+                    {m.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Modals */}
+      <WhatIfComparisonModal
+        isOpen={showWhatIfModal}
+        onClose={() => setShowWhatIfModal(false)}
+      />
+
+      <SavedEstimationsModal
+        isOpen={showSavedModal}
+        onClose={() => setShowSavedModal(false)}
+      />
+    </>
   );
 };
