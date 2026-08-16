@@ -277,7 +277,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     // ── 8. Materials Reactive to Selections ──
     // Facade Palette
     let facadeHex = 0xffffff;
-    if (painting?.brand === 'Asian Paints' || painting?.internalPaint === 'Royale') {
+    if (painting?.brand === 'Asian Paints' || painting?.internalPaint === 'Royale Luxury Emulsion') {
       facadeHex = 0xfdfbf7; // Warm Italian Ivory
     } else if (city === 'Mysore') {
       facadeHex = 0xffedd5; // Warm Heritage Terracotta Tone
@@ -295,10 +295,8 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
 
     // Main Door Finish
     let doorHex = 0xb45309; // Natural Honey Teak
-    if (doors?.mainDoor?.toLowerCase().includes('burma')) {
+    if (doors?.mainDoor === 'Premium Teak') {
       doorHex = 0x78350f; // Deep Burma Teak
-    } else if (doors?.mainDoor?.toLowerCase().includes('flush') || doors?.mainDoor?.toLowerCase().includes('laminate')) {
-      doorHex = 0x334155; // Contemporary Dark Laminate
     }
 
     // Window Frame Finish
@@ -489,7 +487,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     buildingGroup.add(cabin);
 
     // Overhead Water Tank (Sintex or SS Tank based on sanitaryTier)
-    const isSSTank = bathroomFittings?.sanitaryTier === 'Luxury';
+    const isSSTank = bathroomFittings?.sanitaryTier === 'Luxury (Toto / Duravit)';
     const tankColor = isSSTank ? 0x94a3b8 : 0x1e293b;
     const tankMat = new THREE.MeshStandardMaterial({ color: tankColor, roughness: isSSTank ? 0.2 : 0.4, metalness: isSSTank ? 0.8 : 0 });
     const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.75, 16), tankMat);
