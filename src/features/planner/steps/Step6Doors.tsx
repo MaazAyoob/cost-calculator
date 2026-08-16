@@ -9,9 +9,9 @@ export const Step6Doors: React.FC = () => {
   const { doors, setDoorSelection } = useWizardStore();
   const quantities = useQuantities();
 
-  const mainCount = quantities.mainDoorsCount || 1;
-  const internalCount = quantities.internalDoorsCount || 8;
-  const bathroomCount = quantities.bathroomFixtureSets ? Math.round(quantities.bathroomFixtureSets / 3) : 4;
+  const mainCount = quantities.mainDoorsCount || 0;
+  const internalCount = quantities.internalDoorsCount || 0;
+  const bathroomCount = quantities.bathroomDoorsCount || 0;
 
   const mainDoorOptions: { label: 'Premium Teak' | 'Normal Teak'; rate: number; desc: string }[] = [
     { label: 'Premium Teak', rate: 65000, desc: 'First-grade Burma Teakwood carved frame and shutter.' },

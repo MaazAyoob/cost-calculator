@@ -136,7 +136,7 @@ export const Step1BasicInfo: React.FC = () => {
                 max={200}
                 step={1}
                 value={plotLength}
-                onChange={(e) => setPlotDimensions(Number(e.target.value), plotWidth || 30)}
+                onChange={(e) => setPlotDimensions(Number(e.target.value), plotWidth)}
                 className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
               <div className="flex gap-1.5 justify-start">
@@ -172,7 +172,7 @@ export const Step1BasicInfo: React.FC = () => {
                 max={200}
                 step={1}
                 value={plotWidth}
-                onChange={(e) => setPlotDimensions(plotLength || 40, Number(e.target.value))}
+                onChange={(e) => setPlotDimensions(plotLength, Number(e.target.value))}
                 className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
               <div className="flex gap-1.5 justify-start">

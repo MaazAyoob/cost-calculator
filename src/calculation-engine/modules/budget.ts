@@ -1,96 +1,88 @@
-// Budget Module — Restored from RC1 (a2620e3)
-// Simple bua * baseRate formula. Always calculates. No progressive gating.
-import { EngineInput, AreaResult, BudgetResult, BudgetHead } from '../types';
-import { BUDGET_ALLOCATION, BUDGET_HEAD_COLORS } from '../data/qualityTiers';
+// ============================================================
+// BUDGET MODULE – Itemized BOQ-Driven Cost Aggregator
+// Total Construction Cost is derived directly from itemized BOQ.
+// Category heads, dynamic percentages, and effective rate/sq.ft
+// are calculated strictly from true item sums.
+// ============================================================
+
+import { EngineInput, AreaResult, BudgetResult, BudgetHead, BOQItem } from '../types';
+import { BUDGET_HEAD_COLORS } from '../data/qualityTiers';
 import {
-  BASE_RATE_PER_SQFT,
   GST_RATE,
   CONTRACTOR_MARGIN,
   PROFESSIONAL_FEES,
   CONTINGENCY_RATE,
-  STILT_PARKING_COST_PER_CAR,
-  LIFT_COST,
-  EV_CHARGING_COST,
 } from '../data/locationRates';
 
-export function calculateBudget(input: EngineInput, area: AreaResult): BudgetResult {
-  const {
-    city,
-    qualityTier,
-    parkingType,
-    carCount,
-    liftRequired,
-    evCharging,
-    materialBrands,
-  } = input;
-
+export function calculateBudget(
+  input: EngineInput,
+  area: AreaResult,
+  boq: BOQItem[]
+): BudgetResult {
+  const { qualityTier } = input;
   const bua = area.totalBUASqFt;
-
-  // Safe fallbacks so calculation works before city is selected
-  const resolvedCity = city || 'Bangalore';
   const resolvedTier = qualityTier || 'Premium';
 
-  const baseRate = BASE_RATE_PER_SQFT[resolvedCity]?.[resolvedTier] ?? 2450;
-  const baseConstructionCost = Math.round(bua * baseRate);
+  // 1. Total Base Construction Cost is the exact sum of all itemized BOQ items
+  const baseConstructionCost = boq.reduce((acc, item) => acc + item.amount, 0);
 
-  // Material brand multiplier (from RC1 materialBrands.steel / cement)
-  let brandMultiplier = 1.0;
-  const steel = materialBrands?.steel as string | undefined;
-  const cement = materialBrands?.cement as string | undefined;
-  if (steel === 'Tata Tiscon' || steel === 'Tata Tiscon Fe 550D') brandMultiplier += 0.02;
-  else if (steel === 'JSW Neosteel') brandMultiplier += 0.01;
-  if (cement === 'UltraTech' || cement === 'UltraTech OPC 53') brandMultiplier += 0.015;
-  else if (cement === 'ACC Cement') brandMultiplier += 0.005;
+  // 2. Statutory / Markup Additions
+  const professionalFees = Math.round(baseConstructionCost * (PROFESSIONAL_FEES[resolvedTier] ?? 0.05));
+  const contractorMargin = Math.round(baseConstructionCost * (CONTRACTOR_MARGIN[resolvedTier] ?? 0.10));
+  const contingency      = Math.round(baseConstructionCost * (CONTINGENCY_RATE[resolvedTier] ?? 0.05));
+  const gstAmount        = Math.round((baseConstructionCost + professionalFees) * GST_RATE);
 
-  const adjustedConstructionCost = Math.round(baseConstructionCost * brandMultiplier);
+  // 3. Final Total Project Cost
+  const totalProjectCost = baseConstructionCost + professionalFees + contractorMargin + contingency + gstAmount;
 
-  // Add-ons
-  const parkingCost = (parkingType === 'Stilt Parking' || parkingType === 'Stilt')
-    ? (carCount || 0) * (STILT_PARKING_COST_PER_CAR[resolvedCity] ?? 180000)
-    : (carCount || 0) * 60000;
+  // 4. Derived Effective Rate per Sq.Ft
+  const costPerSqFt = bua > 0 ? Math.round(totalProjectCost / bua) : 0;
 
-  const liftCost = liftRequired ? (LIFT_COST[resolvedCity]?.[resolvedTier] ?? 450000) : 0;
-  const evCost   = evCharging   ? EV_CHARGING_COST : 0;
+  // Helper to sum BOQ amounts by category
+  const sumCat = (categories: string[]): number => {
+    return boq
+      .filter((item) => categories.includes(item.category))
+      .reduce((sum, item) => sum + item.amount, 0);
+  };
 
-  const constructionWithAddons = adjustedConstructionCost + parkingCost + liftCost + evCost;
+  const foundationStructureAmt = sumCat(['Site Preparation', 'Foundation', 'Plinth', 'RCC Structure']);
+  const masonryAmt             = sumCat(['Masonry']);
+  const roofingAmt             = sumCat(['Roofing']);
+  const flooringAmt            = sumCat(['Flooring']);
+  const doorsJoineryAmt        = sumCat(['Doors & Joinery']);
+  const windowsAmt             = sumCat(['Windows & Glazing']);
+  const electricalAmt          = sumCat(['Electrical']);
+  const plumbingSanitaryAmt    = sumCat(['Plumbing & Sanitary']);
+  const paintingAmt            = sumCat(['Painting & Waterproofing']);
+  const fixturesFinishesAmt    = sumCat(['Fixtures & Finishes']);
+  const markupAndGSTAmt        = professionalFees + contractorMargin + contingency + gstAmount;
 
-  // Professional fees, margin, contingency, GST
-  const professionalFees = Math.round(constructionWithAddons * (PROFESSIONAL_FEES[resolvedTier] ?? 0.05));
-  const contractorMargin = Math.round(constructionWithAddons * (CONTRACTOR_MARGIN[resolvedTier] ?? 0.10));
-  const contingency      = Math.round(constructionWithAddons * (CONTINGENCY_RATE[resolvedTier] ?? 0.05));
-  const gstAmount        = Math.round((constructionWithAddons + professionalFees) * GST_RATE);
-
-  const totalProjectCost = constructionWithAddons + professionalFees + contractorMargin + contingency + gstAmount;
-  const costPerSqFt      = bua > 0 ? Math.round(totalProjectCost / bua) : 0;
-
-  // Budget head breakdown
-  const alloc = BUDGET_ALLOCATION[resolvedTier] ?? BUDGET_ALLOCATION['Premium'];
   const headDefs = [
-    { key: 'foundationStructure',    label: 'Foundation & Structure',  pct: alloc.foundationStructure },
-    { key: 'masonry',                label: 'Masonry',                 pct: alloc.masonry },
-    { key: 'roofing',                label: 'Roofing',                 pct: alloc.roofing },
-    { key: 'flooring',               label: 'Flooring',                pct: alloc.flooring },
-    { key: 'doorsJoinery',           label: 'Doors & Joinery',         pct: alloc.doorsJoinery },
-    { key: 'windows',                label: 'Windows & Glazing',       pct: alloc.windows },
-    { key: 'electrical',             label: 'Electrical',              pct: alloc.electrical },
-    { key: 'plumbingSanitary',       label: 'Plumbing & Sanitary',     pct: alloc.plumbingSanitary },
-    { key: 'paintingWaterproofing',  label: 'Painting',                pct: alloc.paintingWaterproofing },
-    { key: 'fixturesFinishes',       label: 'Fixtures & Finishes',     pct: alloc.fixturesFinishes },
-    { key: 'contingencyGST',         label: 'Contingency & GST',       pct: alloc.contingencyGST },
+    { key: 'foundationStructure',    label: 'Foundation & Structure',  amt: foundationStructureAmt },
+    { key: 'masonry',                label: 'Masonry',                 amt: masonryAmt },
+    { key: 'roofing',                label: 'Roofing',                 amt: roofingAmt },
+    { key: 'flooring',               label: 'Flooring',                amt: flooringAmt },
+    { key: 'doorsJoinery',           label: 'Doors & Joinery',         amt: doorsJoineryAmt },
+    { key: 'windows',                label: 'Windows & Glazing',       amt: windowsAmt },
+    { key: 'electrical',             label: 'Electrical',              amt: electricalAmt },
+    { key: 'plumbingSanitary',       label: 'Plumbing & Sanitary',     amt: plumbingSanitaryAmt },
+    { key: 'paintingWaterproofing',  label: 'Painting & Waterproofing', amt: paintingAmt },
+    { key: 'fixturesFinishes',       label: 'Fixtures & Finishes',     amt: fixturesFinishesAmt },
+    { key: 'contingencyGST',         label: 'Contingency, Margin & GST', amt: markupAndGSTAmt },
   ];
 
   const heads: BudgetHead[] = headDefs.map((h) => ({
     id:              h.key,
     name:            h.label,
-    percentage:      Math.round(h.pct * 100),
-    allocatedAmount: Math.round(totalProjectCost * h.pct),
+    allocatedAmount: h.amt,
+    percentage:      totalProjectCost > 0 ? parseFloat(((h.amt / totalProjectCost) * 100).toFixed(1)) : 0,
     color:           BUDGET_HEAD_COLORS[h.label] ?? '#94A3B8',
   }));
 
-  // Derive sub-totals
-  const structuralCost = Math.round(totalProjectCost * (alloc.foundationStructure + alloc.masonry + alloc.roofing));
-  const finishingCost  = Math.round(totalProjectCost * (alloc.flooring + alloc.doorsJoinery + alloc.windows + alloc.fixturesFinishes));
-  const mepCost        = Math.round(totalProjectCost * (alloc.electrical + alloc.plumbingSanitary));
+  // Major trade subtotals
+  const structuralCost = foundationStructureAmt + masonryAmt + roofingAmt;
+  const finishingCost  = flooringAmt + doorsJoineryAmt + windowsAmt + paintingAmt + fixturesFinishesAmt;
+  const mepCost        = electricalAmt + plumbingSanitaryAmt;
 
   return {
     heads,
@@ -100,7 +92,7 @@ export function calculateBudget(input: EngineInput, area: AreaResult): BudgetRes
     professionalFees,
     contingency,
     gstAmount,
-    baseConstructionCost: adjustedConstructionCost,
+    baseConstructionCost,
     totalProjectCost,
     costPerSqFt,
   };

@@ -1,50 +1,54 @@
 // ============================================================
-// COEFFICIENTS – IS Code Engineering Ratios
-// All values derived from IS 456:2000, IS 13920 & field data
+// COEFFICIENTS – Centralized Engineering & Planning Ratios
+// Derived from CENTRALIZED_ENGINEERING_ASSUMPTIONS, IS 456:2000,
+// NBC 2016, and Rightcon QS models.
 // ============================================================
 
 import { QualityTier } from '../../store/useWizardStore';
+import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from './engineeringAssumptions';
+
+const A = CENTRALIZED_ENGINEERING_ASSUMPTIONS;
 
 /** Steel consumption: kg per sq ft of built-up area */
 export const STEEL_KG_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 3.8,
-  Premium:   4.5,
-  Luxury:    5.5,
+  Essential: A.steelKgPerSqFtEssential.value,
+  Premium:   A.steelKgPerSqFtPremium.value,
+  Luxury:    A.steelKgPerSqFtLuxury.value,
 };
 
 /** OPC 53 grade cement: bags (50 kg) per sq ft of BUA */
 export const CEMENT_BAGS_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 0.38,
-  Premium:   0.44,
-  Luxury:    0.50,
+  Essential: A.cementBagsPerSqFtEssential.value,
+  Premium:   A.cementBagsPerSqFtPremium.value,
+  Luxury:    A.cementBagsPerSqFtLuxury.value,
 };
 
 /** M25 Ready Mix Concrete: cubic metres per sq ft BUA (slab + column + beam) */
 export const CONCRETE_CUM_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 0.045,
-  Premium:   0.052,
-  Luxury:    0.060,
+  Essential: A.concreteCuMPerSqFtEssential.value,
+  Premium:   A.concreteCuMPerSqFtPremium.value,
+  Luxury:    A.concreteCuMPerSqFtLuxury.value,
 };
 
 /** Sand: cubic feet per sq ft BUA (plaster + masonry + flooring bed) */
 export const SAND_CUFT_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 1.6,
-  Premium:   1.8,
-  Luxury:    2.0,
+  Essential: A.sandCuFtPerSqFtEssential.value,
+  Premium:   A.sandCuFtPerSqFtPremium.value,
+  Luxury:    A.sandCuFtPerSqFtLuxury.value,
 };
 
 /** 20mm Metal Aggregate: cu ft per sq ft BUA */
 export const AGGREGATE_CUFT_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 1.2,
-  Premium:   1.5,
-  Luxury:    1.7,
+  Essential: A.aggregateCuFtPerSqFtEssential.value,
+  Premium:   A.aggregateCuFtPerSqFtPremium.value,
+  Luxury:    A.aggregateCuFtPerSqFtLuxury.value,
 };
 
 /** AAC block volume: cubic metres per sq ft BUA (wall volume approximation) */
 export const AAC_CUM_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 0.055,
-  Premium:   0.060,
-  Luxury:    0.065,
+  Essential: A.aacBlockCuMPerSqFtEssential.value,
+  Premium:   A.aacBlockCuMPerSqFtPremium.value,
+  Luxury:    A.aacBlockCuMPerSqFtLuxury.value,
 };
 
 /** Floor tile area factor: sq ft tiles per sq ft BUA (floor area + wastage) */
@@ -55,13 +59,13 @@ export const FLOOR_TILE_FACTOR: Record<QualityTier, number> = {
 };
 
 /** Wall tile coverage: sq ft per bathroom (only wet areas) */
-export const WALL_TILE_SQFT_PER_BATHROOM = 120;
+export const WALL_TILE_SQFT_PER_BATHROOM = A.wallTileSqFtPerBathroom.value;
 
 /** Interior paint area: multiplier on BUA (walls + ceiling) */
-export const INTERIOR_PAINT_FACTOR = 3.5;
+export const INTERIOR_PAINT_FACTOR = A.interiorPaintFactor.value;
 
 /** Exterior paint: multiplier on perimeter × height */
-export const EXTERIOR_PAINT_FACTOR = 1.15; // for returns and reveals
+export const EXTERIOR_PAINT_FACTOR = A.exteriorPaintFactor.value;
 
 /** Electrical wire: metres per sq ft BUA */
 export const ELECTRICAL_WIRE_M_PER_SQFT: Record<QualityTier, number> = {
@@ -87,19 +91,19 @@ export const CPVC_M_PER_SQFT = 0.18;
 export const SWR_M_PER_SQFT = 0.12;
 
 /** Waterproofing: sq ft of wet areas relative to bathrooms */
-export const WATERPROOFING_SQFT_PER_BATHROOM = 80;
+export const WATERPROOFING_SQFT_PER_BATHROOM = A.waterproofingSqFtPerBathroom.value;
 
 /** Terrace waterproofing as % of plot area */
 export const TERRACE_WATERPROOFING_FACTOR = 0.7;
 
-/** Ground floor coverage factor (how much of plot is buildable) */
-export const COVERAGE_FACTOR = 0.60;      // BBMP 60% rule
+/** Ground floor coverage factor (how much of plot is buildable footprint) */
+export const COVERAGE_FACTOR = A.coverageFactor.value;
 
 /** Usable area efficiency per floor (deduct walls, shafts etc.) */
-export const FLOOR_EFFICIENCY = 0.92;
+export const FLOOR_EFFICIENCY = A.floorEfficiency.value;
 
 /** Super BUA multiplier (includes common areas + wall thickness) */
-export const SUPER_BUA_FACTOR = 1.15;
+export const SUPER_BUA_FACTOR = A.superBuaFactor.value;
 
 /** Modular switch modules per sq ft BUA */
 export const SWITCH_MODULES_PER_SQFT: Record<QualityTier, number> = {
@@ -115,4 +119,4 @@ export const BATHROOM_FIXTURES_PER_BATH = 1;
 export const FLOOR_TRAPS_PER_BATH = 2;
 
 /** Granite slabs: sq ft per staircase floor (treads + risers + landing) */
-export const GRANITE_PER_FLOOR = 180;
+export const GRANITE_PER_FLOOR = A.graniteSqFtPerFloor.value;

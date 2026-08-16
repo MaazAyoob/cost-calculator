@@ -10,10 +10,10 @@ export const Step8Electrical: React.FC = () => {
   const quantities = useQuantities();
   const [showQty, setShowQty] = useState(false);
 
-  const wireM = quantities.electricalWireMetres || 2400;
-  const conduitM = quantities.conduitsMetres || 1100;
-  const points = quantities.lightingPoints || 140;
-  const modules = quantities.switchModules || 45;
+  const wireM = quantities.electricalWireMetres || 0;
+  const conduitM = quantities.conduitsMetres || 0;
+  const points = quantities.lightingPoints || 0;
+  const modules = quantities.switchModules || 0;
 
   const wireTiers: {
     id: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)';

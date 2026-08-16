@@ -9,8 +9,8 @@ export const Step10Painting: React.FC = () => {
   const { painting, setPaintingSelection } = useWizardStore();
   const quantities = useQuantities();
 
-  const interiorAreaSqFt = quantities.interiorPaintAreaSqFt || 12500;
-  const exteriorAreaSqFt = quantities.exteriorPaintAreaSqFt || 3800;
+  const interiorAreaSqFt = quantities.interiorPaintAreaSqFt || 0;
+  const exteriorAreaSqFt = quantities.exteriorPaintAreaSqFt || 0;
 
   const brands: ('Asian Paints' | 'Berger Paints' | 'Dulux')[] = ['Asian Paints', 'Berger Paints', 'Dulux'];
 

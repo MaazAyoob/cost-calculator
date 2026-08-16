@@ -1,9 +1,7 @@
 // ============================================================
 // MASTER CALCULATOR ORCHESTRATOR
-// Runs all modules in dependency order and returns a complete
-// CalculationResult. Designed to be called on every wizard change.
-// Future: swap individual modules with AI-enhanced equivalents
-// without changing the frontend or store interface.
+// Runs all modules in strict linear engineering dependency order:
+// Input → Area → Quantities → BOQ → Budget → Timeline → Payment → Procurement → Report
 // ============================================================
 
 import { EngineInput, CalculationResult, MaterialQuantities } from './types';
@@ -29,7 +27,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
   // ── STEP 1: Area ──────────────────────────────────────────
   const area = calculateArea(input);
 
-  // ── STEP 2: Material Quantities ───────────────────────────
+  // ── STEP 2: Physical Material Quantities ──────────────────
   const { steelTonnes, steelKg }    = calculateSteel(input, area);
   const { cementBags }              = calculateCement(input, area);
   const { aacBlocksCuM, sandCuFt, aggregateCuFt, concreteCuM } = calculateMasonry(input, area);
@@ -37,7 +35,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
   const {
     interiorPaintAreaSqFt, exteriorPaintAreaSqFt, puttyAreaSqFt,
   } = calculatePaint(input, area);
-  const { mainDoorsCount, internalDoorsCount } = calculateDoors(input);
+  const { mainDoorsCount, internalDoorsCount, bathroomDoorsCount } = calculateDoors(input);
   const { windowsCount, windowAreaSqFt }       = calculateWindows(input, area);
   const { electricalWireMetres, conduitsMetres, switchModules, lightingPoints } = calculateElectrical(input, area);
   const { cpvcSupplyMetres, swrDrainMetres, bathroomFixtureSets, floorTrapsCount } = calculatePlumbing(input, area);
@@ -58,6 +56,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     puttyAreaSqFt,
     mainDoorsCount,
     internalDoorsCount,
+    bathroomDoorsCount,
     windowsCount,
     windowAreaSqFt,
     electricalWireMetres,
@@ -70,17 +69,17 @@ export function runCalculator(input: EngineInput): CalculationResult {
     floorTrapsCount,
   };
 
-  // ── STEP 3: Budget ────────────────────────────────────────
-  const budget = calculateBudget(input, area);
+  // ── STEP 3: Itemized BOQ (Quantity × Unit Rate) ───────────
+  const boq = generateBOQ(input, area, quantities);
 
-  // ── STEP 4: Timeline ──────────────────────────────────────
+  // ── STEP 4: Budget (Direct BOQ Aggregation) ───────────────
+  const budget = calculateBudget(input, area, boq);
+
+  // ── STEP 5: Timeline ──────────────────────────────────────
   const timeline = calculateTimeline(input, area);
 
-  // ── STEP 5: Payment Plan ──────────────────────────────────
+  // ── STEP 6: Payment Plan ──────────────────────────────────
   const paymentPlan = calculatePaymentPlan(input, budget, timeline);
-
-  // ── STEP 6: BOQ ───────────────────────────────────────────
-  const boq = generateBOQ(input, area, quantities, budget);
 
   // ── STEP 7: Procurement List ──────────────────────────────
   const procurement = generateProcurementList(input, quantities, budget);

@@ -11,22 +11,30 @@ import {
 } from '../data/coefficients';
 
 export function calculateArea(input: EngineInput): AreaResult {
-  const rawLength = input.plotLength || 0;
-  const rawWidth  = input.plotWidth || 0;
-  const rawFloors = input.floors || 0;
+  const length = input.plotLength || 0;
+  const width  = input.plotWidth || 0;
+  const floors = input.floors || 0;
 
   // Actual plot area entered by user
-  const plotAreaSqFt = rawLength * rawWidth;
+  const plotAreaSqFt = length * width;
 
-  // Use fallback reference plot (40x30, 2 floors = 1,325 sq ft) for rate calculation if dimensions not entered yet
-  const length = rawLength > 0 ? rawLength : 40;
-  const width  = rawWidth > 0 ? rawWidth : 30;
-  const floors = rawFloors > 0 ? rawFloors : 2;
-
-  const calcPlotArea = length * width;
+  if (plotAreaSqFt <= 0 || floors <= 0) {
+    const sqFtPerCar = input.parkingType === 'Stilt Parking' || input.parkingType === 'Stilt' ? 180 : 120;
+    const parkingAreaSqFt = Math.round((input.carCount || 0) * sqFtPerCar + ((input.bikeCount || 0) * 35));
+    return {
+      plotAreaSqFt: 0,
+      buildableAreaSqFt: 0,
+      buaPerFloorSqFt: 0,
+      totalBUASqFt: 0,
+      superBUASqFt: 0,
+      parkingAreaSqFt,
+      terraceSqFt: 0,
+      totalConstructedSqFt: parkingAreaSqFt,
+    };
+  }
 
   // BBMP: Ground coverage max 60% of plot area
-  const buildableAreaSqFt = Math.round(calcPlotArea * COVERAGE_FACTOR);
+  const buildableAreaSqFt = Math.round(plotAreaSqFt * COVERAGE_FACTOR);
 
   // Usable floor plate per storey
   const buaPerFloorSqFt = Math.round(buildableAreaSqFt * FLOOR_EFFICIENCY);

@@ -10,8 +10,8 @@ export const Step3CoreMaterials: React.FC = () => {
   const quantities = useQuantities();
   const [showWhy, setShowWhy] = useState(false);
 
-  const steelTonnes = quantities.steelTonnes || 18.5;
-  const cementBags = quantities.cementBags || 1450;
+  const steelTonnes = quantities.steelTonnes || 0;
+  const cementBags = quantities.cementBags || 0;
 
   const steelOptions: { brand: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT'; grade: string; ratePerKg: number; desc: string; recommended?: boolean }[] = [
     { brand: 'Tata Tiscon', grade: 'Fe 550D Super Ductile', ratePerKg: 78, desc: 'Primary steel with superior earthquake resistant ductility.', recommended: true },

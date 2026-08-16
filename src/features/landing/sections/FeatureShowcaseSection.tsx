@@ -154,7 +154,7 @@ export const FeatureShowcaseSection: React.FC = () => {
                       </div>
                       <div className="pt-2 flex justify-between items-center text-xs font-extrabold">
                         <span className="text-[var(--cc-text-secondary)]">Calculation Status:</span>
-                        <span className="text-[var(--cc-brand)] font-bold">100% Accurate</span>
+                        <span className="text-[var(--cc-brand)] font-bold">Engineering-Grade Estimate</span>
                       </div>
                     </div>
                   </div>

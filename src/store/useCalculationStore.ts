@@ -20,7 +20,7 @@ function buildInput(): EngineInput {
     plotLength:      s.plotLength || 0,
     plotWidth:       s.plotWidth || 0,
     houseType:       s.houseType || 'Duplex',
-    floors:          s.floors || 0,
+    floors:          s.floors > 0 ? s.floors : (s.plotLength > 0 && s.plotWidth > 0 ? 1 : 0),
     parkingType:     (s.parkingType as any) || 'Normal Ground',
     carCount:        s.carCount || 0,
     bikeCount:       s.bikeCount || 0,

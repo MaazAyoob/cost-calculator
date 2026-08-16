@@ -10,8 +10,8 @@ export const Step7Windows: React.FC = () => {
   const quantities = useQuantities();
   const [showCalc, setShowCalc] = useState(false);
 
-  const totalWindowAreaSqFt = quantities.windowAreaSqFt || 320;
-  const windowsCount = quantities.windowsCount || 12;
+  const totalWindowAreaSqFt = quantities.windowAreaSqFt || 0;
+  const windowsCount = quantities.windowsCount || 0;
 
   const materials: { id: 'uPVC' | 'Wood' | 'Aluminium'; title: string; desc: string }[] = [
     { id: 'uPVC', title: 'uPVC Windows', desc: 'Soundproof, weather-sealed multi-chambered vinyl windows.' },

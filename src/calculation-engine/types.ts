@@ -117,6 +117,7 @@ export interface MaterialQuantities {
   // Openings
   mainDoorsCount: number;
   internalDoorsCount: number;
+  bathroomDoorsCount: number;
   windowsCount: number;
   windowAreaSqFt: number;
   // Electrical
@@ -158,6 +159,7 @@ export interface BOQItem {
   quantity: number;
   unitRate: number;      // ₹
   amount: number;        // ₹
+  percentage: number;    // Dynamic % = (amount / totalBOQAmount) * 100
   brand: string;
   remarks: string;
 }

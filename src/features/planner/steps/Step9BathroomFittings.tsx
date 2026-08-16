@@ -9,8 +9,8 @@ export const Step9BathroomFittings: React.FC = () => {
   const { bathroomFittings, setBathroomFittingSelection } = useWizardStore();
   const quantities = useQuantities();
 
-  const fixtureSets = quantities.bathroomFixtureSets || 12;
-  const cpvcMetres = quantities.cpvcSupplyMetres || 650;
+  const fixtureSets = quantities.bathroomFixtureSets || 0;
+  const cpvcMetres = quantities.cpvcSupplyMetres || 0;
 
   const sanitaryTiers: {
     id: 'Mass Market (Cera / Hindware / Parryware)' | 'Premium (Jaquar / Kohler / Grohe)' | 'Luxury (Toto / Duravit)';

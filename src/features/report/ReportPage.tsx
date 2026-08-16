@@ -7,52 +7,59 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/common/StatusBadge';
+import { LeadCaptureModal } from '../../components/modals/LeadCaptureModal';
 import {
   Download, Printer, Shield, Building, Layers, CheckCircle2,
   FileSpreadsheet, Calendar, CreditCard, ShoppingCart, Lightbulb,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, Lock,
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 
 export const ReportPage: React.FC = () => {
-  const { preparedFor } = useReportStore();
+  const { preparedFor, isLeadCaptured, leadInfo } = useReportStore();
   const { result } = useCalculationStore();
   const { report, area, quantities, budget, timeline, paymentPlan, boq, input } = result;
 
+  const [showLeadModal, setShowLeadModal] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     exec: true,
     config: true,
-    materials: false,
-    boq: false,
+    materials: true,
+    boq: true,
     payments: false,
-    assumptions: false,
+    assumptions: true,
   });
 
   const toggleAccordion = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrintRequest = () => {
+    if (!isLeadCaptured) {
+      setShowLeadModal(true);
+    } else {
+      window.print();
+    }
   };
 
   return (
     <motion.div variants={pageFadeVariant} initial="initial" animate="animate" exit="exit" className="space-y-6 max-w-4xl mx-auto py-2">
       <PageHeader
-        title="Feasibility & Material Report"
-        subtitle="Bank-loan ready engineering specification, BOQ, timeline & payment roadmap."
-        breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Comprehensive Report' }]}
+        title="Digital QS BOQ & Feasibility Report"
+        subtitle="Bank-loan ready engineering specification, itemized BOQ, timeline & payment roadmap."
+        breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Quantity Surveyor Report' }]}
         actions={
           <div className="flex items-center gap-3 print:hidden">
-            <Button variant="outline" size="sm" onClick={handlePrint} leftIcon={<Printer className="w-4 h-4" />}>
+            <Button variant="outline" size="sm" onClick={handlePrintRequest} leftIcon={<Printer className="w-4 h-4" />}>
               Print / Save PDF
             </Button>
-            <Button size="sm" onClick={handlePrint} leftIcon={<Download className="w-4 h-4" />}>
-              Download Official Report
+            <Button size="sm" onClick={handlePrintRequest} leftIcon={isLeadCaptured ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}>
+              {isLeadCaptured ? 'Download Official BOQ' : 'Unlock Full Report'}
             </Button>
           </div>
         }
       />
+
 
       {/* Legend Bar */}
       <Card className="p-3 bg-slate-900 text-white border-none print:hidden flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -88,20 +95,22 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* 1. Executive Summary */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
           <button
             type="button"
             onClick={() => toggleAccordion('exec')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer"
+            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
           >
             <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
               <Building className="w-4 h-4" /> 1. Executive Summary & Core Feasibility
             </span>
-            {openSections.exec ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="print:hidden">
+              {openSections.exec ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
           </button>
 
-          {openSections.exec && (
-            <div className="p-4 bg-white border-t border-slate-200 space-y-3">
+          {(openSections.exec || true) && (
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-3 ${openSections.exec ? 'block' : 'hidden'} print:block print:p-2`}>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Total Usable BUA</span>
@@ -125,20 +134,22 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* 2. Project Configuration & Area */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
           <button
             type="button"
             onClick={() => toggleAccordion('config')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer"
+            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
           >
             <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
               <Shield className="w-4 h-4" /> 2-4. Project Inputs, Sanction Body & Footprint
             </span>
-            {openSections.config ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="print:hidden">
+              {openSections.config ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
           </button>
 
-          {openSections.config && (
-            <div className="p-4 bg-white border-t border-slate-200 space-y-3 text-xs">
+          {(openSections.config || true) && (
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-3 text-xs ${openSections.config ? 'block' : 'hidden'} print:block print:p-2`}>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
                   <span className="text-[10px] font-bold text-blue-600 block">[USER INPUT] Location</span>
@@ -162,20 +173,22 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* 5-15. Materials & Specifications */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
           <button
             type="button"
             onClick={() => toggleAccordion('materials')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer"
+            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
           >
             <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
               <Layers className="w-4 h-4" /> 5-15. Materials, Finishes & Engineering Specifications
             </span>
-            {openSections.materials ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="print:hidden">
+              {openSections.materials ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
           </button>
 
-          {openSections.materials && (
-            <div className="p-4 bg-white border-t border-slate-200 space-y-4 text-xs">
+          {(openSections.materials || true) && (
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-4 text-xs ${openSections.materials ? 'block' : 'hidden'} print:block print:p-2`}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200/60">
                   <span className="text-[10px] font-bold text-blue-700 uppercase block">Structural TMT Steel</span>
@@ -222,35 +235,47 @@ export const ReportPage: React.FC = () => {
           <button
             type="button"
             onClick={() => toggleAccordion('boq')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer"
+            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
           >
             <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
               <FileSpreadsheet className="w-4 h-4" /> 16-17. Itemized BOQ & Cost Allocations ({boq.length} Line Items)
             </span>
-            {openSections.boq ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="print:hidden">
+              {openSections.boq ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
           </button>
 
-          {openSections.boq && (
-            <div className="p-4 bg-white border-t border-slate-200 space-y-4 text-xs">
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
-                <table className="w-full text-left border-collapse">
+          {(openSections.boq || true) && (
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-4 text-xs ${openSections.boq ? 'block' : 'hidden'} print:block print:p-2`}>
+              <div className="border border-slate-200 rounded-xl overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
-                    <tr className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
-                      <th className="p-2">Code</th>
-                      <th className="p-2">Description</th>
-                      <th className="p-2 text-right">Qty</th>
-                      <th className="p-2">Unit</th>
-                      <th className="p-2 text-right">Amount (₹)</th>
+                    <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
+                      <th className="p-2.5">Code</th>
+                      <th className="p-2.5">Description</th>
+                      <th className="p-2.5">Category</th>
+                      <th className="p-2.5 text-right">Qty</th>
+                      <th className="p-2.5">Unit</th>
+                      <th className="p-2.5 text-right">Rate (₹)</th>
+                      <th className="p-2.5 text-right">%</th>
+                      <th className="p-2.5 text-right">Amount (₹)</th>
+                      <th className="p-2.5">Material / Spec</th>
+                      <th className="p-2.5">Remarks</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {boq.slice(0, 8).map((item) => (
-                      <tr key={item.code}>
-                        <td className="p-2 font-mono text-[10px] text-slate-400">{item.code}</td>
-                        <td className="p-2 font-semibold text-slate-900">{item.description}</td>
-                        <td className="p-2 text-right font-medium">{item.quantity.toLocaleString('en-IN')}</td>
-                        <td className="p-2 text-slate-500">{item.unit}</td>
-                        <td className="p-2 text-right font-bold text-slate-900">{formatCurrency(item.amount)}</td>
+                  <tbody className="divide-y divide-slate-100 text-[11px]">
+                    {boq.map((item) => (
+                      <tr key={item.code} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="p-2.5 font-mono text-[10px] text-slate-400">{item.code}</td>
+                        <td className="p-2.5 font-semibold text-slate-900">{item.description}</td>
+                        <td className="p-2.5 text-slate-500">{item.category}</td>
+                        <td className="p-2.5 text-right font-medium text-slate-800">{item.quantity.toLocaleString('en-IN')}</td>
+                        <td className="p-2.5 text-slate-500">{item.unit}</td>
+                        <td className="p-2.5 text-right font-mono text-slate-700">₹{item.unitRate.toLocaleString('en-IN')}</td>
+                        <td className="p-2.5 text-right font-bold text-blue-600">{item.percentage}%</td>
+                        <td className="p-2.5 text-right font-extrabold text-slate-900">{formatCurrency(item.amount)}</td>
+                        <td className="p-2.5 font-medium text-slate-600 max-w-[140px] truncate">{item.brand}</td>
+                        <td className="p-2.5 text-slate-400 text-[10px] max-w-[140px] truncate">{item.remarks}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -261,20 +286,22 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* 18-20. Timeline & Payment Roadmap */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
           <button
             type="button"
             onClick={() => toggleAccordion('payments')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer"
+            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
           >
             <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
               <CreditCard className="w-4 h-4" /> 18-20. Construction Timeline & Payment Milestones
             </span>
-            {openSections.payments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="print:hidden">
+              {openSections.payments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
           </button>
 
-          {openSections.payments && (
-            <div className="p-4 bg-white border-t border-slate-200 space-y-3 text-xs">
+          {(openSections.payments || true) && (
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-3 text-xs ${openSections.payments ? 'block' : 'hidden'} print:block print:p-2`}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {paymentPlan.slice(0, 6).map((m) => (
                   <div key={m.stage} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/60 flex justify-between items-center">
@@ -292,34 +319,46 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* 21-22. Assumptions & References */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
           <button
             type="button"
             onClick={() => toggleAccordion('assumptions')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer"
+            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
           >
             <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
               <Lightbulb className="w-4 h-4 text-amber-500" /> 21-22. Feasibility Assumptions & Engineering Standards
             </span>
-            {openSections.assumptions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="print:hidden">
+              {openSections.assumptions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </span>
           </button>
 
-          {openSections.assumptions && (
-            <div className="p-4 bg-white border-t border-slate-200 space-y-2 text-xs text-slate-600">
+          {(openSections.assumptions || true) && (
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-2 text-xs text-slate-600 ${openSections.assumptions ? 'block' : 'hidden'} print:block print:p-2`}>
+              <p>• <span className="font-bold">Nominal Soil Bearing Capacity</span>: 180 kN/sqm (Isolated footings planning assumption &bull; <span className="text-amber-600 font-semibold">Requires Client Confirmation</span>).</p>
               <p>• <span className="font-bold">IS 456:2000</span> Code of Practice for Plain and Reinforced Concrete.</p>
               <p>• <span className="font-bold">IS 875:1987</span> Code of Practice for Design Loads (Dead, Live & Wind) for Buildings.</p>
               <p>• <span className="font-bold">NBC 2016</span> National Building Code of India (Fire & Safety Regulations).</p>
-              <p>• <span className="font-bold">{input.authority}</span> Bylaws & Zoned FAR Compliance.</p>
+              <p>• <span className="font-bold">{input.authority}</span> Bylaws & Zoned FAR Compliance (60% Ground Coverage, 92% Floor Efficiency).</p>
             </div>
           )}
         </div>
 
         {/* Report Footer Verification */}
         <div className="pt-6 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
-          <span>Cost Calculator Engine v1.0.0 &bull; Rightcon</span>
+          <span>Cost Calculator Engine v1.0.0 &bull; Rightcon Digital Quantity Surveyor</span>
           <span>Certified Feasibility & Material Report</span>
         </div>
       </Card>
+
+      <LeadCaptureModal
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        onSuccess={() => {
+          setTimeout(() => window.print(), 300);
+        }}
+      />
     </motion.div>
   );
 };
+

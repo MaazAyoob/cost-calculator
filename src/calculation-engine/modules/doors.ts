@@ -1,24 +1,30 @@
-// Doors Module
+// Doors Module — Driven by house type, floors, and space requirements
 import { EngineInput } from '../types';
 
 export function calculateDoors(input: EngineInput): {
   mainDoorsCount: number;
   internalDoorsCount: number;
+  bathroomDoorsCount: number;
 } {
-  const { rooms, floors } = input;
+  const { rooms, floors, houseType } = input;
 
-  // 1 main door per floor (ground entry + first floor terrace + roof)
-  const mainDoorsCount = 1; // typically 1 main door per home
+  // Main door count: 1 per dwelling unit (Duplex/Triplex = 1, Rental/Mixed = floors or rental units)
+  const mainDoorsCount = houseType === 'Rental Units' || houseType === 'Mixed Use' 
+    ? Math.max(1, floors) 
+    : 1;
 
-  // Internal doors: each bedroom, bathroom, utility, office, pooja, store
+  // Internal doors: 1 per bedroom + office + pooja + utility + storeRoom + (terrace access if multi-storey)
   const internalDoorsCount =
-    rooms.bedrooms +
-    rooms.bathrooms +
-    rooms.utility +
-    rooms.office +
-    rooms.pooja +
-    rooms.storeRoom +
-    (floors > 1 ? 1 : 0); // terrace access door
+    (rooms.bedrooms || 0) +
+    (rooms.office || 0) +
+    (rooms.pooja || 0) +
+    (rooms.utility || 0) +
+    (rooms.storeRoom || 0) +
+    (floors > 1 ? 1 : 0);
 
-  return { mainDoorsCount, internalDoorsCount };
+  // Bathroom doors: 1 per bathroom
+  const bathroomDoorsCount = rooms.bathrooms || 0;
+
+  return { mainDoorsCount, internalDoorsCount, bathroomDoorsCount };
 }
+

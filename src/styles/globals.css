@@ -381,3 +381,75 @@
   transform: rotate(180deg) scale(0.5);
   opacity: 0;
 }
+
+/* ============================================================
+   PRINT / PDF EXPORT STYLES (A4 Bank-Ready Report Output)
+   ============================================================ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide interactive web chrome */
+  header,
+  footer,
+  nav,
+  button,
+  .print\:hidden,
+  [role="dialog"],
+  .toast-container {
+    display: none !important;
+  }
+
+  /* Force accordion contents to expand on print */
+  .print-expand-all {
+    display: block !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Page break rules */
+  .print-page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Ensure tables span full width cleanly */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    padding: 4pt 6pt !important;
+    font-size: 8.5pt !important;
+  }
+
+  /* Clean print containers */
+  .shadow-soft-lg,
+  .shadow-soft-md,
+  .shadow-soft-xs,
+  .shadow-2xl {
+    box-shadow: none !important;
+  }
+}
