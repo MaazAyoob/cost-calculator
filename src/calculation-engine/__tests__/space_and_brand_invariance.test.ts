@@ -7,6 +7,7 @@ const baseInput: EngineInput = {
   authority: 'BBMP/BDA',
   plotLength: 50,
   plotWidth: 30,
+  builtUpAreaPerFloor: 900,
   houseType: 'Duplex',
   floors: 3,
   parkingType: 'Normal Ground',
@@ -209,6 +210,6 @@ describe('Exhaustive Brand Invariance & Space Dependency Test Suite', () => {
 
     const buaStep = res.trace.find((t) => t.parameter === 'Total Built-up Area (BUA)');
     expect(buaStep).toBeDefined();
-    expect(buaStep?.result).toBe(2484);
+    expect(buaStep?.result).toBe(2700);
   });
 });

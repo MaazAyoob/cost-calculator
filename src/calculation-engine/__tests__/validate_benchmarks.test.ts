@@ -100,13 +100,13 @@ export interface BenchmarkReportItem {
 }
 
 const testCases = [
-  { name: '30x40 Ground', length: 40, width: 30, floors: 1, beds: 2, baths: 2 },
-  { name: '30x40 G+1',    length: 40, width: 30, floors: 2, beds: 3, baths: 3 },
-  { name: '30x40 G+2',    length: 40, width: 30, floors: 3, beds: 4, baths: 4 },
-  { name: '30x40 G+3',    length: 40, width: 30, floors: 4, beds: 5, baths: 5 },
-  { name: '30x40 G+4',    length: 40, width: 30, floors: 5, beds: 6, baths: 6 },
-  { name: '30x50 G+2',    length: 50, width: 30, floors: 3, beds: 4, baths: 4 },
-  { name: '60x90 G+4',    length: 90, width: 60, floors: 5, beds: 8, baths: 8 },
+  { name: '30x40 Ground', length: 40, width: 30, bua: 720, floors: 1, beds: 2, baths: 2 },
+  { name: '30x40 G+1',    length: 40, width: 30, bua: 720, floors: 2, beds: 3, baths: 3 },
+  { name: '30x40 G+2',    length: 40, width: 30, bua: 720, floors: 3, beds: 4, baths: 4 },
+  { name: '30x40 G+3',    length: 40, width: 30, bua: 720, floors: 4, beds: 5, baths: 5 },
+  { name: '30x40 G+4',    length: 40, width: 30, bua: 720, floors: 5, beds: 6, baths: 6 },
+  { name: '30x50 G+2',    length: 50, width: 30, bua: 900, floors: 3, beds: 4, baths: 4 },
+  { name: '60x90 G+4',    length: 90, width: 60, bua: 3240, floors: 5, beds: 8, baths: 8 },
 ];
 
 describe('Rightcon 7-Case Benchmark Validation Suite', () => {
@@ -118,6 +118,7 @@ describe('Rightcon 7-Case Benchmark Validation Suite', () => {
         ...defaultInput,
         plotLength: tc.length,
         plotWidth: tc.width,
+        builtUpAreaPerFloor: tc.bua,
         floors: tc.floors,
         liftRequired: tc.floors >= 4,
         rooms: {

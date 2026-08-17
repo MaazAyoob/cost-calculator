@@ -53,6 +53,7 @@ export interface ConfiguratorState {
   authority: AuthorityOption | null;
   plotLength: number;
   plotWidth: number;
+  builtUpAreaPerFloor: number; // Desired built-up area per floor (sq.ft)
   floors: number;
   houseType: HouseType | null;
   parkingType: ParkingTypeOption | null;
@@ -91,6 +92,7 @@ export interface ConfiguratorState {
 
   setCity: (city: CityLocation) => void;
   setPlotDimensions: (length: number, width: number) => void;
+  setBuiltUpAreaPerFloor: (bua: number) => void;
   setHouseConfig: (type: HouseType, floors: number) => void;
   setParkingConfig: (parkingType: ParkingTypeOption, carCount: number, bikeCount: number, evCharging: boolean) => void;
   updateRoomCount: (room: keyof RoomCounts, delta: number) => void;
@@ -120,6 +122,7 @@ export function getFreshZeroState() {
     authority: null as any,
     plotLength: 0,
     plotWidth: 0,
+    builtUpAreaPerFloor: 0,
     floors: 0,
     houseType: null as any,
     parkingType: null as any,
@@ -238,6 +241,10 @@ export const useWizardStore = create<ConfiguratorState>()(
         const plotLength = Math.max(0, Math.min(200, length));
         const plotWidth = Math.max(0, Math.min(200, width));
         set({ plotLength, plotWidth, hasStartedSelection: true });
+      },
+
+      setBuiltUpAreaPerFloor: (builtUpAreaPerFloor) => {
+        set({ builtUpAreaPerFloor: Math.max(0, builtUpAreaPerFloor), hasStartedSelection: true });
       },
 
       // Rule 2 & Rule 4 enforcement:

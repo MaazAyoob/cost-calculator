@@ -29,29 +29,51 @@ export function generateCalculationTrace(
     unit: 'Sq.Ft',
   });
 
-  // 2. Ground Coverage (Buildable Footprint)
+  // 2. Maximum Allowable BUA Per Floor (Authority Setback Rule)
   steps.push({
-    parameter: 'Buildable Footprint (Ground Coverage)',
+    parameter: 'Maximum Allowable BUA / Floor',
     category: 'Building Geometry',
-    inputs: { plotArea: `${area.plotAreaSqFt} sq.ft`, coverageFactor: `${A.coverageFactor.value * 100}%` },
+    inputs: { plotArea: `${area.plotAreaSqFt} sq.ft`, maxCoverageRatio: `${A.coverageFactor.value * 100}%` },
     formula: `${area.plotAreaSqFt} × ${A.coverageFactor.value}`,
-    assumption: `BBMP / BDA Ground Coverage Rule (${A.coverageFactor.name}) = ${A.coverageFactor.value}`,
-    result: area.buildableAreaSqFt,
+    assumption: `BBMP / BDA / MUDA Statutory Coverage Benchmark = ${(A.coverageFactor.value * 100).toFixed(0)}%`,
+    result: area.maxAllowableBUAPerFloorSqFt,
     unit: 'Sq.Ft',
   });
 
-  // 3. BUA Per Floor
+  // 3. User Selected BUA Per Floor
   steps.push({
-    parameter: 'Usable BUA Per Floor',
+    parameter: 'User Selected BUA / Floor',
     category: 'Building Geometry',
-    inputs: { buildableArea: `${area.buildableAreaSqFt} sq.ft`, floorEfficiency: `${A.floorEfficiency.value * 100}%` },
-    formula: `${area.buildableAreaSqFt} × ${A.floorEfficiency.value}`,
-    assumption: `Floor Efficiency Ratio (${A.floorEfficiency.name}) = ${A.floorEfficiency.value}`,
+    inputs: { selectedBUAPerFloor: `${area.buaPerFloorSqFt} sq.ft`, withinLimit: area.isWithinPermissibleLimit ? 'Yes' : 'Requires Variance Confirmation' },
+    formula: `${area.buaPerFloorSqFt}`,
+    assumption: area.isWithinPermissibleLimit ? 'Direct user-specified floor plate' : 'Exceeds standard 60% coverage (Client Confirmation Required)',
     result: area.buaPerFloorSqFt,
     unit: 'Sq.Ft',
   });
 
-  // 4. Total BUA
+  // 4. Remaining Ground Area
+  steps.push({
+    parameter: 'Remaining Open Ground Area',
+    category: 'Building Geometry',
+    inputs: { plotArea: `${area.plotAreaSqFt} sq.ft`, buaPerFloor: `${area.buaPerFloorSqFt} sq.ft` },
+    formula: `${area.plotAreaSqFt} - ${area.buaPerFloorSqFt}`,
+    assumption: 'Calculated on ground footprint only (Plot Area - BUA/Floor)',
+    result: area.remainingGroundAreaSqFt,
+    unit: 'Sq.Ft',
+  });
+
+  // 5. Ground Coverage Percentage
+  steps.push({
+    parameter: 'Ground Coverage Percentage',
+    category: 'Building Geometry',
+    inputs: { buaPerFloor: `${area.buaPerFloorSqFt} sq.ft`, plotArea: `${area.plotAreaSqFt} sq.ft` },
+    formula: `(${area.buaPerFloorSqFt} ÷ ${area.plotAreaSqFt || 1}) × 100`,
+    assumption: 'Actual footprint percentage on site',
+    result: parseFloat(area.groundCoveragePercentage.toFixed(1)),
+    unit: '%',
+  });
+
+  // 6. Total BUA
   steps.push({
     parameter: 'Total Built-up Area (BUA)',
     category: 'Building Geometry',
@@ -62,7 +84,7 @@ export function generateCalculationTrace(
     unit: 'Sq.Ft',
   });
 
-  // 5. Super BUA
+  // 7. Super BUA
   steps.push({
     parameter: 'Super Built-up Area',
     category: 'Building Geometry',

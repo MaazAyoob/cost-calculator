@@ -19,6 +19,7 @@ function buildInput(): EngineInput {
     authority:       s.authority || 'BBMP/BDA',
     plotLength:      s.plotLength || 0,
     plotWidth:       s.plotWidth || 0,
+    builtUpAreaPerFloor: s.builtUpAreaPerFloor || 0,
     houseType:       s.houseType || 'Duplex',
     floors:          s.floors > 0 ? s.floors : (s.plotLength > 0 && s.plotWidth > 0 ? 1 : 0),
     parkingType:     (s.parkingType as any) || 'Normal Ground',

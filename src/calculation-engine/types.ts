@@ -56,6 +56,7 @@ export interface EngineInput {
   authority: string;
   plotLength: number; // ft (10-200)
   plotWidth: number;  // ft (10-200)
+  builtUpAreaPerFloor?: number; // User-selected desired built-up area per floor (sq.ft)
   houseType: HouseType;
   floors: number;     // 1=G, 2=G+1, 3=G+2, 4=G+3, 5=G+4
   parkingType: 'Stilt' | 'Stilt Parking' | 'Normal Ground' | 'EV Charging Ready';
@@ -82,13 +83,20 @@ export interface EngineInput {
 
 export interface AreaResult {
   plotAreaSqFt: number;
-  buildableAreaSqFt: number;  // ground coverage
-  buaPerFloorSqFt: number;    // usable BUA per floor
-  totalBUASqFt: number;       // across all floors
-  superBUASqFt: number;       // with 15% common area
+  maxAllowableBUAPerFloorSqFt: number; // statutory/authority max permissible BUA per floor
+  buaPerFloorSqFt: number;            // user-selected desired BUA per floor
+  buildableAreaSqFt: number;          // ground coverage footprint (= buaPerFloorSqFt)
+  remainingGroundAreaSqFt: number;    // plotArea - buaPerFloorSqFt (ground footprint only)
+  remainingGroundArea: number;        // alias for calculation simplicity
+  groundCoveragePercentage: number;   // (buaPerFloorSqFt / plotArea) * 100
+  totalBUASqFt: number;               // buaPerFloorSqFt * floors
+  superBUASqFt: number;               // with 15% common area
   parkingAreaSqFt: number;
-  terraceSqFt: number;
+  terraceSqFt: number;                // top slab exposed area (= buaPerFloorSqFt)
   totalConstructedSqFt: number;
+  isWithinPermissibleLimit: boolean;
+  requiresClientConfirmation: boolean;
+  confirmationMessage?: string;
 }
 
 // ────────────────────────────────────────────────────────────

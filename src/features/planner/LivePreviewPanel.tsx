@@ -120,22 +120,49 @@ export const LivePreviewPanel: React.FC = () => {
             </p>
           </div>
 
-          {/* Key Secondary Metrics Grid */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-            <div className="p-3 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-0.5">
+          {/* Key Secondary Metrics Grid - 4-Card Overview */}
+          <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-100">
+            <div className="p-2.5 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-0.5">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-                Built-Up Area
+                BUA / Floor
               </span>
-              <span className="text-sm font-black text-slate-900 block">
+              <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
+                {area.buaPerFloorSqFt > 0 ? `${area.buaPerFloorSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                Total BUA
+              </span>
+              <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
                 {buaSqFt > 0 ? `${buaSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
               </span>
             </div>
 
-            <div className="p-3 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-0.5">
+            <div className="p-2.5 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-0.5">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-                Current Rate
+                Remaining Ground
               </span>
-              <span className="text-sm font-black text-blue-600 block">
+              <span className="text-xs sm:text-sm font-black text-emerald-600 block truncate">
+                {area.remainingGroundAreaSqFt > 0 ? `${area.remainingGroundAreaSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+              </span>
+            </div>
+
+            <div className="p-2.5 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                Ground Coverage
+              </span>
+              <span className="text-xs sm:text-sm font-black text-blue-600 block truncate">
+                {area.groundCoveragePercentage > 0 ? `${area.groundCoveragePercentage.toFixed(1)}%` : '0%'}
+              </span>
+            </div>
+
+            <div className="col-span-2 p-2.5 bg-blue-50/60 rounded-2xl border border-blue-100 flex items-center justify-between">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 block">
+                Rate / Sq.Ft
+              </span>
+              <span className="text-sm font-black text-blue-700 block">
                 {ratePerSqFt > 0 ? `₹${ratePerSqFt.toLocaleString()}/sq.ft` : '₹0 / sq.ft'}
               </span>
             </div>
@@ -214,13 +241,13 @@ export const LivePreviewPanel: React.FC = () => {
                     {plotLength}'
                   </span>
 
-                  {/* Buildable Inner Footprint */}
+                  {/* Built-Up Ground Footprint */}
                   <div className="w-4/5 h-16 bg-blue-50/90 border border-blue-300 rounded-lg flex flex-col items-center justify-center space-y-0.5">
                     <span className="text-[9px] font-extrabold text-blue-600 uppercase tracking-tight">
-                      Buildable Footprint (60%)
+                      Selected BUA Footprint ({area.groundCoveragePercentage > 0 ? area.groundCoveragePercentage.toFixed(0) : 0}%)
                     </span>
                     <span className="text-xs font-black text-slate-900">
-                      {area.buildableAreaSqFt > 0 ? `${area.buildableAreaSqFt.toLocaleString()} sq.ft` : `${Math.round(plotLength * plotWidth * 0.6)} sq.ft`}
+                      {area.buaPerFloorSqFt > 0 ? `${area.buaPerFloorSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
                     </span>
                   </div>
                 </div>
@@ -243,16 +270,30 @@ export const LivePreviewPanel: React.FC = () => {
             </div>
 
             {plotLength > 0 && plotWidth > 0 && (
-              <div className="flex justify-between items-center text-slate-600">
-                <span className="font-semibold text-slate-500">Plot Dimensions</span>
-                <span className="font-extrabold text-slate-800">{plotLength} × {plotWidth} ft</span>
-              </div>
+              <>
+                <div className="flex justify-between items-center text-slate-600">
+                  <span className="font-semibold text-slate-500">Plot Area</span>
+                  <span className="font-extrabold text-slate-800">{(plotLength * plotWidth).toLocaleString()} sq.ft ({plotLength} × {plotWidth} ft)</span>
+                </div>
+                {area.buaPerFloorSqFt > 0 && (
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span className="font-semibold text-slate-500">BUA / Floor</span>
+                    <span className="font-extrabold text-slate-800">{area.buaPerFloorSqFt.toLocaleString()} sq.ft ({area.groundCoveragePercentage.toFixed(1)}% coverage)</span>
+                  </div>
+                )}
+                {area.remainingGroundAreaSqFt > 0 && (
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span className="font-semibold text-slate-500">Remaining Ground</span>
+                    <span className="font-extrabold text-emerald-600">{area.remainingGroundAreaSqFt.toLocaleString()} sq.ft</span>
+                  </div>
+                )}
+              </>
             )}
 
             {floors > 0 && (
               <div className="flex justify-between items-center text-slate-600">
                 <span className="font-semibold text-slate-500">Storeys / Floors</span>
-                <span className="font-extrabold text-slate-800">{floors === 1 ? 'Ground Only' : `G + ${floors - 1}`}</span>
+                <span className="font-extrabold text-slate-800">{floors === 1 ? 'Ground Only' : `G + ${floors - 1}`} ({floors} Floors)</span>
               </div>
             )}
 

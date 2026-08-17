@@ -1,7 +1,8 @@
 import React from 'react';
 import { useWizardStore, CityLocation, HouseType, ParkingTypeOption } from '../../../store/useWizardStore';
+import { useArea } from '../../../store/useCalculationStore';
 import { Card } from '../../../components/ui/Card';
-import { MapPin, MoveHorizontal, MoveVertical, Check, ArrowRight } from 'lucide-react';
+import { MapPin, MoveHorizontal, MoveVertical, AlertTriangle, Check, Layers, Compass } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
 export const Step1BasicInfo: React.FC = () => {
@@ -9,6 +10,7 @@ export const Step1BasicInfo: React.FC = () => {
     city,
     plotLength,
     plotWidth,
+    builtUpAreaPerFloor,
     floors,
     houseType,
     parkingType,
@@ -17,10 +19,15 @@ export const Step1BasicInfo: React.FC = () => {
     evCharging,
     setCity,
     setPlotDimensions,
+    setBuiltUpAreaPerFloor,
     setHouseConfig,
     setParkingConfig,
-    calculatedAreaSqFt,
   } = useWizardStore();
+
+  const area = useArea();
+  const plotArea = plotLength * plotWidth;
+  const maxAllowable = area.maxAllowableBUAPerFloorSqFt || Math.round(plotArea * 0.6);
+  const isExceeding = builtUpAreaPerFloor > maxAllowable && maxAllowable > 0;
 
   const cities: { id: CityLocation; name: string; authority: string; desc: string }[] = [
     {
@@ -59,7 +66,7 @@ export const Step1BasicInfo: React.FC = () => {
       <div className="space-y-1.5">
         <h2 className="text-2xl font-black text-slate-900 tracking-tight">Basic Project Information</h2>
         <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-          Specify location, plot dimensions, floor count, and parking to set your project baseline.
+          Specify location, plot dimensions, desired built-up area per floor, floor count, and parking to set your project baseline.
         </p>
       </div>
 
@@ -208,7 +215,7 @@ export const Step1BasicInfo: React.FC = () => {
               </span>
               <div className="w-40 h-20 bg-blue-50/80 border border-blue-200 rounded-lg flex items-center justify-center">
                 <span className="text-sm font-black text-blue-900">
-                  {calculatedAreaSqFt > 0 ? `${calculatedAreaSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+                  {plotArea > 0 ? `${plotArea.toLocaleString()} sq.ft` : '0 sq.ft'}
                 </span>
               </div>
             </div>
@@ -216,10 +223,155 @@ export const Step1BasicInfo: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Home Configuration (Floors & Typology) */}
+      {/* 3. User-Selected Built-Up Area per Floor (BUA) */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 text-xs font-black flex items-center justify-center">3</span>
+          <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-700">Desired Built-Up Area Per Floor</h3>
+        </div>
+
+        <div className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-soft-xs space-y-6">
+          <div className="space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <label className="text-xs font-bold text-slate-700">
+                Built-Up Area (BUA) per Floor
+              </label>
+              {plotArea > 0 && (
+                <span className="text-[11px] font-semibold text-slate-500">
+                  Authority Maximum (60%): <strong className="text-slate-800">{maxAllowable.toLocaleString()} sq.ft</strong>
+                </span>
+              )}
+            </div>
+
+            {/* Direct Number Input & Slider */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+              <div className="sm:col-span-2 space-y-2">
+                <input
+                  type="range"
+                  min={0}
+                  max={plotArea > 0 ? plotArea : 3000}
+                  step={10}
+                  disabled={plotArea === 0}
+                  value={builtUpAreaPerFloor}
+                  onChange={(e) => setBuiltUpAreaPerFloor(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600 disabled:opacity-40"
+                />
+                <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
+                  <span>0 sq.ft</span>
+                  <span>{maxAllowable > 0 ? `${maxAllowable} sq.ft (60% Max)` : ''}</span>
+                  <span>{plotArea > 0 ? `${plotArea} sq.ft (Full Plot)` : ''}</span>
+                </div>
+              </div>
+
+              {/* Direct numeric input */}
+              <div className="relative">
+                <input
+                  type="number"
+                  min={0}
+                  max={plotArea > 0 ? plotArea : 10000}
+                  disabled={plotArea === 0}
+                  value={builtUpAreaPerFloor === 0 ? '' : builtUpAreaPerFloor}
+                  placeholder="0"
+                  onChange={(e) => setBuiltUpAreaPerFloor(Number(e.target.value) || 0)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-slate-900 text-right pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                  sq.ft
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Percentage Presets */}
+            {plotArea > 0 && (
+              <div className="pt-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1.5">
+                  Quick Presets based on {plotArea.toLocaleString()} sq.ft plot:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: '60% (Statutory Max)', pct: 0.60 },
+                    { label: '70%', pct: 0.70 },
+                    { label: '75%', pct: 0.75 },
+                    { label: '80%', pct: 0.80 },
+                  ].map((preset) => {
+                    const targetVal = Math.round(plotArea * preset.pct);
+                    const isSelected = builtUpAreaPerFloor === targetVal;
+                    return (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => setBuiltUpAreaPerFloor(targetVal)}
+                        className={cn(
+                          'text-xs font-extrabold px-3 py-1.5 rounded-xl border transition-all cursor-pointer',
+                          isSelected
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                        )}
+                      >
+                        {preset.label}: {targetVal.toLocaleString()} sq.ft
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Key Area Derivations Card */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                BUA / Floor
+              </span>
+              <span className="text-sm font-black text-slate-900 block">
+                {builtUpAreaPerFloor > 0 ? `${builtUpAreaPerFloor.toLocaleString()} sq.ft` : '0 sq.ft'}
+              </span>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                Ground Coverage
+              </span>
+              <span className="text-sm font-black text-blue-600 block">
+                {area.groundCoveragePercentage > 0 ? `${area.groundCoveragePercentage.toFixed(1)}%` : '0%'}
+              </span>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                Remaining Ground
+              </span>
+              <span className="text-sm font-black text-emerald-600 block">
+                {area.remainingGroundAreaSqFt > 0 ? `${area.remainingGroundAreaSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+              </span>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                Total BUA ({floors || 1} Flr{floors > 1 ? 's' : ''})
+              </span>
+              <span className="text-sm font-black text-slate-900 block">
+                {area.totalBUASqFt > 0 ? `${area.totalBUASqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+              </span>
+            </div>
+          </div>
+
+          {/* Validation Banner if exceeding statutory limit */}
+          {isExceeding && (
+            <div className="p-3.5 bg-amber-50/90 border border-amber-200 rounded-xl flex items-start gap-2.5 text-xs text-amber-800">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-extrabold">Client Confirmation Required:</strong> Selected BUA ({builtUpAreaPerFloor.toLocaleString()} sq.ft / {area.groundCoveragePercentage.toFixed(1)}% coverage) exceeds the standard 60% maximum permissible ground footprint ({maxAllowable.toLocaleString()} sq.ft) under {city === 'Mysore' ? 'MUDA' : 'BBMP/BDA'} bylaws. Requires setback variance confirmation.
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 4. Home Configuration (Floors & Typology) */}
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 text-xs font-black flex items-center justify-center">4</span>
           <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-700">Floors &amp; Typology</h3>
         </div>
 
@@ -282,10 +434,10 @@ export const Step1BasicInfo: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Parking Setup */}
+      {/* 5. Parking Setup */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 text-xs font-black flex items-center justify-center">4</span>
+          <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 text-xs font-black flex items-center justify-center">5</span>
           <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-700">Parking Setup</h3>
         </div>
 
