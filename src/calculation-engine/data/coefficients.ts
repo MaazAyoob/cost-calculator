@@ -59,7 +59,12 @@ export const FLOOR_TILE_FACTOR: Record<QualityTier, number> = {
 };
 
 /** Wall tile coverage: sq ft per bathroom (only wet areas) */
-export const WALL_TILE_SQFT_PER_BATHROOM = A.wallTileSqFtPerBathroom.value;
+export const WALL_TILE_SQFT_PER_BATHROOM_STANDARD = A.wallTileSqFtPerBathroomStandard.value;
+export const WALL_TILE_SQFT_PER_BATHROOM_FULL_HEIGHT = A.wallTileSqFtPerBathroomFullHeight.value;
+
+/** Kitchen splashback / dado area */
+export const KITCHEN_DADO_SQFT_STANDARD = A.kitchenDadoSqFtStandard.value;
+export const KITCHEN_DADO_SQFT_EXTENDED = A.kitchenDadoSqFtExtended.value;
 
 /** Interior paint area: multiplier on BUA (walls + ceiling) */
 export const INTERIOR_PAINT_FACTOR = A.interiorPaintFactor.value;
@@ -69,32 +74,33 @@ export const EXTERIOR_PAINT_FACTOR = A.exteriorPaintFactor.value;
 
 /** Electrical wire: metres per sq ft BUA */
 export const ELECTRICAL_WIRE_M_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 2.2,
-  Premium:   2.8,
-  Luxury:    3.5,
+  Essential: A.electricalWireMPerSqFtEssential.value,
+  Premium:   A.electricalWireMPerSqFtPremium.value,
+  Luxury:    A.electricalWireMPerSqFtLuxury.value,
 };
 
 /** Conduit: metres per sq ft BUA */
 export const CONDUIT_M_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 1.4,
-  Premium:   1.8,
-  Luxury:    2.2,
+  Essential: A.conduitMPerSqFtEssential.value,
+  Premium:   A.conduitMPerSqFtPremium.value,
+  Luxury:    A.conduitMPerSqFtLuxury.value,
 };
 
 /** Lighting points: per sq ft BUA */
-export const LIGHTING_POINTS_PER_SQFT = 0.035;
+export const LIGHTING_POINTS_PER_SQFT = A.lightingPointsPerSqFt.value;
 
 /** CPVC supply pipe: metres per sq ft BUA */
-export const CPVC_M_PER_SQFT = 0.18;
+export const CPVC_M_PER_SQFT = A.cpvcMPerSqFt.value;
 
 /** SWR drain pipe: metres per sq ft BUA */
-export const SWR_M_PER_SQFT = 0.12;
+export const SWR_M_PER_SQFT = A.swrMPerSqFt.value;
 
 /** Waterproofing: sq ft of wet areas relative to bathrooms */
 export const WATERPROOFING_SQFT_PER_BATHROOM = A.waterproofingSqFtPerBathroom.value;
+export const WATERPROOFING_BALCONY_SQFT = A.waterproofingBalconySqFt.value;
 
 /** Terrace waterproofing as % of plot area */
-export const TERRACE_WATERPROOFING_FACTOR = 0.7;
+export const TERRACE_WATERPROOFING_FACTOR = A.waterproofingTerraceFactor.value;
 
 /** Ground floor coverage factor (how much of plot is buildable footprint) */
 export const COVERAGE_FACTOR = A.coverageFactor.value;
@@ -107,9 +113,9 @@ export const SUPER_BUA_FACTOR = A.superBuaFactor.value;
 
 /** Modular switch modules per sq ft BUA */
 export const SWITCH_MODULES_PER_SQFT: Record<QualityTier, number> = {
-  Essential: 0.06,
-  Premium:   0.09,
-  Luxury:    0.12,
+  Essential: A.switchModulesPerSqFtEssential.value,
+  Premium:   A.switchModulesPerSqFtPremium.value,
+  Luxury:    A.switchModulesPerSqFtLuxury.value,
 };
 
 /** Bathroom fixtures: sets per bathroom */

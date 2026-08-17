@@ -1,9 +1,14 @@
-// Paint Module
+// ============================================================
+// PAINT MODULE — Internal, external, and putty coverage
+// ============================================================
+
 import { EngineInput, AreaResult } from '../types';
 import { INTERIOR_PAINT_FACTOR, EXTERIOR_PAINT_FACTOR } from '../data/coefficients';
+import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from '../data/engineeringAssumptions';
 
-/** Rough perimeter in ft (assumes near-square footprint) */
+/** Perimeter estimation in ft based on plot area */
 function estimatePerimeterFt(plotArea: number): number {
+  if (plotArea <= 0) return 0;
   const side = Math.sqrt(plotArea);
   return Math.round(side * 4);
 }
@@ -18,23 +23,23 @@ export function calculatePaint(input: EngineInput, area: AreaResult): {
 } {
   const { floors } = input;
   const bua = area.totalBUASqFt;
-  const FLOOR_HEIGHT_FT = 10;
+  const floorHeightFt = CENTRALIZED_ENGINEERING_ASSUMPTIONS.floorHeightFt.value || 10;
 
-  // Interior: walls (3.5 × BUA) + ceiling (BUA)
+  // Interior: walls (3.5 × BUA) + ceiling
   const interiorPaintAreaSqFt = Math.round(bua * INTERIOR_PAINT_FACTOR);
 
-  // Exterior: perimeter × height per floor × floors
+  // Exterior: perimeter × height per floor × floors × returns factor
   const perimeter = estimatePerimeterFt(area.plotAreaSqFt);
-  const exteriorRaw = perimeter * FLOOR_HEIGHT_FT * floors * EXTERIOR_PAINT_FACTOR;
+  const exteriorRaw = perimeter * floorHeightFt * (floors || 1) * EXTERIOR_PAINT_FACTOR;
   const exteriorPaintAreaSqFt = Math.round(exteriorRaw);
 
   // Putty on interior walls + ceiling
   const puttyAreaSqFt = interiorPaintAreaSqFt;
 
-  // Litres: 1 litre covers ~100 sqft for 2 coats of emulsion
-  const interiorPaintLitres = Math.ceil(interiorPaintAreaSqFt / 45);   // 45 sqft / litre × 2 coats
-  const exteriorPaintLitres = Math.ceil(exteriorPaintAreaSqFt / 60);   // 60 sqft / litre × 2 coats
-  const puttyKg = Math.round(puttyAreaSqFt * 0.55);                    // ~550g / sqft
+  // Litres: 1 litre covers ~45 sqft for 2 coats of emulsion
+  const interiorPaintLitres = Math.ceil(interiorPaintAreaSqFt / 45);
+  const exteriorPaintLitres = Math.ceil(exteriorPaintAreaSqFt / 60);
+  const puttyKg = Math.round(puttyAreaSqFt * 0.55);
 
   return {
     interiorPaintAreaSqFt,

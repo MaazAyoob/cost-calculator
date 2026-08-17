@@ -334,12 +334,49 @@ export const ReportPage: React.FC = () => {
           </button>
 
           {(openSections.assumptions || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-2 text-xs text-slate-600 ${openSections.assumptions ? 'block' : 'hidden'} print:block print:p-2`}>
-              <p>• <span className="font-bold">Nominal Soil Bearing Capacity</span>: 180 kN/sqm (Isolated footings planning assumption &bull; <span className="text-amber-600 font-semibold">Requires Client Confirmation</span>).</p>
-              <p>• <span className="font-bold">IS 456:2000</span> Code of Practice for Plain and Reinforced Concrete.</p>
-              <p>• <span className="font-bold">IS 875:1987</span> Code of Practice for Design Loads (Dead, Live & Wind) for Buildings.</p>
-              <p>• <span className="font-bold">NBC 2016</span> National Building Code of India (Fire & Safety Regulations).</p>
-              <p>• <span className="font-bold">{input.authority}</span> Bylaws & Zoned FAR Compliance (60% Ground Coverage, 92% Floor Efficiency).</p>
+            <div className={`p-4 bg-white border-t border-slate-200 space-y-4 text-xs text-slate-600 ${openSections.assumptions ? 'block' : 'hidden'} print:block print:p-2`}>
+              <div className="space-y-1.5">
+                <p>• <span className="font-bold text-slate-800">Nominal Soil Bearing Capacity</span>: 180 kN/sqm (Standard Isolated Footings assumption &bull; <span className="text-amber-600 font-semibold">Requires Client Confirmation</span>).</p>
+                <p>• <span className="font-bold text-slate-800">IS 456:2000 & IS 13920</span> Code of Practice for Plain, Reinforced and Ductile Concrete.</p>
+                <p>• <span className="font-bold text-slate-800">IS 875:1987</span> Code of Practice for Structural Design Loads (Dead, Live & Wind).</p>
+                <p>• <span className="font-bold text-slate-800">NBC 2016</span> National Building Code of India (Clear Height 10ft, Stairway & Fire Norms).</p>
+                <p>• <span className="font-bold text-slate-800">{input.authority}</span> Bylaws & Zoned FAR Compliance (60% Ground Coverage, 92% Floor Efficiency).</p>
+              </div>
+
+              {/* Engineering Trace Audit Table */}
+              {report.trace && report.trace.length > 0 && (
+                <div className="pt-2">
+                  <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-2">
+                    Mathematical Calculation Trace (Auditable Derivations)
+                  </span>
+                  <div className="border border-slate-200 rounded-xl overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-[10px]">
+                      <thead>
+                        <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                          <th className="p-2">Parameter</th>
+                          <th className="p-2">Category</th>
+                          <th className="p-2">Formula</th>
+                          <th className="p-2">Governing Assumption</th>
+                          <th className="p-2 text-right">Result</th>
+                          <th className="p-2">Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {report.trace.map((t, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50">
+                            <td className="p-2 font-bold text-slate-900">{t.parameter}</td>
+                            <td className="p-2 text-slate-500">{t.category}</td>
+                            <td className="p-2 font-mono text-blue-600">{t.formula}</td>
+                            <td className="p-2 text-slate-600">{t.assumption}</td>
+                            <td className="p-2 text-right font-black text-slate-900">{typeof t.result === 'number' ? t.result.toLocaleString('en-IN') : t.result}</td>
+                            <td className="p-2 text-slate-500">{t.unit}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -347,9 +384,10 @@ export const ReportPage: React.FC = () => {
         {/* Report Footer Verification */}
         <div className="pt-6 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
           <span>Cost Calculator Engine v1.0.0 &bull; Rightcon Digital Quantity Surveyor</span>
-          <span>Certified Feasibility & Material Report</span>
+          <span>Formula-Driven Indicative Construction Estimate</span>
         </div>
       </Card>
+
 
       <LeadCaptureModal
         isOpen={showLeadModal}

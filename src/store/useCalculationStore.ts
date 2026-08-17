@@ -82,3 +82,4 @@ export const usePaymentResult  = () => useCalculationStore((s) => s.result.payme
 export const useBOQ            = () => useCalculationStore((s) => s.result.boq);
 export const useProcurement    = () => useCalculationStore((s) => s.result.procurement);
 export const useReportData     = () => useCalculationStore((s) => s.result.report);
+export const useCalculationTrace = () => useCalculationStore((s) => s.result.trace);

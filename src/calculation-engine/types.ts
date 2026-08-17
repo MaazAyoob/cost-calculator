@@ -152,6 +152,7 @@ export type BOQCategory =
   | 'Fixtures & Finishes';
 
 export interface BOQItem {
+  slNo: number;
   code: string;
   category: BOQCategory;
   description: string;
@@ -162,6 +163,21 @@ export interface BOQItem {
   percentage: number;    // Dynamic % = (amount / totalBOQAmount) * 100
   brand: string;
   remarks: string;
+  formula?: string;
+}
+
+// ────────────────────────────────────────────────────────────
+// CALCULATION AUDIT & TRACEABILITY
+// ────────────────────────────────────────────────────────────
+
+export interface CalculationTraceStep {
+  parameter: string;
+  category: string;
+  inputs: Record<string, any>;
+  formula: string;
+  assumption: string;
+  result: number | string;
+  unit: string;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -260,6 +276,7 @@ export interface ReportData {
   paymentPlan: PaymentMilestone[];
   procurement: ProcurementItem[];
   recommendations: string[];
+  trace: CalculationTraceStep[];
 }
 
 // ────────────────────────────────────────────────────────────
@@ -276,5 +293,7 @@ export interface CalculationResult {
   boq: BOQItem[];
   procurement: ProcurementItem[];
   report: ReportData;
+  trace: CalculationTraceStep[];
   calculatedAt: string;
 }
+

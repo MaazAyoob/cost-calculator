@@ -1,7 +1,7 @@
 // ============================================================
 // MASTER CALCULATOR ORCHESTRATOR
 // Runs all modules in strict linear engineering dependency order:
-// Input → Area → Quantities → BOQ → Budget → Timeline → Payment → Procurement → Report
+// Input → Area → Quantities → BOQ → Budget → Timeline → Payment → Procurement → Trace → Report
 // ============================================================
 
 import { EngineInput, CalculationResult, MaterialQuantities } from './types';
@@ -21,6 +21,7 @@ import { calculateTimeline }         from './modules/timeline';
 import { calculatePaymentPlan }      from './modules/payment';
 import { generateBOQ }               from './modules/boq';
 import { generateProcurementList }   from './modules/materials';
+import { generateCalculationTrace }  from './modules/trace';
 import { assembleReport }            from './modules/report';
 
 export function runCalculator(input: EngineInput): CalculationResult {
@@ -84,8 +85,11 @@ export function runCalculator(input: EngineInput): CalculationResult {
   // ── STEP 7: Procurement List ──────────────────────────────
   const procurement = generateProcurementList(input, quantities, budget);
 
-  // ── STEP 8: Report Assembly ───────────────────────────────
-  const report = assembleReport(input, area, quantities, budget, timeline, paymentPlan, boq, procurement);
+  // ── STEP 8: Calculation Audit Trace ───────────────────────
+  const trace = generateCalculationTrace(input, area, quantities, budget);
+
+  // ── STEP 9: Report Assembly ───────────────────────────────
+  const report = assembleReport(input, area, quantities, budget, timeline, paymentPlan, boq, procurement, trace);
 
   return {
     input,
@@ -97,6 +101,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     boq,
     procurement,
     report,
+    trace,
     calculatedAt: new Date().toISOString(),
   };
 }
