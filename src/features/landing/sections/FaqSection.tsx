@@ -6,50 +6,46 @@ export const FaqSection: React.FC = () => {
 
   const faqs = [
     {
-      q: 'How accurate is Cost Calculator compared to final site completion cost?',
-      a: 'Cost Calculator is computed using Indian Standard IS 456 structural algorithms and live Bangalore material price indices. Our estimates consistently align within ±3% to ±5% of final contractor bills.',
+      q: 'How does Cost Calculator estimate residential construction costs?',
+      a: 'The engine uses deterministic structural ratios based on Indian Standards (IS 456, IS 1786) and Bangalore regional market Schedule of Rates. It calculates exact quantities for concrete volume, rebar tonnage, AAC blocks, flooring, plumbing, electrical, and paint.',
     },
     {
-      q: 'Are the BOQ reports accepted by banks for home loan sanction?',
-      a: 'Yes. Cost Calculator generates itemized Bills of Quantities (BOQ) with structural specifications and stage-wise milestone payment schedules designed to satisfy bank home loan audit requirements.',
+      q: 'Can I compare specific material brands like UltraTech vs ACC or Tata Tiscon vs JSW?',
+      a: 'Yes. In the 10-step wizard, you can toggle between brand tiers and finishes. The physical required quantity (e.g. 9.6 tonnes of steel) remains engineering-invariant while your itemized rates update accurately.',
     },
     {
-      q: 'How are cement and steel quantities computed?',
-      a: 'Quantities are calculated based on structural engineering ratios: M20/M25 concrete mix standards, slab thickness, column rebar tonnage (Fe 550D TMT), AAC block mortar ratios, and IS 456 plastering formulas.',
+      q: 'Are the generated BOQ reports accepted for bank home loans?',
+      a: 'Yes. Cost Calculator generates 13-stage itemized Bills of Quantities and a 6-stage milestone disbursement roadmap structured according to standard Indian bank appraisal formats (SBI, HDFC, ICICI, Axis).',
     },
     {
-      q: 'Can I customize material brands and quality tiers?',
-      a: 'Yes. In the step-by-step calculator, you can choose specific material options such as UltraTech/ACC cement, Tata Tiscon/JSW steel, Kohler/Jaquar sanitaryware, and Asian Paints grades.',
+      q: 'What plot sizes and storeys are supported?',
+      a: 'All standard South Indian urban plot sizes (30×40, 30×50, 40×60, 50×80, and custom dimensions) and residential heights from Ground floor up to G+4 storeys with ground or stilt parking.',
     },
     {
-      q: 'What plot dimensions and floor plans are supported?',
-      a: 'Cost Calculator supports all standard plot sizes (30x40, 30x50, 40x60, 50x80, custom dimensions) and floor configurations from Ground floor (G) up to G+4 levels with parking options.',
-    },
-    {
-      q: 'Is the cost calculator free to use?',
-      a: 'Yes. The step-by-step calculator, real-time live preview, dashboard workspace, and basic BOQ summaries are 100% free for homeowners.',
+      q: 'Is there any fee to plan and download estimates?',
+      a: 'No. The 10-step planning wizard, 3D architectural viewer, interactive dashboard, and BOQ summaries are 100% free for homeowners.',
     },
   ];
 
   return (
-    <section id="faq" className="py-24 bg-white border-b border-slate-200">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <section id="faq" className="py-20 lg:py-28 bg-[#F7F7F5] border-b border-[#E5E7EB]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         
         {/* Section Heading */}
-        <div className="space-y-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+        <div className="max-w-2xl space-y-4 text-left">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#1F4B43] bg-[#EBF2F0] border border-[#1F4B43]/15 px-3 py-1.5 rounded-md inline-block">
             Frequently Asked Questions
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-            Frequently Asked Questions
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172033] tracking-tight leading-[1.15]">
+            Everything you need to know.
           </h2>
-          <p className="text-base text-slate-600 leading-relaxed font-normal">
-            Everything you need to know about pre-construction estimation and IS code calculations.
+          <p className="text-base text-[#667085] leading-relaxed">
+            Common questions about pre-construction planning, engineering assumptions, and BOQ reports.
           </p>
         </div>
 
-        {/* Clean Accordion List with Dividers */}
-        <div className="divide-y divide-slate-200 border-y border-slate-200">
+        {/* Minimalist Accordion with Dividers */}
+        <div className="divide-y divide-[#E5E7EB] border-y border-[#E5E7EB] text-left">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
@@ -58,14 +54,18 @@ export const FaqSection: React.FC = () => {
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
                   className="w-full flex items-center justify-between text-left gap-4 cursor-pointer group"
                 >
-                  <span className="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <span className="text-base sm:text-lg font-bold text-[#172033] group-hover:text-[#1F4B43] transition-colors">
                     {faq.q}
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${isOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 text-[#667085] shrink-0 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-[#1F4B43]' : ''
+                    }`}
+                  />
                 </button>
 
                 {isOpen && (
-                  <p className="mt-3 text-sm text-slate-600 leading-relaxed font-normal pr-6">
+                  <p className="mt-3 text-xs sm:text-sm text-[#667085] leading-relaxed font-normal pr-8">
                     {faq.a}
                   </p>
                 )}

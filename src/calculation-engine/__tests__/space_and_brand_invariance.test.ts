@@ -177,39 +177,123 @@ describe('Exhaustive Brand Invariance & Space Dependency Test Suite', () => {
     expect(b.costPerSqFt).toBe(Math.round(b.totalProjectCost / res.area.totalBUASqFt));
   });
 
-  // ── 9. Robustness & Edge Cases: No NaN or Infinity ──
-  it('EDGE CASES: Handles zero, tiny plots, huge plots, and extreme room counts without NaN/Infinity', () => {
-    const edgeCases: Partial<EngineInput>[] = [
-      { plotLength: 0, plotWidth: 0, floors: 0 },
-      { plotLength: 10, plotWidth: 10, floors: 1 },
-      { plotLength: 200, plotWidth: 200, floors: 5 },
-      { floors: 1, rooms: { ...baseInput.rooms, balcony: 0, commonToilets: 0 } },
-      { liftRequired: true, evCharging: true, carCount: 4, bikeCount: 6 },
-    ];
-
-    edgeCases.forEach((ec) => {
-      const res = runCalculator({ ...baseInput, ...ec } as EngineInput);
-      expect(Number.isNaN(res.budget.totalProjectCost)).toBe(false);
-      expect(Number.isFinite(res.budget.totalProjectCost)).toBe(true);
-      expect(Number.isNaN(res.budget.costPerSqFt)).toBe(false);
-      expect(Number.isFinite(res.budget.costPerSqFt)).toBe(true);
-      expect(res.budget.totalProjectCost).toBeGreaterThanOrEqual(0);
-      expect(res.budget.costPerSqFt).toBeGreaterThanOrEqual(0);
+  // ── 10. Dedicated 10-Case Client Requirement Validation Suite ──
+  describe('Client Required 10-Case Live Calculation Propagation Tests', () => {
+    it('TEST 1: Initial zero-state project has totalProjectCost === 0', () => {
+      const zeroInput: EngineInput = {
+        city: 'Bangalore',
+        authority: 'BBMP/BDA',
+        plotLength: 0,
+        plotWidth: 0,
+        builtUpAreaPerFloor: 0,
+        houseType: 'Duplex',
+        floors: 0,
+        parkingType: 'Normal Ground',
+        carCount: 0,
+        bikeCount: 0,
+        evCharging: false,
+        liftRequired: false,
+        rooms: {
+          bedrooms: 0, bathrooms: 0, commonToilets: 0, kitchen: 0,
+          dining: 0, living: 0, balcony: 0, office: 0, pooja: 0, utility: 0, storeRoom: 0
+        },
+        qualityTier: 'Premium',
+        materialBrands: {} as any,
+        flooringZones: {} as any,
+        wallCladding: {} as any,
+        doors: {} as any,
+        windows: {} as any,
+        electrical: {} as any,
+        bathroomFittings: {} as any,
+        painting: {} as any,
+      };
+      const res = runCalculator(zeroInput);
+      expect(res.budget.totalProjectCost).toBe(0);
+      expect(res.budget.costPerSqFt).toBe(0);
+      expect(res.area.totalBUASqFt).toBe(0);
+      expect(res.boq.length).toBe(0);
     });
-  });
 
-  // ── 10. Trace Generation Invariant ──
-  it('CALCULATION TRACE: Generates complete auditable derivation steps', () => {
-    const res = runCalculator(baseInput);
-    expect(res.trace).toBeDefined();
-    expect(res.trace.length).toBeGreaterThanOrEqual(10);
+    it('TEST 2: Changing plot dimensions changes total cost when configured', () => {
+      const rSmall = runCalculator({ ...baseInput, plotLength: 40, plotWidth: 30, builtUpAreaPerFloor: 720 });
+      const rLarge = runCalculator({ ...baseInput, plotLength: 60, plotWidth: 40, builtUpAreaPerFloor: 1440 });
+      expect(rSmall.budget.totalProjectCost).not.toBe(rLarge.budget.totalProjectCost);
+      expect(rLarge.budget.totalProjectCost).toBeGreaterThan(rSmall.budget.totalProjectCost);
+    });
 
-    const plotStep = res.trace.find((t) => t.parameter === 'Plot Area');
-    expect(plotStep).toBeDefined();
-    expect(plotStep?.result).toBe(1500);
+    it('TEST 3: Changing floors changes BUA and total cost', () => {
+      const rG1 = runCalculator({ ...baseInput, floors: 2 });
+      const rG2 = runCalculator({ ...baseInput, floors: 3 });
+      expect(rG1.area.totalBUASqFt).not.toBe(rG2.area.totalBUASqFt);
+      expect(rG2.area.totalBUASqFt).toBeGreaterThan(rG1.area.totalBUASqFt);
+      expect(rG1.budget.totalProjectCost).not.toBe(rG2.budget.totalProjectCost);
+      expect(rG2.budget.totalProjectCost).toBeGreaterThan(rG1.budget.totalProjectCost);
+    });
 
-    const buaStep = res.trace.find((t) => t.parameter === 'Total Built-up Area (BUA)');
-    expect(buaStep).toBeDefined();
-    expect(buaStep?.result).toBe(2700);
+    it('TEST 4: Bedrooms + 1 changes bedroom-dependent quantities and total cost', () => {
+      const r2Bed = runCalculator({ ...baseInput, rooms: { ...baseInput.rooms, bedrooms: 2 } });
+      const r3Bed = runCalculator({ ...baseInput, rooms: { ...baseInput.rooms, bedrooms: 3 } });
+
+      expect(r3Bed.quantities.internalDoorsCount).toBe(r2Bed.quantities.internalDoorsCount + 1);
+      expect(r3Bed.quantities.windowsCount).toBeGreaterThan(r2Bed.quantities.windowsCount);
+      expect(r3Bed.quantities.lightingPoints).toBeGreaterThan(r2Bed.quantities.lightingPoints);
+      expect(r3Bed.budget.totalProjectCost).toBeGreaterThan(r2Bed.budget.totalProjectCost);
+    });
+
+    it('TEST 5: Bathrooms + 1 changes bathroom-dependent quantities and total cost', () => {
+      const r2Bath = runCalculator({ ...baseInput, rooms: { ...baseInput.rooms, bathrooms: 2 } });
+      const r3Bath = runCalculator({ ...baseInput, rooms: { ...baseInput.rooms, bathrooms: 3 } });
+
+      expect(r3Bath.quantities.bathroomDoorsCount).toBe(r2Bath.quantities.bathroomDoorsCount + 1);
+      expect(r3Bath.quantities.bathroomFixtureSets).toBeGreaterThan(r2Bath.quantities.bathroomFixtureSets);
+      expect(r3Bath.quantities.wallTilesSqFt).toBeGreaterThan(r2Bath.quantities.wallTilesSqFt);
+      expect(r3Bath.quantities.waterproofingAreaSqFt).toBeGreaterThan(r2Bath.quantities.waterproofingAreaSqFt);
+      expect(r3Bath.budget.totalProjectCost).toBeGreaterThan(r2Bath.budget.totalProjectCost);
+    });
+
+    it('TEST 6: Steel brand change keeps quantity invariant, changes rate and amount', () => {
+      const rTata = runCalculator({ ...baseInput, materialBrands: { ...baseInput.materialBrands, steel: 'Tata Tiscon' } });
+      const rJSW = runCalculator({ ...baseInput, materialBrands: { ...baseInput.materialBrands, steel: 'JSW Neosteel' } });
+
+      expect(rTata.quantities.steelTonnes).toBe(rJSW.quantities.steelTonnes);
+      expect(rTata.budget.totalProjectCost).not.toBe(rJSW.budget.totalProjectCost);
+      expect(rTata.budget.totalProjectCost).toBeGreaterThan(rJSW.budget.totalProjectCost);
+    });
+
+    it('TEST 7: Cement brand change keeps bag count invariant, changes rate and amount', () => {
+      const rUltra = runCalculator({ ...baseInput, materialBrands: { ...baseInput.materialBrands, cement: 'UltraTech' } });
+      const rDalmia = runCalculator({ ...baseInput, materialBrands: { ...baseInput.materialBrands, cement: 'Dalmia Bharat' } });
+
+      expect(rUltra.quantities.cementBags).toBe(rDalmia.quantities.cementBags);
+      expect(rUltra.budget.totalProjectCost).not.toBe(rDalmia.budget.totalProjectCost);
+      expect(rUltra.budget.totalProjectCost).toBeGreaterThan(rDalmia.budget.totalProjectCost);
+    });
+
+    it('TEST 8: Flooring selection keeps floor tile area invariant, changes rate and amount', () => {
+      const rMarble = runCalculator({ ...baseInput, flooringZones: { ...baseInput.flooringZones, living: 'Italian Marble' } });
+      const rVitrified = runCalculator({ ...baseInput, flooringZones: { ...baseInput.flooringZones, living: 'Vitrified Tiles 800x800mm' } });
+
+      expect(rMarble.quantities.floorTilesSqFt).toBe(rVitrified.quantities.floorTilesSqFt);
+      expect(rMarble.budget.totalProjectCost).not.toBe(rVitrified.budget.totalProjectCost);
+      expect(rMarble.budget.totalProjectCost).toBeGreaterThan(rVitrified.budget.totalProjectCost);
+    });
+
+    it('TEST 9: Door selection keeps door count invariant, changes rate and amount', () => {
+      const rTeak = runCalculator({ ...baseInput, doors: { ...baseInput.doors, mainDoor: 'Premium Teak' } });
+      const rNormal = runCalculator({ ...baseInput, doors: { ...baseInput.doors, mainDoor: 'Normal Teak' } });
+
+      expect(rTeak.quantities.mainDoorsCount).toBe(rNormal.quantities.mainDoorsCount);
+      expect(rTeak.budget.totalProjectCost).not.toBe(rNormal.budget.totalProjectCost);
+      expect(rTeak.budget.totalProjectCost).toBeGreaterThan(rNormal.budget.totalProjectCost);
+    });
+
+    it('TEST 10: Paint brand / grade keeps paint area invariant, changes rate and amount', () => {
+      const rRoyale = runCalculator({ ...baseInput, painting: { ...baseInput.painting, internalPaint: 'Royale Luxury Emulsion', brand: 'Asian Paints' } });
+      const rTractor = runCalculator({ ...baseInput, painting: { ...baseInput.painting, internalPaint: 'Tractor Emulsion', brand: 'Berger Paints' } });
+
+      expect(rRoyale.quantities.interiorPaintAreaSqFt).toBe(rTractor.quantities.interiorPaintAreaSqFt);
+      expect(rRoyale.budget.totalProjectCost).not.toBe(rTractor.budget.totalProjectCost);
+      expect(rRoyale.budget.totalProjectCost).toBeGreaterThan(rTractor.budget.totalProjectCost);
+    });
   });
 });

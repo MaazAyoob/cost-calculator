@@ -1,223 +1,339 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Layout, BarChart3, FileSpreadsheet, Calendar, FileCheck2, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { ArrowRight, Sliders } from 'lucide-react';
+import { runCalculator } from '../../../calculation-engine/calculator';
+import { EngineInput } from '../../../calculation-engine/types';
+import { formatCurrency } from '../../../utils/cn';
+import { useWizardStore } from '../../../store/useWizardStore';
 
 export const InteractiveDemoSection: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'wizard' | 'dashboard' | 'boq' | 'timeline' | 'reports'>('wizard');
 
-  const tabs = [
-    { id: 'wizard', label: 'Planning Wizard', icon: <Layout className="w-4 h-4" /> },
-    { id: 'dashboard', label: 'Interactive Dashboard', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'boq', label: '13-Stage BOQ', icon: <FileSpreadsheet className="w-4 h-4" /> },
-    { id: 'timeline', label: 'Construction Timeline', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'reports', label: 'Bank-Ready Reports', icon: <FileCheck2 className="w-4 h-4" /> },
-  ];
+  // Local interactive controls for the live demo widget
+  const [plotSize, setPlotSize] = useState<'30x40' | '30x50' | '40x60'>('30x50');
+  const [floors, setFloors] = useState<number>(3);
+  const [bedrooms, setBedrooms] = useState<number>(3);
+  const [tier, setTier] = useState<'Essential' | 'Premium' | 'Luxury'>('Premium');
+
+  const getDims = () => {
+    switch (plotSize) {
+      case '30x40': return { length: 40, width: 30, bua: 720 };
+      case '30x50': return { length: 50, width: 30, bua: 900 };
+      case '40x60': return { length: 60, width: 40, bua: 1440 };
+    }
+  };
+
+  const dims = getDims();
+
+  // Run the calculation engine live on every user change
+  const demoInput: EngineInput = {
+    city: 'Bangalore',
+    authority: 'BBMP/BDA',
+    plotLength: dims.length,
+    plotWidth: dims.width,
+    builtUpAreaPerFloor: dims.bua,
+    houseType: 'Duplex',
+    floors: floors,
+    parkingType: 'Normal Ground',
+    carCount: 1,
+    bikeCount: 2,
+    evCharging: true,
+    liftRequired: floors >= 4,
+    rooms: {
+      bedrooms: bedrooms,
+      bathrooms: bedrooms,
+      commonToilets: 1,
+      kitchen: 1,
+      dining: 1,
+      living: 1,
+      balcony: 1,
+      office: 0,
+      pooja: 1,
+      utility: 1,
+      storeRoom: 0,
+    },
+    qualityTier: tier,
+    materialBrands: {
+      steel: tier === 'Luxury' ? 'Tata Tiscon' : tier === 'Premium' ? 'Tata Tiscon' : 'JSW Neosteel',
+      cement: tier === 'Luxury' ? 'UltraTech' : tier === 'Premium' ? 'UltraTech' : 'ACC Cement',
+      doors: tier === 'Luxury' ? 'Burma Teak Custom Carved' : tier === 'Premium' ? 'Premium Teak' : 'Flush Door',
+      windows: 'uPVC',
+      flooring: tier === 'Luxury' ? 'Italian Marble' : 'Vitrified Tiles',
+      bathroom: tier === 'Luxury' ? 'Toto' : tier === 'Premium' ? 'Jaquar' : 'Cera',
+      electrical: 'V-Guard',
+      paint: 'Asian Paints',
+    },
+    flooringZones: {
+      living: tier === 'Luxury' ? 'Italian Marble' : 'Vitrified Tiles 800x800mm',
+      kitchenDining: 'Vitrified Tiles',
+      bedrooms: 'Vitrified Tiles',
+      bathrooms: 'Anti-skid Ceramic Tiles',
+      parkingUtility: 'Heavy-Duty Parking Tiles',
+      balconies: 'Anti-skid Ceramic',
+    },
+    wallCladding: {
+      kitchenDadoHeight: '2 ft',
+      bathroomTileHeight: '7 ft (Lintel)',
+    },
+    doors: {
+      mainDoor: tier === 'Luxury' ? 'Burma Teak Custom Carved' : tier === 'Premium' ? 'Premium Teak' : 'Normal Teak',
+      internalDoor: 'Flush Door',
+      bathroomDoor: 'WPC Door',
+    },
+    windows: {
+      primaryMaterial: 'uPVC',
+      subGrade: 'Standard uPVC',
+    },
+    electrical: {
+      conduit: 'Heavy-Duty ISI Marked PVC',
+      wireTier: 'Mid-range (V-Guard)',
+    },
+    bathroomFittings: {
+      sanitaryTier: tier === 'Luxury' ? 'Luxury (Kohler / Toto)' : 'Premium (Jaquar / Kohler / Grohe)',
+      cpvcBrand: 'Ashirwad',
+    },
+    painting: {
+      baseLayer: 'Putty + Primer',
+      internalPaint: tier === 'Luxury' ? 'Royale Luxury Emulsion' : 'Premium Emulsion',
+      externalPaint: 'Ultima Weather Proof',
+      brand: 'Asian Paints',
+    },
+  };
+
+  const result = runCalculator(demoInput);
 
   return (
-    <section id="demo" className="bg-[var(--cc-bg)] py-20 border-b border-[var(--cc-border)] relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="demo" className="py-20 lg:py-28 bg-[#F7F7F5] border-b border-[#E5E7EB]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" /> Interactive Product Experience
+        <div className="max-w-3xl space-y-4 text-left">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#1F4B43] bg-[#EBF2F0] border border-[#1F4B43]/15 px-3 py-1.5 rounded-md inline-block">
+            Interactive Calculator Preview
           </span>
-          <h2 className="heading-xl tracking-tight text-[var(--cc-text-primary)]">
-            See the Flagship Engine in Action.
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172033] tracking-tight leading-[1.15]">
+            See your estimate take shape as you configure your home.
           </h2>
-          <p className="text-[var(--cc-text-secondary)] text-base leading-relaxed">
-            Explore how Cost Calculator turns complex architectural variables into clean, actionable dashboards and reports.
+          <p className="text-base text-[#667085] leading-relaxed">
+            Adjust plot dimensions, storeys, room allocations, and material tiers below to watch live construction costs, quantities, and rates recalculate instantly.
           </p>
         </div>
 
-        {/* Tab Switcher Buttons */}
-        <div className="flex items-center justify-center gap-2 flex-wrap mb-8">
-          {tabs.map((t) => {
-            const isSelected = activeTab === t.id;
-            return (
+        {/* Live Interactive Product Mockup */}
+        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+          
+          {/* Left: Interactive Configuration Controls (5 cols) */}
+          <div className="lg:col-span-5 p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-[#E5E7EB] space-y-6 text-left bg-slate-50/50">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#E5E7EB]">
+              <Sliders className="w-4 h-4 text-[#1F4B43]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#172033]">
+                Try Changing Inputs
+              </span>
+            </div>
+
+            {/* 1. Plot Size */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#172033] block">
+                Plot Dimensions
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['30x40', '30x50', '40x60'] as const).map((ps) => (
+                  <button
+                    key={ps}
+                    type="button"
+                    onClick={() => setPlotSize(ps)}
+                    className={`py-2 px-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      plotSize === ps
+                        ? 'bg-[#1F4B43] text-white border-[#1F4B43] shadow-xs'
+                        : 'bg-white text-[#172033] border-[#E5E7EB] hover:bg-slate-50'
+                    }`}
+                  >
+                    {ps.replace('x', ' × ')} ft
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Floors */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#172033] block">
+                Floors / Storeys
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {[1, 2, 3, 4].map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setFloors(f)}
+                    className={`py-2 px-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      floors === f
+                        ? 'bg-[#1F4B43] text-white border-[#1F4B43] shadow-xs'
+                        : 'bg-white text-[#172033] border-[#E5E7EB] hover:bg-slate-50'
+                    }`}
+                  >
+                    {f === 1 ? 'Ground' : `G+${f - 1}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Bedrooms */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#172033] block">
+                Bedroom Layout
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[2, 3, 4].map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setBedrooms(b)}
+                    className={`py-2 px-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      bedrooms === b
+                        ? 'bg-[#1F4B43] text-white border-[#1F4B43] shadow-xs'
+                        : 'bg-white text-[#172033] border-[#E5E7EB] hover:bg-slate-50'
+                    }`}
+                  >
+                    {b} BHK
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Specification Tier */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#172033] block">
+                Construction Grade
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['Essential', 'Premium', 'Luxury'] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTier(t)}
+                    className={`py-2 px-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      tier === t
+                        ? 'bg-[#1F4B43] text-white border-[#1F4B43] shadow-xs'
+                        : 'bg-white text-[#172033] border-[#E5E7EB] hover:bg-slate-50'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Live Calculation Output & Breakdown (7 cols) */}
+          <div className="lg:col-span-7 p-6 sm:p-8 space-y-6 text-left flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#667085]">
+                  Calculated Estimate Output
+                </span>
+                <span className="text-[11px] font-bold text-[#1F4B43] bg-[#EBF2F0] px-2.5 py-0.5 rounded-full">
+                  Live Engine Active
+                </span>
+              </div>
+
+              {/* Primary Cost Display */}
+              <div className="py-4 space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#667085] block">
+                  Estimated Total Project Cost
+                </span>
+                <div className="text-3xl sm:text-4xl font-bold text-[#1F4B43] tracking-tight">
+                  {formatCurrency(result.budget.totalProjectCost)}
+                </div>
+                <p className="text-xs text-[#667085]">
+                  Includes structural base, {tier} specifications, contractor margins &amp; statutory GST.
+                </p>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div className="p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] block">
+                    Total BUA
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-[#172033] block">
+                    {result.area.totalBUASqFt.toLocaleString()} sqft
+                  </span>
+                </div>
+
+                <div className="p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] block">
+                    Effective Rate
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-[#172033] block">
+                    ₹{result.budget.costPerSqFt.toLocaleString()}/sqft
+                  </span>
+                </div>
+
+                <div className="p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] block">
+                    TMT Steel
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-[#172033] block">
+                    {result.quantities.steelTonnes} Tonnes
+                  </span>
+                </div>
+
+                <div className="p-3 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] block">
+                    Cement Bags
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-[#172033] block">
+                    {result.quantities.cementBags.toLocaleString()} Bags
+                  </span>
+                </div>
+              </div>
+
+              {/* Active BOQ Sample Preview */}
+              <div className="pt-4 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] block">
+                  Top BOQ Contributions ({result.boq.length} line items total)
+                </span>
+                <div className="space-y-1 text-xs">
+                  {result.boq.slice(0, 3).map((item) => (
+                    <div key={item.code} className="p-2 bg-slate-50 rounded-lg flex items-center justify-between border border-[#E5E7EB]">
+                      <span className="font-semibold text-[#172033] truncate max-w-[65%]">
+                        {item.description}
+                      </span>
+                      <span className="font-bold text-[#172033]">
+                        {formatCurrency(item.amount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Launch Full Calculator CTA */}
+            <div className="pt-4 border-t border-[#E5E7EB]">
               <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id as any)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  isSelected ? 'bg-[var(--cc-brand)] text-white shadow-soft-md border border-[var(--cc-brand)]'
-                    : 'bg-[var(--cc-surface)] text-[var(--cc-text-secondary)] border border-[var(--cc-border)] hover:text-[var(--cc-text-primary)] hover:bg-[var(--cc-surface-muted)]'
-                }`}
+                onClick={() => {
+                  useWizardStore.getState().startNewProject();
+                  useWizardStore.setState({
+                    plotLength: dims.length,
+                    plotWidth: dims.width,
+                    floors: floors,
+                    qualityTier: tier,
+                    rooms: {
+                      ...useWizardStore.getState().rooms,
+                      bedrooms: bedrooms,
+                      bathrooms: bedrooms,
+                    },
+                  });
+                  navigate('/calculator');
+                }}
+                className="w-full py-3 px-4 bg-[#1F4B43] hover:bg-[#163731] text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
-                {t.icon}
-                <span>{t.label}</span>
+                Customize Your Actual Plot in Full Calculator <ArrowRight className="w-4 h-4" />
               </button>
-            );
-          })}
-        </div>
+            </div>
 
-        {/* Tab Showcase Card */}
-        <div className="rounded-3xl p-1 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 border border-[var(--cc-border)] shadow-soft-xl overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="p-6 sm:p-10 bg-[var(--cc-surface)] rounded-[22px] text-left space-y-8"
-            >
-              {activeTab === 'wizard' && (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-[var(--cc-brand)] uppercase tracking-widest block">Step 08 of 10</span>
-                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">Material Brand Selection Matrix</h3>
-                    </div>
-                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-[var(--cc-brand)] text-white font-bold text-xs cursor-pointer">
-                      Try Wizard →
-                    </Button>
-                  </div>
+          </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)] space-y-2">
-                      <div className="text-xs font-bold text-blue-600 uppercase">Cement Grade</div>
-                      <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">UltraTech Super PPC</div>
-                      <div className="text-[11px] text-[var(--cc-text-secondary)]">1,056 Bags &bull; ₹390 / bag</div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)] space-y-2">
-                      <div className="text-xs font-bold text-indigo-600 uppercase">TMT Steel Grade</div>
-                      <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">Tata Tiscon 550D Fe</div>
-                      <div className="text-[11px] text-[var(--cc-text-secondary)]">9.6 Metric Tons &bull; ₹78 / kg</div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)] space-y-2">
-                      <div className="text-xs font-bold text-emerald-600 uppercase">Sanitaryware</div>
-                      <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">Kohler / Grohe Premium</div>
-                      <div className="text-[11px] text-[var(--cc-text-secondary)]">CPVC Ashirwad &bull; Kohler Fittings</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'dashboard' && (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-[var(--cc-brand)] uppercase tracking-widest block">Real-time Financial Overview</span>
-                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">Executive Project Summary Dashboard</h3>
-                    </div>
-                    <Button size="sm" onClick={() => navigate('/dashboard')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
-                      Open Live Workspace →
-                    </Button>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Estimated Cost</span>
-                      <span className="text-lg font-black text-blue-600">₹68.4 Lakhs</span>
-                    </div>
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Base Rate / Sq.Ft</span>
-                      <span className="text-lg font-black text-[var(--cc-text-primary)]">₹2,850 / sq.ft</span>
-                    </div>
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Built-up Area</span>
-                      <span className="text-lg font-black text-[var(--cc-text-primary)]">2,400 sq.ft</span>
-                    </div>
-                    <div className="p-4 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <span className="text-[10px] text-[var(--cc-text-secondary)] block font-medium uppercase">Build Duration</span>
-                      <span className="text-lg font-black text-emerald-600">10 Months</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'boq' && (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest block">IS Code Itemization</span>
-                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">13 Construction Stages BOQ Matrix</h3>
-                    </div>
-                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
-                      View Full BOQ →
-                    </Button>
-                  </div>
-
-                  <div className="space-y-2 text-xs">
-                    <div className="flex justify-between p-3 rounded-lg bg-slate-50 border border-[var(--cc-border)] font-bold">
-                      <span className="text-slate-800">Stage 01: Excavation & Footing Concrete (M20)</span>
-                      <span className="text-blue-600 font-extrabold">₹4,20,000</span>
-                    </div>
-                    <div className="flex justify-between p-3 rounded-lg bg-slate-50 border border-[var(--cc-border)] font-bold">
-                      <span className="text-slate-800">Stage 02: Plinth Beam & RCC Columns (Tata 550D)</span>
-                      <span className="text-blue-600 font-extrabold">₹8,60,000</span>
-                    </div>
-                    <div className="flex justify-between p-3 rounded-lg bg-slate-50 border border-[var(--cc-border)] font-bold">
-                      <span className="text-slate-800">Stage 03: AAC Block Masonry & Lintels</span>
-                      <span className="text-blue-600 font-extrabold">₹5,40,000</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'timeline' && (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-cyan-600 uppercase tracking-widest block">Milestone Roadmap</span>
-                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">10-Month Milestone Schedule</h3>
-                    </div>
-                    <Button size="sm" onClick={() => navigate('/calculator')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
-                      Configure Timeline →
-                    </Button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <div className="font-bold text-cyan-600 uppercase text-[10px]">Month 1-2</div>
-                      <div className="text-[var(--cc-text-primary)] font-extrabold text-sm">Substructure & Foundation</div>
-                      <div className="text-[var(--cc-text-secondary)] text-[11px] mt-1">Advance 15% &bull; Sump & Footing</div>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <div className="font-bold text-cyan-600 uppercase text-[10px]">Month 3-5</div>
-                      <div className="text-[var(--cc-text-primary)] font-extrabold text-sm">Superstructure Slabs</div>
-                      <div className="text-[var(--cc-text-secondary)] text-[11px] mt-1">Milestone 25% &bull; G+1/G+2 Slabs</div>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-[var(--cc-border)]">
-                      <div className="font-bold text-cyan-600 uppercase text-[10px]">Month 6-10</div>
-                      <div className="text-[var(--cc-text-primary)] font-extrabold text-sm">Finishes & Handover</div>
-                      <div className="text-[var(--cc-text-secondary)] text-[11px] mt-1">Milestone 60% &bull; Plaster & Paint</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'reports' && (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--cc-border)] pb-4">
-                    <div>
-                      <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block">Loan Approval Ready</span>
-                      <h3 className="text-xl font-extrabold text-[var(--cc-text-primary)]">Bank Home Loan Certified Reports</h3>
-                    </div>
-                    <Button size="sm" onClick={() => navigate('/report')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
-                      Export Sample PDF →
-                    </Button>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-[var(--cc-border)] flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                      <FileCheck2 className="w-8 h-8 text-blue-600 shrink-0" />
-                      <div>
-                        <div className="text-sm font-extrabold text-[var(--cc-text-primary)]">Bank_Disbursement_BOQ_Report.pdf</div>
-                        <div className="text-xs text-[var(--cc-text-secondary)]">SBI / HDFC / ICICI Certified Structural Format &bull; 22 Sections</div>
-                      </div>
-                    </div>
-                    <Button size="sm" onClick={() => navigate('/report')} className="bg-blue-600 text-white font-bold text-xs cursor-pointer">
-                      Download Sample PDF
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
         </div>
 
       </div>

@@ -75,10 +75,10 @@ export const LivePreviewPanel: React.FC = () => {
     <>
       {/* ── DESKTOP STICKY SIDEBAR PANEL (lg:block) ── */}
       <aside className="hidden lg:block w-full sticky top-20">
-        <Card className="p-6 bg-white border border-slate-200/90 shadow-soft-lg rounded-3xl space-y-6">
+        <Card className="p-6 bg-white border border-slate-200/90 shadow-soft-lg rounded-3xl space-y-5">
           
           {/* Header & Status */}
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
               <span className="text-xs font-black uppercase tracking-widest text-slate-500">Live Estimate</span>
@@ -121,7 +121,7 @@ export const LivePreviewPanel: React.FC = () => {
           </div>
 
           {/* Key Secondary Metrics Grid - 4-Card Overview */}
-          <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-100">
+          <div className="grid grid-cols-2 gap-2.5 pt-1 border-t border-slate-100">
             <div className="p-2.5 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-0.5">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
                 BUA / Floor
@@ -151,54 +151,45 @@ export const LivePreviewPanel: React.FC = () => {
 
             <div className="p-2.5 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-0.5">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-                Ground Coverage
-              </span>
-              <span className="text-xs sm:text-sm font-black text-blue-600 block truncate">
-                {area.groundCoveragePercentage > 0 ? `${area.groundCoveragePercentage.toFixed(1)}%` : '0%'}
-              </span>
-            </div>
-
-            <div className="col-span-2 p-2.5 bg-blue-50/60 rounded-2xl border border-blue-100 flex items-center justify-between">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 block">
                 Rate / Sq.Ft
               </span>
-              <span className="text-sm font-black text-blue-700 block">
+              <span className="text-xs sm:text-sm font-black text-blue-700 block truncate">
                 {ratePerSqFt > 0 ? `₹${ratePerSqFt.toLocaleString()}/sq.ft` : '₹0 / sq.ft'}
               </span>
             </div>
           </div>
 
-          {/* Visual Architecture Preview (3D Model / 2D Schematic Switcher) */}
+          {/* Large Architectural 3D Visualization */}
           {plotLength > 0 && plotWidth > 0 && (
             <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2.5">
               {/* Switcher Header */}
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-                  Architectural Preview
+                  Architectural 3D Model
                 </span>
                 <div className="flex items-center bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-extrabold">
                   <button
                     type="button"
                     onClick={() => setActiveVisualMode('3d')}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                       activeVisualMode === '3d'
                         ? 'bg-white text-blue-600 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    <Box className="w-3 h-3" />
+                    <Box className="w-3.5 h-3.5" />
                     3D Model
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveVisualMode('2d')}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                       activeVisualMode === '2d'
                         ? 'bg-white text-blue-600 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    <Compass className="w-3 h-3" />
+                    <Compass className="w-3.5 h-3.5" />
                     2D Plan
                   </button>
                 </div>
@@ -230,32 +221,32 @@ export const LivePreviewPanel: React.FC = () => {
                 />
               ) : (
                 /* 2D Schematic Blueprint Mode */
-                <div className="w-full py-4 px-2 border border-dashed border-slate-300 rounded-xl flex items-center justify-center relative bg-white shadow-xs">
+                <div className="w-full py-8 px-4 border border-dashed border-slate-300 rounded-xl flex items-center justify-center relative bg-white shadow-xs">
                   {/* Top Width Badge */}
-                  <span className="absolute -top-2.5 text-[9px] font-black text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-full shadow-xs">
+                  <span className="absolute -top-2.5 text-[9px] font-black text-blue-700 bg-blue-50 px-2.5 py-0.5 border border-blue-200 rounded-full shadow-xs">
                     {plotWidth} FT WIDE
                   </span>
 
                   {/* Left Length Badge */}
-                  <span className="absolute -left-3 text-[9px] font-black text-blue-700 bg-blue-50 px-1.5 py-0.5 border border-blue-200 rounded-full shadow-xs -rotate-90">
+                  <span className="absolute -left-3 text-[9px] font-black text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-full shadow-xs -rotate-90">
                     {plotLength}'
                   </span>
 
                   {/* Built-Up Ground Footprint */}
-                  <div className="w-4/5 h-16 bg-blue-50/90 border border-blue-300 rounded-lg flex flex-col items-center justify-center space-y-0.5">
-                    <span className="text-[9px] font-extrabold text-blue-600 uppercase tracking-tight">
-                      Selected BUA Footprint ({area.groundCoveragePercentage > 0 ? area.groundCoveragePercentage.toFixed(0) : 0}%)
+                  <div className="w-4/5 h-24 bg-blue-50/90 border border-blue-300 rounded-xl flex flex-col items-center justify-center space-y-1">
+                    <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-tight">
+                      Selected Footprint ({area.groundCoveragePercentage > 0 ? area.groundCoveragePercentage.toFixed(0) : 0}% coverage)
                     </span>
-                    <span className="text-xs font-black text-slate-900">
+                    <span className="text-sm font-black text-slate-900">
                       {area.buaPerFloorSqFt > 0 ? `${area.buaPerFloorSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
                     </span>
                   </div>
                 </div>
               )}
 
-              <div className="flex justify-between text-[10px] text-slate-500 font-medium px-0.5 pt-0.5">
-                <span>{plotLength * plotWidth} sq.ft Plot Area</span>
-                <span>{floors === 1 ? '1 Floor' : `${floors || 2} Floors`}</span>
+              <div className="flex justify-between text-[10px] text-slate-500 font-semibold px-0.5 pt-0.5">
+                <span>{(plotLength * plotWidth).toLocaleString()} sq.ft Plot Area</span>
+                <span>{floors === 1 ? 'Ground Level (1 Floor)' : `G+${(floors || 2) - 1} (${floors} Floors)`}</span>
               </div>
             </div>
           )}
@@ -263,51 +254,23 @@ export const LivePreviewPanel: React.FC = () => {
           {/* Project Baseline Specs */}
           <div className="space-y-2 pt-1 border-t border-slate-100 text-xs">
             <div className="flex justify-between items-center text-slate-600">
-              <span className="font-semibold text-slate-500">Active Selections</span>
-              <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                {selectionCount} items
+              <span className="font-semibold text-slate-500">Configured Specifications</span>
+              <span className="font-extrabold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-100">
+                {selectionCount} items active
               </span>
             </div>
 
-            {plotLength > 0 && plotWidth > 0 && (
-              <>
-                <div className="flex justify-between items-center text-slate-600">
-                  <span className="font-semibold text-slate-500">Plot Area</span>
-                  <span className="font-extrabold text-slate-800">{(plotLength * plotWidth).toLocaleString()} sq.ft ({plotLength} × {plotWidth} ft)</span>
-                </div>
-                {area.buaPerFloorSqFt > 0 && (
-                  <div className="flex justify-between items-center text-slate-600">
-                    <span className="font-semibold text-slate-500">BUA / Floor</span>
-                    <span className="font-extrabold text-slate-800">{area.buaPerFloorSqFt.toLocaleString()} sq.ft ({area.groundCoveragePercentage.toFixed(1)}% coverage)</span>
-                  </div>
-                )}
-                {area.remainingGroundAreaSqFt > 0 && (
-                  <div className="flex justify-between items-center text-slate-600">
-                    <span className="font-semibold text-slate-500">Remaining Ground</span>
-                    <span className="font-extrabold text-emerald-600">{area.remainingGroundAreaSqFt.toLocaleString()} sq.ft</span>
-                  </div>
-                )}
-              </>
-            )}
-
-            {floors > 0 && (
-              <div className="flex justify-between items-center text-slate-600">
-                <span className="font-semibold text-slate-500">Storeys / Floors</span>
-                <span className="font-extrabold text-slate-800">{floors === 1 ? 'Ground Only' : `G + ${floors - 1}`} ({floors} Floors)</span>
-              </div>
-            )}
-
             {quantities.steelTonnes > 0 && (
               <div className="flex justify-between items-center text-slate-600">
-                <span className="font-semibold text-slate-500">Calculated Steel</span>
-                <span className="font-extrabold text-slate-800">{quantities.steelTonnes} Tonnes</span>
+                <span className="font-semibold text-slate-500">Structural Steel</span>
+                <span className="font-extrabold text-slate-800">{quantities.steelTonnes} Tonnes ({materialBrands?.steel || 'Fe 500D'})</span>
               </div>
             )}
 
             {quantities.cementBags > 0 && (
               <div className="flex justify-between items-center text-slate-600">
-                <span className="font-semibold text-slate-500">Calculated Cement</span>
-                <span className="font-extrabold text-slate-800">{quantities.cementBags.toLocaleString()} Bags</span>
+                <span className="font-semibold text-slate-500">Structural Cement</span>
+                <span className="font-extrabold text-slate-800">{quantities.cementBags.toLocaleString()} Bags ({materialBrands?.cement || 'OPC 53'})</span>
               </div>
             )}
           </div>
@@ -321,7 +284,7 @@ export const LivePreviewPanel: React.FC = () => {
             >
               <span className="flex items-center gap-1.5">
                 <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-600" />
-                View Itemized Summary
+                View Itemized Summary &amp; BOQ
               </span>
               <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform group-hover:translate-x-0.5" />
             </button>
@@ -330,10 +293,11 @@ export const LivePreviewPanel: React.FC = () => {
         </Card>
       </aside>
 
-      {/* ── MOBILE COMPACT STICKY SUMMARY (lg:hidden) ── */}
-      <div className="lg:hidden w-full mb-4">
+      {/* ── MOBILE / TABLET PROMINENT PREVIEW SECTION (lg:hidden) ── */}
+      <div className="lg:hidden w-full mb-6 space-y-3">
+        {/* Compact Top Stat Banner */}
         <Card className="p-3.5 bg-white border border-slate-200/90 shadow-soft-sm rounded-2xl">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2">
             <div className="space-y-0.5">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
                 Estimated Cost
@@ -343,7 +307,7 @@ export const LivePreviewPanel: React.FC = () => {
               </span>
             </div>
 
-            <div className="flex items-center gap-3 text-right">
+            <div className="flex items-center gap-2.5 text-right">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
                   BUA
@@ -353,7 +317,7 @@ export const LivePreviewPanel: React.FC = () => {
                 </span>
               </div>
 
-              <div className="border-l border-slate-200 pl-3">
+              <div className="border-l border-slate-200 pl-2.5">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
                   Rate
                 </span>
@@ -365,29 +329,68 @@ export const LivePreviewPanel: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowDetailsModal(true)}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-                title="View Details"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                title="View BOQ Details"
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
             </div>
           </div>
         </Card>
+
+        {/* Mobile 3D Model Card (Prominent & Proportional) */}
+        {plotLength > 0 && plotWidth > 0 && (
+          <Card className="p-3 bg-white border border-slate-200/90 shadow-soft-sm rounded-2xl space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                <Box className="w-3.5 h-3.5 text-blue-600" />
+                3D Architectural View
+              </span>
+              <span className="text-[10px] font-bold text-slate-500">
+                {floors === 1 ? '1 Floor' : `${floors} Floors`} &bull; {(plotLength * plotWidth).toLocaleString()} sqft
+              </span>
+            </div>
+
+            <Architectural3DViewer
+              city={city}
+              plotLength={plotLength}
+              plotWidth={plotWidth}
+              floors={floors}
+              parkingType={parkingType}
+              carCount={carCount}
+              bikeCount={bikeCount}
+              evCharging={evCharging}
+              liftRequired={liftRequired}
+              houseType={houseType}
+              qualityTier={qualityTier}
+              rooms={rooms}
+              materialBrands={materialBrands}
+              flooringZones={flooringZones}
+              wallCladding={wallCladding}
+              doors={doors}
+              windows={windows}
+              electrical={electrical}
+              bathroomFittings={bathroomFittings}
+              painting={painting}
+              className="h-60 sm:h-72"
+            />
+          </Card>
+        )}
       </div>
 
-      {/* ── ITEM SUMMARY MODAL ── */}
+      {/* ── ITEM SUMMARY & AUDIT TRACE MODAL ── */}
       {showDetailsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-soft-2xl border border-slate-200 space-y-5 max-h-[85vh] flex flex-col"
+            className="bg-white rounded-3xl p-6 max-w-xl w-full shadow-soft-2xl border border-slate-200 space-y-5 max-h-[85vh] flex flex-col"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
               <div>
-                <h3 className="text-base font-black text-slate-900">Live Estimate Breakdown</h3>
-                <p className="text-xs text-slate-500 font-medium">Real-time calculations from engineering engine</p>
+                <h3 className="text-base font-black text-slate-900">Live Estimate &amp; BOQ Breakdown</h3>
+                <p className="text-xs text-slate-500 font-medium">Real-time calculations from Rightcon engineering engine</p>
               </div>
               <button
                 onClick={() => setShowDetailsModal(false)}
@@ -413,7 +416,7 @@ export const LivePreviewPanel: React.FC = () => {
               {/* Active BOQ Items List */}
               <div className="space-y-2">
                 <h4 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">
-                  Active BOQ Contributions ({boq.length} line items)
+                  Active BOQ Line Items ({boq.length} contributions)
                 </h4>
 
                 {boq.length === 0 ? (
@@ -421,7 +424,7 @@ export const LivePreviewPanel: React.FC = () => {
                     No cost-bearing specifications selected yet. Choose materials to build your BOQ.
                   </p>
                 ) : (
-                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
                     {boq.map((item) => (
                       <div key={item.code} className="p-2.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl flex items-center justify-between gap-2 border border-slate-100">
                         <div className="min-w-0">

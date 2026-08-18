@@ -1,151 +1,142 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Check, ArrowRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { Check, ArrowRight } from 'lucide-react';
+import { useWizardStore } from '../../../store/useWizardStore';
 
 export const PackagesSection: React.FC = () => {
   const navigate = useNavigate();
 
   const packages = [
     {
-      name: 'Essential Package',
-      rate: '₹2₹200',
+      name: 'Essential Specification',
+      tagline: 'Standard structural safety with reliable national brands.',
+      rate: '₹2,200',
       unit: '/ sq.ft',
-      description: 'Ideal for budget-conscious homebuilders seeking IS-compliant structural safety.',
-      badge: 'Standard Quality',
       popular: false,
-      features: [
-        'ACC / Dalmia PPC Cement Grade',
-        'JSW / Prime Fe 500 TMT Steel',
-        'Vitrified Tile Flooring (2x2 ft @ ₹55/sq.ft)',
-        'Jaquar / Hindware CP & Sanitary Fittings',
-        'Asian Paints Tractor Emulsion (Interior)',
-        'Teakwood Flush Main Door Frame',
-        'IS 456 Structural Compliance Warranty',
+      specs: [
+        { label: 'Structural Steel', val: 'JSW Neosteel Fe 500D TMT' },
+        { label: 'Cement Grade', val: 'ACC / Dalmia PPC 53 Grade' },
+        { label: 'Wall Masonry', val: 'AAC Lightweight Blocks (6 inch)' },
+        { label: 'Flooring', val: 'Vitrified Tiles (800×800mm)' },
+        { label: 'Sanitaryware', val: 'Cera / Hindware CP Fittings' },
+        { label: 'Internal Paint', val: 'Asian Paints Tractor Emulsion' },
+        { label: 'Main Door', val: 'Solid Hardwood Flush Door' },
       ],
     },
     {
-      name: 'Premium Package',
-      rate: '₹2₹850',
+      name: 'Premium Specification',
+      tagline: 'High-grade architectural finishes with enhanced durability.',
+      rate: '₹2,850',
       unit: '/ sq.ft',
-      description: 'Our most popular tier combining luxury aesthetics with top-tier brand matrix.',
-      badge: 'Most Popular',
       popular: true,
-      features: [
-        'UltraTech Super PPC Concrete Cement',
-        'Tata Tiscon 550D Fe High Ductility Steel',
-        'GVT Vitrified / Italian Marble Tiles (4x2 ft @ ₹95/sq.ft)',
-        'Kohler / Grohe Diverter Sanitary Fittings',
-        'Asian Paints Apex Ultima Exterior & Royale Interior',
-        'Teakwood Main Door with Digital Lock',
-        'UPVC 3-Track Windows with Mosquito Mesh',
-        'Solar Water Heater & Sump Tank RMC Waterproofing',
+      specs: [
+        { label: 'Structural Steel', val: 'Tata Tiscon 550D Fe High Ductility' },
+        { label: 'Cement Grade', val: 'UltraTech Super PPC / OPC 53' },
+        { label: 'Wall Masonry', val: 'Aerated AAC Blocks + Polymer Mortar' },
+        { label: 'Flooring', val: 'GVT Vitrified / Jet Black Granite' },
+        { label: 'Sanitaryware', val: 'Jaquar / Kohler Concealed Fittings' },
+        { label: 'Internal Paint', val: 'Asian Paints Royale Luxury Emulsion' },
+        { label: 'Main Door', val: 'Seasoned Burma Teakwood Frame' },
       ],
     },
     {
-      name: 'Luxury Package',
-      rate: '₹3₹600',
+      name: 'Luxury Specification',
+      tagline: 'Bespoke residences with imported stones and custom joinery.',
+      rate: '₹3,600',
       unit: '/ sq.ft',
-      description: 'Ultra-luxury architectural finish with Italian marble, home automation, and teakwood.',
-      badge: 'Ultra Luxury',
       popular: false,
-      features: [
-        'UltraTech Super / RMC M25 Grade Concrete',
-        'Tata Tiscon 550D Corrosion Resistant Steel',
-        'Imported Italian Bottochino Marble Flooring (@ ₹280/sq.ft)',
-        'Hansgrohe / Kohler Concealed Thermostatic Shower System',
-        'Asian Paints Royale Aspira Silk Polish & PU Wood Finish',
-        'Solid Teakwood Main & Interior Doors',
-        'Smart Home Automation & Video Door Phone',
-        'EV Car Charging Dock & Solar Roof Provisions',
+      specs: [
+        { label: 'Structural Steel', val: 'Tata Tiscon 550D Corrosion Resistant' },
+        { label: 'Cement Grade', val: 'UltraTech Ready Mix Concrete (M25)' },
+        { label: 'Wall Masonry', val: 'Precision AAC + Acoustical Insulation' },
+        { label: 'Flooring', val: 'Imported Italian Botticino Marble' },
+        { label: 'Sanitaryware', val: 'Toto / Grohe Thermostatic Systems' },
+        { label: 'Internal Paint', val: 'Royale Aspira Silk + PU Polish' },
+        { label: 'Main Door', val: 'Custom Carved Solid Teakwood' },
       ],
     },
   ];
 
   return (
-    <section id="packages" className="bg-[var(--cc-bg)] py-20 border-b border-[var(--cc-border)] relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="packages" className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--cc-brand)]/10 border border-[var(--cc-brand)]/30 text-[var(--cc-brand)] text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" /> Construction Packages & Pricing
+        {/* Section Header */}
+        <div className="max-w-3xl space-y-4 text-left">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#1F4B43] bg-[#EBF2F0] border border-[#1F4B43]/15 px-3 py-1.5 rounded-md inline-block">
+            Construction Specifications
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black text-[var(--cc-text-primary)] tracking-tight">
-            Transparent Pricing Per Square Foot.
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172033] tracking-tight leading-[1.15]">
+            Transparent construction specification tiers.
           </h2>
-          <p className="text-[var(--cc-text-secondary)] text-base leading-relaxed">
-            Compare material brands and specifications. Every tier is fully customizable inside our 10-step calculator.
+          <p className="text-base text-[#667085] leading-relaxed">
+            Compare material grades and finishes. Every parameter can be individually customized inside the step-by-step calculator.
           </p>
         </div>
 
-        {/* Packages Grid */}
+        {/* 3 Columns with Subtle Separators */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {packages.map((pkg, idx) => (
-            <motion.div
+            <div
               key={idx}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className={`rounded-3xl p-8 flex flex-col justify-between relative transition-all ${
-                pkg.popular ? 'bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-2 border-[var(--cc-brand)] shadow-2xl shadow-teal-900/5 scale-105 z-10'
-                  : 'bg-[var(--cc-surface)]/50 border border-[var(--cc-border)]/80 hover:border-[var(--cc-border)]'
+              className={`rounded-2xl p-7 sm:p-9 flex flex-col justify-between text-left space-y-8 transition-all ${
+                pkg.popular
+                  ? 'bg-white border-2 border-[#1F4B43] shadow-sm relative'
+                  : 'bg-[#F7F7F5] border border-[#E5E7EB]'
               }`}
             >
               {pkg.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[var(--cc-brand)] text-white text-[11px] font-black uppercase tracking-widest shadow-md">
-                  â˜… Most Selected Tier
+                <div className="absolute -top-3 left-6 px-3 py-0.5 rounded-md bg-[#1F4B43] text-white text-[10px] font-bold uppercase tracking-wider">
+                  Most Selected Grade
                 </div>
               )}
 
-              <div className="space-y-6 text-left">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-[var(--cc-surface-muted)] text-[var(--cc-text-secondary)] border border-[var(--cc-border)]">
-                    {pkg.badge}
-                  </span>
-                  <ShieldCheck className="w-5 h-5 text-[var(--cc-brand)]" />
+              <div className="space-y-6">
+                <div className="space-y-1.5">
+                  <h3 className="text-xl font-bold text-[#172033]">{pkg.name}</h3>
+                  <p className="text-xs text-[#667085] leading-relaxed">{pkg.tagline}</p>
                 </div>
 
-                <div>
-                  <h3 className="text-xl font-bold text-[var(--cc-text-primary)]">{pkg.name}</h3>
-                  <p className="text-xs text-[var(--cc-text-secondary)] mt-1">{pkg.description}</p>
+                <div className="flex items-baseline gap-1 pb-4 border-b border-[#E5E7EB]">
+                  <span className="text-3xl font-bold text-[#172033]">{pkg.rate}</span>
+                  <span className="text-xs text-[#667085] font-semibold">{pkg.unit} indicative base</span>
                 </div>
 
-                <div className="flex items-baseline gap-1 border-b border-[var(--cc-border)] pb-4">
-                  <span className="text-4xl font-black text-[var(--cc-text-primary)]">{pkg.rate}</span>
-                  <span className="text-xs text-[var(--cc-text-secondary)] font-bold">{pkg.unit}</span>
-                </div>
-
-                {/* Features List */}
+                {/* Specs List */}
                 <div className="space-y-3">
-                  <span className="text-xs font-bold text-[var(--cc-text-secondary)] uppercase tracking-wider block">Included Specifications:</span>
-                  <ul className="space-y-2 text-xs text-[var(--cc-text-secondary)]">
-                    {pkg.features.map((feat, fIdx) => (
-                      <li key={fIdx} className="flex items-start gap-2.5">
-                        <Check className="w-4 h-4 text-[var(--cc-brand)] shrink-0 mt-0.5" />
-                        <span>{feat}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] block">
+                    Material Specifications:
+                  </span>
+                  <ul className="space-y-2.5 text-xs text-[#172033]">
+                    {pkg.specs.map((item, sIdx) => (
+                      <li key={sIdx} className="flex items-start justify-between gap-2 border-b border-[#E5E7EB]/50 pb-1.5">
+                        <span className="text-[#667085]">{item.label}</span>
+                        <span className="font-semibold text-right text-[#172033]">{item.val}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
 
-              <div className="pt-8">
-                <Button
-                  size="lg"
-                  onClick={() => navigate('/calculator')}
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                  className={`w-full font-bold text-xs justify-center ${
-                    pkg.popular ? 'bg-[var(--cc-brand)] hover:bg-[var(--cc-brand)] text-white shadow-lg shadow-teal-900/10'
-                      : 'bg-[var(--cc-surface-muted)] hover:bg-slate-700 text-[var(--cc-text-primary)] border border-[var(--cc-border)]'
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    useWizardStore.getState().startNewProject();
+                    useWizardStore.setState({
+                      qualityTier: pkg.name.split(' ')[0] as any,
+                    });
+                    navigate('/calculator');
+                  }}
+                  className={`w-full py-3 px-4 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    pkg.popular
+                      ? 'bg-[#1F4B43] hover:bg-[#163731] text-white shadow-xs'
+                      : 'bg-white hover:bg-slate-100 text-[#172033] border border-[#E5E7EB]'
                   }`}
                 >
-                  Estimate in {pkg.name.split(' ')[0]} Tier
-                </Button>
+                  Estimate in {pkg.name.split(' ')[0]} <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 

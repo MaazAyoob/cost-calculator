@@ -183,8 +183,8 @@ export const PlannerPage: React.FC = () => {
           {/* Two-Column Grid on Desktop (>= lg) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* LEFT COLUMN: Calculator Form / Current Step (lg:col-span-7 xl:col-span-8) */}
-            <div className="lg:col-span-7 xl:col-span-8">
+            {/* LEFT COLUMN: Calculator Form / Current Step (lg:col-span-7 xl:col-span-6) */}
+            <div className="lg:col-span-7 xl:col-span-6">
               <AnimatePresence mode="wait">
                 <motion.div key={currentStep} variants={pageFadeVariant} initial="initial" animate="animate" exit="exit">
                   {currentStep === 1 && <Step1BasicInfo />}
@@ -201,8 +201,8 @@ export const PlannerPage: React.FC = () => {
               </AnimatePresence>
             </div>
 
-            {/* RIGHT COLUMN: Sticky Live Estimate Preview (lg:col-span-5 xl:col-span-4) */}
-            <div className="hidden lg:block lg:col-span-5 xl:col-span-4">
+            {/* RIGHT COLUMN: Sticky Live Estimate Preview & 3D Visualizer (lg:col-span-5 xl:col-span-6) */}
+            <div className="hidden lg:block lg:col-span-5 xl:col-span-6">
               <LivePreviewPanel />
             </div>
 

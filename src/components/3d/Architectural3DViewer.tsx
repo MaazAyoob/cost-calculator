@@ -88,15 +88,21 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     if (!container) return;
 
     // ── 1. Dimensions & Scene Setup ──
-    const width = container.clientWidth || 320;
-    const height = container.clientHeight || 240;
+    const width = container.clientWidth || 400;
+    const height = container.clientHeight || 360;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(isNightMode ? 0x090d16 : 0xf1f5f9);
+    scene.background = new THREE.Color(isNightMode ? 0x090d16 : 0xf8fafc);
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
-    camera.position.set(0, 7.5, 15.5);
+    const floorH = 1.35;
+    const centerY = (numFloors * floorH) / 2 + 0.2;
+    const cameraDistZ = 13.0 + (numFloors - 1) * 1.4 + Math.max(0, (plotAspect - 1) * 2.2);
+    const cameraDistY = centerY + 3.4;
+
+    const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 120);
+    camera.position.set(0, cameraDistY, cameraDistZ);
+    camera.lookAt(0, centerY, 0);
     cameraRef.current = camera;
 
     // ── 2. WebGL Renderer with Soft Contact Shadows ──
@@ -329,7 +335,6 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     // Proportions
     const bWidth = 4.8 * Math.max(0.85, Math.min(1.3, plotAspect));
     const bDepth = 4.0 / Math.max(0.85, Math.min(1.3, plotAspect));
-    const floorH = 1.35;
 
     // ── 9. Floor-by-Floor Construction ──
     for (let f = 0; f < numFloors; f++) {
@@ -514,7 +519,6 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     }
 
     // Center camera on building mid-height
-    const centerY = (numFloors * floorH) / 2 + 0.2;
     camera.lookAt(0, centerY, 0);
 
     buildingGroup.rotation.x = rotationRef.current.x;
@@ -630,7 +634,11 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
   const handleResetView = () => {
     rotationRef.current = { x: 0.28, y: -0.75 };
     if (cameraRef.current) {
-      cameraRef.current.position.set(0, 7.5, 15.5);
+      const centerY = (numFloors * 1.35) / 2 + 0.2;
+      const cameraDistZ = 13.0 + (numFloors - 1) * 1.4 + Math.max(0, (plotAspect - 1) * 2.2);
+      const cameraDistY = centerY + 3.4;
+      cameraRef.current.position.set(0, cameraDistY, cameraDistZ);
+      cameraRef.current.lookAt(0, centerY, 0);
       setZoomLevel(1);
     }
   };
@@ -639,12 +647,16 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     if (!cameraRef.current) return;
     const newZoom = Math.max(0.6, Math.min(1.8, zoomLevel * factor));
     setZoomLevel(newZoom);
-    cameraRef.current.position.set(0, 7.5 / newZoom, 15.5 / newZoom);
+    const centerY = (numFloors * 1.35) / 2 + 0.2;
+    const cameraDistZ = (13.0 + (numFloors - 1) * 1.4 + Math.max(0, (plotAspect - 1) * 2.2)) / newZoom;
+    const cameraDistY = (centerY + 3.4) / newZoom;
+    cameraRef.current.position.set(0, cameraDistY, cameraDistZ);
+    cameraRef.current.lookAt(0, centerY, 0);
   };
 
   return (
     <div className={`relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 select-none shadow-soft-md ${className}`}>
-      {/* 3D Canvas Viewport */}
+      {/* 3D Canvas Viewport - Significantly enlarged height for prominent architectural experience */}
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
@@ -654,7 +666,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="w-full h-52 cursor-grab active:cursor-grabbing"
+        className="w-full h-72 sm:h-80 lg:h-[350px] xl:h-[390px] cursor-grab active:cursor-grabbing transition-[height] duration-200"
       />
 
       {/* Floating 3D Badge & City */}
