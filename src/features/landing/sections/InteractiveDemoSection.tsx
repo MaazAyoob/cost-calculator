@@ -56,7 +56,7 @@ export const InteractiveDemoSection: React.FC = () => {
     materialBrands: {
       steel: tier === 'Luxury' ? 'Tata Tiscon' : tier === 'Premium' ? 'Tata Tiscon' : 'JSW Neosteel',
       cement: tier === 'Luxury' ? 'UltraTech' : tier === 'Premium' ? 'UltraTech' : 'ACC Cement',
-      doors: tier === 'Luxury' ? 'Burma Teak Custom Carved' : tier === 'Premium' ? 'Premium Teak' : 'Flush Door',
+      doors: tier === 'Luxury' ? 'Premium Teak' : tier === 'Premium' ? 'Premium Teak' : 'Flush Door',
       windows: 'uPVC',
       flooring: tier === 'Luxury' ? 'Italian Marble' : 'Vitrified Tiles',
       bathroom: tier === 'Luxury' ? 'Toto' : tier === 'Premium' ? 'Jaquar' : 'Cera',
@@ -76,7 +76,7 @@ export const InteractiveDemoSection: React.FC = () => {
       bathroomTileHeight: '7 ft (Lintel)',
     },
     doors: {
-      mainDoor: tier === 'Luxury' ? 'Burma Teak Custom Carved' : tier === 'Premium' ? 'Premium Teak' : 'Normal Teak',
+      mainDoor: tier === 'Luxury' ? 'Premium Teak' : tier === 'Premium' ? 'Premium Teak' : 'Normal Teak',
       internalDoor: 'Flush Door',
       bathroomDoor: 'WPC Door',
     },
@@ -89,7 +89,7 @@ export const InteractiveDemoSection: React.FC = () => {
       wireTier: 'Mid-range (V-Guard)',
     },
     bathroomFittings: {
-      sanitaryTier: tier === 'Luxury' ? 'Luxury (Kohler / Toto)' : 'Premium (Jaquar / Kohler / Grohe)',
+      sanitaryTier: tier === 'Luxury' ? 'Luxury (Toto / Duravit)' : 'Premium (Jaquar / Kohler / Grohe)',
       cpvcBrand: 'Ashirwad',
     },
     painting: {
