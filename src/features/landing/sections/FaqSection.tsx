@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 export const FaqSection: React.FC = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
@@ -7,11 +7,11 @@ export const FaqSection: React.FC = () => {
   const faqs = [
     {
       q: 'How does Cost Calculator estimate residential construction costs?',
-      a: 'The engine uses deterministic structural ratios based on Indian Standards (IS 456, IS 1786) and Bangalore regional market Schedule of Rates. It calculates exact quantities for concrete volume, rebar tonnage, AAC blocks, flooring, plumbing, electrical, and paint.',
+      a: 'The engine applies deterministic civil engineering formulas anchored to Indian Standards (IS 456, IS 1786) and Bangalore Schedule of Rates. It calculates required volumes of concrete, steel rebar tonnage, AAC masonry, flooring, plumbing, electrical, and paint from room and floor dimensions.',
     },
     {
       q: 'Can I compare specific material brands like UltraTech vs ACC or Tata Tiscon vs JSW?',
-      a: 'Yes. In the 10-step wizard, you can toggle between brand tiers and finishes. The physical required quantity (e.g. 9.6 tonnes of steel) remains engineering-invariant while your itemized rates update accurately.',
+      a: 'Yes. In the 10-step wizard, you can switch between brand tiers and finishes. The physical required quantity (e.g. 9.6 tonnes of steel) remains engineering-invariant while your itemized rates update dynamically.',
     },
     {
       q: 'Are the generated BOQ reports accepted for bank home loans?',
@@ -28,44 +28,43 @@ export const FaqSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq" className="py-20 lg:py-28 bg-[#F7F7F5] border-b border-[#E5E7EB]">
+    <section id="faq" className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         
-        {/* Section Heading */}
-        <div className="max-w-2xl space-y-4 text-left">
+        {/* Section Header */}
+        <div className="space-y-3 text-left">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#1F4B43] bg-[#EBF2F0] border border-[#1F4B43]/15 px-3 py-1.5 rounded-md inline-block">
             Frequently Asked Questions
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172033] tracking-tight leading-[1.15]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#172033] tracking-tight leading-[1.15]">
             Everything you need to know.
           </h2>
-          <p className="text-base text-[#667085] leading-relaxed">
-            Common questions about pre-construction planning, engineering assumptions, and BOQ reports.
+          <p className="text-base text-[#667085] leading-relaxed font-normal">
+            Common questions regarding calculation assumptions, material grades, and bank-loan BOQ reports.
           </p>
         </div>
 
-        {/* Minimalist Accordion with Dividers */}
+        {/* Simple Editorial Accordion with Thin Dividers and Plus/Minus Icons - No Cards */}
         <div className="divide-y divide-[#E5E7EB] border-y border-[#E5E7EB] text-left">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
-              <div key={idx} className="py-6">
+              <div key={idx} className="py-6 sm:py-7">
                 <button
+                  type="button"
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full flex items-center justify-between text-left gap-4 cursor-pointer group"
+                  className="w-full flex items-center justify-between text-left gap-6 cursor-pointer group"
                 >
-                  <span className="text-base sm:text-lg font-bold text-[#172033] group-hover:text-[#1F4B43] transition-colors">
+                  <span className="text-lg sm:text-xl font-bold text-[#172033] group-hover:text-[#1F4B43] transition-colors leading-snug">
                     {faq.q}
                   </span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-[#667085] shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-[#1F4B43]' : ''
-                    }`}
-                  />
+                  <div className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[#172033] shrink-0 group-hover:border-[#1F4B43] group-hover:text-[#1F4B43] transition-colors">
+                    {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                  </div>
                 </button>
 
                 {isOpen && (
-                  <p className="mt-3 text-xs sm:text-sm text-[#667085] leading-relaxed font-normal pr-8">
+                  <p className="mt-4 text-xs sm:text-sm text-[#667085] leading-relaxed font-normal pr-10">
                     {faq.a}
                   </p>
                 )}

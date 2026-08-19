@@ -1,83 +1,98 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
 
 export const CalculatorSolutionsSection: React.FC = () => {
   const navigate = useNavigate();
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
 
   const steps = [
     {
-      number: '01',
-      title: 'Define Plot',
-      description: 'Enter site length, width, and number of approved residential storeys (Ground to G+4).',
+      num: '01',
+      title: 'Define Your Plot',
+      sentence: 'Enter site length, width, and municipal authority to compute permissible ground coverage.',
     },
     {
-      number: '02',
-      title: 'Configure Home',
-      description: 'Set room counts (bedrooms, bathrooms, kitchen, balconies) and parking provisions.',
+      num: '02',
+      title: 'Configure Your Home',
+      sentence: 'Select number of residential storeys, bedroom count, bathrooms, and parking requirements.',
     },
     {
-      number: '03',
+      num: '03',
       title: 'Choose Specifications',
-      description: 'Select brand grades for structural steel, cement, flooring, doors, windows, and paint.',
+      sentence: 'Pick brand tiers for structural steel, cement, flooring, doors, windows, and electrical.',
     },
     {
-      number: '04',
-      title: 'Review Estimate',
-      description: 'Receive instant live project cost, 13-stage BOQ line items, and payment schedule.',
+      num: '04',
+      title: 'Review Your Estimate',
+      sentence: 'Get an immediate live project cost, 13-stage BOQ schedule, and bank milestone roadmap.',
     },
   ];
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB]">
+    <section id="how-it-works" className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
-        {/* Section Heading */}
-        <div className="max-w-3xl space-y-4 text-left">
+        {/* Section Header */}
+        <div className="max-w-3xl space-y-3 text-left">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#1F4B43] bg-[#EBF2F0] border border-[#1F4B43]/15 px-3 py-1.5 rounded-md inline-block">
             Step-by-Step Methodology
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172033] tracking-tight leading-[1.15]">
-            Four simple steps to your construction budget.
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#172033] tracking-tight leading-[1.15]">
+            How Cost Calculator Works.
           </h2>
-          <p className="text-base text-[#667085] leading-relaxed">
-            Transform plot dimensions into an accurate, engineering-grade residential construction plan.
+          <p className="text-base text-[#667085] leading-relaxed font-normal">
+            A linear pre-construction planning process from boundary dimensions to final line-item estimate.
           </p>
         </div>
 
-        {/* 4-Step Horizontal Process with Thin Connecting Line */}
+        {/* Horizontal Timeline with Large Numbers & Thin Line - No Cards */}
         <div className="relative">
-          {/* Thin Horizontal Connecting Line on Desktop */}
-          <div className="hidden lg:block absolute top-6 left-12 right-12 h-px bg-[#E5E7EB] z-0" />
+          {/* Thin connecting line across all 4 steps on desktop */}
+          <div className="hidden lg:block absolute top-7 left-8 right-8 h-px bg-[#E5E7EB] z-0" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 relative z-10">
-            {steps.map((item) => (
-              <div key={item.number} className="space-y-3.5 text-left">
-                {/* Step Number Circle / Badge */}
-                <div className="w-12 h-12 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center text-base font-black text-[#1F4B43] shadow-xs">
-                  {item.number}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 relative z-10">
+            {steps.map((step, idx) => (
+              <div
+                key={step.num}
+                onMouseEnter={() => setActiveStepIndex(idx)}
+                className="space-y-3 text-left group cursor-pointer transition-all"
+              >
+                {/* Large Editorial Number */}
+                <div className="flex items-center gap-3">
+                  <span className={`text-4xl sm:text-5xl font-black font-mono transition-colors ${
+                    activeStepIndex === idx ? 'text-[#1F4B43]' : 'text-slate-300 group-hover:text-[#1F4B43]'
+                  }`}>
+                    {step.num}
+                  </span>
+                  <div className={`w-2 h-2 rounded-full transition-colors ${
+                    activeStepIndex === idx ? 'bg-[#1F4B43]' : 'bg-transparent'
+                  }`} />
                 </div>
 
-                <h3 className="text-lg font-bold text-[#172033] leading-snug">
-                  {item.title}
+                {/* Small Title */}
+                <h3 className="text-base font-bold text-[#172033] tracking-tight">
+                  {step.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
-                  {item.description}
+
+                {/* One Sentence */}
+                <p className="text-xs sm:text-sm text-[#667085] leading-relaxed font-normal">
+                  {step.sentence}
                 </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom CTA Action */}
+        {/* Minimal CTA Action */}
         <div className="pt-2 text-left">
           <button
             onClick={() => {
               useWizardStore.getState().startNewProject();
               navigate('/calculator');
             }}
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#1F4B43] hover:text-[#163731] transition-colors cursor-pointer group"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1F4B43] hover:text-[#163731] transition-colors cursor-pointer group"
           >
             Start your estimate now 
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

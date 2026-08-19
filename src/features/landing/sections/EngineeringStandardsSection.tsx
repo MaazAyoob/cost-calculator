@@ -1,93 +1,112 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 
 export const EngineeringStandardsSection: React.FC = () => {
-  const specs = [
+  const pipelineSteps = ['PLOT', 'BUA', 'QUANTITY', 'RATE', 'BOQ', 'TOTAL'];
+
+  const references = [
     {
-      standard: 'IS 456 : 2000',
+      code: 'IS 456',
       title: 'Code of Practice for Plain and Reinforced Concrete',
-      assumption: 'M20/M25 concrete mix ratio (1:1.5:3) with 0.45 water-cement ratio; 25mm–40mm structural clear cover for beams and columns.',
-      application: 'Computes dry cement volume, coarse/fine aggregate consumption, and structural slab thickness per floor.',
+      assumption: 'M20/M25 concrete mix design, structural cover standards & dry cement ratios.',
     },
     {
-      standard: 'IS 1786 : 2008',
+      code: 'IS 1786',
       title: 'High Strength Deformed Steel Bars for Concrete Reinforcement',
-      assumption: 'Fe 500D / Fe 550D grade high ductility rebar with 1.85%–2.80% structural density multiplier across building heights.',
-      application: 'Derives total rebar tonnage, column ties, beam stirrups, and slab reinforcement distribution from floor geometry.',
+      assumption: 'Fe 500D / Fe 550D rebar density multiplier (4.0 to 5.0 kg / sq.ft BUA).',
     },
     {
-      standard: 'IS 2185 : 2008',
-      title: 'Concrete Masonry Units & AAC Autoclaved Aerated Blocks',
-      assumption: '600×200×150mm precision autoclaved aerated concrete blocks with 3mm polymer thin-bed adhesive jointing mortar.',
-      application: 'Calculates block count, dead load reduction, and interior/exterior wall surface area for plastering and paint.',
+      code: 'NBC',
+      title: 'National Building Code of India Guidelines',
+      assumption: 'Permissible FSI, ground coverage limits, room ventilation & clear ceiling heights.',
     },
     {
-      standard: 'National Building Code (NBC)',
-      title: 'Setback Regulations & Statutory Floor Space Index (FSI)',
-      assumption: 'Standard statutory coverage benchmark of ~60% ground footprint with mandatory front, rear, and side ventilation margins.',
-      application: 'Determines permissible built-up area per floor, super BUA circulation, and remaining open ground space.',
+      code: 'PLANNING ASSUMPTIONS',
+      title: 'Defined Civil Engineering Multipliers',
+      assumption: 'Concrete volumes, mortar ratios, wall surface takeoff & floor efficiency formulas.',
     },
     {
-      standard: 'Karnataka Market Index',
-      title: 'Schedule of Rates (SoR) for Bangalore & Mysore Urban Zones',
-      assumption: 'Indexed vendor rates for structural steel, OPC/PPC cement, River Sand, RMC, sanitaryware, and electrical wiring.',
-      application: 'Maps localized labor and material rates against physical takeoffs to produce indicative cost projections.',
+      code: 'MARKET RATES',
+      title: 'Bangalore & Mysore Regional Indices',
+      assumption: 'Indexed material and trade labor rates from active regional construction tenders.',
     },
   ];
 
   return (
-    <section id="standards" className="py-20 lg:py-28 bg-[#F7F7F5] border-b border-[#E5E7EB]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+    <section id="standards" className="py-20 lg:py-28 bg-[#1F4B43] text-white relative overflow-hidden">
+      {/* Subtle blueprint grid watermark on dark green */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-10"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #FFFFFF 1px, transparent 1px),
+            linear-gradient(to bottom, #FFFFFF 1px, transparent 1px)
+          `,
+          backgroundSize: '36px 36px',
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
         
-        {/* Section Heading */}
-        <div className="max-w-3xl space-y-4 text-left">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[#1F4B43] bg-[#EBF2F0] border border-[#1F4B43]/15 px-3 py-1.5 rounded-md inline-block">
-            Engineering Benchmarks
+        {/* Section Header */}
+        <div className="max-w-3xl space-y-3 text-left">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#B8894A] bg-white/10 px-3 py-1.5 rounded-md inline-block">
+            Engineering References &amp; Assumptions
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#172033] tracking-tight leading-[1.15]">
-            Built around transparent engineering assumptions.
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.15]">
+            Built on transparent assumptions.
           </h2>
-          <p className="text-base text-[#667085] leading-relaxed">
-            Every material multiplier and cost calculation in our engine is anchored to recognized civil engineering codes, structural standards, and regional market indices.
+          <p className="text-base text-slate-200/90 leading-relaxed font-normal">
+            Formula-driven calculations anchored to recognized Indian civil engineering codes and defined mathematical relationships.
           </p>
         </div>
 
-        {/* Technical Specification Sheet Layout */}
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs overflow-hidden">
-          {/* Header Row */}
-          <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-[#F2F2EF] border-b border-[#E5E7EB] text-[11px] font-bold uppercase tracking-wider text-[#172033]">
-            <div className="col-span-3">Civil Standard &amp; Code</div>
-            <div className="col-span-4">Engineering Assumption</div>
-            <div className="col-span-5">Calculation Engine Application</div>
-          </div>
+        {/* Simplified Calculation Pipeline (PLOT -> BUA -> QUANTITY -> RATE -> BOQ -> TOTAL) */}
+        <div className="bg-white/5 border border-white/15 rounded-2xl p-6 sm:p-8 backdrop-blur-xs text-left space-y-4">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#B8894A] block">
+            Calculation Derivation Pipeline
+          </span>
 
-          {/* Data Rows */}
-          <div className="divide-y divide-[#E5E7EB] text-left">
-            {specs.map((item, idx) => (
-              <div key={idx} className="p-6 md:px-6 md:py-5 grid grid-cols-1 md:grid-cols-12 gap-4 text-xs items-start">
-                <div className="md:col-span-3 space-y-1">
-                  <span className="font-bold text-[#1F4B43] text-sm block">
-                    {item.standard}
-                  </span>
-                  <span className="text-[11px] text-[#667085] block leading-snug">
-                    {item.title}
-                  </span>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            {pipelineSteps.map((step, idx) => (
+              <React.Fragment key={step}>
+                <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-xs sm:text-sm font-black font-mono tracking-wider text-white">
+                  {step}
                 </div>
-                <div className="md:col-span-4 text-[#172033] leading-relaxed">
-                  <span className="md:hidden font-bold text-[10px] text-[#667085] uppercase tracking-wider block mb-0.5">Assumption:</span>
-                  {item.assumption}
-                </div>
-                <div className="md:col-span-5 text-[#667085] leading-relaxed">
-                  <span className="md:hidden font-bold text-[10px] text-[#667085] uppercase tracking-wider block mb-0.5">Application:</span>
-                  {item.application}
-                </div>
-              </div>
+                {idx < pipelineSteps.length - 1 && (
+                  <span className="text-white/40 font-bold text-sm">→</span>
+                )}
+              </React.Fragment>
             ))}
           </div>
         </div>
 
-        <div className="text-xs text-[#667085] text-left">
+        {/* Engineering References List with Thin Dividers */}
+        <div className="divide-y divide-white/10 border-y border-white/15 text-left">
+          {references.map((item) => (
+            <div key={item.code} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+              <div className="md:col-span-3">
+                <span className="text-sm font-mono font-black text-[#B8894A] tracking-wider block">
+                  {item.code}
+                </span>
+              </div>
+              <div className="md:col-span-4">
+                <h3 className="text-sm font-bold text-white">
+                  {item.title}
+                </h3>
+              </div>
+              <div className="md:col-span-5">
+                <p className="text-xs text-slate-300/90 leading-relaxed">
+                  {item.assumption}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-xs text-slate-300/70 text-left pt-2">
           <p>
-            * Note: The Cost Calculator generates formula-driven indicative pre-construction estimates. Final site structural execution requires geotechnical soil analysis and structural engineer sign-off.
+            * Note: Formula-driven calculations provide pre-construction planning clarity. Site-specific structural engineering drawings and geotechnical soil testing are required prior to actual excavation.
           </p>
         </div>
 

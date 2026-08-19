@@ -1,38 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { pageFadeVariant } from '../../animations/variants';
 import { useReportStore } from '../../store/useReportStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import { StatusBadge } from '../../components/common/StatusBadge';
 import { LeadCaptureModal } from '../../components/modals/LeadCaptureModal';
-import {
-  Download, Printer, Shield, Building, Layers, CheckCircle2,
-  FileSpreadsheet, Calendar, CreditCard, ShoppingCart, Lightbulb,
-  ChevronDown, ChevronUp, Lock,
-} from 'lucide-react';
+import { Printer, Download, ArrowLeft, Building2 } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 
 export const ReportPage: React.FC = () => {
-  const { preparedFor, isLeadCaptured, leadInfo } = useReportStore();
+  const navigate = useNavigate();
+  const { preparedFor, isLeadCaptured } = useReportStore();
   const { result } = useCalculationStore();
   const { report, area, quantities, budget, timeline, paymentPlan, boq, input } = result;
 
   const [showLeadModal, setShowLeadModal] = useState(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    exec: true,
-    config: true,
-    materials: true,
-    boq: true,
-    payments: false,
-    assumptions: true,
-  });
-
-  const toggleAccordion = (key: string) => {
-    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
 
   const handlePrintRequest = () => {
     if (!isLeadCaptured) {
@@ -42,352 +24,209 @@ export const ReportPage: React.FC = () => {
     }
   };
 
+  const currentDate = new Date().toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+
   return (
-    <motion.div variants={pageFadeVariant} initial="initial" animate="animate" exit="exit" className="space-y-6 max-w-4xl mx-auto py-2">
-      <PageHeader
-        title="Digital QS BOQ & Feasibility Report"
-        subtitle="Bank-loan ready engineering specification, itemized BOQ, timeline & payment roadmap."
-        breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Quantity Surveyor Report' }]}
-        actions={
-          <div className="flex items-center gap-3 print:hidden">
-            <Button variant="outline" size="sm" onClick={handlePrintRequest} leftIcon={<Printer className="w-4 h-4" />}>
-              Print / Save PDF
-            </Button>
-            <Button size="sm" onClick={handlePrintRequest} leftIcon={isLeadCaptured ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />}>
-              {isLeadCaptured ? 'Download Official BOQ' : 'Unlock Full Report'}
-            </Button>
-          </div>
-        }
-      />
+    <motion.div
+      variants={pageFadeVariant}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="min-h-screen bg-[#F7F7F5] py-8 sm:py-12"
+    >
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6 text-left">
 
+        {/* Top Control Bar (Hidden on print) */}
+        <div className="flex items-center justify-between gap-4 print:hidden">
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-1.5 text-xs font-bold text-[#667085] hover:text-[#172033] transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </button>
 
-      {/* Legend Bar */}
-      <Card className="p-3 bg-slate-900 text-white border-none print:hidden flex flex-wrap items-center justify-between gap-2 text-xs">
-        <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Data Source Tags:</span>
-        <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-          <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">[USER INPUT]</span>
-          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">[CALCULATED VALUE]</span>
-          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30">[ASSUMPTION]</span>
-          <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">[MARKET RATE]</span>
-          <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">[ESTIMATED COST]</span>
-        </div>
-      </Card>
-
-      {/* Document Sheet Container */}
-      <Card className="p-6 sm:p-10 bg-white border border-slate-200 shadow-soft-lg space-y-6 print:shadow-none print:border-none">
-        {/* Header Branding */}
-        <div className="flex justify-between items-start pb-4 border-b border-slate-200">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black">
-                C
-              </div>
-              <span className="font-black text-slate-900 text-lg tracking-tight">COST CALCULATOR BY RIGHTCON</span>
-            </div>
-            <p className="text-xs text-slate-500 font-medium">Construction Feasibility & BOQ Specification</p>
-            <p className="text-[10px] text-slate-400 font-mono mt-0.5">ID: {report.projectId} | IS 456 Verified</p>
-          </div>
-
-          <div className="text-right space-y-1">
-            <StatusBadge status="success" label="Calculations Verified" />
-            <p className="text-[11px] text-slate-500 font-medium pt-1">Prepared For: {preparedFor}</p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePrintRequest}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-slate-50 text-xs font-bold text-[#172033] transition-colors cursor-pointer shadow-2xs"
+            >
+              <Printer className="w-3.5 h-3.5 text-[#1F4B43]" /> Print / PDF
+            </button>
+            <button
+              type="button"
+              onClick={handlePrintRequest}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#1F4B43] hover:bg-[#163731] text-xs font-bold text-white transition-colors cursor-pointer shadow-xs"
+            >
+              <Download className="w-3.5 h-3.5" /> Download Report
+            </button>
           </div>
         </div>
 
-        {/* 1. Executive Summary */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
-          <button
-            type="button"
-            onClick={() => toggleAccordion('exec')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
-              <Building className="w-4 h-4" /> 1. Executive Summary & Core Feasibility
-            </span>
-            <span className="print:hidden">
-              {openSections.exec ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </span>
-          </button>
+        {/* Document Sheet (Professional Construction Document) */}
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-12 shadow-xs space-y-8 print:border-none print:shadow-none print:p-0">
 
-          {(openSections.exec || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-3 ${openSections.exec ? 'block' : 'hidden'} print:block print:p-2`}>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Total Usable BUA</span>
-                  <p className="text-sm font-black text-slate-900">{area.totalBUASqFt.toLocaleString('en-IN')} Sq Ft</p>
+          {/* 1. Header */}
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b-2 border-[#172033]">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-[#1F4B43] flex items-center justify-center text-white text-xs font-bold">
+                  <Building2 className="w-3.5 h-3.5" />
                 </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Total Estimated Cost</span>
-                  <p className="text-sm font-black text-blue-600">{formatCurrency(budget.totalProjectCost)}</p>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Rate / Sq Ft</span>
-                  <p className="text-sm font-black text-slate-900">₹{budget.costPerSqFt.toLocaleString('en-IN')}</p>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Est. Duration</span>
-                  <p className="text-sm font-black text-slate-900">{timeline.totalMonths} Months</p>
-                </div>
+                <span className="font-extrabold text-lg sm:text-xl text-[#172033] tracking-tight">
+                  Cost Calculator by Rightcon
+                </span>
+              </div>
+              <p className="text-xs text-[#667085]">Pre-Construction Quantity Feasibility &amp; BOQ Specification</p>
+            </div>
+
+            <div className="text-xs text-left sm:text-right space-y-0.5 text-[#667085]">
+              <p><strong className="text-[#172033]">Project ID:</strong> {report.projectId || 'PRJ-2026-BLR'}</p>
+              <p><strong className="text-[#172033]">Date:</strong> {currentDate}</p>
+              <p><strong className="text-[#172033]">Prepared For:</strong> {preparedFor || 'Residential Client'}</p>
+            </div>
+          </div>
+
+          {/* 2. Project Summary */}
+          <section className="space-y-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1F4B43] border-b border-[#E5E7EB] pb-1.5">
+              1. Project Summary
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+              <div className="p-3 bg-[#F7F7F5] rounded-lg">
+                <span className="text-[10px] text-[#667085] uppercase block">Location</span>
+                <span className="font-bold text-[#172033]">{input.city} ({input.authority})</span>
+              </div>
+              <div className="p-3 bg-[#F7F7F5] rounded-lg">
+                <span className="text-[10px] text-[#667085] uppercase block">Plot Dimensions</span>
+                <span className="font-bold text-[#172033]">{input.plotWidth}' × {input.plotLength}' ({(input.plotWidth * input.plotLength).toLocaleString()} sq.ft)</span>
+              </div>
+              <div className="p-3 bg-[#F7F7F5] rounded-lg">
+                <span className="text-[10px] text-[#667085] uppercase block">Built-Up Area</span>
+                <span className="font-bold text-[#172033]">{area.totalBUASqFt.toLocaleString()} sq.ft ({input.floors} Floors)</span>
+              </div>
+              <div className="p-3 bg-[#F7F7F5] rounded-lg">
+                <span className="text-[10px] text-[#667085] uppercase block">Typology</span>
+                <span className="font-bold text-[#172033]">{input.houseType} ({input.qualityTier})</span>
               </div>
             </div>
-          )}
-        </div>
+          </section>
 
-        {/* 2. Project Configuration & Area */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
-          <button
-            type="button"
-            onClick={() => toggleAccordion('config')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
-              <Shield className="w-4 h-4" /> 2-4. Project Inputs, Sanction Body & Footprint
-            </span>
-            <span className="print:hidden">
-              {openSections.config ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </span>
-          </button>
-
-          {(openSections.config || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-3 text-xs ${openSections.config ? 'block' : 'hidden'} print:block print:p-2`}>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] font-bold text-blue-600 block">[USER INPUT] Location</span>
-                  <div className="font-extrabold text-slate-900">{input.city}</div>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] font-bold text-emerald-600 block">[CALCULATED] Sanction Body</span>
-                  <div className="font-extrabold text-slate-900">{input.authority}</div>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] font-bold text-blue-600 block">[USER INPUT] Plot Dimensions</span>
-                  <div className="font-extrabold text-slate-900">{input.plotWidth}' x {input.plotLength}'</div>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                  <span className="text-[10px] font-bold text-blue-600 block">[USER INPUT] Floor Config</span>
-                  <div className="font-extrabold text-slate-900">{input.floors} Levels (G+{input.floors - 1})</div>
-                </div>
+          {/* 3. Cost Summary */}
+          <section className="space-y-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1F4B43] border-b border-[#E5E7EB] pb-1.5">
+              2. Cost Summary
+            </h2>
+            <div className="p-4 bg-[#F7F7F5] rounded-xl border border-[#E5E7EB] flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-[#667085] block">Total Estimated Project Cost</span>
+                <span className="text-3xl font-black text-[#1F4B43]">{formatCurrency(budget.totalProjectCost)}</span>
+              </div>
+              <div className="text-xs text-[#667085]">
+                <span>Effective Rate: <strong className="text-[#172033]">₹{budget.costPerSqFt.toLocaleString()} / sq.ft</strong></span>
+                <span className="mx-2">•</span>
+                <span>Est. Duration: <strong className="text-[#172033]">{timeline.totalMonths} Months</strong></span>
               </div>
             </div>
-          )}
-        </div>
+          </section>
 
-        {/* 5-15. Materials & Specifications */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
-          <button
-            type="button"
-            onClick={() => toggleAccordion('materials')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
-              <Layers className="w-4 h-4" /> 5-15. Materials, Finishes & Engineering Specifications
-            </span>
-            <span className="print:hidden">
-              {openSections.materials ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </span>
-          </button>
-
-          {(openSections.materials || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-4 text-xs ${openSections.materials ? 'block' : 'hidden'} print:block print:p-2`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200/60">
-                  <span className="text-[10px] font-bold text-blue-700 uppercase block">Structural TMT Steel</span>
-                  <div className="font-black text-slate-900">{input.materialBrands.steel || 'Unselected'} &bull; {quantities.steelTonnes} Tonnes</div>
-                </div>
-                <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/60">
-                  <span className="text-[10px] font-bold text-emerald-700 uppercase block">Portland Cement</span>
-                  <div className="font-black text-slate-900">{input.materialBrands.cement || 'Unselected'} &bull; {quantities.cementBags.toLocaleString()} Bags</div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block">Flooring (Living)</span>
-                  <div className="font-extrabold text-slate-800">{input.flooringZones.living}</div>
-                </div>
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block">Doors</span>
-                  <div className="font-extrabold text-slate-800">{input.doors.mainDoor}</div>
-                </div>
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block">Windows</span>
-                  <div className="font-extrabold text-slate-800">{input.windows.primaryMaterial} ({input.windows.subGrade})</div>
-                </div>
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block">Electrical Wires</span>
-                  <div className="font-extrabold text-slate-800">{input.electrical.wireTier}</div>
-                </div>
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block">Plumbing & Fittings</span>
-                  <div className="font-extrabold text-slate-800">{input.bathroomFittings.cpvcBrand} / {input.bathroomFittings.sanitaryTier}</div>
-                </div>
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/60">
-                  <span className="text-[10px] text-slate-400 font-bold block">Painting</span>
-                  <div className="font-extrabold text-slate-800">{input.painting.brand} ({input.painting.internalPaint})</div>
-                </div>
-              </div>
+          {/* 4. Itemized BOQ Table */}
+          <section className="space-y-3">
+            <div className="flex justify-between items-center border-b border-[#E5E7EB] pb-1.5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1F4B43]">
+                3. Bill of Quantities (BOQ Takeoff)
+              </h2>
+              <span className="text-[11px] text-[#667085] font-mono">{boq.length} Line Items</span>
             </div>
-          )}
-        </div>
 
-        {/* 16-17. BOQ & Cost Schedule */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleAccordion('boq')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
-              <FileSpreadsheet className="w-4 h-4" /> 16-17. Itemized BOQ & Cost Allocations ({boq.length} Line Items)
-            </span>
-            <span className="print:hidden">
-              {openSections.boq ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </span>
-          </button>
-
-          {(openSections.boq || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-4 text-xs ${openSections.boq ? 'block' : 'hidden'} print:block print:p-2`}>
-              <div className="border border-slate-200 rounded-xl overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[700px]">
-                  <thead>
-                    <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
-                      <th className="p-2.5">Code</th>
-                      <th className="p-2.5">Description</th>
-                      <th className="p-2.5">Category</th>
-                      <th className="p-2.5 text-right">Qty</th>
-                      <th className="p-2.5">Unit</th>
-                      <th className="p-2.5 text-right">Rate (₹)</th>
-                      <th className="p-2.5 text-right">%</th>
-                      <th className="p-2.5 text-right">Amount (₹)</th>
-                      <th className="p-2.5">Material / Spec</th>
-                      <th className="p-2.5">Remarks</th>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#F7F7F5] text-[#172033] font-bold border-b border-[#E5E7EB] text-[11px]">
+                    <th className="p-2.5">Code</th>
+                    <th className="p-2.5">Trade Description</th>
+                    <th className="p-2.5 text-right">Quantity</th>
+                    <th className="p-2.5">Unit</th>
+                    <th className="p-2.5 text-right">Rate (₹)</th>
+                    <th className="p-2.5 text-right">Amount (₹)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E7EB] text-[11px]">
+                  {boq.map((item) => (
+                    <tr key={item.code} className="hover:bg-slate-50">
+                      <td className="p-2.5 font-mono text-[10px] text-[#667085]">{item.code}</td>
+                      <td className="p-2.5 font-semibold text-[#172033]">{item.description}</td>
+                      <td className="p-2.5 text-right text-[#172033]">{item.quantity.toLocaleString()}</td>
+                      <td className="p-2.5 text-[#667085]">{item.unit}</td>
+                      <td className="p-2.5 text-right font-mono text-[#667085]">₹{item.unitRate.toLocaleString()}</td>
+                      <td className="p-2.5 text-right font-bold text-[#172033]">{formatCurrency(item.amount)}</td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-[11px]">
-                    {boq.map((item) => (
-                      <tr key={item.code} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="p-2.5 font-mono text-[10px] text-slate-400">{item.code}</td>
-                        <td className="p-2.5 font-semibold text-slate-900">{item.description}</td>
-                        <td className="p-2.5 text-slate-500">{item.category}</td>
-                        <td className="p-2.5 text-right font-medium text-slate-800">{item.quantity.toLocaleString('en-IN')}</td>
-                        <td className="p-2.5 text-slate-500">{item.unit}</td>
-                        <td className="p-2.5 text-right font-mono text-slate-700">₹{item.unitRate.toLocaleString('en-IN')}</td>
-                        <td className="p-2.5 text-right font-bold text-blue-600">{item.percentage}%</td>
-                        <td className="p-2.5 text-right font-extrabold text-slate-900">{formatCurrency(item.amount)}</td>
-                        <td className="p-2.5 font-medium text-slate-600 max-w-[140px] truncate">{item.brand}</td>
-                        <td className="p-2.5 text-slate-400 text-[10px] max-w-[140px] truncate">{item.remarks}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* 5. Material Specifications */}
+          <section className="space-y-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1F4B43] border-b border-[#E5E7EB] pb-1.5">
+              4. Materials &amp; Brand Specifications
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-2.5 bg-[#F7F7F5] rounded border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#667085] block font-semibold">Structural Steel</span>
+                <span className="font-bold text-[#172033]">{input.materialBrands.steel || 'Tata Tiscon'} ({quantities.steelTonnes} Tonnes)</span>
+              </div>
+              <div className="p-2.5 bg-[#F7F7F5] rounded border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#667085] block font-semibold">Portland Cement</span>
+                <span className="font-bold text-[#172033]">{input.materialBrands.cement || 'UltraTech'} ({quantities.cementBags.toLocaleString()} Bags)</span>
+              </div>
+              <div className="p-2.5 bg-[#F7F7F5] rounded border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#667085] block font-semibold">Flooring</span>
+                <span className="font-bold text-[#172033]">{input.flooringZones.living}</span>
+              </div>
+              <div className="p-2.5 bg-[#F7F7F5] rounded border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#667085] block font-semibold">Main Door</span>
+                <span className="font-bold text-[#172033]">{input.doors.mainDoor}</span>
+              </div>
+              <div className="p-2.5 bg-[#F7F7F5] rounded border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#667085] block font-semibold">Windows</span>
+                <span className="font-bold text-[#172033]">{input.windows.primaryMaterial} ({input.windows.subGrade})</span>
+              </div>
+              <div className="p-2.5 bg-[#F7F7F5] rounded border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#667085] block font-semibold">Electrical Wires</span>
+                <span className="font-bold text-[#172033]">{input.electrical.wireTier}</span>
               </div>
             </div>
-          )}
-        </div>
+          </section>
 
-        {/* 18-20. Timeline & Payment Roadmap */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
-          <button
-            type="button"
-            onClick={() => toggleAccordion('payments')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
-              <CreditCard className="w-4 h-4" /> 18-20. Construction Timeline & Payment Milestones
-            </span>
-            <span className="print:hidden">
-              {openSections.payments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </span>
-          </button>
-
-          {(openSections.payments || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-3 text-xs ${openSections.payments ? 'block' : 'hidden'} print:block print:p-2`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {paymentPlan.slice(0, 6).map((m) => (
-                  <div key={m.stage} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/60 flex justify-between items-center">
-                    <div>
-                      <span className="font-extrabold text-blue-600">Stage {m.stage}:</span>{' '}
-                      <span className="font-bold text-slate-800">{m.title}</span>
-                      <div className="text-[10px] text-slate-400">{m.targetDate} • {m.percentage}%</div>
-                    </div>
-                    <div className="text-right font-extrabold text-slate-900">{formatCurrency(m.amount)}</div>
-                  </div>
-                ))}
-              </div>
+          {/* 6. Assumptions & Engineering Trace */}
+          <section className="space-y-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1F4B43] border-b border-[#E5E7EB] pb-1.5">
+              5. Assumptions &amp; Engineering References
+            </h2>
+            <div className="space-y-1.5 text-xs text-[#667085]">
+              <p>• <strong className="text-[#172033]">IS 456:2000</strong> Code of Practice for Plain and Reinforced Concrete (M20/M25 mixes).</p>
+              <p>• <strong className="text-[#172033]">IS 1786:2008</strong> High-Strength Deformed Steel Bars for Concrete Reinforcement.</p>
+              <p>• <strong className="text-[#172033]">NBC 2016</strong> National Building Code of India (clear heights, floor space index, setback norms).</p>
+              <p>• <strong className="text-[#172033]">Regional Tender Indices</strong> Indexed market Schedule of Rates for Bangalore &amp; Mysore.</p>
             </div>
-          )}
+          </section>
+
+          {/* Document Footer */}
+          <div className="pt-6 border-t border-[#E5E7EB] flex justify-between items-center text-[10px] text-[#667085]">
+            <span>Cost Calculator by Rightcon • Verified Engineering Report</span>
+            <span>Formula-Driven Indicative Construction Estimate</span>
+          </div>
+
         </div>
 
-        {/* 21-22. Assumptions & References */}
-        <div className="border border-slate-200 rounded-2xl overflow-hidden print-avoid-break">
-          <button
-            type="button"
-            onClick={() => toggleAccordion('assumptions')}
-            className="w-full p-4 bg-slate-50 flex items-center justify-between font-extrabold text-xs text-slate-900 cursor-pointer print:bg-white print:p-2"
-          >
-            <span className="flex items-center gap-2 uppercase tracking-wider text-blue-600">
-              <Lightbulb className="w-4 h-4 text-amber-500" /> 21-22. Feasibility Assumptions & Engineering Standards
-            </span>
-            <span className="print:hidden">
-              {openSections.assumptions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </span>
-          </button>
-
-          {(openSections.assumptions || true) && (
-            <div className={`p-4 bg-white border-t border-slate-200 space-y-4 text-xs text-slate-600 ${openSections.assumptions ? 'block' : 'hidden'} print:block print:p-2`}>
-              <div className="space-y-1.5">
-                <p>• <span className="font-bold text-slate-800">Nominal Soil Bearing Capacity</span>: 180 kN/sqm (Standard Isolated Footings assumption &bull; <span className="text-amber-600 font-semibold">Requires Client Confirmation</span>).</p>
-                <p>• <span className="font-bold text-slate-800">IS 456:2000 & IS 13920</span> Code of Practice for Plain, Reinforced and Ductile Concrete.</p>
-                <p>• <span className="font-bold text-slate-800">IS 875:1987</span> Code of Practice for Structural Design Loads (Dead, Live & Wind).</p>
-                <p>• <span className="font-bold text-slate-800">NBC 2016</span> National Building Code of India (Clear Height 10ft, Stairway & Fire Norms).</p>
-                <p>• <span className="font-bold text-slate-800">{input.authority}</span> Bylaws & Zoned FAR Compliance (60% Ground Coverage, 92% Floor Efficiency).</p>
-              </div>
-
-              {/* Engineering Trace Audit Table */}
-              {report.trace && report.trace.length > 0 && (
-                <div className="pt-2">
-                  <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-2">
-                    Mathematical Calculation Trace (Auditable Derivations)
-                  </span>
-                  <div className="border border-slate-200 rounded-xl overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-[10px]">
-                      <thead>
-                        <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                          <th className="p-2">Parameter</th>
-                          <th className="p-2">Category</th>
-                          <th className="p-2">Formula</th>
-                          <th className="p-2">Governing Assumption</th>
-                          <th className="p-2 text-right">Result</th>
-                          <th className="p-2">Unit</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {report.trace.map((t, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50">
-                            <td className="p-2 font-bold text-slate-900">{t.parameter}</td>
-                            <td className="p-2 text-slate-500">{t.category}</td>
-                            <td className="p-2 font-mono text-blue-600">{t.formula}</td>
-                            <td className="p-2 text-slate-600">{t.assumption}</td>
-                            <td className="p-2 text-right font-black text-slate-900">{typeof t.result === 'number' ? t.result.toLocaleString('en-IN') : t.result}</td>
-                            <td className="p-2 text-slate-500">{t.unit}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Report Footer Verification */}
-        <div className="pt-6 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
-          <span>Cost Calculator Engine v1.0.0 &bull; Rightcon Digital Quantity Surveyor</span>
-          <span>Formula-Driven Indicative Construction Estimate</span>
-        </div>
-      </Card>
-
+      </div>
 
       <LeadCaptureModal
         isOpen={showLeadModal}
@@ -399,4 +238,3 @@ export const ReportPage: React.FC = () => {
     </motion.div>
   );
 };
-

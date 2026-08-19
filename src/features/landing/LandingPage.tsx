@@ -14,43 +14,41 @@ import { FinalCtaSection } from './sections/FinalCtaSection';
 
 export const LandingPage: React.FC = () => {
   return (
-    <div
-      className="w-full min-h-screen font-sans bg-slate-50 text-slate-900"
-    >
-      {/* 1. Hero */}
+    <div className="w-full min-h-screen font-sans bg-[#F7F7F5] text-[#172033]">
+      {/* 01. Hero */}
       <HeroSection />
 
-      {/* 2. Trust Stats / Credibility */}
+      {/* 02. Trust Strip */}
       <TrustStatsSection />
 
-      {/* 3. Why Planning Matters */}
+      {/* 03. Why Planning */}
       <WhyPlanningSection />
 
-      {/* 4. How It Works */}
+      {/* 04. How It Works */}
       <CalculatorSolutionsSection />
 
-      {/* 5. Interactive Calculator Preview */}
+      {/* 05. Live Interactive Demo */}
       <InteractiveDemoSection />
 
-      {/* 6. Features Showcase */}
+      {/* 06. Features Showcase */}
       <FeatureShowcaseSection />
 
-      {/* 7. Engineering Standards */}
+      {/* 07. Dark Technical Engineering Standards */}
       <EngineeringStandardsSection />
 
-      {/* 8. Construction Packages */}
+      {/* 08. Construction Packages Matrix */}
       <PackagesSection />
 
-      {/* 9. Project Gallery */}
+      {/* 09. Architectural Projects Gallery */}
       <ProjectGallerySection />
 
-      {/* 10. Testimonials */}
+      {/* 10. Large Testimonial */}
       <TestimonialsSection />
 
-      {/* 11. FAQ */}
+      {/* 11. Minimal FAQ Accordion */}
       <FaqSection />
 
-      {/* 12. Final CTA */}
+      {/* 12. Final Action CTA */}
       <FinalCtaSection />
     </div>
   );

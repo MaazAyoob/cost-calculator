@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useArea } from '../../../store/useCalculationStore';
-import { Card } from '../../../components/ui/Card';
-import { Grid, Check, HelpCircle, ArrowRight } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step4Flooring: React.FC = () => {
   const { flooringZones, setFlooringZone } = useWizardStore();
   const area = useArea();
   const [activeZoneKey, setActiveZoneKey] = useState<keyof typeof flooringZones>('living');
-  const [showWhy, setShowWhy] = useState(false);
 
-  const totalBua = area.totalBUASqFt || 3850;
+  const totalBua = area.totalBUASqFt || 2400;
 
   const zones: {
     key: keyof typeof flooringZones;
@@ -82,128 +80,103 @@ export const Step4Flooring: React.FC = () => {
   const selectedOptionLabel = flooringZones[currentZone.key];
 
   return (
-    <div className="space-y-8 py-2">
-      {/* Header Intro */}
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Zone-Specific Flooring</h2>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-          Select material preferences for each room zone to estimate flooring cost.
+    <div className="space-y-8 text-left">
+      {/* Editorial Step Header */}
+      <div className="space-y-1">
+        <span className="text-xs font-mono font-bold tracking-widest text-[#1F4B43] uppercase block">
+          STEP 04
+        </span>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#172033] tracking-tight">
+          Flooring Finishes
+        </h2>
+        <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+          Select surface finishes by zone to calculate tile and stone material rates.
         </p>
       </div>
 
-      {/* Zone Selector Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+      {/* Zone Switcher Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar border-b border-[#E5E7EB]">
         {zones.map((z) => {
           const isActive = activeZoneKey === z.key;
-          const isZoneSelected = Boolean(flooringZones[z.key]);
+          const isConfigured = Boolean(flooringZones[z.key]);
           return (
             <button
               key={z.key}
               type="button"
               onClick={() => setActiveZoneKey(z.key)}
               className={cn(
-                'px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 border',
+                'px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5',
                 isActive
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                  : isZoneSelected
-                  ? 'bg-blue-50 text-blue-700 border-blue-200'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#1F4B43] text-white shadow-xs'
+                  : 'text-[#667085] hover:text-[#172033] hover:bg-slate-100'
               )}
             >
               <span>{z.label}</span>
-              {isZoneSelected && <span className={cn('w-2 h-2 rounded-full', isActive ? 'bg-white' : 'bg-blue-600')}></span>}
+              {isConfigured && !isActive && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1F4B43]" />
+              )}
             </button>
           );
         })}
       </div>
 
-      {/* Active Zone Card */}
-      <Card className="p-6 bg-white border border-slate-200/90 shadow-soft-xs rounded-2xl space-y-5">
+      {/* Active Zone Option Cards */}
+      <div className="space-y-3">
         <div className="flex justify-between items-center text-xs">
-          <div>
-            <h3 className="text-sm font-extrabold text-slate-900">{currentZone.label} Finish</h3>
-            <span className="text-slate-500 text-[11px] font-medium">
-              {selectedOptionLabel ? `Selected: ${selectedOptionLabel}` : 'Status: No option selected'}
-            </span>
-          </div>
-          <div className="text-right">
-            <span className="text-blue-600 font-extrabold block">~{currentZone.approxAreaSqFt} Sq Ft</span>
-            <button
-              type="button"
-              onClick={() => setShowWhy(!showWhy)}
-              className="text-[10px] text-slate-400 hover:text-slate-600 underline flex items-center gap-0.5 justify-end cursor-pointer font-semibold"
-            >
-              <HelpCircle className="w-3 h-3" /> Why area?
-            </button>
-          </div>
+          <label className="font-bold text-[#172033] uppercase tracking-wider">
+            {currentZone.label} Options (~{currentZone.approxAreaSqFt} sq.ft)
+          </label>
         </div>
 
-        {showWhy && (
-          <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200/60 text-xs text-blue-900 space-y-1">
-            <p className="font-bold">Area Estimation Rationale:</p>
-            <p className="text-[11px] leading-relaxed text-blue-800">
-              Estimated from your project's total usable built-up area and configured room counts for {currentZone.label}.
-            </p>
-          </div>
-        )}
-
-        {/* Options Selection Cards */}
         <div className="space-y-2.5">
           {currentZone.options.map((opt) => {
             const isSelected = selectedOptionLabel === opt.label;
             const estimatedCost = Math.round(currentZone.approxAreaSqFt * opt.rate);
             return (
-              <Card
+              <div
                 key={opt.label}
                 onClick={() => setFlooringZone(currentZone.key, opt.label)}
                 className={cn(
-                  'p-4 cursor-pointer border transition-all flex items-center justify-between rounded-2xl',
+                  'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-blue-50/60 border-blue-600 ring-2 ring-blue-500/15 shadow-xs'
-                    : 'bg-white border-slate-200 hover:border-slate-300'
+                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-blue-600 text-white' : 'border border-slate-300 text-transparent'
+                      isSelected ? 'bg-[#1F4B43] text-white' : 'border border-slate-300 text-transparent'
                     )}
                   >
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-extrabold text-slate-900">{opt.label}</h4>
+                      <h4 className="text-xs font-bold text-[#172033]">{opt.label}</h4>
                       {opt.recommended && (
-                        <span className="text-[10px] font-extrabold bg-blue-100/80 text-blue-700 px-2 py-0.5 rounded">
+                        <span className="text-[9px] font-bold bg-[#1F4B43]/10 text-[#1F4B43] px-1.5 py-0.5 rounded">
                           Recommended
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-500 leading-tight mt-0.5">{opt.desc}</p>
+                    <p className="text-[11px] text-[#667085] leading-tight mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-right shrink-0">
-                  <div>
-                    <span className="text-xs font-extrabold text-slate-900 block">{formatCurrency(estimatedCost)}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">₹{opt.rate}/sq.ft</span>
-                  </div>
-                  <span className={cn(
-                    'text-xs font-extrabold px-3 py-1 rounded-xl border transition-colors flex items-center gap-1',
-                    isSelected
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                  )}>
-                    {isSelected ? '✓ Selected' : <>Select <ArrowRight className="w-3 h-3 inline" /></>}
+                <div className="text-right shrink-0">
+                  <span className="text-xs font-bold text-[#172033] block">
+                    {formatCurrency(estimatedCost)}
                   </span>
+                  <span className="text-[10px] text-[#667085]">₹{opt.rate}/sq.ft</span>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
-      </Card>
+      </div>
+
     </div>
   );
 };
