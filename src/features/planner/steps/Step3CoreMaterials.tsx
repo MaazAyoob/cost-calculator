@@ -24,16 +24,16 @@ export const Step3CoreMaterials: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 text-left">
+    <div className="space-y-8 text-left select-none">
       {/* Editorial Step Header */}
       <div className="space-y-1">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#1F4B43] uppercase block">
+        <span className="text-xs font-mono font-bold tracking-widest text-[#1B3D34] uppercase block">
           STEP 03
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#172033] tracking-tight">
+        <h2 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
           Core Materials
         </h2>
-        <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
           Choose the primary structural materials for your estimate.
         </p>
       </div>
@@ -41,7 +41,7 @@ export const Step3CoreMaterials: React.FC = () => {
       {/* 1. Structural Steel */}
       <div className="space-y-3">
         <div className="flex justify-between items-center text-xs">
-          <label className="font-bold text-[#172033] uppercase tracking-wider">
+          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             Structural TMT Steel ({steelTonnes} Tonnes Required)
           </label>
         </div>
@@ -57,38 +57,38 @@ export const Step3CoreMaterials: React.FC = () => {
                 className={cn(
                   'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1F4B43] text-white' : 'border border-slate-300 text-transparent'
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#E5E7EB] text-transparent'
                     )}
                   >
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-bold text-[#172033]">{item.brand}</h4>
-                      <span className="text-[10px] text-[#667085]">({item.grade})</span>
+                      <h4 className="text-xs font-bold text-[#1B3D34]">{item.brand}</h4>
+                      <span className="text-[10px] text-[#4B5563]">({item.grade})</span>
                       {item.recommended && (
-                        <span className="text-[9px] font-bold bg-[#1F4B43]/10 text-[#1F4B43] px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] font-bold bg-[rgba(27,61,52,0.08)] text-[#1B3D34] px-1.5 py-0.5 rounded">
                           Recommended
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[#667085] leading-tight mt-0.5">{item.desc}</p>
+                    <p className="text-[11px] text-[#4B5563] leading-tight mt-0.5">{item.desc}</p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs font-bold text-[#172033] block">
+                  <span className="text-xs font-bold text-[#1B3D34] block font-mono">
                     {steelTonnes > 0 ? formatCurrency(itemCost) : `₹${item.ratePerKg}/kg`}
                   </span>
-                  <span className="text-[10px] text-[#667085]">₹{item.ratePerKg}/kg</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerKg}/kg</span>
                 </div>
               </div>
             );
@@ -99,7 +99,7 @@ export const Step3CoreMaterials: React.FC = () => {
       {/* 2. Cement */}
       <div className="space-y-3 pt-2 border-t border-[#E5E7EB]">
         <div className="flex justify-between items-center text-xs">
-          <label className="font-bold text-[#172033] uppercase tracking-wider">
+          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             Portland Cement ({cementBags.toLocaleString()} Bags Required)
           </label>
         </div>
@@ -115,38 +115,38 @@ export const Step3CoreMaterials: React.FC = () => {
                 className={cn(
                   'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1F4B43] text-white' : 'border border-slate-300 text-transparent'
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#E5E7EB] text-transparent'
                     )}
                   >
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-bold text-[#172033]">{item.brand}</h4>
-                      <span className="text-[10px] text-[#667085]">({item.grade})</span>
+                      <h4 className="text-xs font-bold text-[#1B3D34]">{item.brand}</h4>
+                      <span className="text-[10px] text-[#4B5563]">({item.grade})</span>
                       {item.recommended && (
-                        <span className="text-[9px] font-bold bg-[#1F4B43]/10 text-[#1F4B43] px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] font-bold bg-[rgba(27,61,52,0.08)] text-[#1B3D34] px-1.5 py-0.5 rounded">
                           Recommended
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[#667085] leading-tight mt-0.5">{item.desc}</p>
+                    <p className="text-[11px] text-[#4B5563] leading-tight mt-0.5">{item.desc}</p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs font-bold text-[#172033] block">
+                  <span className="text-xs font-bold text-[#1B3D34] block font-mono">
                     {cementBags > 0 ? formatCurrency(itemCost) : `₹${item.ratePerBag}/bag`}
                   </span>
-                  <span className="text-[10px] text-[#667085]">₹{item.ratePerBag}/bag</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerBag}/bag</span>
                 </div>
               </div>
             );

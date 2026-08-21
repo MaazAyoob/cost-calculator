@@ -80,16 +80,16 @@ export const Step4Flooring: React.FC = () => {
   const selectedOptionLabel = flooringZones[currentZone.key];
 
   return (
-    <div className="space-y-8 text-left">
+    <div className="space-y-8 text-left select-none">
       {/* Editorial Step Header */}
       <div className="space-y-1">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#1F4B43] uppercase block">
+        <span className="text-xs font-mono font-bold tracking-widest text-[#1B3D34] uppercase block">
           STEP 04
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#172033] tracking-tight">
+        <h2 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
           Flooring Finishes
         </h2>
-        <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
           Select surface finishes by zone to calculate tile and stone material rates.
         </p>
       </div>
@@ -107,13 +107,13 @@ export const Step4Flooring: React.FC = () => {
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5',
                 isActive
-                  ? 'bg-[#1F4B43] text-white shadow-xs'
-                  : 'text-[#667085] hover:text-[#172033] hover:bg-slate-100'
+                  ? 'bg-[#1B3D34] text-white shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)]'
               )}
             >
               <span>{z.label}</span>
               {isConfigured && !isActive && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1F4B43]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1B3D34]" />
               )}
             </button>
           );
@@ -123,7 +123,7 @@ export const Step4Flooring: React.FC = () => {
       {/* Active Zone Option Cards */}
       <div className="space-y-3">
         <div className="flex justify-between items-center text-xs">
-          <label className="font-bold text-[#172033] uppercase tracking-wider">
+          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             {currentZone.label} Options (~{currentZone.approxAreaSqFt} sq.ft)
           </label>
         </div>
@@ -139,37 +139,37 @@ export const Step4Flooring: React.FC = () => {
                 className={cn(
                   'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1F4B43] text-white' : 'border border-slate-300 text-transparent'
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#E5E7EB] text-transparent'
                     )}
                   >
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-bold text-[#172033]">{opt.label}</h4>
+                      <h4 className="text-xs font-bold text-[#1B3D34]">{opt.label}</h4>
                       {opt.recommended && (
-                        <span className="text-[9px] font-bold bg-[#1F4B43]/10 text-[#1F4B43] px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] font-bold bg-[rgba(27,61,52,0.08)] text-[#1B3D34] px-1.5 py-0.5 rounded">
                           Recommended
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[#667085] leading-tight mt-0.5">{opt.desc}</p>
+                    <p className="text-[11px] text-[#4B5563] leading-tight mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs font-bold text-[#172033] block">
+                  <span className="text-xs font-bold text-[#1B3D34] block font-mono">
                     {formatCurrency(estimatedCost)}
                   </span>
-                  <span className="text-[10px] text-[#667085]">₹{opt.rate}/sq.ft</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{opt.rate}/sq.ft</span>
                 </div>
               </div>
             );

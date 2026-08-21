@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUIStore } from '../../../store/useUIStore';
 import { useWizardStore } from '../../../store/useWizardStore';
-import { Sparkles, Building2, CheckCircle2, Loader2, ArrowRight, Trophy, ShieldCheck } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { Check, Loader2, ArrowRight, ShieldCheck, FileCheck2 } from 'lucide-react';
+import { HuttyLogo } from '../../../components/common/HuttyLogo';
 
 export const Step10LoadingExperience: React.FC = () => {
   const navigate = useNavigate();
@@ -15,8 +15,8 @@ export const Step10LoadingExperience: React.FC = () => {
     'Calculating Total Built-up Area & Floor Space Index...',
     'Estimating Steel Tonnage & Cement Bag Requirements...',
     'Aggregating Plumbing, Electrical & Conduit Quantities...',
-    `Applying ${city} Material Market Rates...`,
-    'Finalizing Feasibility & Material Report...',
+    `Applying ${city || 'Bangalore'} Material Market Rates...`,
+    'Finalizing Construction Dossier & BOQ...',
   ];
 
   const [activeStageIndex, setActiveStageIndex] = useState(0);
@@ -31,7 +31,7 @@ export const Step10LoadingExperience: React.FC = () => {
         }
         return prev + 1;
       });
-    }, 800);
+    }, 700);
 
     return () => clearInterval(interval);
   }, [loadingStages.length]);
@@ -40,7 +40,7 @@ export const Step10LoadingExperience: React.FC = () => {
     if (isDone) {
       addToast({
         title: 'Estimate Generation Complete!',
-        description: 'Your comprehensive feasibility and BOQ report is ready.',
+        description: 'Your comprehensive construction dossier and BOQ is ready.',
         type: 'success',
       });
     }
@@ -49,37 +49,27 @@ export const Step10LoadingExperience: React.FC = () => {
   const progressPercent = Math.min(100, Math.round((activeStageIndex / loadingStages.length) * 100));
 
   return (
-    <div className="min-h-[75vh] flex flex-col items-center justify-center p-6 space-y-8 max-w-2xl mx-auto text-center">
+    <div className="min-h-[75vh] flex flex-col items-center justify-center p-6 space-y-8 max-w-2xl mx-auto text-center select-none">
       {!isDone ? (
         <motion.div
           key="loading"
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          className="w-full space-y-8 bg-white p-8 sm:p-12 rounded-3xl border border-slate-200/80 shadow-soft-xl"
+          className="w-full space-y-8 bg-white p-8 sm:p-12 rounded-2xl border border-[#E5E7EB] shadow-xs text-left"
         >
-          {/* Animated Logo Container */}
-          <div className="relative inline-block">
-            <div className="w-20 h-20 rounded-3xl bg-blue-600 text-white flex items-center justify-center text-3xl font-extrabold shadow-soft-xl animate-pulse">
-              <Building2 className="w-10 h-10 text-white" />
-            </div>
-            <div className="absolute -bottom-2 -right-2 p-2 bg-emerald-500 text-white rounded-xl shadow-soft-sm">
-              <Sparkles className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600">COST CALCULATOR BY RIGHTCON</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Executing Architectural & Material Estimations
+          <div className="text-center space-y-3">
+            <HuttyLogo variant="compact" width={130} />
+            <h2 className="heading-sm text-2xl font-extrabold text-[#1B3D34] tracking-tight">
+              Executing Engineering Takeoff
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">
-              Processing inputs against {city} market rates and structural engineering specifications...
+            <p className="text-xs sm:text-sm text-[#4B5563]">
+              Computing physical quantities and market rates for {city || 'Bangalore'}...
             </p>
           </div>
 
-          {/* 5 Client Required Stages Checklist */}
-          <div className="space-y-3 text-left">
+          {/* Stages Checklist */}
+          <div className="space-y-2.5">
             {loadingStages.map((stageText, idx) => {
               const isCompleted = idx < activeStageIndex;
               const isCurrent = idx === activeStageIndex;
@@ -87,24 +77,26 @@ export const Step10LoadingExperience: React.FC = () => {
               return (
                 <div
                   key={idx}
-                  className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${
+                  className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all text-xs font-semibold ${
                     isCompleted
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-900 font-bold'
+                      ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] text-[#1B3D34]'
                       : isCurrent
-                      ? 'bg-blue-50 border-blue-400 text-blue-900 font-extrabold shadow-soft-xs'
-                      : 'bg-slate-50 border-slate-200/60 text-slate-400 opacity-50'
+                      ? 'bg-[#F8F8F6] border-[#1B3D34] text-[#1B3D34] font-bold'
+                      : 'bg-white border-[#E5E7EB] text-[#4B5563] opacity-50'
                   }`}
                 >
                   {isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
                   ) : isCurrent ? (
-                    <Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
+                    <Loader2 className="w-5 h-5 text-[#F28C28] animate-spin shrink-0" />
                   ) : (
-                    <span className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-xs text-slate-400 font-bold">
+                    <span className="w-5 h-5 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[10px] text-[#4B5563] font-mono">
                       {idx + 1}
                     </span>
                   )}
-                  <span className="text-xs sm:text-sm">{stageText}</span>
+                  <span>{stageText}</span>
                 </div>
               );
             })}
@@ -112,13 +104,13 @@ export const Step10LoadingExperience: React.FC = () => {
 
           {/* Smooth Progress Bar */}
           <div className="space-y-2 pt-2">
-            <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-              <span>Engineering Computation Progress</span>
-              <span className="text-blue-600 font-extrabold">{progressPercent}%</span>
+            <div className="flex justify-between items-center text-xs font-bold text-[#1B3D34]">
+              <span>Computation Progress</span>
+              <span className="font-mono text-[#F28C28]">{progressPercent}%</span>
             </div>
-            <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200 p-0.5">
+            <div className="w-full h-2.5 bg-[#F8F8F6] rounded-full overflow-hidden border border-[#E5E7EB]">
               <div
-                className="h-full bg-blue-600 rounded-full transition-all duration-300 ease-out"
+                className="h-full bg-[#1B3D34] rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -128,47 +120,41 @@ export const Step10LoadingExperience: React.FC = () => {
         /* Completion State */
         <motion.div
           key="done"
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, type: 'spring' }}
-          className="w-full space-y-8 bg-gradient-to-b from-white to-slate-50 p-8 sm:p-14 rounded-3xl border border-slate-200/80 shadow-soft-2xl"
+          transition={{ duration: 0.4 }}
+          className="w-full space-y-8 bg-white p-8 sm:p-12 rounded-2xl border border-[#E5E7EB] shadow-xs text-center"
         >
-          <div className="w-24 h-24 rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-soft-xl">
-            <Trophy className="w-12 h-12 text-emerald-600" />
+          <div className="w-16 h-16 rounded-2xl bg-[rgba(27,61,52,0.08)] text-[#1B3D34] border border-[#1B3D34]/20 flex items-center justify-center mx-auto">
+            <FileCheck2 className="w-8 h-8 text-[#1B3D34]" />
           </div>
 
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" /> Feasibility Computation Complete
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[rgba(27,61,52,0.08)] text-[#1B3D34] border border-[#1B3D34]/20 text-[10px] font-bold uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34]" /> COMPUTATION COMPLETE
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Congratulations!
+            <h2 className="heading-xl text-3xl font-extrabold text-[#1B3D34] tracking-tight">
+              Your Estimate is Ready.
             </h2>
-            <p className="text-base sm:text-xl font-black text-blue-600">
-              Your Construction Estimate is Ready.
-            </p>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
-              Your comprehensive itemized BOQ, material matrix, timeline, and disbursement schedule are fully computed.
+            <p className="text-xs sm:text-sm text-[#4B5563] max-w-md mx-auto leading-relaxed">
+              Your itemized Bill of Quantities, physical material takeoffs, and payment schedule are fully compiled.
             </p>
           </div>
 
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              onClick={() => navigate('/dashboard')}
-              rightIcon={<ArrowRight className="w-5 h-5 text-white" />}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-extrabold shadow-soft-xl text-base h-14 px-10 rounded-2xl w-full sm:w-auto cursor-pointer"
-            >
-              View Dashboard
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
+          <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
+            <button
               onClick={() => navigate('/report')}
-              className="font-extrabold text-base h-14 px-8 rounded-2xl w-full sm:w-auto cursor-pointer"
+              className="hutty-btn-primary px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm cursor-pointer"
             >
-              View Full Feasibility Report
-            </Button>
+              <span>View Construction Report</span>
+              <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+            </button>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="hutty-btn-secondary px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm cursor-pointer"
+            >
+              <span>Project Summary</span>
+            </button>
           </div>
         </motion.div>
       )}

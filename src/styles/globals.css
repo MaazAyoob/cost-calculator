@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 /* ============================================================
-   BuildPlan AI — PRD Color Palette System (PRD Section 10)
-   Background:    #F9FAFB (Slate 50)
-   Surface/Cards: #FFFFFF
-   Primary Text:  #0F172A (Slate 900)
-   Accent Brand:  #2563EB (Electric Blue)
-   Active Border: #2563EB (Electric Blue)
+   HUTTY — STRICT BRAND SYSTEM & DESIGN TOKENS
+   Primary Green:       #1B3D34
+   Roof Accent Orange:  #F28C28 (Used sparingly)
+   Secondary Text:      #4B5563
+   White Surface:       #FFFFFF
+   Light Background:    #F8F8F6
+   Border:              #E5E7EB
    ============================================================ */
 
 @layer base {
@@ -14,132 +15,48 @@
     color-scheme: light;
 
     /* Backgrounds */
-    --cc-bg:            #F7F7F5;
+    --cc-bg:            #F8F8F6;
     --cc-surface:       #FFFFFF;
-    --cc-surface-muted: #F2F2EF;
+    --cc-surface-muted: rgba(27, 61, 52, 0.04);
 
     /* Text */
-    --cc-text-primary:   #172033;
-    --cc-text-secondary: #667085;
+    --cc-text-primary:   #1B3D34;
+    --cc-text-secondary: #4B5563;
     --cc-text-disabled:  #9CA3AF;
 
-    /* Brand (Deep Architectural Green & Muted Brass) */
-    --cc-brand:          #1F4B43;
-    --cc-brand-hover:    #163731;
-    --cc-brand-soft:     #EBF2F0;
-    --cc-brand-light:    #F2F7F5;
-    --cc-brass:          #B8894A;
-    --cc-brass-hover:    #9A723C;
-    --cc-brass-soft:     #F9F5EE;
-    --cc-brass-light:    #FAF3E7;
+    /* Hutty Brand Colors */
+    --cc-brand:          #1B3D34;
+    --cc-brand-hover:    #132C25;
+    --cc-brand-soft:     rgba(27, 61, 52, 0.08);
+    --cc-brand-light:    rgba(27, 61, 52, 0.04);
+    
+    /* Roof Accent Orange */
+    --cc-accent:         #F28C28;
+    --cc-accent-hover:   #D9771A;
+    --cc-accent-soft:    rgba(242, 140, 40, 0.10);
+    --cc-accent-light:   rgba(242, 140, 40, 0.05);
 
-    /* Interactive Blue Accent */
-    --cc-blue:           #3B6FF5;
-    --cc-blue-soft:      #EFF4FE;
-    --cc-accent:         #3B6FF5;
-    --cc-accent-light:   #EFF4FE;
-
-    /* Status */
-    --cc-success:        #287A55;
-    --cc-success-light:  #EDF7F2;
-    --cc-warning:        #B7791F;
-    --cc-warning-light:  #FEF8ED;
-    --cc-error:          #B42318;
-    --cc-error-light:    #FEE4E2;
-
-    /* Borders */
+    /* Neutral Border */
     --cc-border:         #E5E7EB;
     --cc-border-strong:  #D1D5DB;
 
     /* Overlay */
-    --cc-overlay:        rgba(23,32,51,0.45);
+    --cc-overlay:        rgba(27, 61, 52, 0.40);
 
-    /* Radii */
-    --cc-radius-card:    16px;
+    /* Architectural Radii System */
+    --cc-radius-panel:   18px;
+    --cc-radius-card:    14px;
     --cc-radius-btn:     10px;
     --cc-radius-input:   10px;
-    --cc-radius-modal:   20px;
-    --cc-radius-sheet:   24px;
+    --cc-radius-badge:   8px;
     --cc-radius-pill:    9999px;
 
-    /* Shadows (Restrained, architectural) */
-    --cc-shadow-xs:      0 1px 2px 0 rgba(23,32,51,0.03);
-    --cc-shadow-sm:      0 1px 3px 0 rgba(23,32,51,0.05), 0 1px 2px -1px rgba(23,32,51,0.03);
-    --cc-shadow-md:      0 4px 8px -2px rgba(23,32,51,0.06), 0 2px 4px -2px rgba(23,32,51,0.03);
-    --cc-shadow-lg:      0 12px 20px -4px rgba(23,32,51,0.08), 0 4px 6px -2px rgba(23,32,51,0.03);
-    --cc-shadow-xl:      0 20px 32px -8px rgba(23,32,51,0.10), 0 8px 12px -4px rgba(23,32,51,0.04);
-    --cc-shadow-brand:   0 4px 14px 0 rgba(31,75,67,0.20);
-    --cc-shadow-accent:  0 4px 14px 0 rgba(59,111,245,0.18);
-    --cc-shadow-glass:   0 4px 16px rgba(255,255,255,0.60), inset 0 1px 0 rgba(255,255,255,0.80);
-
-    /* Legacy aliases */
-    --bg-main:           var(--cc-bg);
-    --surface-card:      var(--cc-surface);
-    --accent-primary:    var(--cc-brand);
-    --text-primary:      var(--cc-text-primary);
-    --border-color:      var(--cc-border);
-    --color-success:     var(--cc-success);
-    --color-warning:     var(--cc-warning);
-    --color-danger:      var(--cc-error);
-    --radius-card:       var(--cc-radius-card);
-    --radius-button:     var(--cc-radius-btn);
-    --radius-input:      var(--cc-radius-input);
-    --radius-modal:      var(--cc-radius-modal);
-    --radius-sheet:      var(--cc-radius-sheet);
-  }
-
-  [data-theme="dark"] {
-    color-scheme: dark;
-
-    --cc-bg:             #0F172A;
-    --cc-surface:        #1E293B;
-    --cc-surface-muted:  #334155;
-
-    --cc-text-primary:   #F8FAFC;
-    --cc-text-secondary: #94A3B8;
-    --cc-text-disabled:  #64748B;
-
-    --cc-brand:          #2A6B60;
-    --cc-brand-hover:    #1F4B43;
-    --cc-brand-soft:     #17332D;
-    --cc-brand-light:    #17332D;
-    --cc-brass:          #D4A566;
-    --cc-brass-hover:    #B8894A;
-    --cc-brass-soft:     #342819;
-    --cc-brass-light:    #342819;
-
-    --cc-blue:           #4E7FF7;
-    --cc-blue-soft:      #172554;
-    --cc-accent:         #4E7FF7;
-    --cc-accent-light:   #172554;
-
-    --cc-success:        #287A55;
-    --cc-success-light:  #14532D;
-    --cc-warning:        #B7791F;
-    --cc-warning-light:  #451A03;
-    --cc-error:          #B42318;
-    --cc-error-light:    #450A0A;
-
-    --cc-border:         #334155;
-    --cc-border-strong:  #475569;
-
-    --cc-overlay:        rgba(0,0,0,0.60);
-
-    --cc-shadow-xs:      0 1px 2px 0 rgba(0,0,0,0.30);
-    --cc-shadow-sm:      0 2px 6px 0 rgba(0,0,0,0.40);
-    --cc-shadow-md:      0 4px 12px -2px rgba(0,0,0,0.50);
-    --cc-shadow-lg:      0 12px 24px -4px rgba(0,0,0,0.60);
-    --cc-shadow-xl:      0 20px 40px -8px rgba(0,0,0,0.70);
-    --cc-shadow-brand:   0 6px 18px 0 rgba(42,107,96,0.30);
-    --cc-shadow-accent:  0 6px 18px 0 rgba(78,127,247,0.25);
-    --cc-shadow-glass:   0 4px 16px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.05);
-
-    --bg-main:        var(--cc-bg);
-    --surface-card:   var(--cc-surface);
-    --accent-primary: var(--cc-brand);
-    --text-primary:   var(--cc-text-primary);
-    --border-color:   var(--cc-border);
-    --color-danger:   var(--cc-error);
+    /* Shadows: Subtle, derived strictly from Hutty Green */
+    --cc-shadow-xs:      0 1px 2px 0 rgba(27, 61, 52, 0.03);
+    --cc-shadow-sm:      0 1px 3px 0 rgba(27, 61, 52, 0.05), 0 1px 2px -1px rgba(27, 61, 52, 0.03);
+    --cc-shadow-md:      0 4px 10px -2px rgba(27, 61, 52, 0.06), 0 2px 4px -2px rgba(27, 61, 52, 0.03);
+    --cc-shadow-lg:      0 10px 22px -4px rgba(27, 61, 52, 0.08), 0 4px 6px -2px rgba(27, 61, 52, 0.03);
+    --cc-shadow-brand:   0 4px 14px 0 rgba(27, 61, 52, 0.20);
   }
 
   *, *::before, *::after {
@@ -147,339 +64,242 @@
   }
 
   html {
-    transition: background-color 0.25s ease, color 0.25s ease;
+    background-color: #F8F8F6;
+    color: #1B3D34;
   }
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    background-color: var(--cc-bg);
-    color: var(--cc-text-primary);
+    background-color: #F8F8F6;
+    color: #1B3D34;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
   }
 
   ::selection {
-    background-color: var(--cc-brand);
-    color: #fff;
+    background-color: #1B3D34;
+    color: #FFFFFF;
   }
 }
 
 /* ============================================================
    TYPOGRAPHY UTILITIES — Plus Jakarta Sans & Inter
    ============================================================ */
+.font-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
 .heading-display {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  line-height: 1.08;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: var(--cc-text-primary);
+  font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+  line-height: 1.06;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: #1B3D34;
 }
 
 .heading-xl {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.10;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  line-height: 1.12;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--cc-text-primary);
+  letter-spacing: -0.025em;
+  color: #1B3D34;
 }
 
 .heading-lg {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.875rem;
   line-height: 1.20;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--cc-text-primary);
+  color: #1B3D34;
 }
 
 .heading-md {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   line-height: 1.30;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.015em;
-  color: var(--cc-text-primary);
+  color: #1B3D34;
 }
 
 .heading-sm {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   line-height: 1.40;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--cc-text-primary);
+  color: #1B3D34;
 }
 
 .body-lg {
   font-size: 1.125rem;
   line-height: 1.60;
   font-weight: 400;
-  color: var(--cc-text-secondary);
+  color: #4B5563;
 }
 
 .body-base {
   font-size: 1rem;
   line-height: 1.60;
   font-weight: 400;
-  color: var(--cc-text-secondary);
+  color: #4B5563;
 }
 
 .body-sm {
   font-size: 0.875rem;
   line-height: 1.50;
   font-weight: 400;
-  color: var(--cc-text-secondary);
-}
-
-.label-text {
-  font-size: 0.75rem;
-  line-height: 1.40;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--cc-text-primary);
-}
-
-.caption-text {
-  font-size: 0.6875rem;
-  line-height: 1.40;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--cc-text-secondary);
+  color: #4B5563;
 }
 
 /* ============================================================
-   SHADOW UTILITIES
+   ARCHITECTURAL SELECTION STATES (Rules 1 & 21)
    ============================================================ */
-.shadow-cc-xs    { box-shadow: var(--cc-shadow-xs); }
-.shadow-cc-sm    { box-shadow: var(--cc-shadow-sm); }
-.shadow-cc-md    { box-shadow: var(--cc-shadow-md); }
-.shadow-cc-lg    { box-shadow: var(--cc-shadow-lg); }
-.shadow-cc-xl    { box-shadow: var(--cc-shadow-xl); }
-.shadow-cc-brand { box-shadow: var(--cc-shadow-brand); }
-.shadow-cc-accent{ box-shadow: var(--cc-shadow-accent); }
-.shadow-cc-glass { box-shadow: var(--cc-shadow-glass); }
-
-.shadow-soft-xs  { box-shadow: var(--cc-shadow-xs); }
-.shadow-soft-sm  { box-shadow: var(--cc-shadow-sm); }
-.shadow-soft-md  { box-shadow: var(--cc-shadow-md); }
-.shadow-soft-lg  { box-shadow: var(--cc-shadow-lg); }
-.shadow-soft-xl  { box-shadow: var(--cc-shadow-xl); }
-
-/* ============================================================
-   CARD / GLASS UTILITIES
-   ============================================================ */
-.cc-card {
-  background-color: var(--cc-surface);
-  border: 1px solid var(--cc-border);
+/* Unselected State */
+.hutty-selectable {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
   border-radius: var(--cc-radius-card);
-  box-shadow: var(--cc-shadow-sm);
+  color: #1B3D34;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.cc-card-hover {
-  transition: box-shadow 0.20s ease, transform 0.20s ease;
-}
-.cc-card-hover:hover {
-  box-shadow: var(--cc-shadow-md);
-  transform: translateY(-2px);
+.hutty-selectable:hover {
+  background-color: rgba(27, 61, 52, 0.04);
+  border-color: #D1D5DB;
 }
 
-.cc-glass {
-  background: rgba(255,255,255,0.70);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.60);
-  box-shadow: var(--cc-shadow-glass);
-}
-
-[data-theme="dark"] .cc-glass {
-  background: rgba(30,41,59,0.75);
-  border-color: rgba(255,255,255,0.06);
+/* Selected State */
+.hutty-selectable-selected {
+  background-color: rgba(27, 61, 52, 0.08) !important;
+  border-color: #1B3D34 !important;
+  box-shadow: 0 0 0 1px #1B3D34;
 }
 
 /* ============================================================
-   BRAND BADGE UTILITIES
+   ARCHITECTURAL GRID & LINEWORK
    ============================================================ */
-.cc-badge-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--cc-radius-pill);
-  background-color: var(--cc-brand-soft);
-  color: var(--cc-brand);
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid rgba(31,75,67,0.15);
+.arch-grid-bg {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(27, 61, 52, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(27, 61, 52, 0.05) 1px, transparent 1px);
 }
 
-.cc-badge-brass {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--cc-radius-pill);
-  background-color: var(--cc-brass-soft);
-  color: var(--cc-brass);
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid rgba(184,137,74,0.20);
+.arch-grid-dark {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
 }
 
-.cc-badge-accent {
-  display: inline-flex;
+/* Technical Dimension Divider */
+.arch-dim-line {
+  display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--cc-radius-pill);
-  background-color: var(--cc-blue-soft);
-  color: var(--cc-blue);
+  gap: 0.75rem;
+  color: #4B5563;
   font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid rgba(59,111,245,0.20);
+  font-family: monospace;
+}
+.arch-dim-line::before,
+.arch-dim-line::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #E5E7EB;
 }
 
 /* ============================================================
-   BUTTON BASE
+   BUTTONS
    ============================================================ */
-.cc-btn-primary {
+.hutty-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: var(--cc-radius-btn);
-  background-color: var(--cc-brand);
-  color: #fff;
+  background-color: #1B3D34;
+  color: #FFFFFF;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: -0.01em;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  box-shadow: var(--cc-shadow-brand);
-  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  box-shadow: var(--cc-shadow-sm);
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
-.cc-btn-primary:hover {
-  background-color: var(--cc-brand-hover);
-  box-shadow: 0 8px 20px -2px rgba(31,75,67,0.28);
+.hutty-btn-primary:hover {
+  background-color: #132C25;
+  box-shadow: var(--cc-shadow-md);
   transform: translateY(-1px);
 }
 
-/* ============================================================
-   SECTION HELPERS
-   ============================================================ */
-.cc-section {
-  padding: 5rem 0;
+.hutty-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--cc-radius-btn);
+  background-color: #FFFFFF;
+  color: #1B3D34;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  border: 1px solid #E5E7EB;
+  cursor: pointer;
+  box-shadow: var(--cc-shadow-xs);
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-.cc-section-inner {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+.hutty-btn-secondary:hover {
+  background-color: rgba(27, 61, 52, 0.04);
+  border-color: #D1D5DB;
+  transform: translateY(-1px);
 }
 
 /* ============================================================
    SCROLLBARS
    ============================================================ */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--cc-border-strong);
-  border-radius: var(--cc-radius-pill);
+  background: #D1D5DB;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--cc-text-secondary);
+  background: #4B5563;
 }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ============================================================
-   THEME TOGGLE ANIMATION
-   ============================================================ */
-.theme-toggle-icon {
-  transition: transform 0.30s cubic-bezier(0.34,1.56,0.64,1), opacity 0.20s ease;
-}
-.theme-toggle-icon.entering {
-  transform: rotate(180deg) scale(0.5);
-  opacity: 0;
-}
-
-/* ============================================================
-   PRINT / PDF EXPORT STYLES (A4 Bank-Ready Report Output)
+   PRINT / REPORT STYLES
    ============================================================ */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm 10mm;
+    margin: 10mm;
   }
-
   body {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    font-size: 11pt;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    background: #FFFFFF !important;
+    color: #1B3D34 !important;
+    font-size: 10pt;
   }
-
-  /* Hide interactive web chrome */
-  header,
-  footer,
-  nav,
-  button,
-  .print\:hidden,
-  [role="dialog"],
-  .toast-container {
+  header, footer, nav, button, .print\:hidden {
     display: none !important;
   }
-
-  /* Force accordion contents to expand on print */
-  .print-expand-all {
-    display: block !important;
-    height: auto !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  /* Page break rules */
   .print-page-break {
     page-break-before: always !important;
-    break-before: page !important;
-  }
-
-  .print-avoid-break {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  /* Ensure tables span full width cleanly */
-  table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-  }
-
-  th, td {
-    padding: 4pt 6pt !important;
-    font-size: 8.5pt !important;
-  }
-
-  /* Clean print containers */
-  .shadow-soft-lg,
-  .shadow-soft-md,
-  .shadow-soft-xs,
-  .shadow-2xl {
-    box-shadow: none !important;
   }
 }

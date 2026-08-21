@@ -1,4 +1,5 @@
 import React from 'react';
+import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
 import { TrustStatsSection } from './sections/TrustStatsSection';
 import { WhyPlanningSection } from './sections/WhyPlanningSection';
@@ -14,7 +15,12 @@ import { FinalCtaSection } from './sections/FinalCtaSection';
 
 export const LandingPage: React.FC = () => {
   return (
-    <div className="w-full min-h-screen font-sans bg-[#F7F7F5] text-[#172033]">
+    <div className="w-full min-h-screen font-sans bg-[#F8F8F6] text-[#1B3D34]">
+      <SEO
+        title="Hutty — Home Construction Planning Platform | Build your home with clarity"
+        description="Plan your plot, spaces, materials and construction cost before you build with Hutty. Deterministic, quantity-based estimates and bank-ready BOQ."
+      />
+
       {/* 01. Hero */}
       <HeroSection />
 

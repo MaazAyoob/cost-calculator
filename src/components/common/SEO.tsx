@@ -3,32 +3,29 @@ import React, { useEffect } from 'react';
 interface SEOProps {
   title?: string;
   description?: string;
-  canonicalUrl?: string;
+  keywords?: string;
 }
 
 export const SEO: React.FC<SEOProps> = ({
-  title = "Cost Calculator | Home Construction Planning & Estimation",
-  description = "Configure every aspect of your home before construction begins. Deterministic IS-code cost estimates, material quantities, BOQ, and payment roadmaps.",
-  canonicalUrl = "https://costcalculator.app/",
+  title = "Hutty — Home Construction Planning Platform | Build your home with clarity",
+  description = "Plan your plot, spaces, materials and construction cost before you build with Hutty. Deterministic, quantity-based estimates and bank-ready BOQ.",
+  keywords = "Hutty, home construction planning, residential cost estimator, Bangalore house planning, BOQ generator, architectural cost planning, construction cost calculator",
 }) => {
   useEffect(() => {
     document.title = title;
+    
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', description);
 
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', description);
-    }
+    const metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (metaKeywords) metaKeywords.setAttribute('content', keywords);
 
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) {
-      ogTitle.setAttribute('content', title);
-    }
+    if (ogTitle) ogTitle.setAttribute('content', title);
 
-    const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) {
-      ogDescription.setAttribute('content', description);
-    }
-  }, [title, description, canonicalUrl]);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', description);
+  }, [title, description, keywords]);
 
   return null;
 };

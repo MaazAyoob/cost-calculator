@@ -35,23 +35,23 @@ export const Step10Painting: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 text-left">
+    <div className="space-y-8 text-left select-none">
       {/* Editorial Step Header */}
       <div className="space-y-1">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#1F4B43] uppercase block">
+        <span className="text-xs font-mono font-bold tracking-widest text-[#1B3D34] uppercase block">
           STEP 10
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#172033] tracking-tight">
+        <h2 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
           Painting &amp; Finishes
         </h2>
-        <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
           Specify paint grades and manufacturing brand for interior and exterior walls.
         </p>
       </div>
 
       {/* 1. Brand Selection */}
       <div className="space-y-3">
-        <label className="text-xs font-bold text-[#172033] uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Paint Manufacturer
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -64,13 +64,13 @@ export const Step10Painting: React.FC = () => {
                 className={cn(
                   'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
-                <span className="text-xs font-bold text-[#172033]">{b}</span>
+                <span className="text-xs font-bold text-[#1B3D34]">{b}</span>
                 {isSelected && (
-                  <div className="w-5 h-5 rounded-full bg-[#1F4B43] text-white flex items-center justify-center text-xs">
+                  <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-xs">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                 )}
@@ -82,7 +82,7 @@ export const Step10Painting: React.FC = () => {
 
       {/* 2. Interior Paint Grade */}
       <div className="space-y-3 pt-2 border-t border-[#E5E7EB]">
-        <label className="text-xs font-bold text-[#172033] uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Interior Wall &amp; Ceiling Paint (~{interiorAreaSqFt.toLocaleString()} sq.ft)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -96,25 +96,25 @@ export const Step10Painting: React.FC = () => {
                 className={cn(
                   'p-4 rounded-xl border transition-all cursor-pointer space-y-1.5 text-left flex flex-col justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <h4 className="text-xs font-bold text-[#172033]">{opt.title}</h4>
+                    <h4 className="text-xs font-bold text-[#1B3D34]">{opt.title}</h4>
                     {isSelected && (
-                      <div className="w-5 h-5 rounded-full bg-[#1F4B43] text-white flex items-center justify-center text-xs">
+                      <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-xs">
                         <Check className="w-3.5 h-3.5" />
                       </div>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#667085] leading-tight">{opt.desc}</p>
+                  <p className="text-[11px] text-[#4B5563] leading-tight">{opt.desc}</p>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5E7EB]/60 flex justify-between items-center text-xs font-bold text-[#172033]">
-                  <span>{formatCurrency(optCost)}</span>
-                  <span className="text-[10px] text-[#667085]">₹{opt.ratePerSqFt}/sq.ft</span>
+                <div className="pt-2 border-t border-[#E5E7EB]/60 flex justify-between items-center text-xs font-bold text-[#1B3D34]">
+                  <span className="font-mono">~{formatCurrency(optCost)}</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{opt.ratePerSqFt}/sq.ft</span>
                 </div>
               </div>
             );
@@ -124,8 +124,8 @@ export const Step10Painting: React.FC = () => {
 
       {/* 3. Exterior Paint Grade */}
       <div className="space-y-3 pt-2 border-t border-[#E5E7EB]">
-        <label className="text-xs font-bold text-[#172033] uppercase tracking-wider block">
-          Exterior Weather Guard Paint (~{exteriorAreaSqFt.toLocaleString()} sq.ft)
+        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
+          Exterior Weather-Proof Coating (~{exteriorAreaSqFt.toLocaleString()} sq.ft)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {externalOptions.map((opt) => {
@@ -138,25 +138,25 @@ export const Step10Painting: React.FC = () => {
                 className={cn(
                   'p-4 rounded-xl border transition-all cursor-pointer space-y-1.5 text-left flex flex-col justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <h4 className="text-xs font-bold text-[#172033]">{opt.title}</h4>
+                    <h4 className="text-xs font-bold text-[#1B3D34]">{opt.title}</h4>
                     {isSelected && (
-                      <div className="w-5 h-5 rounded-full bg-[#1F4B43] text-white flex items-center justify-center text-xs">
+                      <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-xs">
                         <Check className="w-3.5 h-3.5" />
                       </div>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#667085] leading-tight">{opt.desc}</p>
+                  <p className="text-[11px] text-[#4B5563] leading-tight">{opt.desc}</p>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5E7EB]/60 flex justify-between items-center text-xs font-bold text-[#172033]">
-                  <span>{formatCurrency(optCost)}</span>
-                  <span className="text-[10px] text-[#667085]">₹{opt.ratePerSqFt}/sq.ft</span>
+                <div className="pt-2 border-t border-[#E5E7EB]/60 flex justify-between items-center text-xs font-bold text-[#1B3D34]">
+                  <span className="font-mono">~{formatCurrency(optCost)}</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{opt.ratePerSqFt}/sq.ft</span>
                 </div>
               </div>
             );

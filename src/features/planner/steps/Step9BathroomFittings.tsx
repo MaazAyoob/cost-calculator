@@ -48,23 +48,23 @@ export const Step9BathroomFittings: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 text-left">
+    <div className="space-y-8 text-left select-none">
       {/* Editorial Step Header */}
       <div className="space-y-1">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#1F4B43] uppercase block">
+        <span className="text-xs font-mono font-bold tracking-widest text-[#1B3D34] uppercase block">
           STEP 09
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#172033] tracking-tight">
+        <h2 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
           Bathroom &amp; CPVC
         </h2>
-        <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
           Configure sanitaryware fixture tiers and CPVC water supply pipe brands (~{fixtureSets} bathroom sets).
         </p>
       </div>
 
       {/* 1. Sanitaryware Tier */}
       <div className="space-y-3">
-        <label className="text-xs font-bold text-[#172033] uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Sanitaryware &amp; Fitting Tier
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -78,26 +78,26 @@ export const Step9BathroomFittings: React.FC = () => {
                 className={cn(
                   'p-4 rounded-xl border transition-all cursor-pointer space-y-1.5 text-left flex flex-col justify-between',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <h4 className="text-xs font-bold text-[#172033]">{tier.title}</h4>
+                    <h4 className="text-xs font-bold text-[#1B3D34]">{tier.title}</h4>
                     {isSelected && (
-                      <div className="w-5 h-5 rounded-full bg-[#1F4B43] text-white flex items-center justify-center text-xs">
+                      <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-xs">
                         <Check className="w-3.5 h-3.5" />
                       </div>
                     )}
                   </div>
-                  <span className="text-[10px] font-bold text-[#1F4B43] block">{tier.brands}</span>
-                  <p className="text-[11px] text-[#667085] leading-tight">{tier.desc}</p>
+                  <span className="text-[10px] font-bold text-[#1B3D34] block">{tier.brands}</span>
+                  <p className="text-[11px] text-[#4B5563] leading-tight">{tier.desc}</p>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5E7EB]/60 flex justify-between items-center text-xs font-bold text-[#172033]">
-                  <span>~{formatCurrency(approxTotal)}</span>
-                  <span className="text-[10px] text-[#667085]">₹{tier.ratePerSet.toLocaleString()}/bath</span>
+                <div className="pt-2 border-t border-[#E5E7EB] flex justify-between items-center text-xs font-bold text-[#1B3D34]">
+                  <span className="font-mono">~{formatCurrency(approxTotal)}</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{tier.ratePerSet.toLocaleString()}/bath</span>
                 </div>
               </div>
             );
@@ -107,7 +107,7 @@ export const Step9BathroomFittings: React.FC = () => {
 
       {/* 2. CPVC Pipe Brand */}
       <div className="space-y-3 pt-2 border-t border-[#E5E7EB]">
-        <label className="text-xs font-bold text-[#172033] uppercase tracking-wider block">
+        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           CPVC Plumbing Pipes (~{cpvcMetres} Metres)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -120,19 +120,19 @@ export const Step9BathroomFittings: React.FC = () => {
                 className={cn(
                   'p-4 rounded-xl border transition-all cursor-pointer space-y-1 text-left',
                   isSelected
-                    ? 'bg-[#EBF2F0] border-[#1F4B43] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:border-slate-300'
+                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 )}
               >
                 <div className="flex justify-between items-center">
-                  <h4 className="text-xs font-bold text-[#172033]">{b.name}</h4>
+                  <h4 className="text-xs font-bold text-[#1B3D34]">{b.name}</h4>
                   {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-[#1F4B43] text-white flex items-center justify-center text-xs">
+                    <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-xs">
                       <Check className="w-3.5 h-3.5" />
                     </div>
                   )}
                 </div>
-                <p className="text-[11px] text-[#667085] leading-tight">{b.desc}</p>
+                <p className="text-[11px] text-[#4B5563] leading-tight">{b.desc}</p>
               </div>
             );
           })}

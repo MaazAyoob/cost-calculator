@@ -5,17 +5,17 @@ import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react'
 import { cn } from '../../utils/cn';
 
 const iconMap: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
-  error: <AlertCircle className="w-4 h-4 text-rose-600" />,
-  warning: <AlertTriangle className="w-4 h-4 text-amber-600" />,
-  info: <Info className="w-4 h-4 text-blue-600" />,
+  success: <CheckCircle2 className="w-4 h-4 text-[#1B3D34]" />,
+  error: <AlertCircle className="w-4 h-4 text-red-600" />,
+  warning: <AlertTriangle className="w-4 h-4 text-[#F28C28]" />,
+  info: <Info className="w-4 h-4 text-[#1B3D34]" />,
 };
 
 const bgMap: Record<ToastType, string> = {
-  success: 'bg-emerald-50/95 border-emerald-200 text-emerald-950',
-  error: 'bg-rose-50/95 border-rose-200 text-rose-950',
-  warning: 'bg-amber-50/95 border-amber-200 text-amber-950',
-  info: 'bg-blue-50/95 border-blue-200 text-blue-950',
+  success: 'bg-white border-[#1B3D34]/30 text-[#1B3D34]',
+  error: 'bg-white border-red-200 text-red-950',
+  warning: 'bg-white border-[#F28C28]/40 text-[#1B3D34]',
+  info: 'bg-white border-[#1B3D34]/30 text-[#1B3D34]',
 };
 
 export const ToastContainer: React.FC = () => {
@@ -25,7 +25,7 @@ export const ToastContainer: React.FC = () => {
     <div
       aria-live="polite"
       aria-atomic="true"
-      className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"
+      className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0 select-none"
     >
       <AnimatePresence>
         {toasts.map((toast) => (
@@ -36,18 +36,18 @@ export const ToastContainer: React.FC = () => {
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
             className={cn(
-              'pointer-events-auto p-3.5 rounded-2xl border shadow-soft-lg backdrop-blur-md flex items-start gap-3 text-xs',
+              'pointer-events-auto p-3.5 rounded-xl border shadow-lg flex items-start gap-3 text-xs',
               bgMap[toast.type]
             )}
           >
             <div className="shrink-0 mt-0.5">{iconMap[toast.type]}</div>
             <div className="flex-1 min-w-0">
-              <div className="font-bold leading-tight">{toast.title}</div>
-              {toast.message && <div className="text-[11px] opacity-80 mt-0.5 leading-snug">{toast.message}</div>}
+              <div className="font-bold leading-tight font-heading">{toast.title}</div>
+              {toast.message && <div className="text-[11px] text-[#4B5563] mt-0.5 leading-snug">{toast.message}</div>}
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="shrink-0 p-1 rounded-lg opacity-60 hover:opacity-100 transition-opacity"
+              className="shrink-0 p-1 rounded-md text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>

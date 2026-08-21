@@ -1,52 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2 } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useWizardStore } from '../../store/useWizardStore';
+import { HuttyLogo } from '../brand/HuttyLogo';
 
 export const WebsiteFooter: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleStartEstimate = () => {
+    useWizardStore.getState().startNewProject();
+    navigate('/calculator');
+  };
+
   return (
-    <footer className="bg-[#172033] text-white pt-16 pb-12 border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-
-        {/* Quiet Editorial Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 text-left">
-
-          {/* Brand & Mission (md:col-span-5) */}
-          <div className="md:col-span-5 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#1F4B43] flex items-center justify-center text-white">
-                <Building2 className="w-4 h-4" />
-              </div>
-              <div className="leading-none">
-                <span className="font-bold text-base tracking-tight text-white block">
-                  Cost Calculator
-                </span>
-                <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase mt-0.5 block">
-                  by Rightcon
-                </span>
+    <footer className="bg-[#1B3D34] text-white border-t border-white/10 select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 lg:gap-12">
+          
+          {/* Brand Col */}
+          <div className="md:col-span-2 space-y-4">
+            <div
+              onClick={() => navigate('/')}
+              className="cursor-pointer inline-block"
+              role="link"
+              aria-label="Hutty — Home"
+            >
+              {/* Official logo on dark bg: clean white pill preserves artwork without distortion */}
+              <div className="inline-block bg-white rounded-xl px-3 py-2">
+                <HuttyLogo variant="full" width={140} />
               </div>
             </div>
-
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Formula-driven Indian Standard pre-construction planning platform. Estimating civil quantities, brand rate variations, and milestone cashflows for residential builders in Bangalore and Mysore.
+            <p className="text-sm text-white/70 max-w-sm font-normal leading-relaxed">
+              Build your home with clarity. Formula-driven architectural planning, physical quantities, and bank-ready construction cost estimates.
             </p>
+              <span className="text-xs text-white/40">Bangalore, India</span>
           </div>
 
-          {/* Product Links (md:col-span-3) */}
-          <div className="md:col-span-3 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Product</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          {/* Product Links */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white/90 font-heading">
+              Product
+            </h4>
+            <ul className="space-y-2 text-xs text-white/70">
               <li>
                 <button
-                  onClick={() => {
-                    useWizardStore.getState().startNewProject();
-                    navigate('/calculator');
-                  }}
-                  className="hover:text-white transition-colors cursor-pointer text-left"
+                  onClick={handleStartEstimate}
+                  className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                 >
-                  Calculator
+                  Calculator Workspace <ArrowUpRight className="w-3 h-3 text-[#F28C28]" />
                 </button>
               </li>
               <li>
@@ -55,71 +56,87 @@ export const WebsiteFooter: React.FC = () => {
                 </a>
               </li>
               <li>
+                <button
+                  onClick={() => navigate('/report')}
+                  className="hover:text-white transition-colors cursor-pointer text-left"
+                >
+                  Construction Report
+                </button>
+              </li>
+              <li>
                 <a href="#standards" className="hover:text-white transition-colors">
                   Engineering Standards
                 </a>
               </li>
               <li>
-                <button
-                  onClick={() => navigate('/report')}
-                  className="hover:text-white transition-colors cursor-pointer text-left"
-                >
-                  Reports &amp; BOQ
-                </button>
+                <a href="#packages" className="hover:text-white transition-colors">
+                  Material Packages
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Company Links (md:col-span-2) */}
-          <div className="md:col-span-2 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Company</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          {/* Company Links */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white/90 font-heading">
+              Company
+            </h4>
+            <ul className="space-y-2 text-xs text-white/70">
               <li>
                 <a href="#why-planning" className="hover:text-white transition-colors">
-                  Why Planning
+                  Why Hutty
                 </a>
               </li>
               <li>
                 <a href="#projects" className="hover:text-white transition-colors">
-                  Projects Gallery
+                  Project Gallery
                 </a>
               </li>
+
               <li>
-                <a href="mailto:contact@rightcon.in" className="hover:text-white transition-colors">
-                  Contact
+                <a
+                  href="https://wa.me/919900000000"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors inline-flex items-center gap-1"
+                >
+                  Contact Engineers <ArrowUpRight className="w-3 h-3 text-white/40" />
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Legal Links (md:col-span-2) */}
-          <div className="md:col-span-2 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Legal</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          {/* Legal / Standards */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white/90 font-heading">
+              Engineering
+            </h4>
+            <ul className="space-y-2 text-xs text-white/70">
               <li>
-                <a href="#privacy" className="hover:text-white transition-colors">
-                  Privacy Policy
-                </a>
+                <span className="text-white/60">IS 456:2000 Plain & RCC</span>
               </li>
               <li>
-                <a href="#terms" className="hover:text-white transition-colors">
-                  Terms of Use
-                </a>
+                <span className="text-white/60">IS 1786 High Strength Deformed Steel</span>
               </li>
               <li>
-                <span className="text-[11px] text-slate-500 block pt-1">IS 456 / IS 1786 Compliant</span>
+                <span className="text-white/60">NBC 2016 Structural Safety</span>
+              </li>
+              <li>
+                <span className="text-white/60">BBMP / BDA Zoning Bylaws</span>
               </li>
             </ul>
           </div>
-
         </div>
 
-        {/* Bottom Minimal Copyright */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-left">
-          <p>&copy; {new Date().getFullYear()} Cost Calculator by Rightcon. All rights reserved.</p>
-          <p className="text-[11px] text-slate-400">Indicative pre-construction estimates for residential planning.</p>
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+          <p>© {new Date().getFullYear()} Hutty. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <span>Privacy Policy</span>
+            <span>Terms of Service</span>
+            <span>Formula-Driven Estimation</span>
+          </div>
         </div>
-
       </div>
     </footer>
   );

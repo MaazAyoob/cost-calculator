@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { pageFadeVariant } from '../../animations/variants';
-import { Button } from '../../components/ui/Button';
-import { Building2, Home, ArrowLeft, Calculator } from 'lucide-react';
+import { Home, ArrowLeft, Calculator } from 'lucide-react';
+import { HuttyLogo } from '../../components/common/HuttyLogo';
 
 export const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,27 +14,33 @@ export const NotFoundPage: React.FC = () => {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="min-h-[75vh] flex flex-col items-center justify-center text-center p-6 space-y-6"
+      className="min-h-[75vh] flex flex-col items-center justify-center text-center p-6 space-y-6 select-none"
     >
-      <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
-        <Building2 className="w-8 h-8" />
-      </div>
+      <HuttyLogo variant="compact" width={130} />
 
       <div className="space-y-2 max-w-sm">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">404</span>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Page Not Found</h1>
-        <p className="text-sm text-slate-500 leading-relaxed">
-          This page does not exist or has been relocated.
+        <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">404 ERROR</span>
+        <h1 className="heading-sm text-3xl font-extrabold text-[#1B3D34] tracking-tight">Page Not Found</h1>
+        <p className="text-sm text-[#4B5563] leading-relaxed">
+          The requested page does not exist or has been relocated.
         </p>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-        <Button variant="outline" size="sm" onClick={() => navigate('/')} leftIcon={<Home className="w-4 h-4" />}>
-          Return Home
-        </Button>
-        <Button size="sm" onClick={() => navigate('/calculator')} leftIcon={<Calculator className="w-4 h-4" />}>
-          Go to Calculator
-        </Button>
+        <button
+          onClick={() => navigate('/')}
+          className="hutty-btn-secondary px-5 py-2.5 rounded-lg text-xs font-semibold flex items-center gap-2"
+        >
+          <Home className="w-4 h-4" />
+          <span>Return Home</span>
+        </button>
+        <button
+          onClick={() => navigate('/calculator')}
+          className="hutty-btn-primary px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2"
+        >
+          <Calculator className="w-4 h-4 text-[#F28C28]" />
+          <span>Start Calculator</span>
+        </button>
       </div>
     </motion.div>
   );

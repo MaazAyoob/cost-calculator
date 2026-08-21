@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, Copy, Trash2, ArrowRight, FolderOpen, Plus } from 'lucide-react';
+import { X, Save, Copy, Trash2, ArrowRight, FolderOpen } from 'lucide-react';
 import { useSavedEstimationsStore } from '../../store/useSavedEstimationsStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { useUIStore } from '../../store/useUIStore';
@@ -37,122 +37,127 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B3D34]/40 backdrop-blur-xs select-none">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-slate-200 space-y-6 max-h-[85vh] overflow-y-auto"
+        className="bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E5E7EB] space-y-6 max-h-[85vh] overflow-y-auto text-left"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-              Project Workspace
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
+              PROJECT WORKSPACE
             </span>
-            <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+            <h2 className="heading-sm text-xl font-bold text-[#1B3D34] mt-0.5">
               Saved Estimations
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            className="p-2 rounded-lg hover:bg-[rgba(27,61,52,0.04)] text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form: Save Current Draft */}
-        <form onSubmit={handleSaveCurrent} className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
-          <label className="text-xs font-semibold text-slate-700 block">
+        <form onSubmit={handleSaveCurrent} className="bg-[#F8F8F6] rounded-xl p-4 border border-[#E5E7EB] space-y-3">
+          <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
             Save Current Calculation State
           </label>
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="e.g., Whitefield Villa Draft 1"
+              placeholder="e.g., Whitefield Villa 30x40"
               value={newEstimateName}
               onChange={(e) => setNewEstimateName(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-xl text-xs border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/30"
+              className="flex-1 px-3 py-2 rounded-lg text-xs border border-[#E5E7EB] bg-white text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+              className="hutty-btn-primary px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
             >
-              <Save className="w-3.5 h-3.5" /> Save Estimation
+              <Save className="w-3.5 h-3.5 text-[#F28C28]" /> Save Estimation
             </button>
           </div>
         </form>
 
         {/* List of Saved Estimations */}
         <div className="space-y-3">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+          <span className="text-xs font-bold text-[#4B5563] uppercase tracking-wider block">
             Your Saved Projects ({savedEstimations.length})
           </span>
 
           {savedEstimations.length === 0 ? (
-            <div className="text-center py-10 border-2 border-dashed border-slate-200 rounded-2xl space-y-2">
-              <FolderOpen className="w-8 h-8 text-slate-300 mx-auto" />
-              <p className="text-sm font-semibold text-slate-700">No saved projects yet</p>
-              <p className="text-xs text-slate-500 max-w-xs mx-auto">
+            <div className="text-center py-10 border-2 border-dashed border-[#E5E7EB] rounded-xl space-y-2">
+              <FolderOpen className="w-8 h-8 text-[#4B5563]/50 mx-auto" />
+              <p className="text-sm font-bold text-[#1B3D34] font-heading">No saved projects yet</p>
+              <p className="text-xs text-[#4B5563] max-w-xs mx-auto">
                 Save your current configuration using the form above to easily switch between estimations.
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {savedEstimations.map((est) => {
-                const isActive = activeId === est.id;
+            <div className="space-y-2">
+              {savedEstimations.map((item) => {
+                const isActive = item.id === activeId;
                 return (
                   <div
-                    key={est.id}
-                    className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    key={item.id}
+                    className={`p-4 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                       isActive
-                        ? 'bg-blue-50/50 border-blue-600 ring-2 ring-blue-500/10'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                        ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34]'
+                        : 'bg-white border-[#E5E7EB] hover:border-[#D1D5DB]'
                     }`}
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-slate-900">{est.name}</h4>
+                        <h4 className="text-xs font-bold text-[#1B3D34] font-heading">{item.name}</h4>
                         {isActive && (
-                          <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded">
-                            Loaded
+                          <span className="text-[9px] font-bold bg-[#1B3D34] text-white px-2 py-0.5 rounded">
+                            Active
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {est.city} • {est.plotDimensions} • {est.buaSqFt > 0 ? `${est.buaSqFt.toLocaleString()} sq.ft` : 'Plot dimensions'} • {est.createdAt}
+                      <p className="text-[11px] text-[#4B5563] mt-0.5">
+                        {item.buaSqFt > 0 ? `${item.buaSqFt.toLocaleString()} sq.ft • ` : ''}
+                        {item.totalCost > 0 ? formatCurrency(item.totalCost) : '₹0'}
                       </p>
-                      <div className="text-sm font-extrabold text-slate-900 mt-1">
-                        {formatCurrency(est.totalCost)}{' '}
-                        {est.ratePerSqFt > 0 && <span className="text-xs font-semibold text-blue-600">({`₹${est.ratePerSqFt.toLocaleString()} / sq.ft`})</span>}
-                      </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5 self-end sm:self-center">
                       <button
+                        type="button"
                         onClick={() => {
-                          loadEstimation(est.id);
+                          loadEstimation(item.id);
+                          addToast({
+                            title: 'Project Loaded',
+                            description: `Switched to "${item.name}".`,
+                            type: 'info',
+                          });
                           onClose();
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#1B3D34] text-white hover:bg-[#132C25] transition-colors cursor-pointer flex items-center gap-1"
                       >
-                        Load <ArrowRight className="w-3 h-3" />
+                        <span>Load</span>
+                        <ArrowRight className="w-3 h-3 text-[#F28C28]" />
                       </button>
                       <button
-                        onClick={() => duplicateEstimation(est.id)}
-                        className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                        type="button"
+                        onClick={() => duplicateEstimation(item.id)}
+                        className="p-1.5 rounded-lg border border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
                         title="Duplicate"
                       >
-                        <Copy className="w-4 h-4" />
+                        <Copy className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => deleteEstimation(est.id)}
-                        className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        type="button"
+                        onClick={() => deleteEstimation(item.id)}
+                        className="p-1.5 rounded-lg border border-[#E5E7EB] hover:bg-red-50 text-[#4B5563] hover:text-red-600 transition-colors cursor-pointer"
                         title="Delete"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
