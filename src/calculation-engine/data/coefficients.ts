@@ -1,128 +1,63 @@
 // ============================================================
 // COEFFICIENTS – Centralized Engineering & Planning Ratios
-// Derived from CENTRALIZED_ENGINEERING_ASSUMPTIONS, IS 456:2000,
-// NBC 2016, and Rightcon QS models.
+// Derived from CENTRALIZED_ENGINEERING_ASSUMPTIONS & Hutty Pilot Specification
 // ============================================================
 
-import { QualityTier } from '../../store/useWizardStore';
 import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from './engineeringAssumptions';
 
 const A = CENTRALIZED_ENGINEERING_ASSUMPTIONS;
 
-/** Steel consumption: kg per sq ft of built-up area */
-export const STEEL_KG_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.steelKgPerSqFtEssential.value,
-  Premium:   A.steelKgPerSqFtPremium.value,
-  Luxury:    A.steelKgPerSqFtLuxury.value,
-};
+/** Standard wall height (ft) consumed across all engines */
+export const WALL_HEIGHT_FT = A.wallHeightFt.value;
 
-/** OPC 53 grade cement: bags (50 kg) per sq ft of BUA */
-export const CEMENT_BAGS_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.cementBagsPerSqFtEssential.value,
-  Premium:   A.cementBagsPerSqFtPremium.value,
-  Luxury:    A.cementBagsPerSqFtLuxury.value,
-};
+/** Steel consumption formula parameters: 2.8 + [0.2 * (Floors - 1)] kg/sqft */
+export const STEEL_BASE_FACTOR_KG_PER_SQFT = A.steelBaseFactor.value; // 2.8
+export const STEEL_ADDITIONAL_FLOOR_FACTOR = A.steelAdditionalFloorFactor.value; // 0.2
+export const STEEL_WASTAGE_PERCENTAGE = A.steelWastagePercentage.value; // 5%
 
-/** M25 Ready Mix Concrete: cubic metres per sq ft BUA (slab + column + beam) */
-export const CONCRETE_CUM_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.concreteCuMPerSqFtEssential.value,
-  Premium:   A.concreteCuMPerSqFtPremium.value,
-  Luxury:    A.concreteCuMPerSqFtLuxury.value,
-};
+/** Direct Material Starting Parameters (PDF Sections 8 - 11) */
+export const CEMENT_BAGS_PER_SQFT = A.cementBagsPerSqFt.value; // 0.40 bags/sqft
+export const M_SAND_CUFT_PER_SQFT = A.mSandCuFtPerSqFt.value; // 0.60 CFT/sqft
+export const P_SAND_CUFT_PER_SQFT = A.pSandCuFtPerSqFt.value; // 0.60 CFT/sqft
+export const COARSE_AGGREGATE_CUFT_PER_SQFT = A.coarseAggregateCuFtPerSqFt.value; // 1.35 CFT/sqft
 
-/** Sand: cubic feet per sq ft BUA (plaster + masonry + flooring bed) */
-export const SAND_CUFT_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.sandCuFtPerSqFtEssential.value,
-  Premium:   A.sandCuFtPerSqFtPremium.value,
-  Luxury:    A.sandCuFtPerSqFtLuxury.value,
-};
+/** Masonry & Block Parameters (PDF Section 12) */
+export const EXTERNAL_WALL_THICKNESS_M = A.externalWallThicknessM.value; // 0.15m (6")
+export const INTERNAL_WALL_THICKNESS_M = A.internalWallThicknessM.value; // 0.10m (4")
+export const AAC_BLOCK_UNIT_VOLUME_CUM = A.aacBlockUnitVolumeCuM.value; // 0.018 m3
+export const MASONRY_WASTAGE_PERCENTAGE = A.masonryWastagePercentage.value; // 5%
 
-/** 20mm Metal Aggregate: cu ft per sq ft BUA */
-export const AGGREGATE_CUFT_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.aggregateCuFtPerSqFtEssential.value,
-  Premium:   A.aggregateCuFtPerSqFtPremium.value,
-  Luxury:    A.aggregateCuFtPerSqFtLuxury.value,
-};
+/** Flooring & Cladding Parameters (PDF Section 15, 16) */
+export const FLOORING_WASTAGE_PERCENTAGE = A.flooringWastagePercentage.value; // 7%
+export const BATHROOM_DADO_HEIGHT_STANDARD_FT = A.bathroomDadoHeightStandardFt.value; // 7 ft
+export const BATHROOM_DADO_HEIGHT_FULL_FT = A.bathroomDadoHeightFullFt.value; // 10 ft
+export const KITCHEN_DADO_HEIGHT_STANDARD_FT = A.kitchenDadoHeightStandardFt.value; // 2 ft
+export const KITCHEN_DADO_HEIGHT_EXTENDED_FT = A.kitchenDadoHeightExtendedFt.value; // 4 ft
+export const KITCHEN_COUNTER_LENGTH_FT = A.kitchenCounterLengthFt.value; // 15 ft
 
-/** AAC block volume: cubic metres per sq ft BUA (wall volume approximation) */
-export const AAC_CUM_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.aacBlockCuMPerSqFtEssential.value,
-  Premium:   A.aacBlockCuMPerSqFtPremium.value,
-  Luxury:    A.aacBlockCuMPerSqFtLuxury.value,
-};
+/** Waterproofing Parameters (PDF Section 23) */
+export const BATHROOM_WATERPROOFING_UPTURN_FT = A.bathroomWaterproofingUpturnFt.value; // 1.0 ft
+export const TERRACE_WATERPROOFING_FACTOR = A.terraceWaterproofingFactor.value; // 1.0
+export const SUMP_WATERPROOFING_SQFT = A.sumpWaterproofingSqFt.value; // 120 sqft
 
-/** Floor tile area factor: sq ft tiles per sq ft BUA (floor area + wastage) */
-export const FLOOR_TILE_FACTOR: Record<QualityTier, number> = {
-  Essential: 0.88, // 5% wastage
-  Premium:   0.90, // 7% wastage
-  Luxury:    0.93, // 10% wastage
-};
+/** Electrical & Plumbing Multipliers (PDF Section 19, 20) */
+export const CONDUIT_M_PER_POINT = A.conduitMPerPoint.value; // 2.8 m/point
+export const WIRE_M_PER_POINT = A.wireMPerPoint.value; // 5.5 m/point
+export const CPVC_M_PER_POINT = A.cpvcMPerPoint.value; // 4.5 m/point
+export const SWR_M_PER_POINT = A.swrMPerPoint.value; // 3.5 m/point
+export const VERTICAL_RISER_ALLOWANCE_M = A.verticalRiserAllowanceM.value; // 12 m/floor
 
-/** Wall tile coverage: sq ft per bathroom (only wet areas) */
-export const WALL_TILE_SQFT_PER_BATHROOM_STANDARD = A.wallTileSqFtPerBathroomStandard.value;
-export const WALL_TILE_SQFT_PER_BATHROOM_FULL_HEIGHT = A.wallTileSqFtPerBathroomFullHeight.value;
+/** Water Demand & Tank Sizing (PDF Section 22) */
+export const OCCUPANTS_PER_BEDROOM = A.occupantsPerBedroom.value; // 2
+export const DAILY_WATER_DEMAND_LPCD = A.dailyWaterDemandLPCD.value; // 135 L
+export const WATER_STORAGE_DAYS = A.waterStorageDays.value; // 1.5 days
 
-/** Kitchen splashback / dado area */
-export const KITCHEN_DADO_SQFT_STANDARD = A.kitchenDadoSqFtStandard.value;
-export const KITCHEN_DADO_SQFT_EXTENDED = A.kitchenDadoSqFtExtended.value;
+/** Planning Footprint & Super BUA Factors */
+export const COVERAGE_FACTOR = A.coverageFactor.value; // 0.60
+export const SUPER_BUA_FACTOR = A.superBuaFactor.value; // 1.15
 
-/** Interior paint area: multiplier on BUA (walls + ceiling) */
-export const INTERIOR_PAINT_FACTOR = A.interiorPaintFactor.value;
-
-/** Exterior paint: multiplier on perimeter × height */
-export const EXTERIOR_PAINT_FACTOR = A.exteriorPaintFactor.value;
-
-/** Electrical wire: metres per sq ft BUA */
-export const ELECTRICAL_WIRE_M_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.electricalWireMPerSqFtEssential.value,
-  Premium:   A.electricalWireMPerSqFtPremium.value,
-  Luxury:    A.electricalWireMPerSqFtLuxury.value,
-};
-
-/** Conduit: metres per sq ft BUA */
-export const CONDUIT_M_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.conduitMPerSqFtEssential.value,
-  Premium:   A.conduitMPerSqFtPremium.value,
-  Luxury:    A.conduitMPerSqFtLuxury.value,
-};
-
-/** Lighting points: per sq ft BUA */
-export const LIGHTING_POINTS_PER_SQFT = A.lightingPointsPerSqFt.value;
-
-/** CPVC supply pipe: metres per sq ft BUA */
-export const CPVC_M_PER_SQFT = A.cpvcMPerSqFt.value;
-
-/** SWR drain pipe: metres per sq ft BUA */
-export const SWR_M_PER_SQFT = A.swrMPerSqFt.value;
-
-/** Waterproofing: sq ft of wet areas relative to bathrooms */
-export const WATERPROOFING_SQFT_PER_BATHROOM = A.waterproofingSqFtPerBathroom.value;
-export const WATERPROOFING_BALCONY_SQFT = A.waterproofingBalconySqFt.value;
-
-/** Terrace waterproofing as % of plot area */
-export const TERRACE_WATERPROOFING_FACTOR = A.waterproofingTerraceFactor.value;
-
-/** Ground floor coverage factor (how much of plot is buildable footprint) */
-export const COVERAGE_FACTOR = A.coverageFactor.value;
-
-/** Usable area efficiency per floor (deduct walls, shafts etc.) */
-export const FLOOR_EFFICIENCY = A.floorEfficiency.value;
-
-/** Super BUA multiplier (includes common areas + wall thickness) */
-export const SUPER_BUA_FACTOR = A.superBuaFactor.value;
-
-/** Modular switch modules per sq ft BUA */
-export const SWITCH_MODULES_PER_SQFT: Record<QualityTier, number> = {
-  Essential: A.switchModulesPerSqFtEssential.value,
-  Premium:   A.switchModulesPerSqFtPremium.value,
-  Luxury:    A.switchModulesPerSqFtLuxury.value,
-};
-
-/** Bathroom fixtures: sets per bathroom */
-export const BATHROOM_FIXTURES_PER_BATH = 1;
-
-/** Floor traps per bathroom */
-export const FLOOR_TRAPS_PER_BATH = 2;
-
-/** Granite slabs: sq ft per staircase floor (treads + risers + landing) */
-export const GRANITE_PER_FLOOR = A.graniteSqFtPerFloor.value;
+/** Commercial & Statutory Markups */
+export const GST_RATE = A.gstRate.value; // 0.18
+export const CONTRACTOR_MARGIN_RATE = A.contractorMarginRate.value; // 0.15
+export const PROFESSIONAL_FEES_RATE = A.professionalFeesRate.value; // 0.05
+export const CONTINGENCY_RATE = A.contingencyRate.value; // 0.06

@@ -1,49 +1,77 @@
 // ============================================================
-// PAINT MODULE — Internal, external, and putty coverage
+// PAINT & PLASTER MODULE
+// Strictly follows Hutty Pilot Specification (Section 17)
+//
+// Rules:
+// - Internal Plaster/Paint Area = Net Internal Wall Area + Applicable Ceilings
+// - External Plaster/Paint Area = Net External Wall Area
+// - Total Paintable Area = Internal Paintable Area + External Paintable Area
+// - NEVER use arbitrary BUA × 3.5 multiplier as primary calculation
 // ============================================================
 
-import { EngineInput, AreaResult } from '../types';
-import { INTERIOR_PAINT_FACTOR, EXTERIOR_PAINT_FACTOR } from '../data/coefficients';
-import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from '../data/engineeringAssumptions';
+import { EngineInput, AreaResult, BuildingModel } from '../types';
 
-/** Perimeter estimation in ft based on plot area */
-function estimatePerimeterFt(plotArea: number): number {
-  if (plotArea <= 0) return 0;
-  const side = Math.sqrt(plotArea);
-  return Math.round(side * 4);
-}
-
-export function calculatePaint(input: EngineInput, area: AreaResult): {
+export function calculatePaint(
+  input: EngineInput,
+  area: AreaResult,
+  buildingModel: BuildingModel
+): {
+  internalWallAreaSqFt: number;
+  ceilingAreaSqFt: number;
   interiorPaintAreaSqFt: number;
   exteriorPaintAreaSqFt: number;
+  totalPaintableAreaSqFt: number;
   puttyAreaSqFt: number;
   interiorPaintLitres: number;
   exteriorPaintLitres: number;
   puttyKg: number;
 } {
-  const { floors } = input;
-  const bua = area.totalBUASqFt;
-  const floorHeightFt = CENTRALIZED_ENGINEERING_ASSUMPTIONS.floorHeightFt.value || 10;
+  const bua = area.totalBUASqFt || 0;
 
-  // Interior: walls (3.5 × BUA) + ceiling
-  const interiorPaintAreaSqFt = Math.round(bua * INTERIOR_PAINT_FACTOR);
+  if (bua <= 0) {
+    return {
+      internalWallAreaSqFt: 0,
+      ceilingAreaSqFt: 0,
+      interiorPaintAreaSqFt: 0,
+      exteriorPaintAreaSqFt: 0,
+      totalPaintableAreaSqFt: 0,
+      puttyAreaSqFt: 0,
+      interiorPaintLitres: 0,
+      exteriorPaintLitres: 0,
+      puttyKg: 0,
+    };
+  }
 
-  // Exterior: perimeter × height per floor × floors × returns factor
-  const perimeter = estimatePerimeterFt(area.plotAreaSqFt);
-  const exteriorRaw = perimeter * floorHeightFt * (floors || 1) * EXTERIOR_PAINT_FACTOR;
-  const exteriorPaintAreaSqFt = Math.round(exteriorRaw);
+  // Derived directly from canonical Building & Space Model
+  const internalWallAreaSqFt = Math.round(buildingModel.netInternalWallAreaSqFt);
+  const ceilingAreaSqFt = Math.round(buildingModel.totalCeilingAreaSqFt);
 
-  // Putty on interior walls + ceiling
+  // Internal Paint Area = Net Internal Wall Area + Total Ceiling Area
+  const interiorPaintAreaSqFt = internalWallAreaSqFt + ceilingAreaSqFt;
+
+  // External Paint Area = Net External Wall Area
+  const exteriorPaintAreaSqFt = Math.round(buildingModel.netExternalWallAreaSqFt);
+
+  // Total Paintable Area
+  const totalPaintableAreaSqFt = interiorPaintAreaSqFt + exteriorPaintAreaSqFt;
+
+  // Putty on internal walls + ceiling
   const puttyAreaSqFt = interiorPaintAreaSqFt;
 
-  // Litres: 1 litre covers ~45 sqft for 2 coats of emulsion
+  // Material consumable quantities:
+  // 1 litre interior emulsion covers ~45 sqft (2 coats)
+  // 1 litre exterior weather guard covers ~60 sqft (2 coats)
+  // 1 kg acrylic putty covers ~1.8 sqft (0.55 kg/sqft for 2 coats)
   const interiorPaintLitres = Math.ceil(interiorPaintAreaSqFt / 45);
   const exteriorPaintLitres = Math.ceil(exteriorPaintAreaSqFt / 60);
   const puttyKg = Math.round(puttyAreaSqFt * 0.55);
 
   return {
+    internalWallAreaSqFt,
+    ceilingAreaSqFt,
     interiorPaintAreaSqFt,
     exteriorPaintAreaSqFt,
+    totalPaintableAreaSqFt,
     puttyAreaSqFt,
     interiorPaintLitres,
     exteriorPaintLitres,

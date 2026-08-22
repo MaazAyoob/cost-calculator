@@ -130,7 +130,7 @@ export const HeroSection: React.FC = () => {
                 plotLength={plotLength || 30}
                 plotWidth={plotWidth || 40}
                 floors={floors || 2}
-                className="w-full"
+                className="w-full h-64 sm:h-72 md:h-80 lg:h-[340px] xl:h-[360px]"
               />
 
               {/* Live Metric Overlay Bar */}

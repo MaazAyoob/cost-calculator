@@ -7,7 +7,7 @@ const mockInput: EngineInput = {
   authority: 'BBMP/BDA',
   plotLength: 60,
   plotWidth: 40,
-  builtUpAreaPerFloor: 1440, // 60% of 2400 sq.ft
+  builtUpAreaPerFloor: 1440,
   houseType: 'Duplex',
   floors: 3,
   parkingType: 'Stilt Parking',
@@ -32,7 +32,7 @@ const mockInput: EngineInput = {
   materialBrands: {
     steel: 'Tata Tiscon',
     cement: 'UltraTech',
-    doors: 'Teakwood Custom Joinery',
+    doors: 'Premium Teak',
     windows: 'Fenesta uPVC',
     flooring: 'Italian Marble',
     bathroom: 'Kohler',
@@ -150,10 +150,9 @@ const emptyZeroInput: EngineInput = {
   },
 };
 
-describe('Calculation Engine Core Invariants', () => {
-  // ── INVARIANT 1: User-Selected BUA & Ground Area Verification ──
-  it('USER SELECTED BUA & GROUND COVERAGE: calculates plot area, selected BUA, remaining ground area, and coverage percentage', () => {
-    // Test Case A: 30×40 plot, Selected BUA = 720 (60% coverage)
+describe('Calculation Engine Core Invariants (Pilot Specification)', () => {
+  // ── 1. Plot Area, Setbacks & Buildable Footprint ──
+  it('GEOMETRY & SETBACKS: calculates plot area, setbacks, buildable footprint, and coverage percentage', () => {
     const resA = runCalculator({
       ...mockInput,
       plotLength: 40,
@@ -166,72 +165,74 @@ describe('Calculation Engine Core Invariants', () => {
     expect(resA.area.remainingGroundAreaSqFt).toBe(480);
     expect(resA.area.groundCoveragePercentage).toBe(60);
     expect(resA.area.totalBUASqFt).toBe(720);
-
-    // Test Case B: 30×40 plot, Selected BUA = 900 (75% coverage)
-    const resB = runCalculator({
-      ...mockInput,
-      plotLength: 40,
-      plotWidth: 30,
-      builtUpAreaPerFloor: 900,
-      floors: 1,
-    });
-    expect(resB.area.plotAreaSqFt).toBe(1200);
-    expect(resB.area.buaPerFloorSqFt).toBe(900);
-    expect(resB.area.remainingGroundAreaSqFt).toBe(300);
-    expect(resB.area.groundCoveragePercentage).toBe(75);
-    expect(resB.area.totalBUASqFt).toBe(900);
-
-    // Test Case C: 30×50 plot, Selected BUA = 900 (60% coverage)
-    const resC = runCalculator({
-      ...mockInput,
-      plotLength: 50,
-      plotWidth: 30,
-      builtUpAreaPerFloor: 900,
-      floors: 1,
-    });
-    expect(resC.area.plotAreaSqFt).toBe(1500);
-    expect(resC.area.buaPerFloorSqFt).toBe(900);
-    expect(resC.area.remainingGroundAreaSqFt).toBe(600);
-    expect(resC.area.groundCoveragePercentage).toBe(60);
-    expect(resC.area.totalBUASqFt).toBe(900);
+    expect(resA.area.buildableFootprintSqFt).toBeGreaterThan(0);
   });
 
-  // ── INVARIANT 2: Multi-Floor Remaining Ground Area Safety ──
-  it('MULTI-FLOOR GROUND FOOTPRINT SAFETY: remaining ground area must be plotArea - buaPerFloor, NOT plotArea - totalBUA', () => {
-    // 30×40 plot (1200 sqft), BUA/floor = 900, Floors = 3
+  // ── 2. Multi-Floor Ground Footprint Safety ──
+  it('MULTI-FLOOR GROUND FOOTPRINT SAFETY: remaining ground area must be plotArea - buaPerFloor', () => {
     const resMulti = runCalculator({
       ...mockInput,
       plotLength: 40,
       plotWidth: 30,
-      builtUpAreaPerFloor: 900,
+      builtUpAreaPerFloor: 720,
       floors: 3,
     });
-
     expect(resMulti.area.plotAreaSqFt).toBe(1200);
-    expect(resMulti.area.buaPerFloorSqFt).toBe(900);
-    expect(resMulti.area.totalBUASqFt).toBe(2700);
-    // Remaining ground area is 1,200 - 900 = 300, NEVER 1,200 - 2,700 (-1500)
-    expect(resMulti.area.remainingGroundAreaSqFt).toBe(300);
-    expect(resMulti.area.remainingGroundArea).toBe(300);
-    expect(resMulti.area.groundCoveragePercentage).toBe(75);
+    expect(resMulti.area.buaPerFloorSqFt).toBe(720);
+    expect(resMulti.area.totalBUASqFt).toBe(2160);
+    expect(resMulti.area.remainingGroundAreaSqFt).toBe(480);
+    expect(resMulti.area.groundCoveragePercentage).toBe(60);
   });
 
-  // ── INVARIANT 3: Steel & Cement Quantities derived from totalBUA ──
-  it('should compute structural quantities from totalBUA without magic multipliers', () => {
-    const result = runCalculator(mockInput);
-    // Premium tier = 4.5 kg steel / sqft BUA
-    const expectedKg = result.area.totalBUASqFt * 4.5;
-    expect(result.quantities.steelTonnes).toBe(parseFloat((expectedKg / 1000).toFixed(1)));
+  // ── 3. Exact Pilot Steel Formula: 2.8 + [0.2 × (Floors - 1)] kg/sqft ──
+  it('STEEL FORMULA: calculates steel factor as 2.8 + 0.2*(floors - 1) kg/sqft', () => {
+    // Ground floor (1 floor): Factor = 2.8 kg/sqft
+    const resG = runCalculator({ ...mockInput, builtUpAreaPerFloor: 1000, floors: 1 });
+    expect(resG.quantities.steelFactorKgPerSqFt).toBe(2.8);
+    expect(resG.quantities.steelKg).toBe(2800);
+    expect(resG.quantities.steelTonnes).toBe(2.8);
 
-    // Premium tier = 0.44 cement bags / sqft BUA
-    const expectedCement = Math.round(result.area.totalBUASqFt * 0.44);
-    expect(result.quantities.cementBags).toBe(expectedCement);
+    // G+1 (2 floors, 2000 BUA): Factor = 2.8 + 0.2*(1) = 3.0 kg/sqft -> 6000 kg (6 Tonnes)
+    const resG1 = runCalculator({ ...mockInput, builtUpAreaPerFloor: 1000, floors: 2 });
+    expect(resG1.quantities.steelFactorKgPerSqFt).toBe(3.0);
+    expect(resG1.quantities.steelKg).toBe(6000);
+    expect(resG1.quantities.steelTonnes).toBe(6.0);
+
+    // G+2 (3 floors, 3000 BUA): Factor = 2.8 + 0.2*(2) = 3.2 kg/sqft -> 9600 kg (9.6 Tonnes)
+    const resG2 = runCalculator({ ...mockInput, builtUpAreaPerFloor: 1000, floors: 3 });
+    expect(resG2.quantities.steelFactorKgPerSqFt).toBe(3.2);
+    expect(resG2.quantities.steelKg).toBe(9600);
+    expect(resG2.quantities.steelTonnes).toBe(9.6);
   });
 
-  // ── INVARIANT 4: BOQ Item Dimensional Correctness ──
+  // ── 4. Direct Material Starting Rules (Cement 0.40, M-Sand 0.60, P-Sand 0.60, Agg 1.35) ──
+  it('DIRECT MATERIAL THUMB RULES: Cement 0.40 bags/sqft, M-Sand 0.60, P-Sand 0.60, Agg 1.35', () => {
+    const res = runCalculator({ ...mockInput, builtUpAreaPerFloor: 1000, floors: 2 });
+    // Total BUA = 2000 sqft
+    expect(res.quantities.cementBags).toBe(800); // 2000 * 0.40
+    expect(res.quantities.mSandCuFt).toBe(1200); // 2000 * 0.60
+    expect(res.quantities.pSandCuFt).toBe(1200); // 2000 * 0.60
+    expect(res.quantities.sandCuFt).toBe(2400);  // 1200 + 1200
+    expect(res.quantities.coarseAggregateCuFt).toBe(2700); // 2000 * 1.35
+  });
+
+  // ── 5. Space Model Masonry & Paint Geometry ──
+  it('SPACE-DRIVEN WALL & PAINT GEOMETRY: derived from space perimeters and height without BUA x 3.5 multiplier', () => {
+    const res = runCalculator(mockInput);
+    expect(res.buildingModel.allSpaces.length).toBeGreaterThan(0);
+    expect(res.quantities.netWallAreaSqFt).toBeGreaterThan(0);
+    expect(res.quantities.totalPaintableAreaSqFt).toBe(
+      res.quantities.interiorPaintAreaSqFt + res.quantities.exteriorPaintAreaSqFt
+    );
+    expect(res.quantities.interiorPaintAreaSqFt).toBe(
+      res.quantities.internalWallAreaSqFt + res.quantities.ceilingAreaSqFt
+    );
+  });
+
+  // ── 6. BOQ Line Item Correctness & Amount = Quantity x Rate ──
   it('BOQ UNIT SAFETY: Amount = Quantity × Unit Rate for all BOQ items', () => {
     const result = runCalculator(mockInput);
-    expect(result.boq.length).toBeGreaterThanOrEqual(35);
+    expect(result.boq.length).toBeGreaterThanOrEqual(25);
 
     result.boq.forEach((item) => {
       const calculatedAmount = Math.round(item.quantity * item.unitRate);
@@ -239,10 +240,13 @@ describe('Calculation Engine Core Invariants', () => {
       expect(item.quantity).toBeGreaterThan(0);
       expect(item.unitRate).toBeGreaterThan(0);
     });
+
+    const sumBOQ = result.boq.reduce((s, i) => s + i.amount, 0);
+    expect(result.budget.baseConstructionCost).toBe(sumBOQ);
   });
 
-  // ── INVARIANT 5: Dynamic BOQ Percentages ──
-  it('DYNAMIC BOQ PERCENTAGES: every percentage is dynamically derived from item amount / total sum', () => {
+  // ── 7. Dynamic BOQ Percentages ──
+  it('DYNAMIC BOQ PERCENTAGES: every percentage dynamically derived from amount / total BOQ sum', () => {
     const result = runCalculator(mockInput);
     const totalSum = result.boq.reduce((sum, item) => sum + item.amount, 0);
 
@@ -251,136 +255,42 @@ describe('Calculation Engine Core Invariants', () => {
       expect(item.percentage).toBe(expectedPercentage);
     });
 
-    const sumPercentages = result.boq.reduce((sum, item) => sum + item.percentage, 0);
-    expect(sumPercentages).toBeGreaterThan(99.0);
-    expect(sumPercentages).toBeLessThan(101.0);
+    const sumPct = result.boq.reduce((sum, item) => sum + item.percentage, 0);
+    expect(sumPct).toBeGreaterThan(99.0);
+    expect(sumPct).toBeLessThan(101.0);
   });
 
-  // ── INVARIANT 6: Total Cost & Effective Rate Derivation ──
-  it('DERIVED EFFECTIVE RATE: Effective Rate/Sq.Ft = Total Project Cost ÷ Total BUA', () => {
+  // ── 8. 4-Section Report Integrity (A, B, C, D) ──
+  it('4-SECTION REPORT: Sections A, B, C, and D are fully populated', () => {
     const result = runCalculator(mockInput);
-    const expectedRate = Math.round(result.budget.totalProjectCost / result.area.totalBUASqFt);
-    expect(result.budget.costPerSqFt).toBe(expectedRate);
+    expect(result.report.sectionA_WorksBOQ.length).toBeGreaterThan(0);
+    expect(result.report.sectionB_MaterialSchedule.length).toBeGreaterThan(0);
+    expect(result.report.sectionC_FixtureSchedule.length).toBeGreaterThan(0);
+    expect(result.report.sectionD_CostSummary.totalProjectCost).toBeGreaterThan(0);
+
+    // Section B must NOT contain a separate "Concrete" line item
+    const hasConcreteMaterial = result.report.sectionB_MaterialSchedule.some(
+      (m) => m.material.toLowerCase().includes('concrete') && !m.material.toLowerCase().includes('sand') && !m.material.toLowerCase().includes('aac')
+    );
+    expect(hasConcreteMaterial).toBe(false);
   });
 
-  // ── INVARIANT 7: Brand Selection Invariance on Physical Quantities ──
-  it('MATERIAL BRAND INVARIANCE: Brand changes must alter unit rates but preserve physical quantities', () => {
-    // Steel brands
-    const resSteel1 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, steel: 'Tata Tiscon' } });
-    const resSteel2 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, steel: 'JSW Neosteel' } });
-    const resSteel3 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, steel: 'Indus TMT' } });
-
-    expect(resSteel1.quantities.steelTonnes).toBe(resSteel2.quantities.steelTonnes);
-    expect(resSteel2.quantities.steelTonnes).toBe(resSteel3.quantities.steelTonnes);
-
-    // Cement brands
-    const resCement1 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, cement: 'UltraTech' } });
-    const resCement2 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, cement: 'ACC Cement' } });
-    const resCement3 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, cement: 'Dalmia Bharat' } });
-
-    expect(resCement1.quantities.cementBags).toBe(resCement2.quantities.cementBags);
-    expect(resCement2.quantities.cementBags).toBe(resCement3.quantities.cementBags);
-
-    // Paint brands
-    const resPaint1 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, paint: 'Asian Paints Royale' } });
-    const resPaint2 = runCalculator({ ...mockInput, materialBrands: { ...mockInput.materialBrands, paint: 'Berger Silk' } });
-
-    expect(resPaint1.quantities.interiorPaintAreaSqFt).toBe(resPaint2.quantities.interiorPaintAreaSqFt);
-    expect(resPaint1.quantities.exteriorPaintAreaSqFt).toBe(resPaint2.quantities.exteriorPaintAreaSqFt);
-  });
-
-  // ── INVARIANT 8: Space Dependencies ──
-  it('ROOM COUNTS DEPENDENCY: changing bedroom count scales doors, electrical points, wiring, and conduit', () => {
-    const base = runCalculator(mockInput);
-    
-    // Add 1 bedroom (4 -> 5)
-    const expandedInput = { ...mockInput, rooms: { ...mockInput.rooms, bedrooms: 5 } };
-    const expanded = runCalculator(expandedInput);
-
-    expect(expanded.quantities.internalDoorsCount).toBeGreaterThan(base.quantities.internalDoorsCount);
-    expect(expanded.quantities.lightingPoints).toBeGreaterThan(base.quantities.lightingPoints);
-    expect(expanded.quantities.electricalWireMetres).toBeGreaterThan(base.quantities.electricalWireMetres);
-    expect(expanded.quantities.conduitsMetres).toBeGreaterThan(base.quantities.conduitsMetres);
-  });
-
-  it('BATHROOM DEPENDENCY: changing bathroom count scales fixture sets, CPVC, SWR, floor traps, wall tiles, and waterproofing', () => {
-    const base = runCalculator(mockInput);
-
-    // Increase bathrooms (4 -> 6)
-    const expanded = runCalculator({ ...mockInput, rooms: { ...mockInput.rooms, bathrooms: 6 } });
-    expect(expanded.quantities.bathroomFixtureSets).toBeGreaterThan(base.quantities.bathroomFixtureSets);
-    expect(expanded.quantities.cpvcSupplyMetres).toBeGreaterThan(base.quantities.cpvcSupplyMetres);
-    expect(expanded.quantities.swrDrainMetres).toBeGreaterThan(base.quantities.swrDrainMetres);
-    expect(expanded.quantities.floorTrapsCount).toBeGreaterThan(base.quantities.floorTrapsCount);
-    expect(expanded.quantities.wallTilesSqFt).toBeGreaterThan(base.quantities.wallTilesSqFt);
-    expect(expanded.quantities.waterproofingAreaSqFt).toBeGreaterThan(base.quantities.waterproofingAreaSqFt);
-  });
-
-  // ── INVARIANT 9: True Zero-Start ──
+  // ── 9. True Zero-Start Project ──
   it('TRUE ZERO-START: unconfigured project yields 0 BUA, ₹0 cost, 0 rate, empty BOQ', () => {
     const res = runCalculator(emptyZeroInput);
     expect(res.area.plotAreaSqFt).toBe(0);
     expect(res.area.buaPerFloorSqFt).toBe(0);
-    expect(res.area.remainingGroundAreaSqFt).toBe(0);
     expect(res.area.totalBUASqFt).toBe(0);
     expect(res.budget.totalProjectCost).toBe(0);
     expect(res.budget.costPerSqFt).toBe(0);
     expect(res.boq.length).toBe(0);
+    expect(res.materialSchedule.length).toBe(0);
+    expect(res.fixtureSchedule.length).toBe(0);
   });
 
-  // ── INVARIANT 10: Progressive Cost Contribution with User-Selected BUA ──
-  it('PROGRESSIVE COST CONTRIBUTION: selecting BUA and materials increases cost progressively', () => {
-    // 1. Enter dimensions and desired BUA (30x40, 720 sqft/floor, G+1 = 1440 sqft BUA)
-    const step1Only: EngineInput = {
-      ...emptyZeroInput,
-      plotLength: 40,
-      plotWidth: 30,
-      builtUpAreaPerFloor: 720,
-      floors: 2,
-    };
-    const resStep1 = runCalculator(step1Only);
-    expect(resStep1.area.plotAreaSqFt).toBe(1200);
-    expect(resStep1.area.buaPerFloorSqFt).toBe(720);
-    expect(resStep1.area.remainingGroundAreaSqFt).toBe(480);
-    expect(resStep1.area.groundCoveragePercentage).toBe(60);
-    expect(resStep1.area.totalBUASqFt).toBe(1440);
-    expect(resStep1.quantities.steelTonnes).toBe(6.5); // 1440 * 4.5 = 6480 kg = 6.5 T
-    expect(resStep1.budget.totalProjectCost).toBeGreaterThan(0);
-    expect(resStep1.budget.costPerSqFt).toBeGreaterThan(0);
-
-    // 2. Select Steel brand (Tata Tiscon)
-    const withSteel: EngineInput = {
-      ...step1Only,
-      materialBrands: { ...step1Only.materialBrands, steel: 'Tata Tiscon' },
-    };
-    const resWithSteel = runCalculator(withSteel);
-    expect(resWithSteel.budget.totalProjectCost).toBeGreaterThan(0);
-    expect(resWithSteel.budget.costPerSqFt).toBeGreaterThan(0);
-
-    // 3. Select Cement brand (UltraTech)
-    const withCement: EngineInput = {
-      ...withSteel,
-      materialBrands: { ...withSteel.materialBrands, cement: 'UltraTech' },
-    };
-    const resWithCement = runCalculator(withCement);
-    expect(resWithCement.budget.totalProjectCost).toBeGreaterThan(resWithSteel.budget.totalProjectCost);
-
-    // 4. Change steel brand from Tata Tiscon to JSW: quantity invariant, cost changes
-    const withJSW: EngineInput = {
-      ...withCement,
-      materialBrands: { ...withCement.materialBrands, steel: 'JSW Neosteel' },
-    };
-    const resWithJSW = runCalculator(withJSW);
-    expect(resWithJSW.quantities.steelTonnes).toBe(resWithCement.quantities.steelTonnes);
-    expect(resWithJSW.budget.totalProjectCost).not.toBe(resWithCement.budget.totalProjectCost);
-  });
-
-  // ── INVARIANT 11: Payment Milestones ──
-  it('PAYMENT MILESTONES: 11 payment milestones sum exactly to total budget', () => {
-    const result = runCalculator(mockInput);
-    expect(result.paymentPlan.length).toBe(11);
-    const sumMilestones = result.paymentPlan.reduce((sum, m) => sum + m.amount, 0);
-    expect(sumMilestones).toBe(result.budget.totalProjectCost);
+  // ── 10. Effective Rate Derivation ──
+  it('EFFECTIVE RATE: costPerSqFt = totalProjectCost / totalBUASqFt', () => {
+    const res = runCalculator(mockInput);
+    expect(res.budget.costPerSqFt).toBe(Math.round(res.budget.totalProjectCost / res.area.totalBUASqFt));
   });
 });
-

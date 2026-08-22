@@ -12,23 +12,23 @@ export const Step7Windows: React.FC = () => {
   const windowsCount = quantities.windowsCount || 10;
 
   const materials: { id: 'uPVC' | 'Wood' | 'Aluminium'; title: string; desc: string }[] = [
-    { id: 'uPVC', title: 'uPVC Windows', desc: 'Soundproof, weather-sealed multi-chambered vinyl frames.' },
-    { id: 'Wood', title: 'Solid Wood Windows', desc: 'Natural hardwood timber frames with glass panels.' },
-    { id: 'Aluminium', title: 'Aluminium Windows', desc: 'Slim-profile powder coated metallic frames.' },
+    { id: 'uPVC', title: 'uPVC Windows', desc: 'Soundproof, weather-sealed vinyl frames.' },
+    { id: 'Wood', title: 'Solid Wood', desc: 'Natural timber frames with glass.' },
+    { id: 'Aluminium', title: 'Aluminium', desc: 'Slim-profile powder coated metallic frames.' },
   ];
 
   const subGradeMap: Record<string, { label: string; ratePerSqFt: number; desc: string }[]> = {
     uPVC: [
       { label: 'Standard uPVC', ratePerSqFt: 550, desc: '3-chamber profile with 5mm toughened single glass.' },
-      { label: 'Luxury / Fenesta uPVC', ratePerSqFt: 850, desc: 'Heavy-duty multi-chamber profile with double DGU acoustic glass.' },
+      { label: 'Luxury / Fenesta uPVC', ratePerSqFt: 850, desc: 'Multi-chamber profile with double DGU acoustic glass.' },
     ],
     Wood: [
       { label: 'Teak Wood Frame', ratePerSqFt: 950, desc: 'Burma teak frame with brass hardware.' },
-      { label: 'Sal Frame / Honne Shutter', ratePerSqFt: 680, desc: 'Seasoned Sal wood frame with Honne timber glass shutter.' },
+      { label: 'Sal Frame / Honne Shutter', ratePerSqFt: 680, desc: 'Sal wood frame with Honne timber shutter.' },
     ],
     Aluminium: [
-      { label: 'Anodized Aluminium', ratePerSqFt: 480, desc: '1.6mm anodized silver section with clear float glass.' },
-      { label: 'Powder Coated Jindal Aluminium', ratePerSqFt: 620, desc: 'Heavy-duty 2.0mm powder coated track system.' },
+      { label: 'Anodized Aluminium', ratePerSqFt: 480, desc: '1.6mm anodized section with float glass.' },
+      { label: 'Powder Coated Jindal Aluminium', ratePerSqFt: 620, desc: '2.0mm powder coated track system.' },
     ],
   };
 
@@ -36,26 +36,27 @@ export const Step7Windows: React.FC = () => {
   const currentSubGrades = subGradeMap[selectedMaterial] || subGradeMap['uPVC'];
 
   return (
-    <div className="space-y-8 text-left select-none">
-      {/* Editorial Step Header */}
-      <div className="space-y-1">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#1B3D34] uppercase block">
+    <div className="space-y-6 text-left select-none">
+      
+      {/* ── STEP HEADER ── */}
+      <div className="space-y-1 pb-1 border-b border-[#E5E7EB]">
+        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
           STEP 07
         </span>
-        <h2 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading">
           Windows &amp; Glazing
-        </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-          Choose window framing materials and glazing performance grades (~{totalWindowAreaSqFt} sq.ft across {windowsCount} openings).
+        </h1>
+        <p className="text-xs sm:text-sm text-[#4B5563]">
+          Choose window framing and glass grade (~{totalWindowAreaSqFt} sq.ft across {windowsCount} openings).
         </p>
       </div>
 
-      {/* 1. Primary Window Material */}
-      <div className="space-y-3">
+      {/* 1. Primary Material */}
+      <div className="space-y-2">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          Primary Framing Material
+          Framing Material
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {materials.map((mat) => {
             const isSelected = windows.primaryMaterial === mat.id;
             return (
@@ -63,33 +64,29 @@ export const Step7Windows: React.FC = () => {
                 key={mat.id}
                 onClick={() => setWindowSelection(mat.id)}
                 className={cn(
-                  'p-4 rounded-xl border transition-all cursor-pointer space-y-1 text-left',
+                  'p-3 rounded-xl border transition-all cursor-pointer space-y-0.5 text-left',
                   isSelected
-                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    ? 'bg-[rgba(27,61,52,0.06)] border-[#1B3D34] ring-1 ring-[#1B3D34]'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[#F8F8F6]'
                 )}
               >
                 <div className="flex justify-between items-center">
                   <h4 className="text-xs font-bold text-[#1B3D34]">{mat.title}</h4>
-                  {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-xs">
-                      <Check className="w-3.5 h-3.5" />
-                    </div>
-                  )}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34]" />}
                 </div>
-                <p className="text-[11px] text-[#4B5563] leading-tight">{mat.desc}</p>
+                <p className="text-[10px] text-[#4B5563]">{mat.desc}</p>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* 2. Sub-Grade Choice */}
-      <div className="space-y-3 pt-2 border-t border-[#E5E7EB]">
+      {/* 2. Sub-Grade Specification */}
+      <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          {selectedMaterial} Specification Grade
+          {selectedMaterial} Performance Grade
         </label>
-        <div className="space-y-2.5">
+        <div className="space-y-1.5">
           {currentSubGrades.map((sg) => {
             const isSelected = windows.subGrade === sg.label;
             const subCost = Math.round(totalWindowAreaSqFt * sg.ratePerSqFt);
@@ -98,24 +95,24 @@ export const Step7Windows: React.FC = () => {
                 key={sg.label}
                 onClick={() => setWindowSelection(selectedMaterial, sg.label)}
                 className={cn(
-                  'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
+                  'p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    ? 'bg-[rgba(27,61,52,0.06)] border-[#1B3D34] ring-1 ring-[#1B3D34]'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[#F8F8F6]'
                 )}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div
                     className={cn(
-                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#E5E7EB] text-transparent'
+                      'w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
                     )}
                   >
-                    <Check className="w-3.5 h-3.5" />
+                    {isSelected && <Check className="w-3 h-3" />}
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-[#1B3D34]">{sg.label}</h4>
-                    <p className="text-[11px] text-[#4B5563] leading-tight mt-0.5">{sg.desc}</p>
+                    <p className="text-[10px] text-[#4B5563] mt-0.5">{sg.desc}</p>
                   </div>
                 </div>
 

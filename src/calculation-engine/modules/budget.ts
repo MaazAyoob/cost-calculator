@@ -1,42 +1,65 @@
 // ============================================================
-// BUDGET MODULE – Itemized BOQ-Driven Cost Aggregator
-// Total Construction Cost is derived directly from itemized BOQ.
-// Category heads, dynamic percentages, and effective rate/sq.ft
-// are calculated strictly from true item sums.
+// BUDGET MODULE – SECTION D: WHAT IT COSTS
+// Strictly follows Hutty Pilot Specification (Section 25, 27, 28)
+//
+// Rules:
+// - Base Construction Cost = Sum of all itemized BOQ amounts
+// - Project Additions: Professional Fees (5%), Contractor Margin (15%),
+//   Contingency (6%), GST (18%)
+// - Effective Rate per Sq.Ft = Total Project Cost ÷ Total BUA (0 if BUA = 0)
+// - Never return NaN, Infinity, undefined, or negative values.
 // ============================================================
 
 import { EngineInput, AreaResult, BudgetResult, BudgetHead, BOQItem } from '../types';
 import { BUDGET_HEAD_COLORS } from '../data/qualityTiers';
 import {
   GST_RATE,
-  CONTRACTOR_MARGIN,
-  PROFESSIONAL_FEES,
+  CONTRACTOR_MARGIN_RATE,
+  PROFESSIONAL_FEES_RATE,
   CONTINGENCY_RATE,
-} from '../data/locationRates';
+} from '../data/coefficients';
 
 export function calculateBudget(
   input: EngineInput,
   area: AreaResult,
   boq: BOQItem[]
 ): BudgetResult {
-  const { qualityTier } = input;
-  const bua = area.totalBUASqFt;
-  const resolvedTier = qualityTier || 'Premium';
+  const bua = area.totalBUASqFt || 0;
 
-  // 1. Total Base Construction Cost is the exact sum of all itemized BOQ items
-  const baseConstructionCost = boq.reduce((acc, item) => acc + item.amount, 0);
+  // 1. Base Construction Cost is the exact sum of all BOQ items
+  const baseConstructionCost = Array.isArray(boq)
+    ? boq.reduce((acc, item) => acc + (item.amount || 0), 0)
+    : 0;
 
-  // 2. Statutory / Markup Additions
-  const professionalFees = Math.round(baseConstructionCost * (PROFESSIONAL_FEES[resolvedTier] ?? 0.05));
-  const contractorMargin = Math.round(baseConstructionCost * (CONTRACTOR_MARGIN[resolvedTier] ?? 0.10));
-  const contingency      = Math.round(baseConstructionCost * (CONTINGENCY_RATE[resolvedTier] ?? 0.05));
-  const gstAmount        = Math.round((baseConstructionCost + professionalFees) * GST_RATE);
+  if (baseConstructionCost <= 0 || bua <= 0) {
+    return {
+      heads: [],
+      structuralCost: 0,
+      finishingCost: 0,
+      mepCost: 0,
+      baseConstructionCost: 0,
+      professionalFees: 0,
+      contractorMargin: 0,
+      contingency: 0,
+      gstAmount: 0,
+      totalProjectCost: 0,
+      costPerSqFt: 0,
+    };
+  }
+
+  // 2. Statutory / Project Additions (Configurable parameters from coefficients)
+  const professionalFees = Math.round(baseConstructionCost * PROFESSIONAL_FEES_RATE); // 5%
+  const contractorMargin = Math.round(baseConstructionCost * CONTRACTOR_MARGIN_RATE); // 15%
+  const contingency      = Math.round(baseConstructionCost * CONTINGENCY_RATE);      // 6%
+  const gstAmount        = Math.round((baseConstructionCost + professionalFees) * GST_RATE); // 18%
 
   // 3. Final Total Project Cost
   const totalProjectCost = baseConstructionCost + professionalFees + contractorMargin + contingency + gstAmount;
 
-  // 4. Derived Effective Rate per Sq.Ft
-  const costPerSqFt = bua > 0 ? Math.round(totalProjectCost / bua) : 0;
+  // 4. Derived Effective Rate per Sq.Ft (Never NaN/Infinity)
+  const costPerSqFt = bua > 0 && !isNaN(totalProjectCost)
+    ? Math.round(totalProjectCost / bua)
+    : 0;
 
   // Helper to sum BOQ amounts by category
   const sumCat = (categories: string[]): number => {
@@ -47,6 +70,7 @@ export function calculateBudget(
 
   const foundationStructureAmt = sumCat(['Site Preparation', 'Foundation', 'Plinth', 'RCC Structure']);
   const masonryAmt             = sumCat(['Masonry']);
+  const plasteringAmt          = sumCat(['Plastering']);
   const roofingAmt             = sumCat(['Roofing']);
   const flooringAmt            = sumCat(['Flooring']);
   const doorsJoineryAmt        = sumCat(['Doors & Joinery']);
@@ -59,16 +83,16 @@ export function calculateBudget(
 
   const headDefs = [
     { key: 'foundationStructure',    label: 'Foundation & Structure',  amt: foundationStructureAmt },
-    { key: 'masonry',                label: 'Masonry',                 amt: masonryAmt },
-    { key: 'roofing',                label: 'Roofing',                 amt: roofingAmt },
-    { key: 'flooring',               label: 'Flooring',                amt: flooringAmt },
+    { key: 'masonry',                label: 'Masonry & Plastering',    amt: masonryAmt + plasteringAmt },
+    { key: 'roofing',                label: 'Roofing & Waterproofing', amt: roofingAmt },
+    { key: 'flooring',               label: 'Flooring & Cladding',     amt: flooringAmt },
     { key: 'doorsJoinery',           label: 'Doors & Joinery',         amt: doorsJoineryAmt },
     { key: 'windows',                label: 'Windows & Glazing',       amt: windowsAmt },
-    { key: 'electrical',             label: 'Electrical',              amt: electricalAmt },
+    { key: 'electrical',             label: 'Electrical MEP',          amt: electricalAmt },
     { key: 'plumbingSanitary',       label: 'Plumbing & Sanitary',     amt: plumbingSanitaryAmt },
-    { key: 'paintingWaterproofing',  label: 'Painting & Waterproofing', amt: paintingAmt },
-    { key: 'fixturesFinishes',       label: 'Fixtures & Finishes',     amt: fixturesFinishesAmt },
-    { key: 'contingencyGST',         label: 'Contingency, Margin & GST', amt: markupAndGSTAmt },
+    { key: 'paintingWaterproofing',  label: 'Painting & Finishes',     amt: paintingAmt },
+    { key: 'fixturesFinishes',       label: 'Installed Fixtures',      amt: fixturesFinishesAmt },
+    { key: 'contingencyGST',         label: 'Margin, Contingency & GST', amt: markupAndGSTAmt },
   ];
 
   const heads: BudgetHead[] = headDefs.map((h) => ({
@@ -80,7 +104,7 @@ export function calculateBudget(
   }));
 
   // Major trade subtotals
-  const structuralCost = foundationStructureAmt + masonryAmt + roofingAmt;
+  const structuralCost = foundationStructureAmt + masonryAmt + plasteringAmt + roofingAmt;
   const finishingCost  = flooringAmt + doorsJoineryAmt + windowsAmt + paintingAmt + fixturesFinishesAmt;
   const mepCost        = electricalAmt + plumbingSanitaryAmt;
 
@@ -89,10 +113,11 @@ export function calculateBudget(
     structuralCost,
     finishingCost,
     mepCost,
+    baseConstructionCost,
     professionalFees,
+    contractorMargin,
     contingency,
     gstAmount,
-    baseConstructionCost,
     totalProjectCost,
     costPerSqFt,
   };

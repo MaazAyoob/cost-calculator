@@ -1,291 +1,297 @@
-// Materials / Procurement List Module
-import { EngineInput, MaterialQuantities, BudgetResult, ProcurementItem } from '../types';
-import { UNIT_RATES_PREMIUM, MATERIAL_QUALITY_MULTIPLIER } from '../data/qualityTiers';
+// ============================================================
+// MATERIAL SCHEDULE & PROCUREMENT MODULE – SECTION B: WHAT WE CONSUME
+// Strictly follows Hutty Pilot Specification (Section 7, 25, 26)
+//
+// Rules:
+// - Physical materials: Steel, Cement, M-Sand, P-Sand, Coarse Aggregate,
+//   AAC Blocks/Bricks, Floor Tiles, Wall Tiles, Paint, Waterproofing, Pipes, Wire.
+// - NO separate "Concrete Material" line (RCC is a construction work in Section A).
+// - Consumes physical quantities directly from the single calculation engine.
+// - Material/Brand selection changes the rate while preserving physical quantity.
+// ============================================================
+
+import {
+  EngineInput,
+  MaterialQuantities,
+  MaterialScheduleItem,
+  ProcurementItem,
+} from '../types';
+import { getBrandRate } from '../data/brandDatabase';
+
+export function generateMaterialSchedule(
+  input: EngineInput,
+  qty: MaterialQuantities
+): MaterialScheduleItem[] {
+  const { materialBrands, flooringZones, painting } = input;
+  const items: MaterialScheduleItem[] = [];
+  let slNo = 0;
+
+  if (qty.steelKg <= 0 && qty.cementBags <= 0) {
+    return [];
+  }
+
+  // 1. TMT Rebar Steel
+  const steelBrand = materialBrands?.steel || 'Tata Tiscon';
+  const steelRatePerTonne = getBrandRate('steel', steelBrand) || 74000;
+  slNo++;
+  items.push({
+    slNo,
+    material: 'TMT Reinforcement Steel (Fe 550D / Fe 500D)',
+    category: 'Rebar',
+    brand: steelBrand,
+    specification: 'IS 1786 certified, high ductility corrosion-resistant thermo-mechanically treated rebar',
+    quantity: qty.steelTonnes,
+    unit: 'Tonne',
+    unitRate: steelRatePerTonne,
+    amount: Math.round(qty.steelTonnes * steelRatePerTonne),
+    sourceFormula: `Total BUA × Steel Factor (${qty.steelFactorKgPerSqFt} kg/sqft) ÷ 1000`,
+  });
+
+  // 2. Portland Cement (50 kg bags)
+  const cementBrand = materialBrands?.cement || 'UltraTech';
+  const cementRatePerBag = getBrandRate('cement', cementBrand) || 420;
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Portland Cement (OPC 53 Grade / PPC)',
+    category: 'Cement',
+    brand: cementBrand,
+    specification: 'IS 269 / IS 1489 certified 50 kg moisture-proof sealed bags',
+    quantity: qty.cementBags,
+    unit: 'Bags (50 kg)',
+    unitRate: cementRatePerBag,
+    amount: qty.cementBags * cementRatePerBag,
+    sourceFormula: 'Total BUA × 0.40 bags/sqft (Pilot Specification Section 8)',
+  });
+
+  // 3. Manufactured Sand (M-Sand)
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Manufactured Concrete Sand (M-Sand Zone II)',
+    category: 'Aggregates',
+    brand: 'Licensed Quarry Standard',
+    specification: 'Zone II double-washed cubical shape manufactured sand, silt content < 3%',
+    quantity: qty.mSandCuFt,
+    unit: 'Cu Ft',
+    unitRate: 65,
+    amount: qty.mSandCuFt * 65,
+    sourceFormula: 'Total BUA × 0.60 CFT/sqft (Pilot Specification Section 9)',
+  });
+
+  // 4. Plaster Sand (P-Sand)
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Fine Plaster Sand (P-Sand)',
+    category: 'Aggregates',
+    brand: 'Licensed Quarry Standard',
+    specification: 'Zone IV ultra-fine washed plastering sand for smooth internal & external wall finish',
+    quantity: qty.pSandCuFt,
+    unit: 'Cu Ft',
+    unitRate: 70,
+    amount: qty.pSandCuFt * 70,
+    sourceFormula: 'Total BUA × 0.60 CFT/sqft (Pilot Specification Section 10)',
+  });
+
+  // 5. Coarse Aggregate (20mm & 12mm)
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Coarse Metal Blue Granite Aggregate (20mm & 12mm)',
+    category: 'Aggregates',
+    brand: 'Crushed Granite Standard',
+    specification: 'IS 383 angular crushed blue metal granite aggregate (60:40 20mm/12mm blend)',
+    quantity: qty.coarseAggregateCuFt,
+    unit: 'Cu Ft',
+    unitRate: 52,
+    amount: qty.coarseAggregateCuFt * 52,
+    sourceFormula: 'Total BUA × 1.35 CFT/sqft (Pilot Specification Section 11)',
+  });
+
+  // 6. AAC Masonry Blocks
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Autoclaved Aerated Concrete (AAC) Blocks',
+    category: 'Masonry',
+    brand: 'Birla Aerocon / Godrej Grade 1',
+    specification: 'IS 2185 Part 3, 600×200×150mm & 600×200×100mm, oven-dry density 600 kg/m3',
+    quantity: qty.aacBlocksPieces,
+    unit: 'Blocks',
+    unitRate: 85,
+    amount: qty.aacBlocksPieces * 85,
+    sourceFormula: `Wall Volume (${qty.wallVolumeCuM} Cu.M) ÷ Block Vol (0.018 Cu.M) × 1.05`,
+  });
+
+  // 7. Floor Tiles & Slabs
+  const floorBrand = materialBrands?.flooring || flooringZones?.living || 'Vitrified Tiles';
+  let tileRate = 110;
+  if (floorBrand.includes('Marble')) tileRate = 420;
+  else if (floorBrand.includes('Granite')) tileRate = 220;
+  else if (materialBrands?.flooring) tileRate = getBrandRate('flooring', materialBrands.flooring) || tileRate;
+
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Vitrified Floor Tiles & Living Surface Cladding',
+    category: 'Flooring',
+    brand: floorBrand,
+    specification: 'Double-charged vitrified tiles / granite slabs with 7% cutting buffer',
+    quantity: qty.floorTilesSqFt,
+    unit: 'Sq Ft',
+    unitRate: tileRate,
+    amount: qty.floorTilesSqFt * tileRate,
+    sourceFormula: 'Sum of configured space floor areas × 1.07 (7% cutting wastage)',
+  });
+
+  // 8. Wall Dado Tiles
+  if (qty.wallTilesSqFt > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: 'Ceramic Wall Dado & Kitchen Splashback Tiles',
+      category: 'Flooring',
+      brand: 'Kajaria / Somany Satin Wall',
+      specification: '600×300mm digital glazed wall tiles for bathroom wet walls and kitchen counter',
+      quantity: qty.wallTilesSqFt,
+      unit: 'Sq Ft',
+      unitRate: 85,
+      amount: qty.wallTilesSqFt * 85,
+      sourceFormula: 'Bathroom Perimeter × Dado Height + Kitchen Counter × Backsplash Height − Openings',
+    });
+  }
+
+  // 9. Interior Paint
+  const paintBrand = materialBrands?.paint || painting?.brand || 'Asian Paints';
+  let intPaintRate = 380; // ₹/Litre
+  if (painting?.internalPaint === 'Royale Luxury Emulsion') intPaintRate = 580;
+  else if (painting?.internalPaint === 'Tractor Emulsion') intPaintRate = 220;
+
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Interior Wall & Ceiling Emulsion Paint',
+    category: 'Paint',
+    brand: paintBrand,
+    specification: `${painting?.internalPaint || 'Premium Emulsion'} (2 coats over putty primer)`,
+    quantity: qty.interiorPaintLitres,
+    unit: 'Litres',
+    unitRate: intPaintRate,
+    amount: qty.interiorPaintLitres * intPaintRate,
+    sourceFormula: `Internal Paintable Area (${qty.interiorPaintAreaSqFt} sq.ft) ÷ 45 sq.ft/L`,
+  });
+
+  // 10. Exterior Weatherproof Paint
+  slNo++;
+  items.push({
+    slNo,
+    material: 'Exterior Anti-Fungal Weatherproof Emulsion',
+    category: 'Paint',
+    brand: `${paintBrand} Apex Ultima`,
+    specification: 'Silicone acrylic elastomeric exterior weather coating (7-year warranty)',
+    quantity: qty.exteriorPaintLitres,
+    unit: 'Litres',
+    unitRate: 420,
+    amount: qty.exteriorPaintLitres * 420,
+    sourceFormula: `External Paintable Area (${qty.exteriorPaintAreaSqFt} sq.ft) ÷ 60 sq.ft/L`,
+  });
+
+  // 11. Acrylic Wall Putty
+  slNo++;
+  items.push({
+    slNo,
+    material: 'White Polymer Modified Acrylic Wall Putty',
+    category: 'Paint',
+    brand: 'Birla White / JK WallMaxx',
+    specification: 'Water-resistant white cement based smooth surface leveling coat',
+    quantity: qty.puttyKg,
+    unit: 'Kg',
+    unitRate: 32,
+    amount: qty.puttyKg * 32,
+    sourceFormula: `Internal Surface Area (${qty.puttyAreaSqFt} sq.ft) × 0.55 kg/sqft`,
+  });
+
+  // 12. Waterproofing Elastomeric Compound
+  if (qty.waterproofingAreaSqFt > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: '2-Component Polymer Elastomeric Waterproofing Membrane',
+      category: 'Waterproofing',
+      brand: 'Dr. Fixit Fastflex 2C / SikaTop Seal 107',
+      specification: 'Flexible cementitious waterproof coating for sunken slabs, terrace, and sump',
+      quantity: qty.waterproofingAreaSqFt,
+      unit: 'Sq Ft',
+      unitRate: 65,
+      amount: qty.waterproofingAreaSqFt * 65,
+      sourceFormula: 'Bathroom floors + 1ft wall upturn + Exposed Terrace Slab + Sump surface',
+    });
+  }
+
+  // 13. CPVC & SWR Plumbing Pipes
+  slNo++;
+  items.push({
+    slNo,
+    material: 'CPVC SDR 11 Hot & Cold Water Pipes',
+    category: 'Pipes & Wire',
+    brand: input.bathroomFittings?.cpvcBrand || 'Ashirwad / Astral',
+    specification: 'SDR 11 chlorinated polyvinyl chloride pipes rated for 82°C at 10 bar (IS 15778)',
+    quantity: qty.cpvcSupplyMetres,
+    unit: 'Metres',
+    unitRate: 140,
+    amount: qty.cpvcSupplyMetres * 140,
+    sourceFormula: 'Water Points × 4.5m + Vertical Shaft Risers',
+  });
+
+  slNo++;
+  items.push({
+    slNo,
+    material: 'SWR Ring-Fit Drainage & Soil Pipes (110mm & 75mm)',
+    category: 'Pipes & Wire',
+    brand: 'Supreme / Prince SWR',
+    specification: 'Type B rubber ring seal leak-proof soil, waste, and rainwater drainage pipe',
+    quantity: qty.swrDrainMetres,
+    unit: 'Metres',
+    unitRate: 180,
+    amount: qty.swrDrainMetres * 180,
+    sourceFormula: 'Drainage Points × 3.5m + Vertical Soil Stack Risers',
+  });
+
+  // 14. Electrical FRLS Copper Wire
+  slNo++;
+  items.push({
+    slNo,
+    material: 'FRLS Multi-Strand Copper Electrical Cable',
+    category: 'Pipes & Wire',
+    brand: materialBrands?.electrical || input.electrical?.wireTier || 'Finolex / Polycab',
+    specification: 'Flame Retardant Low Smoke IS 694 copper single-core wire (1.5, 2.5, 4.0 sq.mm)',
+    quantity: qty.electricalWireMetres,
+    unit: 'Metres',
+    unitRate: 38,
+    amount: qty.electricalWireMetres * 38,
+    sourceFormula: 'Electrical Points × 5.5m + Main Circuit Runs + EV Charger Allowance',
+  });
+
+  return items;
+}
 
 export function generateProcurementList(
   input: EngineInput,
   qty: MaterialQuantities,
-  budget: BudgetResult
+  materialSchedule: MaterialScheduleItem[]
 ): ProcurementItem[] {
-  const { qualityTier, materialBrands } = input;
-  const m = MATERIAL_QUALITY_MULTIPLIER[qualityTier];
-  const r = UNIT_RATES_PREMIUM;
-
-  const items: ProcurementItem[] = [
-    // ── Structure ──
-    {
-      id: 'proc-1',
-      trade: 'Structure',
-      item: 'TMT Steel Bars Fe 550D',
-      brand: materialBrands.steel,
-      specification: 'IS 1786 certified, CRS (Corrosion Resistant Steel)',
-      quantity: qty.steelTonnes,
-      unit: 'Tonne',
-      unitRate: Math.round(r.tmtSteelPerTonne * m.structural),
-      totalCost: Math.round(qty.steelTonnes * r.tmtSteelPerTonne * m.structural),
-      supplierNote: 'Order 5% extra as site waste. Demand mill test certificate.',
-      leadTimeDays: 3,
-    },
-    {
-      id: 'proc-2',
-      trade: 'Structure',
-      item: 'OPC 53 Grade Cement',
-      brand: materialBrands.cement,
-      specification: 'IS 269 OPC 53 grade, 3-month shelf life',
-      quantity: qty.cementBags,
-      unit: 'Bags (50 kg)',
-      unitRate: Math.round(r.cement50kgBag * m.structural),
-      totalCost: Math.round(qty.cementBags * r.cement50kgBag * m.structural),
-      supplierNote: 'Procure in lots of 200 bags. Store on raised wooden pallets.',
-      leadTimeDays: 1,
-    },
-    {
-      id: 'proc-3',
-      trade: 'Structure',
-      item: 'M25 Ready Mix Concrete',
-      brand: 'UltraTech / ACC RMC Plant',
-      specification: 'Design mix M25, 120mm slump, 28-day cube test',
-      quantity: qty.concreteCuM,
-      unit: 'Cu M',
-      unitRate: Math.round(r.rmc25PerCuM * m.structural),
-      totalCost: Math.round(qty.concreteCuM * r.rmc25PerCuM * m.structural),
-      supplierNote: 'Book transit mixer 48 hours in advance for slab pours.',
-      leadTimeDays: 2,
-    },
-    {
-      id: 'proc-4',
-      trade: 'Structure',
-      item: 'AAC Blocks 150mm (6 inch)',
-      brand: 'Birla Aerocon Grade 1',
-      specification: 'IS 2185 Part 3, density 600-650 kg/m3',
-      quantity: Math.round(qty.aacBlocksCuM * 0.55),
-      unit: 'Cu M',
-      unitRate: Math.round(r.aacBlock6InchPerCuM * m.structural),
-      totalCost: Math.round(qty.aacBlocksCuM * 0.55 * r.aacBlock6InchPerCuM * m.structural),
-      supplierNote: 'Use thin-bed polymer mortar; order adhesive with blocks.',
-      leadTimeDays: 3,
-    },
-    {
-      id: 'proc-5',
-      trade: 'Structure',
-      item: 'Washed River / Manufactured Sand',
-      brand: 'Karnataka Licensed Quarry',
-      specification: 'Zone II M-Sand, double washed, silt < 4%',
-      quantity: qty.sandCuFt,
-      unit: 'Cu Ft',
-      unitRate: Math.round(r.sandPerCuFt),
-      totalCost: Math.round(qty.sandCuFt * r.sandPerCuFt),
-      supplierNote: 'Check Form C permit. Store away from cement.',
-      leadTimeDays: 2,
-    },
-
-    // ── Flooring ──
-    {
-      id: 'proc-6',
-      trade: 'Flooring',
-      item: 'Vitrified Floor Tiles (4×2 ft)',
-      brand: materialBrands.flooring,
-      specification: 'Double charged, E1 slip resist, ≤0.5% water absorption',
-      quantity: Math.round(qty.floorTilesSqFt * 0.7),
-      unit: 'Sq Ft',
-      unitRate: Math.round(r.vitrifiedTilePerSqFt * m.finishing),
-      totalCost: Math.round(qty.floorTilesSqFt * 0.7 * r.vitrifiedTilePerSqFt * m.finishing),
-      supplierNote: 'Order 8% extra for cuts and waste. Same batch number.',
-      leadTimeDays: 5,
-    },
-    {
-      id: 'proc-7',
-      trade: 'Flooring',
-      item: 'Bathroom & Kitchen Anti-skid Tiles',
-      brand: 'Johnson Endura / RAK Ceramics',
-      specification: 'R11 slip resistance rating, 300×300mm format',
-      quantity: Math.round(qty.floorTilesSqFt * 0.15),
-      unit: 'Sq Ft',
-      unitRate: Math.round(85 * m.finishing),
-      totalCost: Math.round(qty.floorTilesSqFt * 0.15 * 85 * m.finishing),
-      supplierNote: '10% wastage buffer for bathroom cuts.',
-      leadTimeDays: 3,
-    },
-    {
-      id: 'proc-8',
-      trade: 'Flooring',
-      item: 'Bathroom Wall Tiles (2×1 ft)',
-      brand: 'Kajaria Glamour Collection',
-      specification: 'Satin wall tile, 600×300mm format',
-      quantity: qty.wallTilesSqFt,
-      unit: 'Sq Ft',
-      unitRate: Math.round(r.wallTilePerSqFt * m.finishing),
-      totalCost: Math.round(qty.wallTilesSqFt * r.wallTilePerSqFt * m.finishing),
-      supplierNote: 'Verify layout drawing before ordering for cuts.',
-      leadTimeDays: 4,
-    },
-    {
-      id: 'proc-9',
-      trade: 'Flooring',
-      item: 'Black Granite Steps (20mm)',
-      brand: 'Jet Black Sadahalli Granite',
-      specification: '20mm polished slab, bullnose edge, 3 anti-skid grooves',
-      quantity: qty.graniteSlabsSqFt,
-      unit: 'Sq Ft',
-      unitRate: Math.round(r.graniteStepPerSqFt * m.finishing),
-      totalCost: Math.round(qty.graniteSlabsSqFt * r.graniteStepPerSqFt * m.finishing),
-      supplierNote: 'Get quarry certificate. Machine cut grooves at workshop.',
-      leadTimeDays: 7,
-    },
-
-    // ── Electrical ──
-    {
-      id: 'proc-10',
-      trade: 'Electrical',
-      item: 'FRLS Copper Electrical Wire',
-      brand: materialBrands.electrical,
-      specification: 'IS 694 FRLS PVC insulated copper, 1.5/2.5/4.0 sqmm',
-      quantity: qty.electricalWireMetres,
-      unit: 'Metres',
-      unitRate: Math.round(r.wirePerMetre * m.mep),
-      totalCost: Math.round(qty.electricalWireMetres * r.wirePerMetre * m.mep),
-      supplierNote: 'Demand ISI mark and batch test certificate from supplier.',
-      leadTimeDays: 2,
-    },
-    {
-      id: 'proc-11',
-      trade: 'Electrical',
-      item: 'Modular Switches & Socket Plates',
-      brand: materialBrands.electrical,
-      specification: 'Glass / ABS finish, 16A sockets, child safe shutters',
-      quantity: qty.switchModules,
-      unit: 'Modules',
-      unitRate: Math.round(r.switchModulePerUnit * m.mep),
-      totalCost: Math.round(qty.switchModules * r.switchModulePerUnit * m.mep),
-      supplierNote: 'Confirm layout drawing before final ordering.',
-      leadTimeDays: 3,
-    },
-
-    // ── Plumbing ──
-    {
-      id: 'proc-12',
-      trade: 'Plumbing',
-      item: 'CPVC SDR11 Supply Pipes & Fittings',
-      brand: 'Astral CPVC Pro',
-      specification: 'SDR 11, rated 82°C at 28 bar, IS 15778',
-      quantity: qty.cpvcSupplyMetres,
-      unit: 'Metres',
-      unitRate: Math.round(r.cpvcPipePerMetre * m.mep),
-      totalCost: Math.round(qty.cpvcSupplyMetres * r.cpvcPipePerMetre * m.mep),
-      supplierNote: 'Include elbow/tee fittings at 1.4× pipe cost.',
-      leadTimeDays: 2,
-    },
-    {
-      id: 'proc-13',
-      trade: 'Plumbing',
-      item: 'SWR Soil & Waste Drain Pipes',
-      brand: 'Supreme / Prince SWR',
-      specification: 'IS 14735 Type B SWR ring-fit rubber seal',
-      quantity: qty.swrDrainMetres,
-      unit: 'Metres',
-      unitRate: Math.round(r.swrPipePerMetre * m.mep),
-      totalCost: Math.round(qty.swrDrainMetres * r.swrPipePerMetre * m.mep),
-      supplierNote: 'Order 110mm + 75mm mix in 60:40 ratio.',
-      leadTimeDays: 2,
-    },
-    {
-      id: 'proc-14',
-      trade: 'Sanitary',
-      item: 'CP Bathroom Fixture Sets',
-      brand: materialBrands.bathroom,
-      specification: 'Wall-hung WC + concealed cistern + thermostatic shower + basin',
-      quantity: qty.bathroomFixtureSets,
-      unit: 'Sets',
-      unitRate: Math.round(r.bathroomSetPerUnit * m.fixtures),
-      totalCost: Math.round(qty.bathroomFixtureSets * r.bathroomSetPerUnit * m.fixtures),
-      supplierNote: 'Place order 6 weeks before fitting – long lead time item.',
-      leadTimeDays: 42,
-    },
-
-    // ── Paints ──
-    {
-      id: 'proc-15',
-      trade: 'Paint',
-      item: 'Interior Luxury Emulsion Paint',
-      brand: materialBrands.paint,
-      specification: 'Teflon enriched washable emulsion, sheen finish',
-      quantity: Math.ceil(qty.interiorPaintAreaSqFt / 45),
-      unit: 'Litres',
-      unitRate: Math.round(r.interiorPaintPerLitre * m.finishing),
-      totalCost: Math.round(Math.ceil(qty.interiorPaintAreaSqFt / 45) * r.interiorPaintPerLitre * m.finishing),
-      supplierNote: 'Procure from authorized dealer. Keep invoice for warranty.',
-      leadTimeDays: 1,
-    },
-    {
-      id: 'proc-16',
-      trade: 'Paint',
-      item: 'Exterior Weatherproof Emulsion',
-      brand: 'Asian Paints Apex Ultima',
-      specification: 'DPUR silicone technology, 7-year weatherproof warranty',
-      quantity: Math.ceil(qty.exteriorPaintAreaSqFt / 60),
-      unit: 'Litres',
-      unitRate: Math.round(r.exteriorPaintPerLitre * m.finishing),
-      totalCost: Math.round(Math.ceil(qty.exteriorPaintAreaSqFt / 60) * r.exteriorPaintPerLitre * m.finishing),
-      supplierNote: 'Apply only when rain-free window ≥ 8 hours.',
-      leadTimeDays: 1,
-    },
-
-    // ── Joinery ──
-    {
-      id: 'proc-17',
-      trade: 'Joinery',
-      item: 'Main Entrance Teak Door',
-      brand: materialBrands.doors,
-      specification: '45mm Burma teak, carved panel, SS hinges, 3-bolt lock',
-      quantity: qty.mainDoorsCount,
-      unit: 'Sets',
-      unitRate: Math.round(r.mainDoorPerSet * m.joinery),
-      totalCost: Math.round(qty.mainDoorsCount * r.mainDoorPerSet * m.joinery),
-      supplierNote: 'Custom order: 6-8 week lead time. Get shop drawing approval.',
-      leadTimeDays: 56,
-    },
-    {
-      id: 'proc-18',
-      trade: 'Joinery',
-      item: 'UPVC Double Glazed Windows',
-      brand: materialBrands.windows,
-      specification: '60mm multichamber profile, 12mm argon-filled DGU, mosquito mesh',
-      quantity: qty.windowAreaSqFt,
-      unit: 'Sq Ft',
-      unitRate: Math.round(r.upvcWindowPerSqFt * m.joinery),
-      totalCost: Math.round(qty.windowAreaSqFt * r.upvcWindowPerSqFt * m.joinery),
-      supplierNote: 'Factory measure after plaster is done. 3-4 week lead time.',
-      leadTimeDays: 21,
-    },
-    {
-      id: 'proc-19',
-      trade: 'Joinery',
-      item: 'Internal Flush Veneer Door Sets',
-      brand: 'CenturyPly / Greenply',
-      specification: 'BWP Grade marine ply, real veneer, mortise lock',
-      quantity: qty.internalDoorsCount,
-      unit: 'Sets',
-      unitRate: Math.round(r.interiorDoorPerSet * m.joinery),
-      totalCost: Math.round(qty.internalDoorsCount * r.interiorDoorPerSet * m.joinery),
-      supplierNote: 'Allow 5mm clearance for flooring tile height.',
-      leadTimeDays: 14,
-    },
-
-    // ── Waterproofing ──
-    {
-      id: 'proc-20',
-      trade: 'Waterproofing',
-      item: '2-Component Polymer Waterproofing',
-      brand: 'Dr. Fixit Fastflex 2C / STP Roofdoc',
-      specification: 'IS 6494 compliant, 2mm membrane, 48-hr pond test',
-      quantity: qty.waterproofingAreaSqFt,
-      unit: 'Sq Ft',
-      unitRate: Math.round(r.waterproofingPerSqFt * m.finishing),
-      totalCost: Math.round(qty.waterproofingAreaSqFt * r.waterproofingPerSqFt * m.finishing),
-      supplierNote: 'Apply by manufacturer-trained applicator for warranty.',
-      leadTimeDays: 2,
-    },
-  ];
-
-  return items.filter((i) => i.quantity > 0 && i.totalCost > 0);
+  return materialSchedule.map((m, idx) => ({
+    id: `proc-${idx + 1}`,
+    trade: m.category,
+    item: m.material,
+    brand: m.brand,
+    specification: m.specification,
+    quantity: m.quantity,
+    unit: m.unit,
+    unitRate: m.unitRate,
+    totalCost: m.amount,
+    supplierNote: `Source formula: ${m.sourceFormula}`,
+    leadTimeDays: m.category === 'Rebar' ? 3 : m.category === 'Cement' ? 1 : m.category === 'Paint' ? 2 : 5,
+  }));
 }

@@ -85,8 +85,9 @@ describe('Exhaustive Brand Invariance & Space Dependency Test Suite', () => {
 
     expect(rTata.quantities.steelTonnes).toBe(rJSW.quantities.steelTonnes);
     expect(rJSW.quantities.steelTonnes).toBe(rIndus.quantities.steelTonnes);
+    expect(rTata.quantities.steelKg).toBe(rJSW.quantities.steelKg);
 
-    // Amounts differ because rates differ
+    // Tata (₹78,000) > Indus (₹69,000)
     expect(rTata.budget.totalProjectCost).toBeGreaterThan(rIndus.budget.totalProjectCost);
   });
 
@@ -99,7 +100,7 @@ describe('Exhaustive Brand Invariance & Space Dependency Test Suite', () => {
     expect(rUltra.quantities.cementBags).toBe(rACC.quantities.cementBags);
     expect(rACC.quantities.cementBags).toBe(rDalmia.quantities.cementBags);
 
-    // UltraTech (₹420) > ACC (₹395) > Dalmia (₹375)
+    // UltraTech (₹420) > Dalmia (₹375)
     expect(rUltra.budget.totalProjectCost).toBeGreaterThan(rDalmia.budget.totalProjectCost);
   });
 
@@ -124,6 +125,7 @@ describe('Exhaustive Brand Invariance & Space Dependency Test Suite', () => {
     expect(r5Bed.quantities.windowAreaSqFt).toBeGreaterThan(r3Bed.quantities.windowAreaSqFt);
     expect(r5Bed.quantities.lightingPoints).toBeGreaterThan(r3Bed.quantities.lightingPoints);
     expect(r5Bed.quantities.electricalWireMetres).toBeGreaterThan(r3Bed.quantities.electricalWireMetres);
+    expect(r5Bed.quantities.netWallAreaSqFt).toBeGreaterThan(r3Bed.quantities.netWallAreaSqFt);
   });
 
   // ── 5. Space Dependencies: Bathroom Count ──
@@ -172,12 +174,12 @@ describe('Exhaustive Brand Invariance & Space Dependency Test Suite', () => {
     const res = runCalculator(baseInput);
     const b = res.budget;
 
-    const expectedTotal = b.baseConstructionCost + b.professionalFees + Math.round(b.baseConstructionCost * 0.15) + b.contingency + b.gstAmount;
+    const expectedTotal = b.baseConstructionCost + b.professionalFees + b.contractorMargin + b.contingency + b.gstAmount;
     expect(b.totalProjectCost).toBe(expectedTotal);
     expect(b.costPerSqFt).toBe(Math.round(b.totalProjectCost / res.area.totalBUASqFt));
   });
 
-  // ── 10. Dedicated 10-Case Client Requirement Validation Suite ──
+  // ── 9. Dedicated 10-Case Client Requirement Validation Suite ──
   describe('Client Required 10-Case Live Calculation Propagation Tests', () => {
     it('TEST 1: Initial zero-state project has totalProjectCost === 0', () => {
       const zeroInput: EngineInput = {

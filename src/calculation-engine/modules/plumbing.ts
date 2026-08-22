@@ -1,39 +1,100 @@
 // ============================================================
-// PLUMBING MODULE — Driven by BUA and bathroom/kitchen fixture requirements
+// PLUMBING & SANITARY MODULE
+// Strictly follows Hutty Pilot Specification (Section 20, 21, 22)
+//
+// Rules:
+// - Bathroom count drives WC, basin, shower, health faucet, floor drain
+// - Kitchen & utility drive sink and appliance water/drainage points
+// - Water supply pipe = Water Points × Pipe Factor + Vertical Riser Allowance
+// - Drainage pipe = Drainage Points × Pipe Factor + Vertical Riser Allowance
+// - Water Tank capacity = Occupants × Daily Demand (135 LPCD) × Storage Days
 // ============================================================
 
-import { EngineInput, AreaResult } from '../types';
+import { EngineInput, AreaResult, BuildingModel } from '../types';
 import {
-  CPVC_M_PER_SQFT,
-  SWR_M_PER_SQFT,
-  BATHROOM_FIXTURES_PER_BATH,
-  FLOOR_TRAPS_PER_BATH,
+  CPVC_M_PER_POINT,
+  SWR_M_PER_POINT,
+  VERTICAL_RISER_ALLOWANCE_M,
+  OCCUPANTS_PER_BEDROOM,
+  DAILY_WATER_DEMAND_LPCD,
+  WATER_STORAGE_DAYS,
 } from '../data/coefficients';
 
-export function calculatePlumbing(input: EngineInput, area: AreaResult): {
+export function calculatePlumbing(
+  input: EngineInput,
+  area: AreaResult,
+  buildingModel: BuildingModel
+): {
+  totalWaterPoints: number;
+  totalDrainagePoints: number;
   cpvcSupplyMetres: number;
   swrDrainMetres: number;
-  bathroomFixtureSets: number;
+  wcCount: number;
+  washBasinCount: number;
+  showerCount: number;
+  healthFaucetCount: number;
   floorTrapsCount: number;
+  kitchenSinkCount: number;
+  bathroomFixtureSets: number;
+  overheadTankLitres: number;
 } {
-  const { rooms } = input;
-  const bua = area.totalBUASqFt;
-  const totalBaths = (rooms.bathrooms || 0) + (rooms.commonToilets || 0);
+  const bua = area.totalBUASqFt || 0;
+  const floors = Math.max(0, input.floors || 0);
 
-  const baseCpvc = Math.round(bua * CPVC_M_PER_SQFT);
-  const baseSwr  = Math.round(bua * SWR_M_PER_SQFT);
+  if (bua <= 0 || floors <= 0) {
+    return {
+      totalWaterPoints: 0,
+      totalDrainagePoints: 0,
+      cpvcSupplyMetres: 0,
+      swrDrainMetres: 0,
+      wcCount: 0,
+      washBasinCount: 0,
+      showerCount: 0,
+      healthFaucetCount: 0,
+      floorTrapsCount: 0,
+      kitchenSinkCount: 0,
+      bathroomFixtureSets: 0,
+      overheadTankLitres: 0,
+    };
+  }
 
-  // Bathroom & kitchen plumbing pipe additions
-  const bathCpvcAddition = totalBaths * 18 + (rooms.kitchen || 0) * 12;
-  const bathSwrAddition  = totalBaths * 14 + (rooms.kitchen || 0) * 8 + (rooms.utility || 0) * 6;
+  // 1. Sum fixture counts & points directly from canonical SpaceModel
+  const wcCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.wcCount, 0);
+  const washBasinCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.washBasinCount, 0);
+  const showerCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.showerCount, 0);
+  const healthFaucetCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.healthFaucetCount, 0);
+  const floorTrapsCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.floorDrainCount, 0);
+  const kitchenSinkCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.sinkCount, 0);
 
-  const cpvcSupplyMetres    = baseCpvc + bathCpvcAddition;
-  const swrDrainMetres      = baseSwr + bathSwrAddition;
-  const bathroomFixtureSets = totalBaths * BATHROOM_FIXTURES_PER_BATH;
-  const floorTrapsCount     = totalBaths * FLOOR_TRAPS_PER_BATH +
-                               (rooms.kitchen || 0) * 1 +
-                               (rooms.balcony || 0) * 1 +
-                               (rooms.utility || 0) * 1;
+  const totalWaterPoints = buildingModel.allSpaces.reduce((sum, s) => sum + s.waterPoints, 0);
+  const totalDrainagePoints = buildingModel.allSpaces.reduce((sum, s) => sum + s.drainagePoints, 0);
 
-  return { cpvcSupplyMetres, swrDrainMetres, bathroomFixtureSets, floorTrapsCount };
+  const bathroomFixtureSets = (input.rooms.bathrooms || 0) + (input.rooms.commonToilets || 0);
+
+  // 2. CPVC & SWR Pipe Lengths (PDF Section 20)
+  const verticalRiserM = floors * VERTICAL_RISER_ALLOWANCE_M;
+  const cpvcSupplyMetres = Math.round(totalWaterPoints * CPVC_M_PER_POINT + verticalRiserM * 1.5);
+  const swrDrainMetres = Math.round(totalDrainagePoints * SWR_M_PER_POINT + verticalRiserM);
+
+  // 3. Tank Sizing (PDF Section 22)
+  const bedCount = Math.max(1, input.rooms.bedrooms || 1);
+  const occupants = bedCount * OCCUPANTS_PER_BEDROOM;
+  const rawTankCap = occupants * DAILY_WATER_DEMAND_LPCD * WATER_STORAGE_DAYS;
+  // Round up to standard commercial tank capacities (1000L, 1500L, 2000L, 3000L, etc.)
+  const overheadTankLitres = Math.max(1000, Math.ceil(rawTankCap / 500) * 500);
+
+  return {
+    totalWaterPoints,
+    totalDrainagePoints,
+    cpvcSupplyMetres,
+    swrDrainMetres,
+    wcCount,
+    washBasinCount,
+    showerCount,
+    healthFaucetCount,
+    floorTrapsCount,
+    kitchenSinkCount,
+    bathroomFixtureSets,
+    overheadTankLitres,
+  };
 }

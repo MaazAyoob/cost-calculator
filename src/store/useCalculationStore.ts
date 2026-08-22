@@ -7,9 +7,7 @@
 import { create } from 'zustand';
 import { CalculationResult, EngineInput } from '../calculation-engine/types';
 import { runCalculator } from '../calculation-engine/calculator';
-import {
-  useWizardStore,
-} from './useWizardStore';
+import { useWizardStore } from './useWizardStore';
 
 // Build EngineInput from the wizard store state
 function buildInput(): EngineInput {
@@ -60,27 +58,29 @@ export const useCalculationStore = create<CalculationStore>((set) => ({
   recalculate: () => {
     const input = buildInput();
     const result = runCalculator(input);
-    // IMPORTANT: Do NOT call useWizardStore.setState() here!
-    // That would trigger the subscribe() listener again → infinite loop.
     set({ result, isCalculating: false, lastCalculatedAt: result.calculatedAt });
     return result;
   },
 }));
 
 // Automatically subscribe to any change in useWizardStore!
-// Whenever user updates plot, rooms, steel, cement, flooring, doors, windows, etc.,
-// useCalculationStore instantly recalculates synchronously!
 useWizardStore.subscribe(() => {
   useCalculationStore.getState().recalculate();
 });
 
 // ── Selector helpers (for clean component usage) ──────────
-export const useArea           = () => useCalculationStore((s) => s.result.area);
-export const useQuantities     = () => useCalculationStore((s) => s.result.quantities);
-export const useBudgetResult   = () => useCalculationStore((s) => s.result.budget);
-export const useTimeline       = () => useCalculationStore((s) => s.result.timeline);
-export const usePaymentResult  = () => useCalculationStore((s) => s.result.paymentPlan);
-export const useBOQ            = () => useCalculationStore((s) => s.result.boq);
-export const useProcurement    = () => useCalculationStore((s) => s.result.procurement);
-export const useReportData     = () => useCalculationStore((s) => s.result.report);
-export const useCalculationTrace = () => useCalculationStore((s) => s.result.trace);
+export const useArea              = () => useCalculationStore((s) => s.result.area);
+export const useBuildingModel     = () => useCalculationStore((s) => s.result.buildingModel);
+export const useQuantities        = () => useCalculationStore((s) => s.result.quantities);
+export const useBudgetResult      = () => useCalculationStore((s) => s.result.budget);
+export const useBOQ               = () => useCalculationStore((s) => s.result.boq);
+export const useMaterialSchedule  = () => useCalculationStore((s) => s.result.materialSchedule);
+export const useFixtureSchedule   = () => useCalculationStore((s) => s.result.fixtureSchedule);
+export const useDoorSchedule      = () => useCalculationStore((s) => s.result.doorSchedule);
+export const useWindowSchedule    = () => useCalculationStore((s) => s.result.windowSchedule);
+export const useTimeline          = () => useCalculationStore((s) => s.result.timeline);
+export const usePaymentResult     = () => useCalculationStore((s) => s.result.paymentPlan);
+export const useProcurement       = () => useCalculationStore((s) => s.result.procurement);
+export const useReportData        = () => useCalculationStore((s) => s.result.report);
+export const useCalculationTrace  = () => useCalculationStore((s) => s.result.trace);
+export const useParameterTable    = () => useCalculationStore((s) => s.result.parameterTable);

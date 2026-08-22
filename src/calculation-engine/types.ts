@@ -1,9 +1,12 @@
 // ============================================================
 // CALCULATION ENGINE – TYPES
-// Central type registry for all engine inputs and outputs
+// Central type registry for all engine inputs, canonical models, and outputs
 // ============================================================
 
 import { QualityTier, CityLocation, HouseType, RoomCounts, MaterialBrandSelection } from '../store/useWizardStore';
+import { QSParameterItem } from './data/engineeringAssumptions';
+
+export type { QSParameterItem } from './data/engineeringAssumptions';
 
 // ────────────────────────────────────────────────────────────
 // INPUT MODEL
@@ -54,9 +57,13 @@ export interface PaintingSelection {
 export interface EngineInput {
   city: CityLocation;
   authority: string;
-  plotLength: number; // ft (10-200)
-  plotWidth: number;  // ft (10-200)
-  builtUpAreaPerFloor?: number; // User-selected desired built-up area per floor (sq.ft)
+  plotLength: number; // ft
+  plotWidth: number;  // ft
+  frontSetback?: number; // ft
+  rearSetback?: number;  // ft
+  leftSetback?: number;  // ft
+  rightSetback?: number; // ft
+  builtUpAreaPerFloor?: number; // User-selected desired BUA per floor (sq.ft)
   houseType: HouseType;
   floors: number;     // 1=G, 2=G+1, 3=G+2, 4=G+3, 5=G+4
   parkingType: 'Stilt' | 'Stilt Parking' | 'Normal Ground' | 'EV Charging Ready';
@@ -78,21 +85,147 @@ export interface EngineInput {
 }
 
 // ────────────────────────────────────────────────────────────
-// AREA RESULTS
+// SPACE & BUILDING MODEL (PDF Section 3, 4, 5)
 // ────────────────────────────────────────────────────────────
+
+export interface SpaceModelItem {
+  id: string;
+  type: keyof RoomCounts | 'mainDwelling' | 'terrace' | 'staircase' | 'parking';
+  name: string;
+  floorIndex: number;
+  floorName: string;
+  length: number; // ft
+  width: number;  // ft
+  area: number;   // sq.ft (length × width)
+  perimeter: number; // ft (2 × (length + width))
+  height: number;    // ft (consumes wallHeightFt)
+  doorCount: number;
+  doorOpeningAreaSqFt: number;
+  windowCount: number;
+  windowOpeningAreaSqFt: number;
+  wetArea: boolean;
+  flooringAreaSqFt: number;
+  grossWallAreaSqFt: number; // perimeter × height
+  netWallAreaSqFt: number;   // grossWallArea - doorOpenings - windowOpenings
+  ceilingAreaSqFt: number;   // length × width
+  paintableAreaSqFt: number; // netWallArea + ceilingArea
+  dadoTileAreaSqFt: number;  // bathroom/kitchen wall tiles
+  waterproofingAreaSqFt: number; // floor + upturn
+  // Point counts
+  lightPoints: number;
+  fanPoints: number;
+  socketPoints: number;
+  acPoints: number;
+  tvDataPoints: number;
+  geyserPoints: number;
+  // Plumbing counts
+  waterPoints: number;
+  drainagePoints: number;
+  wcCount: number;
+  washBasinCount: number;
+  showerCount: number;
+  healthFaucetCount: number;
+  floorDrainCount: number;
+  sinkCount: number;
+}
+
+export interface BuildingFloorModel {
+  floorIndex: number;
+  floorName: string;
+  floorAreaSqFt: number;
+  spaces: SpaceModelItem[];
+  totalFloorWallAreaSqFt: number;
+  totalFloorCeilingAreaSqFt: number;
+  totalFloorPaintableAreaSqFt: number;
+  totalFloorDoorsCount: number;
+  totalFloorWindowsCount: number;
+}
+
+export interface BuildingModel {
+  floors: BuildingFloorModel[];
+  allSpaces: SpaceModelItem[];
+  externalPerimeterFt: number;
+  grossExternalWallAreaSqFt: number;
+  netExternalWallAreaSqFt: number;
+  grossInternalWallAreaSqFt: number;
+  netInternalWallAreaSqFt: number;
+  totalCeilingAreaSqFt: number;
+  internalPaintableAreaSqFt: number;
+  externalPaintableAreaSqFt: number;
+  totalPaintableAreaSqFt: number;
+  totalNetWallAreaSqFt: number;
+  totalWallVolumeCuM: number;
+  totalBlockCount: number;
+  totalDoorOpeningAreaSqFt: number;
+  totalWindowOpeningAreaSqFt: number;
+}
+
+// ────────────────────────────────────────────────────────────
+// DOOR & WINDOW SCHEDULES (PDF Section 13, 14)
+// ────────────────────────────────────────────────────────────
+
+export interface DoorScheduleItem {
+  code: string;
+  description: string;
+  spaceType: string;
+  quantity: number;
+  unit: string;
+  openingSize: string; // e.g. "3.5 ft × 7.0 ft"
+  openingAreaSqFt: number;
+  material: string;
+  specification: string;
+  unitRate: number;
+  amount: number;
+}
+
+export interface WindowScheduleItem {
+  code: string;
+  description: string;
+  spaceType: string;
+  quantity: number;
+  unit: string;
+  openingSize: string; // e.g. "5.0 ft × 4.0 ft"
+  openingAreaSqFt: number;
+  totalOpeningAreaSqFt: number;
+  frameAreaSqFt: number;
+  shutterAreaSqFt: number;
+  grillAreaSqFt: number;
+  material: string;
+  specification: string;
+  unitRate: number;
+  amount: number;
+}
+
+// ────────────────────────────────────────────────────────────
+// AREA & SETBACK RESULTS (PDF Section 5)
+// ────────────────────────────────────────────────────────────
+
+export interface SetbackGeometry {
+  frontSetbackFt: number;
+  rearSetbackFt: number;
+  leftSetbackFt: number;
+  rightSetbackFt: number;
+  source: string;
+}
 
 export interface AreaResult {
   plotAreaSqFt: number;
-  maxAllowableBUAPerFloorSqFt: number; // statutory/authority max permissible BUA per floor
-  buaPerFloorSqFt: number;            // user-selected desired BUA per floor
-  buildableAreaSqFt: number;          // ground coverage footprint (= buaPerFloorSqFt)
-  remainingGroundAreaSqFt: number;    // plotArea - buaPerFloorSqFt (ground footprint only)
-  remainingGroundArea: number;        // alias for calculation simplicity
-  groundCoveragePercentage: number;   // (buaPerFloorSqFt / plotArea) * 100
-  totalBUASqFt: number;               // buaPerFloorSqFt * floors
-  superBUASqFt: number;               // with 15% common area
+  plotLength: number;
+  plotWidth: number;
+  setbacks: SetbackGeometry;
+  buildableLengthFt: number;
+  buildableWidthFt: number;
+  buildableFootprintSqFt: number;
+  maxAllowableBUAPerFloorSqFt: number;
+  buaPerFloorSqFt: number;
+  buildableAreaSqFt: number;
+  remainingGroundAreaSqFt: number;
+  remainingGroundArea: number;
+  groundCoveragePercentage: number;
+  totalBUASqFt: number;
+  superBUASqFt: number;
   parkingAreaSqFt: number;
-  terraceSqFt: number;                // top slab exposed area (= buaPerFloorSqFt)
+  terraceSqFt: number;
   totalConstructedSqFt: number;
   isWithinPermissibleLimit: boolean;
   requiresClientConfirmation: boolean;
@@ -100,56 +233,93 @@ export interface AreaResult {
 }
 
 // ────────────────────────────────────────────────────────────
-// MATERIAL QUANTITIES
+// PHYSICAL MATERIAL TAKEOFF (SECTION B QUANTITIES)
 // ────────────────────────────────────────────────────────────
 
 export interface MaterialQuantities {
-  // Structure
+  // Structure & Rebar
+  steelKg: number;
   steelTonnes: number;
+  steelFactorKgPerSqFt: number;
   cementBags: number;
-  concreteCuM: number;        // RMC volume
+  // Sand & Aggregates (Direct Thumb Rules)
+  mSandCuFt: number;
+  pSandCuFt: number;
+  sandCuFt: number; // Total sand (M-Sand + P-Sand)
+  coarseAggregateCuFt: number;
   // Masonry
+  netWallAreaSqFt: number;
+  wallVolumeCuM: number;
   aacBlocksCuM: number;
-  sandCuFt: number;
-  aggregateCuFt: number;
+  aacBlocksPieces: number;
   // Waterproofing
+  bathroomWaterproofingSqFt: number;
+  terraceWaterproofingSqFt: number;
+  sumpWaterproofingSqFt: number;
   waterproofingAreaSqFt: number;
-  // Flooring
+  // Flooring & Cladding
   floorTilesSqFt: number;
-  wallTilesSqFt: number;
+  bathroomDadoTileSqFt: number;
+  kitchenDadoTileSqFt: number;
+  wallTilesSqFt: number; // Total wall tiles
   graniteSlabsSqFt: number;
-  // Finishing
+  // Finishing & Paint
+  internalWallAreaSqFt: number;
+  ceilingAreaSqFt: number;
   interiorPaintAreaSqFt: number;
   exteriorPaintAreaSqFt: number;
+  totalPaintableAreaSqFt: number;
   puttyAreaSqFt: number;
+  interiorPaintLitres: number;
+  exteriorPaintLitres: number;
+  puttyKg: number;
   // Openings
   mainDoorsCount: number;
   internalDoorsCount: number;
   bathroomDoorsCount: number;
+  totalDoorsCount: number;
+  doorOpeningAreaSqFt: number;
   windowsCount: number;
   windowAreaSqFt: number;
+  grillAreaSqFt: number;
   // Electrical
-  electricalWireMetres: number;
-  conduitsMetres: number;
-  switchModules: number;
+  totalElectricalPoints: number;
   lightingPoints: number;
-  // Plumbing
+  fanPoints: number;
+  socketPoints: number;
+  acPoints: number;
+  switchModules: number;
+  conduitsMetres: number;
+  electricalWireMetres: number;
+  // Plumbing & Sanitary
+  totalWaterPoints: number;
+  totalDrainagePoints: number;
   cpvcSupplyMetres: number;
   swrDrainMetres: number;
-  bathroomFixtureSets: number;
+  wcCount: number;
+  washBasinCount: number;
+  showerCount: number;
+  healthFaucetCount: number;
   floorTrapsCount: number;
+  kitchenSinkCount: number;
+  bathroomFixtureSets: number;
+  overheadTankLitres: number;
 }
 
 // ────────────────────────────────────────────────────────────
-// BOQ
+// FOUR CORE SECTIONS (PDF Section 26)
 // ────────────────────────────────────────────────────────────
 
+// SECTION A: WHAT WE BUILD (Works BOQ)
 export type BOQCategory =
   | 'Site Preparation'
+  | 'Excavation & Earthwork'
+  | 'PCC & Sub-structure'
   | 'Foundation'
   | 'Plinth'
   | 'RCC Structure'
   | 'Masonry'
+  | 'Plastering'
   | 'Roofing'
   | 'Flooring'
   | 'Doors & Joinery'
@@ -174,24 +344,35 @@ export interface BOQItem {
   formula?: string;
 }
 
-// ────────────────────────────────────────────────────────────
-// CALCULATION AUDIT & TRACEABILITY
-// ────────────────────────────────────────────────────────────
-
-export interface CalculationTraceStep {
-  parameter: string;
-  category: string;
-  inputs: Record<string, any>;
-  formula: string;
-  assumption: string;
-  result: number | string;
+// SECTION B: WHAT WE CONSUME (Material Schedule)
+export interface MaterialScheduleItem {
+  slNo: number;
+  material: string;
+  category: 'Rebar' | 'Cement' | 'Aggregates' | 'Masonry' | 'Flooring' | 'Paint' | 'Waterproofing' | 'Pipes & Wire' | 'Other';
+  brand: string;
+  specification: string;
+  quantity: number;
   unit: string;
+  unitRate: number;
+  amount: number;
+  sourceFormula: string;
 }
 
-// ────────────────────────────────────────────────────────────
-// BUDGET
-// ────────────────────────────────────────────────────────────
+// SECTION C: WHAT WE INSTALL (Fixtures & Fittings Schedule)
+export interface FixtureScheduleItem {
+  slNo: number;
+  category: 'Doors' | 'Windows' | 'Sanitary Fixtures' | 'Electrical Fixtures' | 'Plumbing Tanks & Pumps' | 'Special Equipment';
+  item: string;
+  brand: string;
+  specification: string;
+  quantity: number;
+  unit: string;
+  unitRate: number;
+  amount: number;
+  location: string;
+}
 
+// SECTION D: WHAT IT COSTS (Cost Summary & Budget Result)
 export interface BudgetHead {
   id: string;
   name: string;
@@ -205,17 +386,28 @@ export interface BudgetResult {
   structuralCost: number;
   finishingCost: number;
   mepCost: number;
+  baseConstructionCost: number;
   professionalFees: number;
+  contractorMargin: number;
   contingency: number;
   gstAmount: number;
-  baseConstructionCost: number;
   totalProjectCost: number;
   costPerSqFt: number;
 }
 
 // ────────────────────────────────────────────────────────────
-// TIMELINE
+// AUDIT TRACEABILITY & TIMELINE / PAYMENT
 // ────────────────────────────────────────────────────────────
+
+export interface CalculationTraceStep {
+  parameter: string;
+  category: string;
+  inputs: Record<string, any>;
+  formula: string;
+  assumption: string;
+  result: number | string;
+  unit: string;
+}
 
 export interface TimelineStage {
   stageNumber: string;
@@ -233,10 +425,6 @@ export interface TimelineResult {
   estimatedHandoverDate: string;
 }
 
-// ────────────────────────────────────────────────────────────
-// PAYMENT PLAN
-// ────────────────────────────────────────────────────────────
-
 export interface PaymentMilestone {
   stage: number;
   title: string;
@@ -247,10 +435,6 @@ export interface PaymentMilestone {
   status: 'Completed' | 'Due' | 'Upcoming';
   bankDisbursement: boolean;
 }
-
-// ────────────────────────────────────────────────────────────
-// PROCUREMENT LIST
-// ────────────────────────────────────────────────────────────
 
 export interface ProcurementItem {
   id: string;
@@ -277,31 +461,45 @@ export interface ReportData {
   engineVersion: string;
   input: EngineInput;
   area: AreaResult;
+  buildingModel: BuildingModel;
   quantities: MaterialQuantities;
   budget: BudgetResult;
-  boq: BOQItem[];
+  // The 4 Core Customer-Facing Sections
+  sectionA_WorksBOQ: BOQItem[];
+  sectionB_MaterialSchedule: MaterialScheduleItem[];
+  sectionC_FixtureSchedule: FixtureScheduleItem[];
+  sectionD_CostSummary: BudgetResult;
+  // Supporting Schedules
+  doorSchedule: DoorScheduleItem[];
+  windowSchedule: WindowScheduleItem[];
   timeline: TimelineResult;
   paymentPlan: PaymentMilestone[];
   procurement: ProcurementItem[];
   recommendations: string[];
   trace: CalculationTraceStep[];
+  parameterTable: QSParameterItem[];
 }
 
 // ────────────────────────────────────────────────────────────
-// MASTER CALCULATION RESULT
+// MASTER CALCULATION RESULT (Single Source of Truth)
 // ────────────────────────────────────────────────────────────
 
 export interface CalculationResult {
   input: EngineInput;
   area: AreaResult;
+  buildingModel: BuildingModel;
   quantities: MaterialQuantities;
-  budget: BudgetResult;
+  doorSchedule: DoorScheduleItem[];
+  windowSchedule: WindowScheduleItem[];
+  boq: BOQItem[]; // Section A
+  materialSchedule: MaterialScheduleItem[]; // Section B
+  fixtureSchedule: FixtureScheduleItem[]; // Section C
+  budget: BudgetResult; // Section D
   timeline: TimelineResult;
   paymentPlan: PaymentMilestone[];
-  boq: BOQItem[];
   procurement: ProcurementItem[];
   report: ReportData;
   trace: CalculationTraceStep[];
+  parameterTable: QSParameterItem[];
   calculatedAt: string;
 }
-

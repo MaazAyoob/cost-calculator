@@ -1,187 +1,211 @@
 // ============================================================
-// CALCULATION AUDIT & TRACEABILITY ENGINE
-// For every major quantity and cost line, exposes:
-// parameter, category, inputs, formula, assumption, result, and unit.
-// Enables full developer, QS, and bank audit traceability.
+// CALCULATION AUDIT & TRACEABILITY MODULE
+// Exposes the complete engineering derivation trace for every major calculation
+// (Per Hutty Pilot Specification Section 28 & Prompt Section 18)
 // ============================================================
 
-import { EngineInput, AreaResult, MaterialQuantities, BudgetResult, CalculationTraceStep } from '../types';
-import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from '../data/engineeringAssumptions';
-
-const A = CENTRALIZED_ENGINEERING_ASSUMPTIONS;
+import {
+  EngineInput,
+  AreaResult,
+  MaterialQuantities,
+  BuildingModel,
+  BudgetResult,
+  CalculationTraceStep,
+} from '../types';
 
 export function generateCalculationTrace(
   input: EngineInput,
   area: AreaResult,
-  qty: MaterialQuantities,
+  quantities: MaterialQuantities,
+  buildingModel: BuildingModel,
   budget: BudgetResult
 ): CalculationTraceStep[] {
   const steps: CalculationTraceStep[] = [];
 
   // 1. Plot Area
   steps.push({
-    parameter: 'Plot Area',
-    category: 'Building Geometry',
-    inputs: { plotLength: `${input.plotLength} ft`, plotWidth: `${input.plotWidth} ft` },
-    formula: `${input.plotLength} × ${input.plotWidth}`,
-    assumption: 'User entered site dimensions',
+    parameter: 'plotAreaSqFt',
+    category: 'GEOMETRY / BUA',
+    inputs: { plotLength: input.plotLength, plotWidth: input.plotWidth },
+    formula: 'Plot Length × Plot Width',
+    assumption: 'Direct site plot boundaries',
     result: area.plotAreaSqFt,
-    unit: 'Sq.Ft',
+    unit: 'sq.ft',
   });
 
-  // 2. Maximum Allowable BUA Per Floor (Authority Setback Rule)
+  // 2. Setbacks & Buildable Footprint
   steps.push({
-    parameter: 'Maximum Allowable BUA / Floor',
-    category: 'Building Geometry',
-    inputs: { plotArea: `${area.plotAreaSqFt} sq.ft`, maxCoverageRatio: `${A.coverageFactor.value * 100}%` },
-    formula: `${area.plotAreaSqFt} × ${A.coverageFactor.value}`,
-    assumption: `BBMP / BDA / MUDA Statutory Coverage Benchmark = ${(A.coverageFactor.value * 100).toFixed(0)}%`,
-    result: area.maxAllowableBUAPerFloorSqFt,
-    unit: 'Sq.Ft',
+    parameter: 'buildableFootprintSqFt',
+    category: 'GEOMETRY / BUA',
+    inputs: {
+      plotLength: input.plotLength,
+      plotWidth: input.plotWidth,
+      frontSetback: area.setbacks.frontSetbackFt,
+      rearSetback: area.setbacks.rearSetbackFt,
+      leftSetback: area.setbacks.leftSetbackFt,
+      rightSetback: area.setbacks.rightSetbackFt,
+    },
+    formula: '(Length − Front − Rear) × (Width − Left − Right)',
+    assumption: area.setbacks.source,
+    result: area.buildableFootprintSqFt,
+    unit: 'sq.ft',
   });
 
-  // 3. User Selected BUA Per Floor
+  // 3. Total BUA
   steps.push({
-    parameter: 'User Selected BUA / Floor',
-    category: 'Building Geometry',
-    inputs: { selectedBUAPerFloor: `${area.buaPerFloorSqFt} sq.ft`, withinLimit: area.isWithinPermissibleLimit ? 'Yes' : 'Requires Variance Confirmation' },
-    formula: `${area.buaPerFloorSqFt}`,
-    assumption: area.isWithinPermissibleLimit ? 'Direct user-specified floor plate' : 'Exceeds standard 60% coverage (Client Confirmation Required)',
-    result: area.buaPerFloorSqFt,
-    unit: 'Sq.Ft',
-  });
-
-  // 4. Remaining Ground Area
-  steps.push({
-    parameter: 'Remaining Open Ground Area',
-    category: 'Building Geometry',
-    inputs: { plotArea: `${area.plotAreaSqFt} sq.ft`, buaPerFloor: `${area.buaPerFloorSqFt} sq.ft` },
-    formula: `${area.plotAreaSqFt} - ${area.buaPerFloorSqFt}`,
-    assumption: 'Calculated on ground footprint only (Plot Area - BUA/Floor)',
-    result: area.remainingGroundAreaSqFt,
-    unit: 'Sq.Ft',
-  });
-
-  // 5. Ground Coverage Percentage
-  steps.push({
-    parameter: 'Ground Coverage Percentage',
-    category: 'Building Geometry',
-    inputs: { buaPerFloor: `${area.buaPerFloorSqFt} sq.ft`, plotArea: `${area.plotAreaSqFt} sq.ft` },
-    formula: `(${area.buaPerFloorSqFt} ÷ ${area.plotAreaSqFt || 1}) × 100`,
-    assumption: 'Actual footprint percentage on site',
-    result: parseFloat(area.groundCoveragePercentage.toFixed(1)),
-    unit: '%',
-  });
-
-  // 6. Total BUA
-  steps.push({
-    parameter: 'Total Built-up Area (BUA)',
-    category: 'Building Geometry',
-    inputs: { buaPerFloor: `${area.buaPerFloorSqFt} sq.ft`, floors: input.floors },
-    formula: `${area.buaPerFloorSqFt} × ${input.floors}`,
-    assumption: 'Multiplied across all approved residential storeys',
+    parameter: 'totalBUASqFt',
+    category: 'GEOMETRY / BUA',
+    inputs: { buaPerFloor: area.buaPerFloorSqFt, floors: input.floors },
+    formula: 'BUA Per Floor × Number of Floors',
+    assumption: 'Uniform floor slabs across all storeys',
     result: area.totalBUASqFt,
-    unit: 'Sq.Ft',
+    unit: 'sq.ft',
   });
 
-  // 7. Super BUA
+  // 4. Steel Rebar Consumption (PDF Section 6)
   steps.push({
-    parameter: 'Super Built-up Area',
-    category: 'Building Geometry',
-    inputs: { totalBUA: `${area.totalBUASqFt} sq.ft`, superBuaFactor: A.superBuaFactor.value },
-    formula: `${area.totalBUASqFt} × ${A.superBuaFactor.value}`,
-    assumption: `Super BUA Circulation Multiplier = ${A.superBuaFactor.value}`,
-    result: area.superBUASqFt,
-    unit: 'Sq.Ft',
+    parameter: 'steelKg',
+    category: 'STRUCTURE / REBAR',
+    inputs: {
+      totalBUA: area.totalBUASqFt,
+      floors: input.floors,
+      baseFactor: 2.8,
+      additionalFloorFactor: 0.2,
+    },
+    formula: 'Total BUA × [2.8 + 0.2 × (Floors − 1)]',
+    assumption: 'Hutty Pilot Specification (Section 6)',
+    result: quantities.steelKg,
+    unit: 'kg',
   });
 
-  // 6. Steel
-  const steelRatio = input.qualityTier === 'Luxury'
-    ? A.steelKgPerSqFtLuxury.value
-    : input.qualityTier === 'Essential'
-    ? A.steelKgPerSqFtEssential.value
-    : A.steelKgPerSqFtPremium.value;
-
   steps.push({
-    parameter: 'Structural TMT Steel',
-    category: 'Physical Quantities',
-    inputs: { totalBUA: `${area.totalBUASqFt} sq.ft`, steelRatio: `${steelRatio} kg/sq.ft`, brand: input.materialBrands?.steel || 'Standard' },
-    formula: `(${area.totalBUASqFt} × ${steelRatio}) ÷ 1000`,
-    assumption: `IS 456 / IS 13920 Preliminary Residential Benchmark = ${steelRatio} kg/sq.ft`,
-    result: qty.steelTonnes,
-    unit: 'Tonnes',
+    parameter: 'steelTonnes',
+    category: 'STRUCTURE / REBAR',
+    inputs: { steelKg: quantities.steelKg },
+    formula: 'Steel Kg ÷ 1000',
+    assumption: 'Metric conversion without intermediate rounding',
+    result: quantities.steelTonnes,
+    unit: 'Tonne',
   });
 
-  // 7. Cement
-  const cementRatio = input.qualityTier === 'Luxury'
-    ? A.cementBagsPerSqFtLuxury.value
-    : input.qualityTier === 'Essential'
-    ? A.cementBagsPerSqFtEssential.value
-    : A.cementBagsPerSqFtPremium.value;
-
+  // 5. Cement Starting Rule (PDF Section 8)
   steps.push({
-    parameter: 'OPC 53 Cement',
-    category: 'Physical Quantities',
-    inputs: { totalBUA: `${area.totalBUASqFt} sq.ft`, cementRatio: `${cementRatio} bags/sq.ft`, brand: input.materialBrands?.cement || 'Standard' },
-    formula: `${area.totalBUASqFt} × ${cementRatio}`,
-    assumption: `Field QS Benchmark = ${cementRatio} bags (50kg)/sq.ft BUA`,
-    result: qty.cementBags,
+    parameter: 'cementBags',
+    category: 'MATERIALS / CEMENT',
+    inputs: { totalBUA: area.totalBUASqFt, startingParameter: 0.40 },
+    formula: 'Total BUA × 0.40 bags/sqft',
+    assumption: 'Hutty Pilot Specification (Section 8) — 50 kg bags',
+    result: quantities.cementBags,
     unit: 'Bags (50 kg)',
   });
 
-  // 8. RMC Concrete
-  const concreteRatio = input.qualityTier === 'Luxury'
-    ? A.concreteCuMPerSqFtLuxury.value
-    : input.qualityTier === 'Essential'
-    ? A.concreteCuMPerSqFtEssential.value
-    : A.concreteCuMPerSqFtPremium.value;
-
+  // 6. M-Sand (PDF Section 9)
   steps.push({
-    parameter: 'M25 Ready Mix Concrete',
-    category: 'Physical Quantities',
-    inputs: { totalBUA: `${area.totalBUASqFt} sq.ft`, concreteRatio: `${concreteRatio} cu.m/sq.ft` },
-    formula: `${area.totalBUASqFt} × ${concreteRatio}`,
-    assumption: `Structural Design Mix Consumption = ${concreteRatio} cu.m/sq.ft BUA`,
-    result: qty.concreteCuM,
-    unit: 'Cu.M',
+    parameter: 'mSandCuFt',
+    category: 'MATERIALS / AGGREGATES',
+    inputs: { totalBUA: area.totalBUASqFt, startingParameter: 0.60 },
+    formula: 'Total BUA × 0.60 CFT/sqft',
+    assumption: 'Hutty Pilot Specification (Section 9) — Concrete & fine aggregate',
+    result: quantities.mSandCuFt,
+    unit: 'Cu Ft',
   });
 
-  // 9. Base Construction Cost
+  // 7. P-Sand (PDF Section 10)
   steps.push({
-    parameter: 'Base Construction Cost (BOQ Sum)',
-    category: 'Commercial Totals',
-    inputs: { itemCount: `${qty ? 'Itemized BOQ' : 0}` },
-    formula: 'Sum(all BOQ item quantities × unit rates)',
-    assumption: 'Direct linear sum of itemized trade lines without magic multipliers',
-    result: budget.baseConstructionCost,
-    unit: '₹',
+    parameter: 'pSandCuFt',
+    category: 'MATERIALS / AGGREGATES',
+    inputs: { totalBUA: area.totalBUASqFt, startingParameter: 0.60 },
+    formula: 'Total BUA × 0.60 CFT/sqft',
+    assumption: 'Hutty Pilot Specification (Section 10) — Masonry & plaster sand',
+    result: quantities.pSandCuFt,
+    unit: 'Cu Ft',
   });
 
-  // 10. Total Project Cost
+  // 8. Coarse Aggregate (PDF Section 11)
   steps.push({
-    parameter: 'Total Project Cost',
-    category: 'Commercial Totals',
+    parameter: 'coarseAggregateCuFt',
+    category: 'MATERIALS / AGGREGATES',
+    inputs: { totalBUA: area.totalBUASqFt, startingParameter: 1.35 },
+    formula: 'Total BUA × 1.35 CFT/sqft',
+    assumption: 'Hutty Pilot Specification (Section 11) — 20mm & 12mm crushed blue metal',
+    result: quantities.coarseAggregateCuFt,
+    unit: 'Cu Ft',
+  });
+
+  // 9. Space-Driven Net Wall Area (PDF Section 12)
+  steps.push({
+    parameter: 'netWallAreaSqFt',
+    category: 'SPACE & MASONRY',
     inputs: {
-      baseCost: budget.baseConstructionCost,
-      professionalFees: budget.professionalFees,
-      contingency: budget.contingency,
-      gst: budget.gstAmount,
+      grossExternalWall: buildingModel.grossExternalWallAreaSqFt,
+      grossInternalWall: buildingModel.grossInternalWallAreaSqFt,
+      doorOpenings: buildingModel.totalDoorOpeningAreaSqFt,
+      windowOpenings: buildingModel.totalWindowOpeningAreaSqFt,
     },
-    formula: 'Base Cost + Professional Fees (5%) + Contractor Margin (15%) + Contingency (6%) + GST (12%)',
-    assumption: `GST = ${A.gstRate.value * 100}%, Professional Fees = ${A.professionalFeesPremium.value * 100}%, Contingency = ${A.contingencyPremium.value * 100}%`,
-    result: budget.totalProjectCost,
-    unit: '₹',
+    formula: 'External Wall Area + Internal Wall Area − Door Openings − Window Openings',
+    assumption: 'Space Configuration wall perimeters at 10 ft height minus fenestration',
+    result: quantities.netWallAreaSqFt,
+    unit: 'sq.ft',
   });
 
-  // 11. Effective Rate per Sq.Ft
+  // 10. AAC Masonry Blocks Count (PDF Section 12)
   steps.push({
-    parameter: 'Effective Cost Rate per Sq.Ft',
-    category: 'Performance Metrics',
-    inputs: { totalProjectCost: budget.totalProjectCost, totalBUA: area.totalBUASqFt },
-    formula: area.totalBUASqFt > 0 ? `${budget.totalProjectCost} ÷ ${area.totalBUASqFt}` : '0',
-    assumption: 'Total Project Cost divided by Usable Total BUA',
+    parameter: 'aacBlocksPieces',
+    category: 'SPACE & MASONRY',
+    inputs: {
+      wallVolumeCuM: quantities.wallVolumeCuM,
+      unitBlockVolume: 0.018,
+      wastagePercentage: 5,
+    },
+    formula: 'Wall Volume ÷ Unit Block Volume × (1 + Wastage%)',
+    assumption: 'Standard 600×200×150mm block size with 5% cutting allowance',
+    result: quantities.aacBlocksPieces,
+    unit: 'Blocks',
+  });
+
+  // 11. Paintable Area (PDF Section 17)
+  steps.push({
+    parameter: 'totalPaintableAreaSqFt',
+    category: 'FINISHES & PAINT',
+    inputs: {
+      netInternalWall: quantities.internalWallAreaSqFt,
+      ceilingArea: quantities.ceilingAreaSqFt,
+      netExternalWall: quantities.exteriorPaintAreaSqFt,
+    },
+    formula: '(Net Internal Wall + Ceilings) + Net External Wall Area',
+    assumption: 'Hutty Pilot Specification (Section 17) — No generic BUA multiplier',
+    result: quantities.totalPaintableAreaSqFt,
+    unit: 'sq.ft',
+  });
+
+  // 12. Water Tank Capacity (PDF Section 22)
+  steps.push({
+    parameter: 'overheadTankLitres',
+    category: 'PLUMBING & TANKS',
+    inputs: {
+      bedrooms: input.rooms.bedrooms || 1,
+      occupantsPerBed: 2,
+      lpcd: 135,
+      storageDays: 1.5,
+    },
+    formula: 'Bedrooms × 2 Occupants × 135 LPCD × 1.5 Days',
+    assumption: 'IS 1172 Standard Domestic Water Demand',
+    result: quantities.overheadTankLitres,
+    unit: 'Litres',
+  });
+
+  // 13. Effective Rate per Sq.Ft (PDF Section 28)
+  steps.push({
+    parameter: 'costPerSqFt',
+    category: 'BUDGET & COMMERCIAL',
+    inputs: {
+      totalProjectCost: budget.totalProjectCost,
+      totalBUA: area.totalBUASqFt,
+    },
+    formula: 'Total Project Cost ÷ Total Built-Up Area',
+    assumption: 'All-inclusive pre-construction estimate',
     result: budget.costPerSqFt,
-    unit: '₹/Sq.Ft',
+    unit: '₹/sq.ft',
   });
 
   return steps;

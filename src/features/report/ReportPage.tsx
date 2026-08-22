@@ -14,7 +14,7 @@ export const ReportPage: React.FC = () => {
   const navigate = useNavigate();
   const { preparedFor, isLeadCaptured } = useReportStore();
   const { result } = useCalculationStore();
-  const { report, area, quantities, budget, timeline, paymentPlan, boq, input } = result;
+  const { report, area, quantities, budget, timeline, paymentPlan, boq, materialSchedule, fixtureSchedule } = result;
 
   const [showLeadModal, setShowLeadModal] = useState(false);
 
@@ -41,8 +41,8 @@ export const ReportPage: React.FC = () => {
       className="min-h-screen bg-[#F8F8F6] py-8 sm:py-12 select-none"
     >
       <SEO
-        title="Construction Dossier & BOQ Report | Hutty"
-        description="Comprehensive pre-construction engineering report, physical material takeoff, and 13-stage BOQ schedule."
+        title="Construction Dossier & Quantity Takeoff | Hutty"
+        description="Authoritative pre-construction digital QS dossier: Works BOQ, Material Takeoff, Fixtures Schedule & Cost Breakdown."
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6 text-left">
@@ -75,14 +75,14 @@ export const ReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Document Sheet (Professional Construction Document) */}
+        {/* Document Sheet */}
         <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-12 shadow-xs space-y-8 print:border-none print:shadow-none print:p-0">
 
           {/* 1. Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b-2 border-[#1B3D34]">
             <div className="space-y-1">
               <HuttyLogo variant="full" width={140} />
-              <p className="text-xs text-[#4B5563] mt-1">Pre-Construction Quantity Feasibility &amp; BOQ Dossier</p>
+              <p className="text-xs text-[#4B5563] mt-1">Residential Digital Quantity Surveyor &bull; Pilot Feasibility Dossier</p>
             </div>
 
             <div className="text-xs text-left sm:text-right space-y-0.5 text-[#4B5563]">
@@ -92,18 +92,18 @@ export const ReportPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 2. Project Summary */}
+          {/* 2. Project Geometry & Summary */}
           <section className="space-y-3">
             <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-              1. Project Summary
+              1. Project Geometry &amp; Parameters
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
               <div>
-                <span className="text-[#4B5563] block">Estimated Total</span>
+                <span className="text-[#4B5563] block">Total Estimated Cost</span>
                 <span className="text-sm font-extrabold text-[#1B3D34] font-heading">{formatCurrency(budget.totalProjectCost)}</span>
               </div>
               <div>
-                <span className="text-[#4B5563] block">Built-Up Area</span>
+                <span className="text-[#4B5563] block">Built-Up Area (BUA)</span>
                 <span className="text-sm font-bold text-[#1B3D34] font-heading">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
               </div>
               <div>
@@ -117,86 +117,152 @@ export const ReportPage: React.FC = () => {
             </div>
           </section>
 
-          {/* 3. Physical Quantities Takeoff */}
-          <section className="space-y-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-              2. Physical Quantities Takeoff (IS 456 / IS 1786)
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-                <span className="text-[#4B5563] text-[10px] block">TMT Steel</span>
-                <span className="font-bold text-[#1B3D34] font-heading text-sm">{quantities.steelTonnes} Tonnes</span>
-              </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-                <span className="text-[#4B5563] text-[10px] block">Portland Cement</span>
-                <span className="font-bold text-[#1B3D34] font-heading text-sm">{quantities.cementBags.toLocaleString()} Bags</span>
-              </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-                <span className="text-[#4B5563] text-[10px] block">AAC Masonry</span>
-                <span className="font-bold text-[#1B3D34] font-heading text-sm">{quantities.aacBlocksCuM} Cu.M</span>
-              </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-                <span className="text-[#4B5563] text-[10px] block">Concrete Volume</span>
-                <span className="font-bold text-[#1B3D34] font-heading text-sm">{quantities.concreteCuM} Cu.M</span>
-              </div>
-            </div>
-          </section>
-
-          {/* 4. Trade Budget Allocation */}
-          <section className="space-y-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-              3. Trade Budget Allocation
-            </h2>
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                  <th className="py-2 font-bold uppercase">Trade Category</th>
-                  <th className="py-2 font-bold uppercase text-right">Amount (INR)</th>
-                  <th className="py-2 font-bold uppercase text-right">% Allocation</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E5E7EB]">
-                {budget.heads.map((head) => (
-                  <tr key={head.id}>
-                    <td className="py-2 font-medium text-[#1B3D34]">{head.name}</td>
-                    <td className="py-2 text-right font-bold text-[#1B3D34] font-mono">{formatCurrency(head.allocatedAmount)}</td>
-                    <td className="py-2 text-right text-[#4B5563] font-mono">{head.percentage}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-
-          {/* 5. 13-Stage BOQ Summary */}
+          {/* SECTION A: WHAT WE BUILD */}
           {Array.isArray(boq) && boq.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-                4. Itemized Bill of Quantities (13 Stages)
-              </h2>
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                  SECTION A — WHAT WE BUILD (Construction Works BOQ)
+                </h2>
+                <span className="text-[10px] text-[#4B5563] font-mono">{boq.length} line items</span>
+              </div>
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                    <th className="py-2 font-bold uppercase">Item</th>
-                    <th className="py-2 font-bold uppercase">Description</th>
-                    <th className="py-2 font-bold uppercase text-right">Qty</th>
+                    <th className="py-2 font-bold uppercase w-10">Sl</th>
+                    <th className="py-2 font-bold uppercase">Activity / Work Description</th>
+                    <th className="py-2 font-bold uppercase text-right">Quantity</th>
                     <th className="py-2 font-bold uppercase text-right">Rate</th>
-                    <th className="py-2 font-bold uppercase text-right">Total</th>
+                    <th className="py-2 font-bold uppercase text-right">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E7EB]">
                   {boq.map((item) => (
                     <tr key={item.code || item.slNo}>
                       <td className="py-2 font-mono text-[#4B5563]">{item.slNo}</td>
-                      <td className="py-2 text-[#1B3D34] font-medium">{item.description}</td>
-                      <td className="py-2 text-right text-[#4B5563] font-mono">{item.quantity} {item.unit}</td>
-                      <td className="py-2 text-right text-[#4B5563] font-mono">₹{item.unitRate}</td>
-                      <td className="py-2 text-right font-bold text-[#1B3D34] font-mono">{formatCurrency(item.amount)}</td>
+                      <td className="py-2 text-[#1B3D34] font-medium">
+                        {item.description}
+                        <span className="block text-[10px] text-[#4B5563] font-normal">{item.brand} &bull; {item.remarks}</span>
+                      </td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">{item.quantity} {item.unit}</td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{item.unitRate.toLocaleString()}</td>
+                      <td className="py-2 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(item.amount)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </section>
           )}
+
+          {/* SECTION B: WHAT WE CONSUME */}
+          {Array.isArray(materialSchedule) && materialSchedule.length > 0 && (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                  SECTION B — WHAT WE CONSUME (Material Schedule)
+                </h2>
+                <span className="text-[10px] text-[#4B5563] font-mono">No separate concrete line (Work in Sec A)</span>
+              </div>
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
+                    <th className="py-2 font-bold uppercase w-10">Sl</th>
+                    <th className="py-2 font-bold uppercase">Physical Material &amp; Brand</th>
+                    <th className="py-2 font-bold uppercase text-right">Quantity</th>
+                    <th className="py-2 font-bold uppercase text-right">Unit Rate</th>
+                    <th className="py-2 font-bold uppercase text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E7EB]">
+                  {materialSchedule.map((mat) => (
+                    <tr key={mat.slNo}>
+                      <td className="py-2 font-mono text-[#4B5563]">{mat.slNo}</td>
+                      <td className="py-2 text-[#1B3D34] font-medium">
+                        {mat.material}
+                        <span className="block text-[10px] text-[#4B5563] font-normal">{mat.brand} &bull; {mat.specification}</span>
+                      </td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">{mat.quantity.toLocaleString()} {mat.unit}</td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{mat.unitRate.toLocaleString()}</td>
+                      <td className="py-2 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(mat.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          )}
+
+          {/* SECTION C: WHAT WE INSTALL */}
+          {Array.isArray(fixtureSchedule) && fixtureSchedule.length > 0 && (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                  SECTION C — WHAT WE INSTALL (Fixtures &amp; Fittings Schedule)
+                </h2>
+                <span className="text-[10px] text-[#4B5563] font-mono">{fixtureSchedule.length} installed units</span>
+              </div>
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
+                    <th className="py-2 font-bold uppercase w-10">Sl</th>
+                    <th className="py-2 font-bold uppercase">Installed Fixture / Equipment</th>
+                    <th className="py-2 font-bold uppercase">Location</th>
+                    <th className="py-2 font-bold uppercase text-right">Quantity</th>
+                    <th className="py-2 font-bold uppercase text-right">Rate</th>
+                    <th className="py-2 font-bold uppercase text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E7EB]">
+                  {fixtureSchedule.map((fix) => (
+                    <tr key={fix.slNo}>
+                      <td className="py-2 font-mono text-[#4B5563]">{fix.slNo}</td>
+                      <td className="py-2 text-[#1B3D34] font-medium">
+                        {fix.item}
+                        <span className="block text-[10px] text-[#4B5563] font-normal">{fix.brand} &bull; {fix.specification}</span>
+                      </td>
+                      <td className="py-2 text-[#4B5563] text-[11px]">{fix.location}</td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">{fix.quantity} {fix.unit}</td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{fix.unitRate.toLocaleString()}</td>
+                      <td className="py-2 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(fix.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          )}
+
+          {/* SECTION D: WHAT IT COSTS */}
+          <section className="space-y-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
+              SECTION D — WHAT IT COSTS (Trade Breakdown &amp; Commercial Additions)
+            </h2>
+            <div className="space-y-2">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
+                    <th className="py-2 font-bold uppercase">Trade Category / Statutory Head</th>
+                    <th className="py-2 font-bold uppercase text-right">Amount (INR)</th>
+                    <th className="py-2 font-bold uppercase text-right">% of Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E7EB]">
+                  {budget.heads.map((head) => (
+                    <tr key={head.id}>
+                      <td className="py-2 font-medium text-[#1B3D34]">{head.name}</td>
+                      <td className="py-2 text-right font-bold text-[#1B3D34] font-mono">{formatCurrency(head.allocatedAmount)}</td>
+                      <td className="py-2 text-right text-[#4B5563] font-mono">{head.percentage}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-[#1B3D34] text-xs">
+                    <td className="py-3 font-black text-[#1B3D34] uppercase font-heading">Total Project Cost (All Inclusive)</td>
+                    <td className="py-3 text-right font-black text-[#1B3D34] font-mono text-sm">{formatCurrency(budget.totalProjectCost)}</td>
+                    <td className="py-3 text-right font-black text-[#1B3D34] font-mono text-sm">100.0%</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </section>
 
           {/* 6. Milestone Payment Schedule */}
           {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
@@ -225,7 +291,7 @@ export const ReportPage: React.FC = () => {
           <section className="space-y-2 text-xs text-[#4B5563] border-t border-[#E5E7EB] pt-4">
             <h3 className="font-bold text-[#1B3D34]">Engineering Assumptions &amp; Disclaimers</h3>
             <p>
-              * Estimates calculated using deterministic formula algorithms conforming to IS 456 (Plain and Reinforced Concrete), IS 1786 (High Strength Deformed Steel Bars), and Bangalore Schedule of Rates.
+              * Estimates calculated using deterministic formula algorithms conforming to IS 456 (Plain and Reinforced Concrete), IS 1786 (High Strength Deformed Steel Bars), and Hutty Pilot Quantity Specification.
             </p>
             <p>
               * Final structural sizes, rebar schedules, and soil bearing capacities must be validated by a registered structural engineer prior to construction.

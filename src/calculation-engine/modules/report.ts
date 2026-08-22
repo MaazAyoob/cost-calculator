@@ -1,55 +1,88 @@
 // ============================================================
-// REPORT MODULE – Assembles the full reportable data structure
+// REPORT MODULE – Assembles the 4-Section Customer-Facing Report
+// Strictly follows Hutty Pilot Specification (Section 26)
+//
+// 4 Core Sections:
+// SECTION A — WHAT WE BUILD: Works & Activity Breakdown (BOQ)
+// SECTION B — WHAT WE CONSUME: Material Schedule (Physical Consumables)
+// SECTION C — WHAT WE INSTALL: Fixtures & Fittings Schedule
+// SECTION D — WHAT IT COSTS: Cost Breakdown, Margin, GST & Total
 // ============================================================
 
 import {
-  EngineInput, AreaResult, MaterialQuantities, BudgetResult,
-  TimelineResult, PaymentMilestone, BOQItem, ProcurementItem, ReportData,
+  EngineInput,
+  AreaResult,
+  BuildingModel,
+  MaterialQuantities,
+  BudgetResult,
+  TimelineResult,
+  PaymentMilestone,
+  BOQItem,
+  MaterialScheduleItem,
+  FixtureScheduleItem,
+  DoorScheduleItem,
+  WindowScheduleItem,
+  ProcurementItem,
   CalculationTraceStep,
+  QSParameterItem,
+  ReportData,
 } from '../types';
+import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from '../data/engineeringAssumptions';
 
 export function assembleReport(
   input: EngineInput,
   area: AreaResult,
+  buildingModel: BuildingModel,
   quantities: MaterialQuantities,
   budget: BudgetResult,
   timeline: TimelineResult,
   paymentPlan: PaymentMilestone[],
   boq: BOQItem[],
+  materialSchedule: MaterialScheduleItem[],
+  fixtureSchedule: FixtureScheduleItem[],
+  doorSchedule: DoorScheduleItem[],
+  windowSchedule: WindowScheduleItem[],
   procurement: ProcurementItem[],
   trace: CalculationTraceStep[]
 ): ReportData {
   const recommendations: string[] = [
-    `Use ${input.qualityTier === 'Luxury' ? 'UltraTech ProTech 53+' : 'UltraTech OPC 53'} cement throughout for consistent 28-day strength.`,
-    `Engage a licensed geotechnical agency for soil bore testing before foundation design is finalised.`,
-    `All RMC pours require 28-day IS 516 cube test certificates — maintain at site office.`,
-    `Ensure chemical earthing pits achieve below 1 Ohm resistance before electrical works sign-off.`,
-    `Conduct 48-hour standing water pond test on all bathroom and terrace waterproofing before tile fixing.`,
-    `Install anti-skid grooves on all granite stair treads to comply with NBC 2016 safety codes.`,
-    `UPVC windows should be factory-measured after plaster is complete to ensure accurate sizing.`,
-    `Maintain an As-Built drawing record of all concealed electrical conduit and plumbing pipe routes.`,
+    `Use ${input.materialBrands?.cement || 'UltraTech OPC 53'} grade cement throughout for consistent 28-day concrete strength.`,
+    `Conduct standard soil core bore testing on site to verify nominal 180 kN/sq.m soil bearing capacity before final footing sign-off.`,
+    `All RMC pours require mandatory 7-day and 28-day IS 516 compressive cube test certificates on site.`,
+    `Maintain 48-hour standing water pond test on all bathroom sunken slabs and top terrace slab prior to tile fixing.`,
+    `Ensure chemical earthing resistance measures strictly below 1.0 Ohm before BESCOM meter commissioning.`,
+    `Verify as-built conduit routes and concealed plumbing drawings before final plastering and masonry chasses closure.`,
     input.evCharging
-      ? 'EV charging specification should be finalised with BESCOM prior to electrical rough-in stage.'
-      : 'Consider future-proofing by installing conduit sleeves for EV charging during electrical rough-in.',
+      ? 'Finalise EV 7.2kW AC charging load sanction with municipal electricity board during foundation stage.'
+      : 'Provision 32mm conduit sleeves in parking bay for future EV charging wallbox installation.',
     input.liftRequired
-      ? 'Lift pit design must be included in structural drawing before foundation excavation begins.'
-      : 'Provision shaft opening in RCC slab if future lift installation is planned.',
+      ? 'Incorporate 1.5m elevator pit depth and 4.2m overhead clearance into structural drawings before foundation excavation.'
+      : 'Provision structural floor slab cutout if future elevator addition is planned.',
   ];
 
+  const parameterTable: QSParameterItem[] = Object.values(CENTRALIZED_ENGINEERING_ASSUMPTIONS);
+
   return {
-    projectId:      `RC-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`,
-    generatedAt:    new Date().toISOString(),
-    clientName:     'Homeowner',
-    engineVersion:  '1.0.0',
+    projectId: `HUTTY-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`,
+    generatedAt: new Date().toISOString(),
+    clientName: 'Homeowner',
+    engineVersion: '1.0.0 (Pilot Spec Space Engine)',
     input,
     area,
+    buildingModel,
     quantities,
     budget,
-    boq,
+    sectionA_WorksBOQ: boq,
+    sectionB_MaterialSchedule: materialSchedule,
+    sectionC_FixtureSchedule: fixtureSchedule,
+    sectionD_CostSummary: budget,
+    doorSchedule,
+    windowSchedule,
     timeline,
     paymentPlan,
     procurement,
     recommendations,
     trace,
+    parameterTable,
   };
 }

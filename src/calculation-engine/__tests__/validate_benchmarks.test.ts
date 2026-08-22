@@ -84,10 +84,10 @@ export interface BenchmarkReportItem {
   steelTonnes: number;
   steelKg: number;
   cementBags: number;
-  concreteCuM: number;
-  aacBlocksCuM: number;
-  sandCuFt: number;
-  aggregateCuFt: number;
+  mSandCuFt: number;
+  pSandCuFt: number;
+  coarseAggregateCuFt: number;
+  aacBlocksPieces: number;
   floorTilesSqFt: number;
   wallTilesSqFt: number;
   doorsCount: number;
@@ -109,7 +109,7 @@ const testCases = [
   { name: '60x90 G+4',    length: 90, width: 60, bua: 3240, floors: 5, beds: 8, baths: 8 },
 ];
 
-describe('Rightcon 7-Case Benchmark Validation Suite', () => {
+describe('Rightcon 7-Case Benchmark Validation Suite (Hutty Pilot Spec)', () => {
   const benchmarkResults: BenchmarkReportItem[] = [];
 
   testCases.forEach((tc) => {
@@ -136,17 +136,17 @@ describe('Rightcon 7-Case Benchmark Validation Suite', () => {
         buaPerFloor: res.area.buaPerFloorSqFt,
         totalBUA: res.area.totalBUASqFt,
         steelTonnes: res.quantities.steelTonnes,
-        steelKg: Math.round(res.quantities.steelTonnes * 1000),
+        steelKg: Math.round(res.quantities.steelKg),
         cementBags: res.quantities.cementBags,
-        concreteCuM: res.quantities.concreteCuM,
-        aacBlocksCuM: res.quantities.aacBlocksCuM,
-        sandCuFt: res.quantities.sandCuFt,
-        aggregateCuFt: res.quantities.aggregateCuFt,
+        mSandCuFt: res.quantities.mSandCuFt,
+        pSandCuFt: res.quantities.pSandCuFt,
+        coarseAggregateCuFt: res.quantities.coarseAggregateCuFt,
+        aacBlocksPieces: res.quantities.aacBlocksPieces,
         floorTilesSqFt: res.quantities.floorTilesSqFt,
         wallTilesSqFt: res.quantities.wallTilesSqFt,
-        doorsCount: res.quantities.mainDoorsCount + res.quantities.internalDoorsCount + res.quantities.bathroomDoorsCount,
+        doorsCount: res.quantities.totalDoorsCount,
         windowsCount: res.quantities.windowsCount,
-        electricalPoints: res.quantities.lightingPoints,
+        electricalPoints: res.quantities.totalElectricalPoints,
         plumbingFixtures: res.quantities.bathroomFixtureSets,
         baseBOQSum: res.budget.baseConstructionCost,
         totalProjectCost: res.budget.totalProjectCost,
@@ -157,9 +157,9 @@ describe('Rightcon 7-Case Benchmark Validation Suite', () => {
 
       console.log(
         `\n[BENCHMARK RESULT: ${tc.name}]\n` +
-        `  Plot: ${item.plotArea} sqft | Buildable: ${item.buildableFootprint} sqft | BUA/Flr: ${item.buaPerFloor} sqft | Total BUA: ${item.totalBUA} sqft\n` +
-        `  Steel: ${item.steelTonnes} T (${item.steelKg} kg) | Cement: ${item.cementBags} Bags | RMC: ${item.concreteCuM} Cu.M | AAC: ${item.aacBlocksCuM} Cu.M\n` +
-        `  Flooring: ${item.floorTilesSqFt} sqft | Wall Tiles: ${item.wallTilesSqFt} sqft | Doors: ${item.doorsCount} | Windows: ${item.windowsCount}\n` +
+        `  Plot: ${item.plotArea} sqft | Footprint: ${item.buildableFootprint} sqft | BUA/Flr: ${item.buaPerFloor} sqft | Total BUA: ${item.totalBUA} sqft\n` +
+        `  Steel: ${item.steelTonnes} T (${item.steelKg} kg) | Cement: ${item.cementBags} Bags | M-Sand: ${item.mSandCuFt} CFT | P-Sand: ${item.pSandCuFt} CFT | Agg: ${item.coarseAggregateCuFt} CFT\n` +
+        `  Masonry: ${item.aacBlocksPieces} Blocks | Flooring: ${item.floorTilesSqFt} sqft | Wall Tiles: ${item.wallTilesSqFt} sqft | Doors: ${item.doorsCount} | Windows: ${item.windowsCount}\n` +
         `  BOQ Sum: ₹${item.baseBOQSum.toLocaleString('en-IN')} | Total Cost: ₹${item.totalProjectCost.toLocaleString('en-IN')} | Effective Rate: ₹${item.effectiveRatePerSqFt}/sqft\n`
       );
     });

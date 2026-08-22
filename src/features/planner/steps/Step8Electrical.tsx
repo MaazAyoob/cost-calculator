@@ -17,7 +17,6 @@ export const Step8Electrical: React.FC = () => {
     brand: string;
     ratePerMetre: number;
     desc: string;
-    recommended?: boolean;
   }[] = [
     {
       id: 'Economy (Anchor)',
@@ -31,39 +30,39 @@ export const Step8Electrical: React.FC = () => {
       title: 'Mid-Range FRLS',
       brand: 'V-Guard Super Shield',
       ratePerMetre: 36,
-      desc: 'Flame Retardant Low Smoke 100% pure electrolytic copper wiring.',
-      recommended: true,
+      desc: 'Flame Retardant Low Smoke 100% pure copper wiring.',
     },
     {
       id: 'Premium (Finolex / Polycab)',
       title: 'Premium Multi-Strand',
       brand: 'Finolex / Polycab',
       ratePerMetre: 48,
-      desc: 'High-temperature zero-halogen fire-resistant industrial grade cables.',
+      desc: 'Zero-halogen fire-resistant industrial grade cables.',
     },
   ];
 
   return (
-    <div className="space-y-8 text-left select-none">
-      {/* Editorial Step Header */}
-      <div className="space-y-1">
-        <span className="text-xs font-mono font-bold tracking-widest text-[#1B3D34] uppercase block">
+    <div className="space-y-6 text-left select-none">
+      
+      {/* ── STEP HEADER ── */}
+      <div className="space-y-1 pb-1 border-b border-[#E5E7EB]">
+        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
           STEP 08
         </span>
-        <h2 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading">
           Electrical &amp; MEP
-        </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+        </h1>
+        <p className="text-xs sm:text-sm text-[#4B5563]">
           Select wiring quality tiers (~{wireM.toLocaleString()}m wire and {conduitM.toLocaleString()}m embedded ISI conduit).
         </p>
       </div>
 
       {/* Wire Quality Tiers */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          Electrical Wiring Specification
+          Wiring Quality Tier
         </label>
-        <div className="space-y-2.5">
+        <div className="space-y-1.5">
           {wireTiers.map((tier) => {
             const isSelected = electrical.wireTier === tier.id;
             const approxWireCost = Math.round(wireM * tier.ratePerMetre);
@@ -72,32 +71,27 @@ export const Step8Electrical: React.FC = () => {
                 key={tier.id}
                 onClick={() => setElectricalSelection(tier.id)}
                 className={cn(
-                  'p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
+                  'p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
                   isSelected
-                    ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
-                    : 'bg-white border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    ? 'bg-[rgba(27,61,52,0.06)] border-[#1B3D34] ring-1 ring-[#1B3D34]'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[#F8F8F6]'
                 )}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div
                     className={cn(
-                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#E5E7EB] text-transparent'
+                      'w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
                     )}
                   >
-                    <Check className="w-3.5 h-3.5" />
+                    {isSelected && <Check className="w-3 h-3" />}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <h4 className="text-xs font-bold text-[#1B3D34]">{tier.title}</h4>
                       <span className="text-[10px] text-[#4B5563]">({tier.brand})</span>
-                      {tier.recommended && (
-                        <span className="text-[9px] font-bold bg-[rgba(27,61,52,0.08)] text-[#1B3D34] px-1.5 py-0.5 rounded">
-                          Recommended
-                        </span>
-                      )}
                     </div>
-                    <p className="text-[11px] text-[#4B5563] leading-tight mt-0.5">{tier.desc}</p>
+                    <p className="text-[10px] text-[#4B5563] mt-0.5">{tier.desc}</p>
                   </div>
                 </div>
 

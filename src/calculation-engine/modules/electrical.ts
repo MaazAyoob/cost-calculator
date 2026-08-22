@@ -1,61 +1,83 @@
 // ============================================================
-// ELECTRICAL MODULE — Driven by BUA and room-by-room electrical load requirements
+// ELECTRICAL MODULE
+// Strictly follows Hutty Pilot Specification (Section 18, 19)
+//
+// Rules:
+// - Generated from configured spaces (light, fan, socket, AC points)
+// - Switches & sockets generated from point schedule
+// - Conduit & wire calculated from point-to-length rules + main route allowance
 // ============================================================
 
-import { EngineInput, AreaResult } from '../types';
-import {
-  ELECTRICAL_WIRE_M_PER_SQFT,
-  CONDUIT_M_PER_SQFT,
-  LIGHTING_POINTS_PER_SQFT,
-  SWITCH_MODULES_PER_SQFT,
-} from '../data/coefficients';
+import { EngineInput, AreaResult, BuildingModel } from '../types';
+import { CONDUIT_M_PER_POINT, WIRE_M_PER_POINT } from '../data/coefficients';
 
-export function calculateElectrical(input: EngineInput, area: AreaResult): {
-  electricalWireMetres: number;
-  conduitsMetres: number;
-  switchModules: number;
+export function calculateElectrical(
+  input: EngineInput,
+  area: AreaResult,
+  buildingModel: BuildingModel
+): {
   lightingPoints: number;
+  fanPoints: number;
+  socketPoints: number;
+  acPoints: number;
+  totalElectricalPoints: number;
+  switchModules: number;
+  conduitsMetres: number;
+  electricalWireMetres: number;
 } {
-  const { qualityTier, rooms, liftRequired, evCharging, carCount, floors } = input;
-  const bua = area.totalBUASqFt;
-  const tier = qualityTier || 'Premium';
+  const bua = area.totalBUASqFt || 0;
+  const floors = Math.max(0, input.floors || 0);
 
-  // Base quantities derived from BUA
-  const baseWireMetres     = Math.round(bua * (ELECTRICAL_WIRE_M_PER_SQFT[tier] ?? 2.8));
-  const baseConduitsMetres = Math.round(bua * (CONDUIT_M_PER_SQFT[tier] ?? 1.8));
-  const baseLightingPoints = Math.round(bua * LIGHTING_POINTS_PER_SQFT);
-  const baseSwitchModules  = Math.round(bua * (SWITCH_MODULES_PER_SQFT[tier] ?? 0.09));
+  if (bua <= 0 || floors <= 0) {
+    return {
+      lightingPoints: 0,
+      fanPoints: 0,
+      socketPoints: 0,
+      acPoints: 0,
+      totalElectricalPoints: 0,
+      switchModules: 0,
+      conduitsMetres: 0,
+      electricalWireMetres: 0,
+    };
+  }
 
-  // Room-driven additive points
-  const totalBaths = (rooms.bathrooms || 0) + (rooms.commonToilets || 0);
-  const bedroomPoints  = (rooms.bedrooms || 0) * 6;
-  const bathroomPoints = totalBaths * 3;
-  const kitchenPoints  = (rooms.kitchen || 0) * 5;
-  const livingPoints   = (rooms.living || 0) * 6;
-  const diningPoints   = (rooms.dining || 0) * 4;
+  // 1. Sum room-driven points from SpaceModel (PDF Section 18)
+  let rawLight = buildingModel.allSpaces.reduce((sum, s) => sum + s.lightPoints, 0);
+  let rawFan = buildingModel.allSpaces.reduce((sum, s) => sum + s.fanPoints, 0);
+  let rawSocket = buildingModel.allSpaces.reduce((sum, s) => sum + s.socketPoints, 0);
+  let rawAC = buildingModel.allSpaces.reduce((sum, s) => sum + s.acPoints, 0);
 
-  const roomPointsTotal = bedroomPoints + bathroomPoints + kitchenPoints + livingPoints + diningPoints;
-  
-  // Room-driven wiring and conduits additions (metres)
-  const roomWireAddition =
-    (rooms.bedrooms || 0) * 45 +
-    totalBaths * 30 +
-    (rooms.kitchen || 0) * 35 +
-    (rooms.living || 0) * 35;
+  // Add circulation / external lighting (terrace, staircase, parking)
+  const stairLight = Math.max(0, floors - 1) * 2;
+  const terraceLight = 2;
+  const parkingLight = (input.carCount || 0) > 0 ? 2 : 1;
+  const liftAddition = input.liftRequired ? 4 : 0;
 
-  const roomConduitAddition =
-    (rooms.bedrooms || 0) * 25 +
-    totalBaths * 15 +
-    (rooms.kitchen || 0) * 20;
+  const lightingPoints = rawLight + stairLight + terraceLight + parkingLight + liftAddition;
+  const fanPoints = rawFan;
+  const socketPoints = rawSocket + (input.evCharging ? 1 : 0);
+  const acPoints = rawAC;
 
-  const liftAddition     = liftRequired ? 8 : 0;
-  const evChargingWire   = evCharging ? (carCount || 1) * 25 : 0;
-  const floorDBWire      = Math.max(0, (floors || 1) - 1) * 15;
+  const totalElectricalPoints = lightingPoints + fanPoints + socketPoints + acPoints;
 
-  const lightingPoints       = baseLightingPoints + roomPointsTotal + liftAddition;
-  const switchModules        = baseSwitchModules + Math.round(roomPointsTotal * 0.7) + (liftRequired ? 4 : 0);
-  const electricalWireMetres = baseWireMetres + roomWireAddition + evChargingWire + floorDBWire;
-  const conduitsMetres       = baseConduitsMetres + roomConduitAddition;
+  // 2. Modular Switch Plates & Modules
+  const switchModules = Math.round(totalElectricalPoints * 0.75) + (input.liftRequired ? 4 : 0);
 
-  return { electricalWireMetres, conduitsMetres, switchModules, lightingPoints };
+  // 3. Conduit & Wire Runs (PDF Section 19)
+  const mainRouteAllowance = Math.max(0, floors - 1) * 15; // Vertical distribution trunking
+  const evChargingWire = input.evCharging ? (input.carCount || 1) * 30 : 0;
+
+  const conduitsMetres = Math.round(totalElectricalPoints * CONDUIT_M_PER_POINT + mainRouteAllowance);
+  const electricalWireMetres = Math.round(totalElectricalPoints * WIRE_M_PER_POINT + mainRouteAllowance * 3 + evChargingWire);
+
+  return {
+    lightingPoints,
+    fanPoints,
+    socketPoints,
+    acPoints,
+    totalElectricalPoints,
+    switchModules,
+    conduitsMetres,
+    electricalWireMetres,
+  };
 }
