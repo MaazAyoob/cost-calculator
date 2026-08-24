@@ -12,23 +12,23 @@ export const Step7Windows: React.FC = () => {
   const windowsCount = quantities.windowsCount || 10;
 
   const materials: { id: 'uPVC' | 'Wood' | 'Aluminium'; title: string; desc: string }[] = [
-    { id: 'uPVC', title: 'uPVC Windows', desc: 'Soundproof, weather-sealed vinyl frames.' },
-    { id: 'Wood', title: 'Solid Wood', desc: 'Natural timber frames with glass.' },
-    { id: 'Aluminium', title: 'Aluminium', desc: 'Slim-profile powder coated metallic frames.' },
+    { id: 'uPVC', title: 'uPVC Windows', desc: 'Acoustic & weather sealed' },
+    { id: 'Wood', title: 'Solid Timber', desc: 'Natural hardwood frames' },
+    { id: 'Aluminium', title: 'Aluminium', desc: 'Slim architectural profile' },
   ];
 
   const subGradeMap: Record<string, { label: string; ratePerSqFt: number; desc: string }[]> = {
     uPVC: [
-      { label: 'Standard uPVC', ratePerSqFt: 550, desc: '3-chamber profile with 5mm toughened single glass.' },
-      { label: 'Luxury / Fenesta uPVC', ratePerSqFt: 850, desc: 'Multi-chamber profile with double DGU acoustic glass.' },
+      { label: 'Standard uPVC', ratePerSqFt: 550, desc: '3-chamber profile with 5mm toughened clear glass and SS mesh.' },
+      { label: 'Luxury / Fenesta uPVC', ratePerSqFt: 850, desc: 'Multi-chamber heavy profile with double DGU acoustic insulated glass.' },
     ],
     Wood: [
-      { label: 'Teak Wood Frame', ratePerSqFt: 950, desc: 'Burma teak frame with brass hardware.' },
-      { label: 'Sal Frame / Honne Shutter', ratePerSqFt: 680, desc: 'Sal wood frame with Honne timber shutter.' },
+      { label: 'Teak Wood Frame', ratePerSqFt: 950, desc: 'First-grade Burma teakwood frame with brass architectural hardware.' },
+      { label: 'Sal Frame / Honne Shutter', ratePerSqFt: 680, desc: 'Heavy seasoned Sal frame with Honne timber glass shutters.' },
     ],
     Aluminium: [
-      { label: 'Anodized Aluminium', ratePerSqFt: 480, desc: '1.6mm anodized section with float glass.' },
-      { label: 'Powder Coated Jindal Aluminium', ratePerSqFt: 620, desc: '2.0mm powder coated track system.' },
+      { label: 'Anodized Aluminium', ratePerSqFt: 480, desc: '1.6mm anodized architectural sections with float glass.' },
+      { label: 'Powder Coated Jindal Aluminium', ratePerSqFt: 620, desc: '2.0mm powder coated heavy-duty track sliding system.' },
     ],
   };
 
@@ -39,20 +39,20 @@ export const Step7Windows: React.FC = () => {
     <div className="space-y-6 text-left select-none">
       
       {/* ── STEP HEADER ── */}
-      <div className="space-y-1 pb-1 border-b border-[#E5E7EB]">
+      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
         <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
           STEP 07
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading">
-          Windows &amp; Glazing
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
+          WINDOWS &amp; GLAZING
         </h1>
         <p className="text-xs sm:text-sm text-[#4B5563]">
-          Choose window framing and glass grade (~{totalWindowAreaSqFt} sq.ft across {windowsCount} openings).
+          Choose window framing and glass acoustic performance (~{totalWindowAreaSqFt} sq.ft across {windowsCount} openings).
         </p>
       </div>
 
-      {/* 1. Primary Material */}
-      <div className="space-y-2">
+      {/* ── 1. FRAMING MATERIAL ── */}
+      <div className="space-y-2.5">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Framing Material
         </label>
@@ -64,29 +64,31 @@ export const Step7Windows: React.FC = () => {
                 key={mat.id}
                 onClick={() => setWindowSelection(mat.id)}
                 className={cn(
-                  'p-3 rounded-xl border transition-all cursor-pointer space-y-0.5 text-left',
-                  isSelected
-                    ? 'bg-[rgba(27,61,52,0.06)] border-[#1B3D34] ring-1 ring-[#1B3D34]'
-                    : 'bg-white border-[#E5E7EB] hover:bg-[#F8F8F6]'
+                  'hutty-tactile-card p-3 space-y-1',
+                  isSelected && 'hutty-tactile-card-selected'
                 )}
               >
                 <div className="flex justify-between items-center">
-                  <h4 className="text-xs font-bold text-[#1B3D34]">{mat.title}</h4>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34]" />}
+                  <h4 className="text-xs font-extrabold text-[#1B3D34]">{mat.title}</h4>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />}
                 </div>
-                <p className="text-[10px] text-[#4B5563]">{mat.desc}</p>
+                <p className="text-[10px] text-[#4B5563] truncate">{mat.desc}</p>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* 2. Sub-Grade Specification */}
-      <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
-        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          {selectedMaterial} Performance Grade
-        </label>
-        <div className="space-y-1.5">
+      {/* ── 2. SUB-GRADE PERFORMANCE ── */}
+      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+        <div className="flex justify-between items-center text-xs">
+          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
+            {selectedMaterial} Specification Tier
+          </label>
+          <span className="font-mono text-[#4B5563] text-[11px]">Computed takeoff</span>
+        </div>
+
+        <div className="space-y-2">
           {currentSubGrades.map((sg) => {
             const isSelected = windows.subGrade === sg.label;
             const subCost = Math.round(totalWindowAreaSqFt * sg.ratePerSqFt);
@@ -95,29 +97,27 @@ export const Step7Windows: React.FC = () => {
                 key={sg.label}
                 onClick={() => setWindowSelection(selectedMaterial, sg.label)}
                 className={cn(
-                  'p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between',
-                  isSelected
-                    ? 'bg-[rgba(27,61,52,0.06)] border-[#1B3D34] ring-1 ring-[#1B3D34]'
-                    : 'bg-white border-[#E5E7EB] hover:bg-[#F8F8F6]'
+                  'hutty-tactile-card flex items-center justify-between',
+                  isSelected && 'hutty-tactile-card-selected'
                 )}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <div
                     className={cn(
-                      'w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
                       isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
                     )}
                   >
-                    {isSelected && <Check className="w-3 h-3" />}
+                    {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-[#1B3D34]">{sg.label}</h4>
+                    <h4 className="text-xs font-extrabold text-[#1B3D34]">{sg.label}</h4>
                     <p className="text-[10px] text-[#4B5563] mt-0.5">{sg.desc}</p>
                   </div>
                 </div>
 
-                <div className="text-right shrink-0">
-                  <span className="text-xs font-bold text-[#1B3D34] block font-mono">
+                <div className="text-right shrink-0 pl-3">
+                  <span className="text-xs font-black text-[#1B3D34] block font-mono">
                     {formatCurrency(subCost)}
                   </span>
                   <span className="text-[10px] text-[#4B5563]">₹{sg.ratePerSqFt}/sq.ft</span>
