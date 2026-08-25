@@ -11,6 +11,7 @@ import {
   Moon,
   Layers,
   Sparkles,
+  PaintBucket,
 } from 'lucide-react';
 import {
   QualityTier,
@@ -79,6 +80,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
   const [isAutoRotating, setIsAutoRotating] = useState(false);
   const [isNightMode, setIsNightMode] = useState(false);
   const [isExplodedView, setIsExplodedView] = useState(false);
+  const [isPaintedMode, setIsPaintedMode] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
 
   const isDraggingRef = useRef(false);
@@ -104,7 +106,6 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
   ): THREE.DataTexture => {
     const data = new Uint8Array(size * size * 4);
     for (let i = 0; i < size * size; i++) {
-      // Multi-octave noise using sine hash for a gritty concrete look
       const x = i % size;
       const y = Math.floor(i / size);
       const n1 = Math.sin(x * 0.31 + y * 0.47) * 0.5 + 0.5;
@@ -120,6 +121,65 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(2.5, 2.5);
+    tex.needsUpdate = true;
+    return tex;
+  };
+
+  // ── Procedural brick texture generator ───────────────────────────────────────
+  // Generates a terracotta brick pattern with mortar joints using pixel math
+  const makeBrickTexture = (size: number): THREE.DataTexture => {
+    const data = new Uint8Array(size * size * 4);
+    const brickW = Math.round(size / 6);  // ~6 bricks wide
+    const brickH = Math.round(size / 12); // ~12 rows tall
+    const mortarT = 2; // mortar thickness in px
+    for (let i = 0; i < size * size; i++) {
+      const px = i % size;
+      const py = Math.floor(i / size);
+      const row = Math.floor(py / brickH);
+      const offset = (row % 2) * Math.round(brickW / 2); // stagger alternate rows
+      const col = Math.floor((px + offset) % brickW);
+      const inMortarX = col < mortarT || col >= brickW - mortarT;
+      const inMortarY = (py % brickH) < mortarT;
+      const idx = i * 4;
+      if (inMortarX || inMortarY) {
+        // Mortar – pale sandy grey
+        const m = 195 + (Math.random() * 12 - 6);
+        data[idx] = m; data[idx+1] = m - 2; data[idx+2] = m - 5; data[idx+3] = 255;
+      } else {
+        // Brick body – warm terracotta with variation
+        const noise = Math.sin(px * 0.7 + py * 1.3) * 14;
+        data[idx]   = Math.min(255, Math.round(178 + noise));  // R – terracotta
+        data[idx+1] = Math.min(255, Math.round(88  + noise * 0.5)); // G
+        data[idx+2] = Math.min(255, Math.round(52  + noise * 0.3)); // B
+        data[idx+3] = 255;
+      }
+    }
+    const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(3, 2);
+    tex.needsUpdate = true;
+    return tex;
+  };
+
+  // ── Weathering / rust streak texture (tall thin drip lines) ──────────────────
+  const makeStreakTexture = (size: number): THREE.DataTexture => {
+    const data = new Uint8Array(size * size * 4);
+    for (let i = 0; i < size * size; i++) {
+      const px = i % size;
+      const py = Math.floor(i / size);
+      // Vertical drip streaks – only show near random x columns
+      const streakSeed = Math.sin(px * 2.71) * 0.5 + 0.5;
+      const isStreak = streakSeed > 0.82; // ~18% of columns get a streak
+      // Streaks stronger towards the bottom (py near size)
+      const fadeDown = py / size;
+      const alpha = isStreak ? Math.round(fadeDown * 110 * (streakSeed - 0.82) / 0.18) : 0;
+      const idx = i * 4;
+      // Dark brown-grey stain colour
+      data[idx]   = 80; data[idx+1] = 68; data[idx+2] = 60; data[idx+3] = Math.min(255, alpha);
+    }
+    const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1.5, 1.0);
     tex.needsUpdate = true;
     return tex;
   };
@@ -210,6 +270,10 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     const groundTex = makeConcreteTexture(256, isNightMode ? 22 : 195, isNightMode ? 32 : 192, isNightMode ? 28 : 186, 24);
     // Rough bump data (same noise, used as roughnessMap tint)
     const bumpTex  = makeConcreteTexture(128, 128, 128, 128, 60);
+    // Brick texture for ground-floor plinth
+    const brickTex = makeBrickTexture(256);
+    // Weathering streak texture for below window sills
+    const streakTex = makeStreakTexture(64);
 
     // ── Materials ─────────────────────────────────────────────────────────────
     // Exposed concrete facade – the star of the show
@@ -220,11 +284,23 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
       metalness: 0.0,
     });
 
+    // ── Paint wash mode: warm plaster finish ─────────────────────────────────
+    // Replaces raw concrete with a smooth painted plaster surface
+    const plasterTex = makeConcreteTexture(128, isNightMode ? 200 : 240, isNightMode ? 195 : 234, isNightMode ? 185 : 222, isNightMode ? 12 : 10);
+    const paintedFacadeMat = new THREE.MeshStandardMaterial({
+      map: plasterTex,
+      roughness: isNightMode ? 0.60 : 0.50, // smoother than bare concrete
+      metalness: 0.0,
+    });
+
+    // Active wall material switches on paint mode
+    const activeFacadeMat = isPaintedMode ? paintedFacadeMat : facadeMat;
+
     // Slightly darker concrete for structural columns / fins
     const concreteDarkTex = makeConcreteTexture(128, isNightMode ? 36 : 148, isNightMode ? 40 : 146, isNightMode ? 38 : 142, 28);
     const accentMat = new THREE.MeshStandardMaterial({
-      map: concreteDarkTex,
-      roughness: 0.85,
+      map: isPaintedMode ? makeConcreteTexture(128, isNightMode ? 185 : 225, isNightMode ? 178 : 218, isNightMode ? 168 : 205, 8) : concreteDarkTex,
+      roughness: isPaintedMode ? 0.55 : 0.85,
       metalness: 0.0,
     });
 
@@ -233,6 +309,23 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
       map: slabTex,
       roughness: isNightMode ? 0.75 : 0.70,
       metalness: 0.0,
+    });
+
+    // Ground-floor plinth – exposed brick (terracotta)
+    const brickMat = new THREE.MeshStandardMaterial({
+      map: brickTex,
+      roughness: 0.88,
+      metalness: 0.0,
+    });
+
+    // Weathering / rain-streak overlay plane material
+    const streakMat = new THREE.MeshStandardMaterial({
+      map: streakTex,
+      transparent: true,
+      opacity: isPaintedMode ? 0.12 : 0.22, // less visible on painted surfaces
+      roughness: 1.0,
+      metalness: 0.0,
+      depthWrite: false,
     });
 
     // Wooden/steel door – keep dark charcoal
@@ -261,6 +354,21 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
       metalness: 0.0,
     });
 
+    // Fake AO – soft shadow quad that sits just above the ground around wall bases
+    const bWidth = 4.8 * Math.max(0.85, Math.min(1.3, plotAspect));
+    const bDepth = 4.0 / Math.max(0.85, Math.min(1.3, plotAspect));
+    const aoGeo = new THREE.PlaneGeometry(bWidth + 0.6, bDepth + 0.6);
+    const aoMat = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+    });
+    const aoPlane = new THREE.Mesh(aoGeo, aoMat);
+    aoPlane.rotation.x = -Math.PI / 2;
+    aoPlane.position.set(0, 0.01, 0);
+    buildingGroup.add(aoPlane);
+
     // Site Landscaping & Baseplate
     const groundW = 9.8 * Math.max(0.85, plotAspect);
     const groundD = 9.2 / Math.max(0.85, plotAspect);
@@ -283,14 +391,14 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
 
     // Municipal Plot Boundary Line
     const boundaryGeo = new THREE.BufferGeometry();
-    const bx = (groundW - 0.8) / 2;
-    const bz = (groundD - 0.8) / 2;
+    const bxLine = (groundW - 0.8) / 2;
+    const bzLine = (groundD - 0.8) / 2;
     const boundaryPoints = [
-      new THREE.Vector3(-bx, 0.02, -bz),
-      new THREE.Vector3(bx, 0.02, -bz),
-      new THREE.Vector3(bx, 0.02, bz),
-      new THREE.Vector3(-bx, 0.02, bz),
-      new THREE.Vector3(-bx, 0.02, -bz),
+      new THREE.Vector3(-bxLine, 0.02, -bzLine),
+      new THREE.Vector3(bxLine, 0.02, -bzLine),
+      new THREE.Vector3(bxLine, 0.02, bzLine),
+      new THREE.Vector3(-bxLine, 0.02, bzLine),
+      new THREE.Vector3(-bxLine, 0.02, -bzLine),
     ];
     boundaryGeo.setFromPoints(boundaryPoints);
     const boundaryMat = new THREE.LineDashedMaterial({ color: 0x1B3D34, dashSize: 0.35, gapSize: 0.18 });
@@ -299,8 +407,6 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     buildingGroup.add(boundaryLine);
 
     // Setback Footprint Dashed Guide on Ground
-    const bWidth = 4.8 * Math.max(0.85, Math.min(1.3, plotAspect));
-    const bDepth = 4.0 / Math.max(0.85, Math.min(1.3, plotAspect));
     const footprintGeo = new THREE.BufferGeometry();
     const fx = bWidth / 2 + 0.15;
     const fz = bDepth / 2 + 0.15;
@@ -349,9 +455,25 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
           floorGroup.add(col);
         });
       } else {
-        // Main wall body – exposed board-formed concrete
-        const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(bWidth, floorH - 0.12, bDepth), facadeMat);
-        wallMesh.position.set(0, floorH / 2, 0);
+        // Ground-floor plinth band – exposed brick for all modes
+        // A 30cm-tall brick plinth runs around the base of the wall
+        const plinthH = 0.30;
+        if (f === 0) {
+          const plinthMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(bWidth + 0.02, plinthH, bDepth + 0.02),
+            brickMat
+          );
+          plinthMesh.position.set(0, plinthH / 2, 0);
+          plinthMesh.castShadow = true;
+          plinthMesh.receiveShadow = true;
+          floorGroup.add(plinthMesh);
+        }
+
+        // Main wall body – exposed board-formed concrete or painted plaster
+        const wallH = f === 0 ? floorH - 0.12 - plinthH : floorH - 0.12;
+        const wallYOffset = f === 0 ? plinthH : 0;
+        const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(bWidth, wallH, bDepth), activeFacadeMat);
+        wallMesh.position.set(0, wallH / 2 + wallYOffset + 0.06, 0);
         wallMesh.castShadow = true;
         wallMesh.receiveShadow = true;
         floorGroup.add(wallMesh);
@@ -386,6 +508,13 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
           winGroup.add(glass);
           winGroup.position.set(wx, wy, wz);
           floorGroup.add(winGroup);
+
+          // ── Weathering streak plane – subtle rain drip stain below each window
+          const streakPlaneGeo = new THREE.PlaneGeometry(wW, 0.55);
+          const streakPlane = new THREE.Mesh(streakPlaneGeo, streakMat);
+          // Place just in front of wall, centred below sill
+          streakPlane.position.set(wx, wy - wH / 2 - 0.27, wz + 0.06);
+          floorGroup.add(streakPlane);
         };
 
         createWindow(-1.1, floorH / 2 + 0.05, bDepth / 2 + 0.04, 1.3, 0.8);
@@ -497,7 +626,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
       }
       renderer.dispose();
       // Dispose procedural textures
-      [wallTex, slabTex, groundTex, bumpTex, concreteDarkTex, paveTex, parapetTex].forEach(t => t.dispose());
+      [wallTex, slabTex, groundTex, bumpTex, concreteDarkTex, paveTex, parapetTex, brickTex, streakTex, plasterTex].forEach(t => t.dispose());
     };
   }, [
     numFloors,
@@ -512,6 +641,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     isAutoRotating,
     isNightMode,
     isExplodedView,
+    isPaintedMode,
     zoomLevel,
   ]);
 
@@ -592,6 +722,11 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
             Exploded View
           </span>
         )}
+        {isPaintedMode && (
+          <span className="bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-md text-[#1B3D34] text-[10px] font-extrabold border border-white/20 shadow-xs pointer-events-none">
+            Painted Finish
+          </span>
+        )}
         <span className="bg-[#F28C28] px-2.5 py-0.5 rounded-md text-[#1B3D34] text-[10px] font-extrabold shadow-xs pointer-events-none">
           {floors === 1 ? 'Ground Level' : `G+${(floors || 2) - 1}`}
         </span>
@@ -608,6 +743,17 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
           title="Toggle Exploded Floor Slice View"
         >
           <Layers className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setIsPaintedMode(!isPaintedMode)}
+          className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+            isPaintedMode ? 'bg-[#F28C28] text-[#1B3D34]' : 'text-white/70 hover:text-white hover:bg-white/10'
+          }`}
+          title={isPaintedMode ? 'Switch to Raw Concrete' : 'Switch to Painted Plaster'}
+        >
+          <PaintBucket className="w-3.5 h-3.5" />
         </button>
 
         <button
