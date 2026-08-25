@@ -122,163 +122,183 @@ export const PlannerPage: React.FC = () => {
 
       {/* ── TOP BAR (Clean, Minimal Architectural Header) ── */}
       {currentStep > 0 && currentStep < 11 && (
-        <header className="h-14 shrink-0 bg-white border-b border-[#E5E7EB] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 z-30">
-          
-          {/* Left: Brand Logo */}
-          <div className="flex items-center gap-2 shrink-0">
-            <div
-              onClick={() => navigate('/')}
-              className="cursor-pointer group flex items-center"
-              role="button"
-              aria-label="Back to home"
-            >
-              <HuttyLogo variant="compact" width={92} />
-            </div>
-          </div>
-
-          {/* Center: Dynamic Step Timeline (Desktop) & Switcher (Mobile) */}
-          <div className="flex flex-col items-center justify-center flex-1 max-w-2xl px-2">
+        <header className="relative shrink-0 bg-white border-b border-[#E5E7EB] z-30">
+          <div className="h-14 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
             
-            {/* Desktop Clean Wispr-inspired Step Timeline */}
-            <div className="hidden lg:flex items-center justify-center gap-1.5 w-full">
-              {STEPS.map((s, idx) => {
-                const stepNum = idx + 1;
-                const isCurrent = currentStep === stepNum;
-                const isCompleted = currentStep > stepNum;
-                return (
-                  <React.Fragment key={s.key}>
-                    <button
-                      type="button"
-                      onClick={() => setStep(stepNum)}
-                      className={`group flex items-center gap-1 px-1.5 py-0.5 rounded transition-all cursor-pointer ${
-                        isCurrent
-                          ? 'bg-[rgba(27,61,52,0.08)] text-[#1B3D34]'
-                          : isCompleted
-                          ? 'text-[#1B3D34] hover:text-[#1B3D34]'
-                          : 'text-[#4B5563] hover:text-[#1B3D34]'
-                      }`}
-                      title={`Step ${stepNum}: ${s.title}`}
-                    >
-                      <span
-                        className={`text-[10px] font-mono font-bold w-4 h-4 rounded flex items-center justify-center transition-colors ${
+            {/* Left: Brand Logo */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div
+                onClick={() => navigate('/')}
+                className="cursor-pointer group flex items-center"
+                role="button"
+                aria-label="Back to home"
+              >
+                <HuttyLogo variant="compact" width={92} />
+              </div>
+            </div>
+
+            {/* Center: Dynamic Sleek Step Timeline (Desktop) & Switcher (Mobile) */}
+            <div className="flex flex-col items-center justify-center flex-1 max-w-xl px-2">
+              
+              {/* Desktop Wispr / Linear inspired Stepper: Inactive compact dots + Active expanding pill */}
+              <div className="hidden lg:flex items-center justify-center gap-1.5 w-full">
+                {STEPS.map((s, idx) => {
+                  const stepNum = idx + 1;
+                  const isCurrent = currentStep === stepNum;
+                  const isCompleted = currentStep > stepNum;
+                  return (
+                    <React.Fragment key={s.key}>
+                      <button
+                        type="button"
+                        onClick={() => setStep(stepNum)}
+                        className={`group relative flex items-center transition-all duration-200 cursor-pointer ${
                           isCurrent
-                            ? 'bg-[#1B3D34] text-white'
-                            : isCompleted
-                            ? 'bg-[rgba(27,61,52,0.12)] text-[#1B3D34]'
-                            : 'bg-[#F8F8F6] text-[#4B5563] group-hover:bg-[#E5E7EB]'
+                            ? 'bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/25 px-2.5 py-1 rounded-full text-[#1B3D34]'
+                            : 'p-1 rounded-full text-[#4B5563] hover:text-[#1B3D34]'
                         }`}
+                        title={`Step ${stepNum}: ${s.title}`}
                       >
-                        {isCompleted ? '✓' : s.num}
-                      </span>
-                      <span
-                        className={`text-[11px] font-medium hidden xl:inline ${
-                          isCurrent ? 'font-bold text-[#1B3D34]' : ''
-                        }`}
-                      >
-                        {s.shortTitle}
-                      </span>
-                    </button>
-                    {idx < STEPS.length - 1 && (
-                      <span
-                        className={`h-px w-2 sm:w-3 transition-colors ${
-                          isCompleted ? 'bg-[#1B3D34]/40' : 'bg-[#E5E7EB]'
-                        }`}
-                      />
-                    )}
-                  </React.Fragment>
-                );
-              })}
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`text-[10px] font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                              isCurrent
+                                ? 'bg-[#1B3D34] text-white shadow-2xs'
+                                : isCompleted
+                                ? 'bg-[rgba(27,61,52,0.12)] text-[#1B3D34]'
+                                : 'bg-[#F8F8F6] text-[#4B5563] border border-[#E5E7EB] group-hover:bg-[#E5E7EB] group-hover:border-[#D1D5DB]'
+                            }`}
+                          >
+                            {isCompleted ? '✓' : stepNum}
+                          </span>
+                          
+                          {/* Only show title for the ACTIVE step to avoid horizontal crowding */}
+                          {isCurrent && (
+                            <motion.span
+                              initial={{ opacity: 0, width: 0 }}
+                              animate={{ opacity: 1, width: 'auto' }}
+                              exit={{ opacity: 0, width: 0 }}
+                              className="text-xs font-bold text-[#1B3D34] whitespace-nowrap overflow-hidden pr-0.5"
+                            >
+                              {s.shortTitle}
+                            </motion.span>
+                          )}
+                        </div>
+                      </button>
+                      
+                      {idx < STEPS.length - 1 && (
+                        <span
+                          className={`h-px w-1.5 sm:w-2 transition-colors ${
+                            isCompleted ? 'bg-[#1B3D34]/40' : 'bg-[#E5E7EB]'
+                          }`}
+                        />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+
+              {/* Tablet Step Title */}
+              <div className="hidden sm:flex lg:hidden items-center gap-2 text-xs">
+                <span className="font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.06)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
+                  Step {currentStep} of 10
+                </span>
+                <span className="font-semibold text-[#4B5563] truncate">
+                  • {currentStepDef.title}
+                </span>
+              </div>
+
+              {/* Mobile View Switcher (Form / 3D & Cost) */}
+              <div className="flex sm:hidden items-center bg-[#F8F8F6] p-0.5 rounded-lg border border-[#E5E7EB]">
+                <button
+                  type="button"
+                  onClick={() => setMobileActiveTab('form')}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    mobileActiveTab === 'form'
+                      ? 'bg-[#1B3D34] text-white shadow-xs'
+                      : 'text-[#4B5563]'
+                  }`}
+                >
+                  <Sliders className="w-3 h-3" />
+                  <span>Configure ({currentStep}/10)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMobileActiveTab('preview')}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    mobileActiveTab === 'preview'
+                      ? 'bg-[#1B3D34] text-white shadow-xs'
+                      : 'text-[#4B5563]'
+                  }`}
+                >
+                  <Box className="w-3 h-3 text-[#F28C28]" />
+                  <span>3D &amp; Estimate</span>
+                </button>
+              </div>
             </div>
 
-            {/* Tablet Step Title */}
-            <div className="hidden sm:flex lg:hidden items-center gap-2 text-xs">
-              <span className="font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.06)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
-                Step {currentStep} of 10
-              </span>
-              <span className="font-semibold text-[#4B5563] truncate">
-                • {currentStepDef.title}
-              </span>
-            </div>
-
-            {/* Mobile View Switcher (Form / 3D & Cost) */}
-            <div className="flex sm:hidden items-center bg-[#F8F8F6] p-0.5 rounded-lg border border-[#E5E7EB]">
+            {/* Right: Actions (Save, Reset, Share, Help, Close) */}
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
-                onClick={() => setMobileActiveTab('form')}
-                className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  mobileActiveTab === 'form'
-                    ? 'bg-[#1B3D34] text-white shadow-xs'
-                    : 'text-[#4B5563]'
-                }`}
+                onClick={() => setShowSavedModal(true)}
+                className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Save Project"
               >
-                <Sliders className="w-3 h-3" />
-                <span>Configure ({currentStep}/10)</span>
+                <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <span className="hidden md:inline">Save</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => setMobileActiveTab('preview')}
-                className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  mobileActiveTab === 'preview'
-                    ? 'bg-[#1B3D34] text-white shadow-xs'
-                    : 'text-[#4B5563]'
-                }`}
+                onClick={() => setShowResetConfirm(true)}
+                className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Reset Configuration"
               >
-                <Box className="w-3 h-3 text-[#F28C28]" />
-                <span>3D &amp; Estimate</span>
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Reset</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowShareModal(true)}
+                className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Share Project"
+              >
+                <Share2 className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <span className="hidden lg:inline">Share</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowHelpModal(true)}
+                className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer"
+                title="Help & Shortcuts"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer ml-1"
+                title="Exit Calculator"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Right: Actions (Save, Reset, Share, Help, Close) */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => setShowSavedModal(true)}
-              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
-              title="Save Project"
+          {/* Architectural Thin Progress Track with Lead Accent */}
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#E5E7EB]">
+            <motion.div
+              className="h-full bg-[#1B3D34] relative"
+              initial={false}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
             >
-              <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
-              <span className="hidden md:inline">Save</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowResetConfirm(true)}
-              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
-              title="Reset Configuration"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Reset</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowShareModal(true)}
-              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
-              title="Share Project"
-            >
-              <Share2 className="w-3.5 h-3.5 text-[#1B3D34]" />
-              <span className="hidden lg:inline">Share</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowHelpModal(true)}
-              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer"
-              title="Help & Shortcuts"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer ml-1"
-              title="Exit Calculator"
-            >
-              <X className="w-4 h-4" />
-            </button>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#F28C28] rounded-full shadow-xs" />
+            </motion.div>
           </div>
         </header>
       )}
@@ -312,10 +332,10 @@ export const PlannerPage: React.FC = () => {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentStep}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                     className="max-w-xl mx-auto w-full"
                   >
                     {currentStep === 1 && <Step1BasicInfo />}

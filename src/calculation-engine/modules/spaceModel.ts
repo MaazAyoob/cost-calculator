@@ -20,6 +20,7 @@ import {
   KITCHEN_COUNTER_LENGTH_FT,
   BATHROOM_WATERPROOFING_UPTURN_FT,
 } from '../data/coefficients';
+import { getMasonrySpecification } from '../data/masonrySpecifications';
 
 export function generateBuildingModel(input: EngineInput, area: AreaResult): BuildingModel {
   const floorsCount = Math.max(0, input.floors || 0);
@@ -304,17 +305,18 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
   const externalPaintableAreaSqFt = netExternalWallAreaSqFt;
   const totalPaintableAreaSqFt = internalPaintableAreaSqFt + externalPaintableAreaSqFt;
 
-  // Masonry Volume & Block Count per PDF Section 12:
-  // Net Wall Area = External Wall Area + Internal Wall Area − Door Openings − Window Openings
+  // Masonry Volume & Block/Brick Count:
+  // Derived from canonical Net Wall Area and Selected Material Specification
+  const masonrySpec = getMasonrySpecification(input.materialBrands?.masonry || (input as any).masonryMaterial);
   const totalNetWallAreaSqFt = netExternalWallAreaSqFt + netInternalWallAreaSqFt;
-  // Convert sq.ft to sq.m (1 sq.ft = 0.092903 sq.m) and multiply by thickness in meters:
+  // Convert sq.ft to sq.m (1 sq.ft = 0.092903 sq.m) and multiply by material-specific thickness:
   const SQFT_TO_SQM = 0.092903;
-  const externalWallVolCuM = (netExternalWallAreaSqFt * SQFT_TO_SQM) * EXTERNAL_WALL_THICKNESS_M;
-  const internalWallVolCuM = (netInternalWallAreaSqFt * SQFT_TO_SQM) * INTERNAL_WALL_THICKNESS_M;
+  const externalWallVolCuM = (netExternalWallAreaSqFt * SQFT_TO_SQM) * masonrySpec.externalWallThicknessM;
+  const internalWallVolCuM = (netInternalWallAreaSqFt * SQFT_TO_SQM) * masonrySpec.internalWallThicknessM;
   const totalWallVolumeCuM = externalWallVolCuM + internalWallVolCuM;
 
   const totalBlockCount = Math.ceil(
-    (totalWallVolumeCuM / AAC_BLOCK_UNIT_VOLUME_CUM) * (1 + MASONRY_WASTAGE_PERCENTAGE / 100)
+    (totalWallVolumeCuM / masonrySpec.unitVolumeCuM) * (1 + masonrySpec.wastagePercentage / 100)
   );
 
   return {

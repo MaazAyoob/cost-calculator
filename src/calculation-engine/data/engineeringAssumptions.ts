@@ -204,7 +204,40 @@ export const CENTRALIZED_ENGINEERING_ASSUMPTIONS: Record<string, QSParameterItem
     effectiveDate: '2026-01-01',
     category: 'ENGINEERING ASSUMPTION',
     requiresClientConfirmation: false,
-    notes: '5% cutting, chases, and handling breakage allowance.',
+    notes: '5% cutting, chases, and handling breakage allowance for blocks.',
+  },
+  clayBrickUnitVolumeCuM: {
+    id: 'clayBrickUnitVolumeCuM',
+    name: 'Standard Modular Clay Brick Unit Volume',
+    value: 0.001539, // 190mm × 90mm × 90mm = 0.001539 m3
+    unit: 'cu.m/brick',
+    source: 'IS 1077 Standard Brick Size (190×90×90mm)',
+    effectiveDate: '2026-01-01',
+    category: 'QS/INDUSTRY BENCHMARK',
+    requiresClientConfirmation: false,
+    notes: 'Unit volume used to derive brick count: Wall Volume ÷ Brick Volume.',
+  },
+  clayBrickWastagePercentage: {
+    id: 'clayBrickWastagePercentage',
+    name: 'Clay Brick Cutting & Breakage Wastage',
+    value: 7,
+    unit: '%',
+    source: 'Field QS Benchmark / IS 2212',
+    effectiveDate: '2026-01-01',
+    category: 'ENGINEERING ASSUMPTION',
+    requiresClientConfirmation: false,
+    notes: '7% cutting and site handling breakage allowance for clay bricks.',
+  },
+  concreteBlockUnitVolumeCuM: {
+    id: 'concreteBlockUnitVolumeCuM',
+    name: 'Standard Solid Concrete Block Unit Volume',
+    value: 0.012, // 400mm × 200mm × 150mm = 0.012 m3
+    unit: 'cu.m/block',
+    source: 'IS 2185 Part 1 Standard Block Size (400×200×150mm)',
+    effectiveDate: '2026-01-01',
+    category: 'QS/INDUSTRY BENCHMARK',
+    requiresClientConfirmation: false,
+    notes: 'Unit volume used to derive concrete block count: Wall Volume ÷ Block Volume.',
   },
 
   // ── 5. Flooring & Cladding Parameters (PDF Section 15, 16) ──

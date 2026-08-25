@@ -148,8 +148,39 @@ export function generateBOQ(
   add('RCC Structure', 'RC', 'Scaffolding & Film-Faced Plywood Formwork System', 'Sq Ft', bua * 0.90, rate(55, m.structural), 'Cuplock Staging System', 'waterproof shuttering ply with oiling', 'Formwork Area × Rate');
 
   // ── 5. Masonry (Space Model Geometry) ──
-  add('Masonry', 'MA', 'AAC Block 150mm External Perimeter Masonry Wall', 'Cu M', qty.aacBlocksCuM * 0.55, rate(r.aacBlock6InchPerCuM, m.structural), 'Birla Aerocon Grade 1', 'thin-bed polymer adhesive joint', 'AAC Volume × Rate');
-  add('Masonry', 'MA', 'AAC Block 100mm Internal Partition Masonry Wall', 'Cu M', qty.aacBlocksCuM * 0.45, rate(r.aacBlock6InchPerCuM * 0.85, m.structural), 'Birla Aerocon Grade 1', '3mm joint mortar bed', 'AAC Volume × Rate');
+  const isClayMasonry = qty.masonryMaterial === 'Clay Bricks' || materialBrands?.masonry?.includes('Clay') || materialBrands?.masonry?.includes('Brick');
+  const isConcreteMasonry = qty.masonryMaterial === 'Concrete Blocks' || materialBrands?.masonry?.includes('Concrete') || materialBrands?.masonry?.includes('Cement Block');
+
+  let extWallDesc = 'AAC Block 150mm External Perimeter Masonry Wall';
+  let intWallDesc = 'AAC Block 100mm Internal Partition Masonry Wall';
+  let extWallRate = rate(r.aacBlock6InchPerCuM, m.structural);
+  let intWallRate = rate(r.aacBlock6InchPerCuM * 0.85, m.structural);
+  let masonryBrandDesc = qty.masonryBrand || 'Birla Aerocon Grade 1';
+  let extJointDesc = 'thin-bed polymer adhesive joint';
+  let intJointDesc = '3mm joint mortar bed';
+
+  if (isClayMasonry) {
+    extWallDesc = 'Red Clay Brick 230mm External Perimeter Masonry Wall';
+    intWallDesc = 'Red Clay Brick 115mm Internal Partition Masonry Wall';
+    extWallRate = rate(4200, m.structural);
+    intWallRate = rate(4200 * 0.9, m.structural);
+    masonryBrandDesc = qty.masonryBrand || 'Wirecut Red Clay Bricks';
+    extJointDesc = 'cement mortar 1:6 laying';
+    intJointDesc = 'cement mortar 1:4 with reinforcement ties';
+  } else if (isConcreteMasonry) {
+    extWallDesc = 'Solid Concrete Block 150mm External Perimeter Masonry Wall';
+    intWallDesc = 'Solid Concrete Block 100mm Internal Partition Masonry Wall';
+    extWallRate = rate(3900, m.structural);
+    intWallRate = rate(3900 * 0.85, m.structural);
+    masonryBrandDesc = qty.masonryBrand || 'Solid Concrete Blocks Standard';
+    extJointDesc = 'cement mortar 1:5 laying';
+    intJointDesc = 'cement mortar 1:4 laying';
+  }
+
+  const masonryVolCuM = qty.masonryVolumeCuM || qty.wallVolumeCuM || qty.aacBlocksCuM;
+
+  add('Masonry', 'MA', extWallDesc, 'Cu M', masonryVolCuM * 0.55, extWallRate, masonryBrandDesc, extJointDesc, 'Masonry Volume × Rate');
+  add('Masonry', 'MA', intWallDesc, 'Cu M', masonryVolCuM * 0.45, intWallRate, masonryBrandDesc, intJointDesc, 'Masonry Volume × Rate');
   add('Masonry', 'MA', 'RCC Lintel Beams with 2-legged Stirrups over Openings', 'RM', (qty.totalDoorsCount + qty.windowsCount) * 1.8, rate(850, m.structural), 'M20 in-situ concrete', '200mm × 150mm lintel band', 'Lintel Length × Rate');
   add('Masonry', 'MA', 'Precast RCC Chajjas / Sunshades over Windows', 'RM', qty.windowsCount * 1.5, rate(1200, m.structural), 'M20 RCC + drip groove', '450mm projection with slope', 'Chajja Length × Rate');
   add('Masonry', 'MA', 'GI Chicken Mesh 22g at RCC-Masonry Wall Junctions', 'RM', area.totalBUASqFt * 0.4, rate(18, 1), 'GI 22g 150mm width', 'prevents hairline shrinkage cracks', 'Joint Length × Rate');

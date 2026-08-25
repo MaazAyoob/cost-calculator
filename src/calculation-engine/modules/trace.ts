@@ -148,19 +148,21 @@ export function generateCalculationTrace(
     unit: 'sq.ft',
   });
 
-  // 10. AAC Masonry Blocks Count (PDF Section 12)
+  // 10. Masonry Units Count (AAC / Clay Brick / Concrete Block)
   steps.push({
-    parameter: 'aacBlocksPieces',
+    parameter: 'masonryUnitsCount',
     category: 'SPACE & MASONRY',
     inputs: {
-      wallVolumeCuM: quantities.wallVolumeCuM,
-      unitBlockVolume: 0.018,
-      wastagePercentage: 5,
+      material: quantities.masonryMaterial || 'AAC Blocks',
+      size: quantities.masonrySizeLabel || '600×200×150mm',
+      wallVolumeCuM: quantities.masonryVolumeCuM || quantities.wallVolumeCuM,
+      unitRate: quantities.masonryUnitRate,
+      wastagePercentage: quantities.masonryWastagePct || 5,
     },
-    formula: 'Wall Volume ÷ Unit Block Volume × (1 + Wastage%)',
-    assumption: 'Standard 600×200×150mm block size with 5% cutting allowance',
-    result: quantities.aacBlocksPieces,
-    unit: 'Blocks',
+    formula: 'Masonry Volume ÷ Unit Block/Brick Volume × (1 + Wastage%)',
+    assumption: `${quantities.masonryMaterial || 'AAC Blocks'} (${quantities.masonrySizeLabel || '600×200×150mm'}) with ${quantities.masonryWastagePct || 5}% approved wastage`,
+    result: quantities.masonryUnitsCount || quantities.aacBlocksPieces,
+    unit: quantities.masonryUnit || 'Nos',
   });
 
   // 11. Paintable Area (PDF Section 17)

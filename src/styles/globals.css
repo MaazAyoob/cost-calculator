@@ -87,7 +87,17 @@
    TYPOGRAPHY UTILITIES — Plus Jakarta Sans & Inter
    ============================================================ */
 .font-heading {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-sans {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tabular-nums, .font-tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 .heading-display {
@@ -165,19 +175,25 @@
   border: 1px solid #E5E7EB;
   border-radius: var(--cc-radius-card);
   color: #1B3D34;
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .hutty-selectable:hover {
   background-color: rgba(27, 61, 52, 0.04);
   border-color: #D1D5DB;
+  transform: translateY(-1px);
+}
+
+.hutty-selectable:active {
+  transform: scale(0.985);
 }
 
 /* Selected State */
 .hutty-selectable-selected {
   background-color: rgba(27, 61, 52, 0.08) !important;
   border-color: #1B3D34 !important;
-  box-shadow: 0 0 0 1px #1B3D34;
+  box-shadow: 0 0 0 1.5px #1B3D34 !important;
+  transform: scale(1.008);
 }
 
 /* ============================================================
@@ -271,20 +287,26 @@
   border: 1px solid #E5E7EB;
   border-radius: var(--cc-radius-card);
   padding: 0.875rem 1rem;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
   cursor: pointer;
   user-select: none;
 }
 
 .hutty-tactile-card:hover {
   border-color: #D1D5DB;
-  background-color: rgba(27, 61, 52, 0.02);
+  background-color: rgba(27, 61, 52, 0.04);
+  transform: translateY(-1px);
+}
+
+.hutty-tactile-card:active {
+  transform: scale(0.985);
 }
 
 .hutty-tactile-card-selected {
-  background-color: rgba(27, 61, 52, 0.06) !important;
+  background-color: rgba(27, 61, 52, 0.08) !important;
   border-color: #1B3D34 !important;
   box-shadow: 0 0 0 1.5px #1B3D34 !important;
+  transform: scale(1.008);
 }
 
 /* Tactile Numeric Input Box */
@@ -293,12 +315,17 @@
   border: 1.5px solid #E5E7EB;
   border-radius: var(--cc-radius-card);
   padding: 0.75rem 1rem;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hutty-number-box:hover {
+  border-color: #D1D5DB;
 }
 
 .hutty-number-box:focus-within {
   border-color: #1B3D34;
-  box-shadow: 0 0 0 1px #1B3D34;
+  background-color: rgba(27, 61, 52, 0.03);
+  box-shadow: 0 0 0 1.5px #1B3D34;
 }
 
 /* Tactile Custom Range Slider */

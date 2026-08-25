@@ -247,9 +247,18 @@ export interface MaterialQuantities {
   pSandCuFt: number;
   sandCuFt: number; // Total sand (M-Sand + P-Sand)
   coarseAggregateCuFt: number;
-  // Masonry
+  // Masonry (Geometry & Specification-Driven)
   netWallAreaSqFt: number;
   wallVolumeCuM: number;
+  masonryMaterial: string;
+  masonryBrand: string;
+  masonrySizeLabel: string;
+  masonryVolumeCuM: number;
+  masonryUnitsCount: number;
+  masonryUnit: string;
+  masonryWastagePct: number;
+  masonryUnitRate: number;
+  masonryAmount: number;
   aacBlocksCuM: number;
   aacBlocksPieces: number;
   // Waterproofing

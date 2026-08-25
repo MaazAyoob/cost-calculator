@@ -99,10 +99,10 @@ export const Step3CoreMaterials: React.FC = () => {
       <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
         <div className="flex justify-between items-center text-xs">
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
-            Portland Cement
+            Portland Cement (50 kg Bag)
           </label>
           <span className="font-mono font-extrabold text-[#1B3D34]">
-            {cementBags > 0 ? `${cementBags.toLocaleString()} Bags Required` : '0 Bags'}
+            {cementBags > 0 ? `${cementBags.toLocaleString()} Bags Required (0.40 bags/sq.ft BUA)` : '0 Bags'}
           </span>
         </div>
 
@@ -113,7 +113,7 @@ export const Step3CoreMaterials: React.FC = () => {
             return (
               <div
                 key={item.brand}
-                onClick={() => setCoreMaterials(materialBrands.steel as any, item.brand)}
+                onClick={() => setCoreMaterials(materialBrands.steel as any, item.brand, materialBrands.masonry as any)}
                 className={cn(
                   'hutty-tactile-card flex items-center justify-between',
                   isSelected && 'hutty-tactile-card-selected'
@@ -143,7 +143,108 @@ export const Step3CoreMaterials: React.FC = () => {
                   <span className="text-xs font-black text-[#1B3D34] block font-mono">
                     {cementBags > 0 ? formatCurrency(itemCost) : `₹${item.ratePerBag}/bag`}
                   </span>
-                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerBag}/bag</span>
+                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerBag} / 50kg bag</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 3. WALL / MASONRY MATERIAL ── */}
+      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+        <div className="flex justify-between items-center text-xs">
+          <div>
+            <label className="font-bold text-[#1B3D34] uppercase tracking-wider block">
+              Wall / Masonry Material
+            </label>
+            {quantities.wallVolumeCuM > 0 && (
+              <span className="text-[10px] text-[#4B5563]">
+                Net Wall Area: {quantities.netWallAreaSqFt} sq.ft &bull; Masonry Vol: {quantities.wallVolumeCuM} m³
+              </span>
+            )}
+          </div>
+          <span className="font-mono font-extrabold text-[#1B3D34]">
+            {quantities.masonryUnitsCount > 0 ? `${quantities.masonryUnitsCount.toLocaleString()} ${quantities.masonryUnit || 'Nos'} Required` : '0 Nos'}
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {[
+            {
+              type: 'AAC Blocks',
+              name: 'AAC Blocks (Birla Aerocon / Godrej)',
+              size: '600 × 200 × 150 mm',
+              vol: '0.018 m³',
+              wastage: '5%',
+              rate: 85,
+              unit: 'Block',
+              desc: 'IS 2185 Part 3 lightweight thermal insulating blocks with polymer jointing.',
+              recommended: true,
+            },
+            {
+              type: 'Clay Bricks',
+              name: 'Wirecut Red Clay Bricks',
+              size: '190 × 90 × 90 mm',
+              vol: '0.00154 m³',
+              wastage: '7%',
+              rate: 12,
+              unit: 'Brick',
+              desc: 'IS 1077 high compressive strength modular kiln-burnt red clay bricks.',
+            },
+            {
+              type: 'Concrete Blocks',
+              name: 'Solid Concrete / Cement Blocks',
+              size: '400 × 200 × 150 mm',
+              vol: '0.012 m³',
+              wastage: '5%',
+              rate: 52,
+              unit: 'Block',
+              desc: 'IS 2185 Part 1 heavy-duty hydraulic pressed solid concrete blocks.',
+            },
+          ].map((item) => {
+            const isSelected = (!materialBrands.masonry && item.type === 'AAC Blocks') || materialBrands.masonry === item.type;
+            const count = isSelected ? quantities.masonryUnitsCount : 0;
+            const itemCost = Math.round(count * item.rate);
+            return (
+              <div
+                key={item.type}
+                onClick={() => {
+                  setCoreMaterials(materialBrands.steel as any, materialBrands.cement as any, item.type);
+                }}
+                className={cn(
+                  'hutty-tactile-card flex items-center justify-between',
+                  isSelected && 'hutty-tactile-card-selected'
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
+                    )}
+                  >
+                    {isSelected && <Check className="w-3.5 h-3.5" />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.name}</h4>
+                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                        Size: {item.size}
+                      </span>
+                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                        Wastage: {item.wastage}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-[#4B5563] mt-0.5">{item.desc}</p>
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0 pl-3">
+                  <span className="text-xs font-black text-[#1B3D34] block font-mono">
+                    {count > 0 ? formatCurrency(itemCost) : `₹${item.rate}/${item.unit}`}
+                  </span>
+                  <span className="text-[10px] text-[#4B5563]">₹{item.rate} / {item.unit}</span>
                 </div>
               </div>
             );

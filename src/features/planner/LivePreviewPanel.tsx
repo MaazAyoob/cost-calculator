@@ -5,29 +5,19 @@ import {
   useBudgetResult,
   useArea,
   useQuantities,
-  useBOQ,
   useBuildingModel,
 } from '../../store/useCalculationStore';
 import { formatCurrency } from '../../utils/cn';
+import { AnimatedNumber } from '../../components/common/AnimatedNumber';
 import { Architectural3DViewer } from '../../components/3d/Architectural3DViewer';
 import {
-  Sparkles,
-  Layers,
-  CheckCircle2,
-  Compass,
-  DoorClosed,
-  AppWindow,
-  Zap,
-  Droplets,
-  Paintbrush,
+  TrendingUp,
+  TrendingDown,
   Info,
   Calculator,
   X,
-  TrendingUp,
-  TrendingDown,
-  Building,
-  Ruler,
-  Maximize2,
+  Compass,
+  Layers,
 } from 'lucide-react';
 
 export const LivePreviewPanel: React.FC = () => {
@@ -105,8 +95,10 @@ export const LivePreviewPanel: React.FC = () => {
     setInspectorItem({ title, formula, variables, standardNorm, result });
   };
 
+  const isZeroState = buaSqFt === 0 || totalCost === 0;
+
   return (
-    <aside className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-5 lg:p-6 shadow-xs flex flex-col justify-between space-y-4 text-left select-none">
+    <aside className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-5 lg:p-6 shadow-xs flex flex-col justify-between space-y-4 text-left select-none relative overflow-hidden">
       
       {/* ── 1. PROMINENT ESTIMATE HERO AREA ── */}
       <div className="space-y-3 pb-3 border-b border-[#E5E7EB]">
@@ -114,7 +106,7 @@ export const LivePreviewPanel: React.FC = () => {
         {/* Top Status & Delta Bar */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#1B3D34] animate-pulse" />
+            <span className={`w-2 h-2 rounded-full ${isZeroState ? 'bg-[#4B5563]' : 'bg-[#1B3D34] animate-pulse'}`} />
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#1B3D34] font-heading">
               ESTIMATED PROJECT COST
             </span>
@@ -132,8 +124,11 @@ export const LivePreviewPanel: React.FC = () => {
                     : 'bg-[#1B3D34]/10 text-[#1B3D34] border border-[#1B3D34]/20'
                 }`}
               >
-                {costDelta > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                <span>{costDelta > 0 ? `+${formatCurrency(costDelta)}` : formatCurrency(costDelta)}</span>
+                {costDelta > 0 ? <TrendingUp className="w-3 h-3 text-[#F28C28]" /> : <TrendingDown className="w-3 h-3 text-[#1B3D34]" />}
+                <span>
+                  {costDelta > 0 ? '+' : ''}
+                  <AnimatedNumber value={costDelta} format={(v) => formatCurrency(Math.round(v))} duration={300} />
+                </span>
               </motion.span>
             )}
 
@@ -143,24 +138,19 @@ export const LivePreviewPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* Large Estimate Number */}
+        {/* Large Estimate Number with Tabular Motion */}
         <div className="flex items-baseline gap-3 flex-wrap">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={totalCost}
-              initial={{ opacity: 0.8, y: -2 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0.8, y: 2 }}
-              transition={{ duration: 0.15 }}
-              className="text-3xl sm:text-4xl font-black text-[#1B3D34] tracking-tight font-heading leading-none"
-            >
-              {totalCost > 0 ? formatCurrency(totalCost) : '₹0'}
-            </motion.div>
-          </AnimatePresence>
+          <div className="text-3xl sm:text-4xl font-black text-[#1B3D34] tracking-tight font-heading leading-none tabular-nums">
+            {isZeroState ? (
+              <span className="text-[#9CA3AF]">₹0</span>
+            ) : (
+              <AnimatedNumber value={totalCost} format={(v) => formatCurrency(Math.round(v))} duration={400} />
+            )}
+          </div>
 
           {ratePerSqFt > 0 && (
-            <span className="text-xs sm:text-sm font-mono font-bold text-[#4B5563]">
-              @ ₹{ratePerSqFt.toLocaleString()} / sq.ft BUA
+            <span className="text-xs sm:text-sm font-mono font-bold text-[#4B5563] tabular-nums">
+              @ ₹<AnimatedNumber value={ratePerSqFt} duration={350} /> / sq.ft BUA
             </span>
           )}
         </div>
@@ -183,8 +173,14 @@ export const LivePreviewPanel: React.FC = () => {
             }
             className="flex items-center gap-1.5 hover:text-[#1B3D34] transition-colors cursor-pointer group"
           >
-            <span className="font-bold text-[#1B3D34] font-mono text-xs">
-              {buaSqFt > 0 ? `${buaSqFt.toLocaleString()} sq.ft` : '0 sq.ft'}
+            <span className="font-bold text-[#1B3D34] font-mono text-xs tabular-nums">
+              {buaSqFt > 0 ? (
+                <>
+                  <AnimatedNumber value={buaSqFt} duration={350} /> sq.ft
+                </>
+              ) : (
+                '0 sq.ft'
+              )}
             </span>
             <span>BUA</span>
             <Info className="w-3 h-3 text-[#4B5563] opacity-60 group-hover:opacity-100" />
@@ -208,8 +204,14 @@ export const LivePreviewPanel: React.FC = () => {
             }
             className="flex items-center gap-1.5 hover:text-[#1B3D34] transition-colors cursor-pointer group"
           >
-            <span className="font-bold text-[#1B3D34] font-mono text-xs">
-              {remainingGround > 0 ? `${Math.round(remainingGround).toLocaleString()} sq.ft` : '0 sq.ft'}
+            <span className="font-bold text-[#1B3D34] font-mono text-xs tabular-nums">
+              {remainingGround > 0 ? (
+                <>
+                  <AnimatedNumber value={Math.round(remainingGround)} duration={350} /> sq.ft
+                </>
+              ) : (
+                '0 sq.ft'
+              )}
             </span>
             <span>Open Yard</span>
             <Info className="w-3 h-3 text-[#4B5563] opacity-60 group-hover:opacity-100" />
@@ -217,8 +219,8 @@ export const LivePreviewPanel: React.FC = () => {
 
           <span className="text-[#E5E7EB]">•</span>
 
-          <span className="font-mono text-[#4B5563] text-xs">
-            {plotArea > 0 ? `${plotArea.toLocaleString()} sq.ft plot` : '0 sq.ft'}
+          <span className="font-mono text-[#4B5563] text-xs tabular-nums">
+            {plotArea > 0 ? `${plotArea.toLocaleString()} sq.ft plot` : '0 sq.ft plot'}
           </span>
         </div>
 
@@ -294,20 +296,33 @@ export const LivePreviewPanel: React.FC = () => {
         )}
 
         {currentStep === 3 && (
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
               <div>
-                <span className="font-bold text-[#1B3D34] block">Rebar Steel</span>
-                <span className="text-[10px] text-[#4B5563]">{materialBrands?.steel || 'Tata Tiscon'}</span>
+                <span className="font-bold text-[#1B3D34] block text-[11px]">Rebar Steel</span>
+                <span className="text-[9px] text-[#4B5563] truncate block">{materialBrands?.steel || 'Tata Tiscon'}</span>
               </div>
-              <span className="font-bold text-[#1B3D34] font-mono text-sm">{quantities.steelTonnes || 0} T</span>
+              <span className="font-bold text-[#1B3D34] font-mono text-xs sm:text-sm mt-1 tabular-nums">
+                <AnimatedNumber value={quantities.steelTonnes || 0} decimals={2} duration={350} /> T
+              </span>
             </div>
-            <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
+            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
               <div>
-                <span className="font-bold text-[#1B3D34] block">Portland Cement</span>
-                <span className="text-[10px] text-[#4B5563]">{materialBrands?.cement || 'UltraTech'}</span>
+                <span className="font-bold text-[#1B3D34] block text-[11px]">Portland Cement</span>
+                <span className="text-[9px] text-[#4B5563] truncate block">{materialBrands?.cement || 'UltraTech'}</span>
               </div>
-              <span className="font-bold text-[#1B3D34] font-mono text-sm">{(quantities.cementBags || 0).toLocaleString()} Bags</span>
+              <span className="font-bold text-[#1B3D34] font-mono text-xs sm:text-sm mt-1 tabular-nums">
+                <AnimatedNumber value={quantities.cementBags || 0} duration={350} /> Bags
+              </span>
+            </div>
+            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
+              <div>
+                <span className="font-bold text-[#1B3D34] block text-[11px]">Masonry</span>
+                <span className="text-[9px] text-[#4B5563] truncate block">{quantities.masonryMaterial || 'AAC Blocks'}</span>
+              </div>
+              <span className="font-bold text-[#1B3D34] font-mono text-xs sm:text-sm mt-1 tabular-nums">
+                <AnimatedNumber value={quantities.masonryUnitsCount || 0} duration={350} /> {quantities.masonryUnit || 'Nos'}
+              </span>
             </div>
           </div>
         )}
@@ -320,8 +335,30 @@ export const LivePreviewPanel: React.FC = () => {
               </span>
               <span className="text-[10px] text-[#4B5563]">Physical Takeoff Computed</span>
             </div>
-            <span className="font-bold text-[#1B3D34] font-mono text-sm">
-              {currentStep === 4 ? `${(quantities.floorTilesSqFt || Math.round(buaSqFt * 0.85)).toLocaleString()} sq.ft` : currentStep === 5 ? `${(quantities.wallTilesSqFt || 580).toLocaleString()} sq.ft` : currentStep === 6 ? `${quantities.totalDoorsCount || 8} Sets` : currentStep === 7 ? `${quantities.windowAreaSqFt || 200} sq.ft` : currentStep === 8 ? `${(quantities.electricalWireMetres || 850).toLocaleString()}m Wire` : currentStep === 9 ? `${quantities.bathroomFixtureSets || 3} Bath Sets` : `${(quantities.totalPaintableAreaSqFt || 8000).toLocaleString()} sq.ft`}
+            <span className="font-bold text-[#1B3D34] font-mono text-sm tabular-nums">
+              {currentStep === 4 ? (
+                <>
+                  <AnimatedNumber value={quantities.floorTilesSqFt || Math.round(buaSqFt * 0.85)} duration={350} /> sq.ft
+                </>
+              ) : currentStep === 5 ? (
+                <>
+                  <AnimatedNumber value={quantities.wallTilesSqFt || 580} duration={350} /> sq.ft
+                </>
+              ) : currentStep === 6 ? (
+                `${quantities.totalDoorsCount || 8} Sets`
+              ) : currentStep === 7 ? (
+                `${quantities.windowAreaSqFt || 200} sq.ft`
+              ) : currentStep === 8 ? (
+                <>
+                  <AnimatedNumber value={quantities.electricalWireMetres || 850} duration={350} />m Wire
+                </>
+              ) : currentStep === 9 ? (
+                `${quantities.bathroomFixtureSets || 3} Bath Sets`
+              ) : (
+                <>
+                  <AnimatedNumber value={quantities.totalPaintableAreaSqFt || 8000} duration={350} /> sq.ft
+                </>
+              )}
             </span>
           </div>
         )}
@@ -331,19 +368,27 @@ export const LivePreviewPanel: React.FC = () => {
           <div className="grid grid-cols-4 gap-2 pt-1 text-[11px] text-[#4B5563]">
             <div className="border-r border-[#E5E7EB] pr-1.5">
               <span className="block text-[9px] font-bold text-[#4B5563] uppercase">Civil Structure</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{formatCurrency(structureCost)}</span>
+              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
+                <AnimatedNumber value={structureCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+              </span>
             </div>
             <div className="border-r border-[#E5E7EB] pr-1.5">
               <span className="block text-[9px] font-bold text-[#4B5563] uppercase">Finishes</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{formatCurrency(finishesCost)}</span>
+              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
+                <AnimatedNumber value={finishesCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+              </span>
             </div>
             <div className="border-r border-[#E5E7EB] pr-1.5">
               <span className="block text-[9px] font-bold text-[#4B5563] uppercase">MEP</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{formatCurrency(mepCost)}</span>
+              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
+                <AnimatedNumber value={mepCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+              </span>
             </div>
             <div>
               <span className="block text-[9px] font-bold text-[#4B5563] uppercase">GST &amp; Misc</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{formatCurrency(gstAndContingency)}</span>
+              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
+                <AnimatedNumber value={gstAndContingency} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+              </span>
             </div>
           </div>
         )}

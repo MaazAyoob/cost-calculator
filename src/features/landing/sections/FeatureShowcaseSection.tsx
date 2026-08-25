@@ -1,215 +1,283 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
 
 export const FeatureShowcaseSection: React.FC = () => {
   const navigate = useNavigate();
 
-  const features = [
-    {
-      num: '01',
-      title: 'LIVE ESTIMATE',
-      quote: 'Know how your choices affect the number.',
-      description: 'Adjust room counts, add a floor, or shift your footprint. Our single source-of-truth engine recalculates structural requirements, built-up area, and cost per square foot dynamically in real time.',
-      bullets: [
-        'Instant response to every dimension and floor adjustment',
-        'Automatic calculation of super built-up area and ground footprint',
-        'Transparent breakdown across civil, finishes, and MEP trades',
-      ],
-      visual: (
-        <div className="p-6 bg-white rounded-2xl border border-[#E5E7EB] space-y-4 text-left shadow-xs">
-          <div className="flex justify-between items-center text-xs pb-3 border-b border-[#E5E7EB]">
-            <span className="font-bold text-[#1B3D34] font-heading">Live Takeoff Preview</span>
-            <span className="text-[#1B3D34] font-bold text-[10px] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded font-mono">
-              ● REAL-TIME SYNC
-            </span>
-          </div>
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Estimated Project Total</span>
-            <div className="text-3xl font-black text-[#1B3D34] font-heading">₹68,40,000</div>
-            <div className="text-xs text-[#4B5563]">2,400 sq.ft total BUA @ ₹2,850/sq.ft</div>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-            <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="text-[#4B5563] text-[10px] block font-semibold">TMT Steel</span>
-              <span className="font-bold text-[#1B3D34] font-heading">9.6 Tonnes</span>
-            </div>
-            <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="text-[#4B5563] text-[10px] block font-semibold">Cement</span>
-              <span className="font-bold text-[#1B3D34] font-heading">1,056 Bags</span>
-            </div>
-          </div>
-        </div>
-      ),
+  // Active Material in the Specification Board
+  const [selectedMaterial, setSelectedMaterial] = useState<'steel' | 'cement' | 'masonry' | 'flooring' | 'windows' | 'paint'>('steel');
+
+  const materialsData = {
+    steel: {
+      name: 'Primary Structural Steel',
+      brand: 'Tata Tiscon Fe 550D Superlinks',
+      rate: '₹74 / kg',
+      standard: 'IS 1786 High-Ductility Grade',
+      details: 'High-ductility seismic-resistant TMT rebar with superior rib pattern for concrete bonding.',
+      takeoff: '4.32 Tonnes for 1,440 sq.ft BUA',
     },
-    {
-      num: '02',
-      title: 'QUANTITY-BASED BOQ',
-      quote: 'Your spaces drive the quantities.',
-      description: 'We do not use rough square-foot rules of thumb. Every line item in your 13-stage Bill of Quantities is mathematically derived from physical geometry, slab spans, and room perimeters.',
-      bullets: [
-        'Concrete volume, rebar tonnage, and masonry area takeoff',
-        '13 civil and architectural trade schedules',
-        'Verifiable against contractor quotation line items',
-      ],
-      visual: (
-        <div className="p-6 bg-white rounded-2xl border border-[#E5E7EB] space-y-2.5 text-left text-xs shadow-xs">
-          <div className="font-bold text-[#1B3D34] pb-2 border-b border-[#E5E7EB] flex justify-between font-heading">
-            <span>13-Stage Schedule of Rates</span>
-            <span className="text-[#4B5563] font-mono text-[10px]">IS 456 COMPLIANT</span>
-          </div>
-          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
-            <span className="font-medium text-[#1B3D34]">01. Earthwork & Foundation Concrete</span>
-            <span className="font-bold text-[#1B3D34] font-mono">₹3,42,000</span>
-          </div>
-          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
-            <span className="font-medium text-[#1B3D34]">02. Plinth Beams & Substructure</span>
-            <span className="font-bold text-[#1B3D34] font-mono">₹8,89,200</span>
-          </div>
-          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
-            <span className="font-medium text-[#1B3D34]">03. Superstructure Columns & Slabs</span>
-            <span className="font-bold text-[#1B3D34] font-mono">₹12,31,200</span>
-          </div>
-        </div>
-      ),
+    cement: {
+      name: 'Structural Portland Cement',
+      brand: 'UltraTech Super 53-Grade OPC',
+      rate: '₹410 / 50kg Bag',
+      standard: 'IS 12269 & IS 269 Compliant',
+      details: 'High early-strength portland cement designed for foundation footings, columns, and RCC slabs.',
+      takeoff: '576 Bags (0.40 bags/sq.ft BUA)',
     },
-    {
-      num: '03',
-      title: 'MATERIAL SPECIFICATIONS',
-      quote: 'Compare materials without changing physical quantities.',
-      description: 'Switch between Tata Tiscon, JSW Neosteel, UltraTech, ACC, Italian Marble, or Vitrified Tiles. The required physical material volume remains structurally invariant while unit rates adjust transparently.',
-      bullets: [
-        'Brand-specific unit rate variance tracking',
-        'Physical volume remains fixed by structural engineering formulas',
-        'Side-by-side Essential, Premium, and Luxury package comparisons',
-      ],
-      visual: (
-        <div className="p-6 bg-white rounded-2xl border border-[#E5E7EB] space-y-3 text-left text-xs shadow-xs">
-          <div className="font-bold text-[#1B3D34] pb-2 border-b border-[#E5E7EB] flex justify-between font-heading">
-            <span>Material Brand Matrix</span>
-            <span className="text-[#1B3D34] font-mono text-[10px] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded">
-              INVARIANT GEOMETRY
-            </span>
-          </div>
-          <div className="space-y-2">
-            <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
-              <div>
-                <span className="font-bold text-[#1B3D34] block">Primary Rebar</span>
-                <span className="text-[10px] text-[#4B5563]">Tata Tiscon Fe550D TMT</span>
-              </div>
-              <span className="text-[#1B3D34] font-bold font-mono">₹74/kg</span>
-            </div>
-            <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center">
-              <div>
-                <span className="font-bold text-[#1B3D34] block">Structural Cement</span>
-                <span className="text-[10px] text-[#4B5563]">UltraTech Super Cement</span>
-              </div>
-              <span className="text-[#1B3D34] font-bold font-mono">₹410/bag</span>
-            </div>
-          </div>
-        </div>
-      ),
+    masonry: {
+      name: 'Autoclaved Aerated Blocks',
+      brand: 'Birla Aerocon / Godrej AAC 150mm',
+      rate: '₹68 / Block (600×200×150mm)',
+      standard: 'IS 2185 Part 3 Certified',
+      details: 'Lightweight thermal-insulating block masonry reducing dead load by up to 50% vs red clay bricks.',
+      takeoff: '1,799 Blocks (1.25 blocks/sq.ft BUA)',
     },
-    {
-      num: '04',
-      title: 'PROJECT REPORT',
-      quote: 'Turn your configuration into a structured construction report.',
-      description: 'Generate an executive pre-construction dossier complete with BOQ line items, cashflow schedule, milestone payment roadmaps, and full engineering trace calculations ready for your bank and architect.',
-      bullets: [
-        'Bank-ready milestone disbursement schedule',
-        'Comprehensive 13-stage BOQ with verified rates',
-        'PDF export and contractor-ready tender package',
-      ],
-      visual: (
-        <div className="p-6 bg-white rounded-2xl border border-[#E5E7EB] space-y-3 text-left text-xs shadow-xs">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E5E7EB]">
-            <span className="font-bold text-[#1B3D34] font-heading">Hutty Construction Dossier</span>
-            <span className="text-[#1B3D34] text-[10px] font-mono font-bold bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded">
-              BANK READY
-            </span>
-          </div>
-          <div className="space-y-2 text-[#4B5563]">
-            <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="font-bold text-[#1B3D34] block">Milestone Payment Schedule</span>
-              <span className="text-[11px] text-[#4B5563]">6-stage disbursement roadmap mapped to site milestones</span>
-            </div>
-            <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="font-bold text-[#1B3D34] block">Full Calculation Trace</span>
-              <span className="text-[11px] text-[#4B5563]">Formulaic audit trail for steel, concrete, and finishes</span>
-            </div>
-          </div>
-        </div>
-      ),
+    flooring: {
+      name: 'Living & Bedroom Surfaces',
+      brand: 'Kajaria / Somany 800×800mm Vitrified',
+      rate: '₹85 / sq.ft (Tile + Adhesive)',
+      standard: 'Nano-Polished Gloss Finish',
+      details: 'Stain-resistant vitrified tiles with 2mm paper joints and epoxy-grouted wet areas.',
+      takeoff: '1,407 sq.ft Flooring Takeoff',
     },
+    windows: {
+      name: 'Weather-Proof Joinery',
+      brand: 'Fenesta / Prominance Multi-Chamber uPVC',
+      rate: '₹750 / sq.ft (Profile + 5mm Toughened Glass)',
+      standard: 'Wind-Load Tested Soundproof',
+      details: 'Multi-chambered German engineered profile with steel reinforcement and stainless bug-mesh.',
+      takeoff: '11 Architectural Window Openings',
+    },
+    paint: {
+      name: 'Interior & Exterior Coatings',
+      brand: 'Asian Paints Royale & Apex Ultima',
+      rate: '₹28 / sq.ft (2-Coat System)',
+      standard: 'Anti-Algal Weather Proofing',
+      details: '100% acrylic exterior emulsion with silicon additives and low-VOC Teflon interior finish.',
+      takeoff: '8,200 sq.ft Total Surface Coating',
+    },
+  };
+
+  const costBreakdown = [
+    { label: '01. Civil & Structural Frame', pct: 55, amount: '₹28,08,543', color: '#1B3D34' },
+    { label: '02. Architectural Finishes & Joinery', pct: 25, amount: '₹12,76,610', color: '#2B584C' },
+    { label: '03. MEP (Electrical & Plumbing)', pct: 12, amount: '₹6,12,773', color: '#4B5563' },
+    { label: '04. Statutory GST (18%) & Overheads', pct: 8, amount: '₹4,08,516', color: '#F28C28' },
   ];
 
   return (
-    <section className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB] select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+    <section id="features" className="py-20 lg:py-24 bg-white border-b border-[#E5E7EB] select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-md inline-block">
-            ARCHITECTURAL PLATFORM CAPABILITIES
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-full inline-block">
+            ARCHITECTURAL SPECIFICATION &amp; BOQ
           </span>
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
-            Engineering depth, <br />
-            delivered with clarity.
+            Engineering precision <br />
+            across every material and trade.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Four core capabilities designed to make home construction transparent and predictable.
+            Hutty operates on invariant engineering formulas. Select materials below to inspect physical takeoffs and cost composition.
           </p>
         </div>
 
-        {/* 4 Large Alternating Editorial Sections */}
-        <div className="space-y-20 lg:space-y-28">
-          {features.map((feature, idx) => {
-            const isReversed = idx % 2 === 1;
-            return (
-              <div
-                key={feature.num}
-                className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center ${
-                  isReversed ? 'lg:flex-row-reverse' : ''
-                }`}
-              >
-                {/* Text Content (col-span-6) */}
-                <div className={`lg:col-span-6 space-y-5 text-left ${isReversed ? 'lg:order-2' : 'lg:order-1'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl sm:text-4xl font-black font-mono text-[#1B3D34]">
-                      {feature.num}
-                    </span>
-                    <span className="h-px w-8 bg-[#E5E7EB]" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#1B3D34]">
-                      {feature.title}
+        {/* ── SHOWCASE 1: Interactive Material Specification Board ── */}
+        <div className="p-6 sm:p-8 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl space-y-6 text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#E5E7EB]">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] block">
+                INTERACTIVE SPECIFICATION BOARD
+              </span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading mt-0.5">
+                Brand Specifications &amp; Invariant Takeoffs
+              </h3>
+            </div>
+            <span className="text-xs font-mono text-[#4B5563] bg-white px-3 py-1 rounded-full border border-[#E5E7EB]">
+              SELECT MATERIAL TO INSPECT
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            {[
+              { id: 'steel', label: 'Steel Rebar' },
+              { id: 'cement', label: 'Cement' },
+              { id: 'masonry', label: 'AAC Blocks' },
+              { id: 'flooring', label: 'Vitrified Tiles' },
+              { id: 'windows', label: 'uPVC Windows' },
+              { id: 'paint', label: 'Wall Coatings' },
+            ].map((mat) => {
+              const isSelected = selectedMaterial === mat.id;
+              return (
+                <button
+                  key={mat.id}
+                  type="button"
+                  onClick={() => setSelectedMaterial(mat.id as any)}
+                  className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer text-center ${
+                    isSelected
+                      ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-2xs'
+                      : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] hover:text-[#1B3D34]'
+                  }`}
+                >
+                  {mat.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Material Card Deep Dive */}
+          <motion.div
+            key={selectedMaterial}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="p-5 sm:p-6 bg-white rounded-xl border border-[#E5E7EB] shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+          >
+            <div className="lg:col-span-7 space-y-2">
+              <span className="text-[10px] font-mono font-bold text-[#4B5563] uppercase block">
+                {materialsData[selectedMaterial].name}
+              </span>
+              <h4 className="text-lg sm:text-xl font-extrabold text-[#1B3D34] font-heading">
+                {materialsData[selectedMaterial].brand}
+              </h4>
+              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                {materialsData[selectedMaterial].details}
+              </p>
+              <div className="flex items-center gap-2 text-[11px] text-[#1B3D34] font-semibold pt-1">
+                <Check className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <span>{materialsData[selectedMaterial].standard}</span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 grid grid-cols-2 gap-3 bg-[#F8F8F6] p-4 rounded-xl border border-[#E5E7EB]">
+              <div>
+                <span className="text-[9px] font-bold text-[#4B5563] uppercase block">
+                  STANDARD UNIT RATE
+                </span>
+                <span className="text-sm font-extrabold text-[#1B3D34] font-mono mt-0.5 block">
+                  {materialsData[selectedMaterial].rate}
+                </span>
+              </div>
+              <div>
+                <span className="text-[9px] font-bold text-[#4B5563] uppercase block">
+                  DERIVED QUANTITY
+                </span>
+                <span className="text-xs font-bold text-[#1B3D34] font-mono mt-0.5 block">
+                  {materialsData[selectedMaterial].takeoff}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ── SHOWCASE 2: Cost Buildup & 13-Stage BOQ Matrix ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          
+          {/* Left: Cost Buildup Composition */}
+          <div className="lg:col-span-6 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs text-left space-y-6 flex flex-col justify-between">
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] block">
+                WHERE DOES YOUR MONEY GO?
+              </span>
+              <h3 className="text-2xl font-extrabold text-[#1B3D34] font-heading">
+                Cost Allocation Buildup
+              </h3>
+              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                Deterministic cost allocation based on IS 456 quantities and verified Bengaluru contractor schedules.
+              </p>
+
+              {/* Stacked Proportional Bar */}
+              <div className="h-4 w-full rounded-full overflow-hidden flex shadow-2xs mt-2">
+                {costBreakdown.map((item) => (
+                  <div
+                    key={item.label}
+                    style={{ width: `${item.pct}%`, backgroundColor: item.color }}
+                    title={`${item.label}: ${item.pct}%`}
+                  />
+                ))}
+              </div>
+
+              {/* Breakdown Rows */}
+              <div className="space-y-2.5 pt-2">
+                {costBreakdown.map((item) => (
+                  <div key={item.label} className="p-3 bg-white rounded-xl border border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="font-semibold text-[#1B3D34]">{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono font-bold text-[#1B3D34]">
+                      <span>{item.amount}</span>
+                      <span className="text-[10px] text-[#4B5563]">({item.pct}%)</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-3 bg-white border border-[#E5E7EB] rounded-xl text-[11px] text-[#1B3D34] font-bold flex items-center justify-between">
+              <span>Total Estimated Benchmark (30×40 G+1):</span>
+              <span className="font-mono text-sm font-black">₹51,06,442</span>
+            </div>
+          </div>
+
+          {/* Right: 13-Stage Schedule of Rates BOQ Table */}
+          <div className="lg:col-span-6 bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs text-left space-y-4 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                  13-Stage BOQ Work Schedule
+                </span>
+                <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded-full">
+                  BANK READY
+                </span>
+              </div>
+              <p className="text-xs text-[#4B5563]">
+                Every civil and finishing stage is itemized for contractor tender comparisons and milestone bank releases.
+              </p>
+
+              <div className="space-y-2 pt-1 text-xs">
+                {[
+                  { code: '01', item: 'Site Preparation, Earthwork & Footing Excavation', cost: '₹2,55,322' },
+                  { code: '02', item: 'Plinth Beam RCC & Anti-Termite Injection', cost: '₹4,08,515' },
+                  { code: '03', item: 'Ground Floor Columns & Slab Casting', cost: '₹8,68,095' },
+                  { code: '04', item: 'First Floor Columns & Roof Slab Casting', cost: '₹8,68,095' },
+                  { code: '05', item: 'AAC Blockwork & Parapet Masonry', cost: '₹4,59,580' },
+                  { code: '06', item: 'Internal & External 2-Coat Plastering', cost: '₹3,57,451' },
+                  { code: '07', item: 'Flooring, Dado & Bathroom Wall Tiling', cost: '₹5,10,644' },
+                ].map((row) => (
+                  <div key={row.code} className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                        {row.code}
+                      </span>
+                      <span className="text-[#1B3D34] font-medium text-[11px] truncate max-w-[220px] sm:max-w-[280px]">
+                        {row.item}
+                      </span>
+                    </div>
+                    <span className="font-mono font-bold text-[#1B3D34] text-xs shrink-0">
+                      {row.cost}
                     </span>
                   </div>
-
-                  <h3 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.2]">
-                    "{feature.quote}"
-                  </h3>
-
-                  <p className="text-sm text-[#4B5563] leading-relaxed font-normal">
-                    {feature.description}
-                  </p>
-
-                  <ul className="space-y-2.5 pt-2">
-                    {feature.bullets.map((b, bIdx) => (
-                      <li key={bIdx} className="flex items-center gap-2.5 text-xs text-[#1B3D34]">
-                        <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
-                        <span className="text-[#4B5563]">{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Visual Area (col-span-6) */}
-                <div className={`lg:col-span-6 ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}>
-                  {feature.visual}
-                </div>
+                ))}
               </div>
-            );
-          })}
+            </div>
+
+            <button
+              onClick={() => {
+                useWizardStore.getState().startNewProject();
+                navigate('/calculator');
+              }}
+              className="w-full hutty-btn-primary py-3 rounded-xl font-bold text-xs shadow-xs"
+            >
+              <span>Explore Complete 13-Stage Schedule</span>
+              <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+            </button>
+          </div>
+
         </div>
 
       </div>

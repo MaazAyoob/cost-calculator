@@ -20,12 +20,23 @@ import {
   P_SAND_CUFT_PER_SQFT,
   COARSE_AGGREGATE_CUFT_PER_SQFT,
 } from '../data/coefficients';
+import { getMasonrySpecification } from '../data/masonrySpecifications';
+import { getBrandRate } from '../data/brandDatabase';
 
 export function calculateMasonry(
   input: EngineInput,
   area: AreaResult,
   buildingModel: BuildingModel
 ): {
+  masonryMaterial: string;
+  masonryBrand: string;
+  masonrySizeLabel: string;
+  masonryVolumeCuM: number;
+  masonryUnitsCount: number;
+  masonryUnit: string;
+  masonryWastagePct: number;
+  masonryUnitRate: number;
+  masonryAmount: number;
   aacBlocksCuM: number;
   aacBlocksPieces: number;
   netWallAreaSqFt: number;
@@ -36,9 +47,19 @@ export function calculateMasonry(
   coarseAggregateCuFt: number;
 } {
   const bua = area.totalBUASqFt || 0;
+  const spec = getMasonrySpecification(input.materialBrands?.masonry || (input as any).masonryMaterial);
 
-  if (bua <= 0) {
+  if (bua <= 0 && area.plotAreaSqFt <= 0) {
     return {
+      masonryMaterial: spec.type,
+      masonryBrand: spec.brand,
+      masonrySizeLabel: spec.sizeLabel,
+      masonryVolumeCuM: 0,
+      masonryUnitsCount: 0,
+      masonryUnit: spec.unit,
+      masonryWastagePct: spec.wastagePercentage,
+      masonryUnitRate: spec.unitRate,
+      masonryAmount: 0,
       aacBlocksCuM: 0,
       aacBlocksPieces: 0,
       netWallAreaSqFt: 0,
@@ -59,12 +80,26 @@ export function calculateMasonry(
   // 2. Space Model Geometry for Masonry (PDF Section 12)
   const netWallAreaSqFt = parseFloat(buildingModel.totalNetWallAreaSqFt.toFixed(1));
   const wallVolumeCuM = parseFloat(buildingModel.totalWallVolumeCuM.toFixed(2));
-  const aacBlocksPieces = buildingModel.totalBlockCount;
-  const aacBlocksCuM = wallVolumeCuM;
+  const masonryUnitsCount = buildingModel.totalBlockCount;
+  const masonryVolumeCuM = wallVolumeCuM;
+
+  // Rate and brand determination
+  const brandName = input.materialBrands?.masonry || spec.brand;
+  const brandRate = getBrandRate('masonry', brandName) || spec.unitRate;
+  const masonryAmount = Math.round(masonryUnitsCount * brandRate);
 
   return {
-    aacBlocksCuM,
-    aacBlocksPieces,
+    masonryMaterial: spec.type,
+    masonryBrand: brandName,
+    masonrySizeLabel: spec.sizeLabel,
+    masonryVolumeCuM,
+    masonryUnitsCount,
+    masonryUnit: spec.unit,
+    masonryWastagePct: spec.wastagePercentage,
+    masonryUnitRate: brandRate,
+    masonryAmount,
+    aacBlocksCuM: masonryVolumeCuM,
+    aacBlocksPieces: masonryUnitsCount,
     netWallAreaSqFt,
     wallVolumeCuM,
     mSandCuFt,

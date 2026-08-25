@@ -109,19 +109,46 @@ export function generateMaterialSchedule(
     sourceFormula: 'Total BUA × 1.35 CFT/sqft (Pilot Specification Section 11)',
   });
 
-  // 6. AAC Masonry Blocks
+  // 6. Selected Masonry Material (AAC Blocks OR Clay Bricks OR Concrete Blocks)
+  const isClay = qty.masonryMaterial === 'Clay Bricks' || materialBrands?.masonry?.includes('Clay') || materialBrands?.masonry?.includes('Brick');
+  const isConcrete = qty.masonryMaterial === 'Concrete Blocks' || materialBrands?.masonry?.includes('Concrete') || materialBrands?.masonry?.includes('Cement Block');
+
+  let masonryName = 'Autoclaved Aerated Concrete (AAC) Blocks';
+  let masonryBrandName = qty.masonryBrand || materialBrands?.masonry || 'Birla Aerocon / Godrej Grade 1';
+  let masonrySpec = `IS 2185 Part 3, ${qty.masonrySizeLabel || '600×200×150mm'}, oven-dry density 600 kg/m3 (5% wastage)`;
+  let masonryUnit = 'Nos';
+  let masonryRate = qty.masonryUnitRate || 85;
+  let masonryFormula = `Masonry Vol (${qty.masonryVolumeCuM || qty.wallVolumeCuM} Cu.M) ÷ Block Vol (0.018 Cu.M) × 1.05`;
+
+  if (isClay) {
+    masonryName = 'Wirecut Red Clay Bricks (IS 1077)';
+    masonryBrandName = qty.masonryBrand || materialBrands?.masonry || 'Standard Red Clay Standard';
+    masonrySpec = `IS 1077 modular wirecut red clay bricks (${qty.masonrySizeLabel || '190×90×90mm'}), compressive strength > 10 N/mm2 (7% wastage)`;
+    masonryFormula = `Masonry Vol (${qty.masonryVolumeCuM || qty.wallVolumeCuM} Cu.M) ÷ Brick Vol (0.001539 Cu.M) × 1.07`;
+    masonryRate = qty.masonryUnitRate || 12;
+  } else if (isConcrete) {
+    masonryName = 'Solid Concrete / Cement Blocks (IS 2185 Part 1)';
+    masonryBrandName = qty.masonryBrand || materialBrands?.masonry || 'Solid Concrete Blocks Standard';
+    masonrySpec = `IS 2185 Part 1 hydraulic compressed solid concrete blocks (${qty.masonrySizeLabel || '400×200×150mm'}) (5% wastage)`;
+    masonryFormula = `Masonry Vol (${qty.masonryVolumeCuM || qty.wallVolumeCuM} Cu.M) ÷ Block Vol (0.012 Cu.M) × 1.05`;
+    masonryRate = qty.masonryUnitRate || 52;
+  }
+
+  const masonryCount = qty.masonryUnitsCount || qty.aacBlocksPieces;
+  const masonryAmount = Math.round(masonryCount * masonryRate);
+
   slNo++;
   items.push({
     slNo,
-    material: 'Autoclaved Aerated Concrete (AAC) Blocks',
+    material: masonryName,
     category: 'Masonry',
-    brand: 'Birla Aerocon / Godrej Grade 1',
-    specification: 'IS 2185 Part 3, 600×200×150mm & 600×200×100mm, oven-dry density 600 kg/m3',
-    quantity: qty.aacBlocksPieces,
-    unit: 'Blocks',
-    unitRate: 85,
-    amount: qty.aacBlocksPieces * 85,
-    sourceFormula: `Wall Volume (${qty.wallVolumeCuM} Cu.M) ÷ Block Vol (0.018 Cu.M) × 1.05`,
+    brand: masonryBrandName,
+    specification: masonrySpec,
+    quantity: masonryCount,
+    unit: masonryUnit,
+    unitRate: masonryRate,
+    amount: masonryAmount,
+    sourceFormula: masonryFormula,
   });
 
   // 7. Floor Tiles & Slabs

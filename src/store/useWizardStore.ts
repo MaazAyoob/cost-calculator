@@ -33,6 +33,7 @@ export interface RoomCounts {
 export interface MaterialBrandSelection {
   steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT';
   cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat';
+  masonry?: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string;
   doors: string;
   windows: string;
   flooring: string;
@@ -97,7 +98,12 @@ export interface ConfiguratorState {
   setParkingConfig: (parkingType: ParkingTypeOption, carCount: number, bikeCount: number, evCharging: boolean) => void;
   updateRoomCount: (room: keyof RoomCounts, delta: number) => void;
   setLiftRequired: (required: boolean) => void;
-  setCoreMaterials: (steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT', cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat') => void;
+  setCoreMaterials: (
+    steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT',
+    cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat',
+    masonry?: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string
+  ) => void;
+  setMasonryMaterial: (masonry: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string) => void;
   setFlooringZone: (zone: keyof ZoneFlooringSelection, choice: any) => void;
   setWallCladding: (kitchenDadoHeight: '2 ft' | '4 ft', bathroomTileHeight: '7 ft (Lintel)' | 'Full Height (Ceiling)') => void;
   setDoorSelection: (category: keyof DoorSelection, choice: any) => void;
@@ -151,6 +157,7 @@ export function getFreshZeroState() {
     materialBrands: {
       steel: null as any,
       cement: null as any,
+      masonry: null as any,
       doors: null as any,
       windows: null as any,
       flooring: null as any,
@@ -282,13 +289,24 @@ export const useWizardStore = create<ConfiguratorState>()(
         set({ liftRequired, hasStartedSelection: true });
       },
 
-      setCoreMaterials: (steel, cement) => {
+      setCoreMaterials: (steel, cement, masonry) => {
         set((state) => ({
           hasStartedSelection: true,
           materialBrands: {
             ...state.materialBrands,
             steel,
             cement,
+            ...(masonry ? { masonry } : {}),
+          },
+        }));
+      },
+
+      setMasonryMaterial: (masonry) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          materialBrands: {
+            ...state.materialBrands,
+            masonry,
           },
         }));
       },

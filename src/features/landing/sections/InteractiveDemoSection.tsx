@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sliders, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Sliders, Check, TrendingUp, TrendingDown, Sparkles } from 'lucide-react';
 import { runCalculator } from '../../../calculation-engine/calculator';
 import { EngineInput } from '../../../calculation-engine/types';
 import { formatCurrency } from '../../../utils/cn';
 import { useWizardStore } from '../../../store/useWizardStore';
+import { AnimatedNumber } from '../../../components/common/AnimatedNumber';
 
 export const InteractiveDemoSection: React.FC = () => {
   const navigate = useNavigate();
@@ -58,6 +60,7 @@ export const InteractiveDemoSection: React.FC = () => {
       materialBrands: {
         steel: tier === 'Luxury' ? 'Tata Tiscon' : tier === 'Premium' ? 'Tata Tiscon' : 'JSW Neosteel',
         cement: tier === 'Luxury' ? 'UltraTech' : tier === 'Premium' ? 'UltraTech' : 'ACC Cement',
+        masonry: 'AAC Blocks',
         doors: tier === 'Luxury' ? 'Premium Teak' : tier === 'Premium' ? 'Premium Teak' : 'Flush Door',
         windows: 'uPVC',
         flooring: tier === 'Luxury' ? 'Italian Marble' : 'Vitrified Tiles',
@@ -111,6 +114,21 @@ export const InteractiveDemoSection: React.FC = () => {
   const steelTonnes = calculationResult.quantities.steelTonnes;
   const cementBags = calculationResult.quantities.cementBags;
 
+  // Live Cost Delta Tracker
+  const prevCostRef = useRef<number>(totalCost);
+  const [costDelta, setCostDelta] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (prevCostRef.current !== totalCost && prevCostRef.current > 0) {
+      const delta = totalCost - prevCostRef.current;
+      setCostDelta(delta);
+      const timer = setTimeout(() => setCostDelta(null), 2800);
+      prevCostRef.current = totalCost;
+      return () => clearTimeout(timer);
+    }
+    prevCostRef.current = totalCost;
+  }, [totalCost]);
+
   const handleLaunchWithParams = () => {
     const store = useWizardStore.getState();
     store.startNewProject();
@@ -127,15 +145,15 @@ export const InteractiveDemoSection: React.FC = () => {
         
         {/* Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-md inline-block">
-            LIVE CALCULATION DEMO
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-full inline-block">
+            LIVE ENGINE DEMO
           </span>
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
             See your estimate change <br />
             as your home takes shape.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Adjust plot dimensions, floor counts, and specifications below to observe real-time engineering recalculation.
+            Adjust plot dimensions, storeys, room allocations, and material tiers below to observe real-time engineering recalculation.
           </p>
         </div>
 
@@ -148,7 +166,7 @@ export const InteractiveDemoSection: React.FC = () => {
               <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
                 Interactive Parameters
               </span>
-              <span className="text-[10px] font-mono text-[#4B5563]">
+              <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
                 CHANGES SYNC INSTANTLY
               </span>
             </div>
@@ -156,7 +174,7 @@ export const InteractiveDemoSection: React.FC = () => {
             {/* 1. Plot Size */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-[#1B3D34] block">
-                Standard Bangalore Plot Dimension
+                Standard Bengaluru Plot Dimensions
               </label>
               <div className="grid grid-cols-3 gap-2.5">
                 {[
@@ -170,9 +188,9 @@ export const InteractiveDemoSection: React.FC = () => {
                       key={item.id}
                       type="button"
                       onClick={() => setPlotChoice(item.id as any)}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      className={`hutty-tactile-card p-3 rounded-xl border text-left cursor-pointer transition-all ${
                         selected
-                          ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] shadow-xs'
+                          ? 'hutty-tactile-card-selected'
                           : 'border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] bg-white'
                       }`}
                     >
@@ -182,7 +200,7 @@ export const InteractiveDemoSection: React.FC = () => {
                         </span>
                         {selected && <Check className="w-3.5 h-3.5 text-[#1B3D34]" />}
                       </div>
-                      <span className="text-[10px] text-[#4B5563] block mt-0.5">
+                      <span className="text-[10px] text-[#4B5563] block mt-0.5 font-mono">
                         {item.desc}
                       </span>
                     </button>
@@ -194,7 +212,7 @@ export const InteractiveDemoSection: React.FC = () => {
             {/* 2. Number of Floors */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-[#1B3D34] block">
-                Floor Configuration
+                Storey Configuration
               </label>
               <div className="grid grid-cols-4 gap-2">
                 {[
@@ -211,7 +229,7 @@ export const InteractiveDemoSection: React.FC = () => {
                       onClick={() => setFloors(item.count)}
                       className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
                         selected
-                          ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] text-[#1B3D34]'
+                          ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] text-[#1B3D34] shadow-2xs'
                           : 'border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] bg-white text-[#4B5563]'
                       }`}
                     >
@@ -234,7 +252,7 @@ export const InteractiveDemoSection: React.FC = () => {
                       key={count}
                       type="button"
                       onClick={() => setBedrooms(count)}
-                      className={`flex-1 py-1.5 rounded-lg border text-xs font-bold cursor-pointer ${
+                      className={`flex-1 py-1.5 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
                         bedrooms === count
                           ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] text-[#1B3D34]'
                           : 'border-[#E5E7EB] text-[#4B5563] hover:bg-[rgba(27,61,52,0.04)]'
@@ -256,7 +274,7 @@ export const InteractiveDemoSection: React.FC = () => {
                       key={count}
                       type="button"
                       onClick={() => setBathrooms(count)}
-                      className={`flex-1 py-1.5 rounded-lg border text-xs font-bold cursor-pointer ${
+                      className={`flex-1 py-1.5 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
                         bathrooms === count
                           ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] text-[#1B3D34]'
                           : 'border-[#E5E7EB] text-[#4B5563] hover:bg-[rgba(27,61,52,0.04)]'
@@ -272,7 +290,7 @@ export const InteractiveDemoSection: React.FC = () => {
             {/* 4. Specification Package Tier */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-[#1B3D34] block">
-                Material Package Tier
+                Specification Quality Tier
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {(['Essential', 'Premium', 'Luxury'] as const).map((t) => {
@@ -284,7 +302,7 @@ export const InteractiveDemoSection: React.FC = () => {
                       onClick={() => setTier(t)}
                       className={`py-2 px-3 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
                         selected
-                          ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] text-[#1B3D34]'
+                          ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.08)] text-[#1B3D34] shadow-2xs'
                           : 'border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] bg-white text-[#4B5563]'
                       }`}
                     >
@@ -297,37 +315,68 @@ export const InteractiveDemoSection: React.FC = () => {
           </div>
 
           {/* RIGHT: Live Architectural Preview (col-span-6) */}
-          <div className="lg:col-span-6 bg-white rounded-2xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6 text-left">
+          <div className="lg:col-span-6 bg-white rounded-2xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6 text-left relative overflow-hidden">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
-                Live Calculation Takeoff
-              </span>
-              <span className="text-[10px] font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded font-bold">
-                ENGINE SYNCED
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#1B3D34] animate-pulse" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                  Live Calculation Takeoff
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded-full font-bold">
+                CANONICAL ENGINE
               </span>
             </div>
 
-            {/* Main Hero Cost */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
-                ESTIMATED TOTAL COST
-              </span>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight font-heading">
-                {formatCurrency(totalCost)}
+            {/* Main Hero Cost with AnimatedNumber and Live Delta Badge */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+                  ESTIMATED TOTAL COST
+                </span>
+
+                {/* Animated Delta Badge */}
+                <AnimatePresence>
+                  {costDelta !== null && costDelta !== 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9, y: -4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: -4 }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold shadow-2xs ${
+                        costDelta > 0
+                          ? 'bg-[#F28C28]/10 text-[#F28C28] border border-[#F28C28]/30'
+                          : 'bg-[#1B3D34]/10 text-[#1B3D34] border border-[#1B3D34]/30'
+                      }`}
+                    >
+                      {costDelta > 0 ? (
+                        <TrendingUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <TrendingDown className="w-3.5 h-3.5" />
+                      )}
+                      <span>
+                        {costDelta > 0 ? `+ ${formatCurrency(costDelta)}` : `- ${formatCurrency(Math.abs(costDelta))}`}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <p className="text-xs text-[#4B5563] mt-1">
-                Includes structural frame, masonry, finishes, electrical, plumbing & 18% statutory GST.
+
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight font-heading">
+                <AnimatedNumber value={totalCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+              </div>
+              <p className="text-xs text-[#4B5563]">
+                Includes RCC frame, masonry, premium finishes, electrical, plumbing & 18% statutory GST.
               </p>
             </div>
 
-            {/* 3 Secondary Metric Boxes */}
+            {/* 3 Secondary Metric Boxes with Animated Numbers */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
               <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                 <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
                   BUILT-UP AREA
                 </span>
-                <span className="text-sm font-extrabold text-[#1B3D34] font-heading mt-0.5 block">
-                  {buaSqFt.toLocaleString()} sq.ft
+                <span className="text-sm font-extrabold text-[#1B3D34] font-mono mt-0.5 block">
+                  <AnimatedNumber value={buaSqFt} format={(v) => `${Math.round(v).toLocaleString()} sq.ft`} duration={300} />
                 </span>
               </div>
 
@@ -335,8 +384,8 @@ export const InteractiveDemoSection: React.FC = () => {
                 <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
                   EFFECTIVE RATE
                 </span>
-                <span className="text-sm font-extrabold text-[#1B3D34] font-heading mt-0.5 block">
-                  ₹{ratePerSqFt.toLocaleString()} / sq.ft
+                <span className="text-sm font-extrabold text-[#1B3D34] font-mono mt-0.5 block">
+                  <AnimatedNumber value={ratePerSqFt} format={(v) => `₹${Math.round(v).toLocaleString()} / sq.ft`} duration={300} />
                 </span>
               </div>
 
@@ -344,7 +393,7 @@ export const InteractiveDemoSection: React.FC = () => {
                 <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
                   STEEL &bull; CEMENT
                 </span>
-                <span className="text-sm font-extrabold text-[#1B3D34] font-heading mt-0.5 block truncate">
+                <span className="text-sm font-extrabold text-[#1B3D34] font-mono mt-0.5 block truncate">
                   {steelTonnes}T &bull; {cementBags} Bags
                 </span>
               </div>
@@ -354,10 +403,10 @@ export const InteractiveDemoSection: React.FC = () => {
             <div className="pt-2">
               <button
                 onClick={handleLaunchWithParams}
-                className="w-full hutty-btn-primary py-3.5 rounded-xl font-bold text-xs sm:text-sm"
+                className="w-full hutty-btn-primary py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-xs"
               >
                 <span>Open in Full Calculator Workspace</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#F28C28]" />
               </button>
             </div>
           </div>
@@ -368,3 +417,4 @@ export const InteractiveDemoSection: React.FC = () => {
     </section>
   );
 };
+
