@@ -94,6 +94,36 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
   const pWidth = Math.max(20, Math.min(100, plotWidth || 30));
   const plotAspect = Math.max(0.65, Math.min(1.5, pWidth / pLength));
 
+  // ── Procedural concrete texture generator ──────────────────────────────────
+  const makeConcreteTexture = (
+    size: number,
+    baseR: number,
+    baseG: number,
+    baseB: number,
+    variance: number
+  ): THREE.DataTexture => {
+    const data = new Uint8Array(size * size * 4);
+    for (let i = 0; i < size * size; i++) {
+      // Multi-octave noise using sine hash for a gritty concrete look
+      const x = i % size;
+      const y = Math.floor(i / size);
+      const n1 = Math.sin(x * 0.31 + y * 0.47) * 0.5 + 0.5;
+      const n2 = Math.sin(x * 0.87 - y * 0.23 + 1.3) * 0.5 + 0.5;
+      const n3 = Math.sin(x * 0.13 + y * 0.91 - 2.1) * 0.5 + 0.5;
+      const noise = (n1 * 0.5 + n2 * 0.3 + n3 * 0.2) * variance - variance * 0.5;
+      const idx = i * 4;
+      data[idx]     = Math.max(0, Math.min(255, Math.round(baseR + noise)));
+      data[idx + 1] = Math.max(0, Math.min(255, Math.round(baseG + noise)));
+      data[idx + 2] = Math.max(0, Math.min(255, Math.round(baseB + noise)));
+      data[idx + 3] = 255;
+    }
+    const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2.5, 2.5);
+    tex.needsUpdate = true;
+    return tex;
+  };
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -102,7 +132,11 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     const height = container.clientHeight || 360;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(isNightMode ? 0x132C25 : 0xF8F8F6);
+    // Soft overcast sky background – concrete looks best against a cool grey sky
+    scene.background = new THREE.Color(isNightMode ? 0x0E1E1A : 0xD8D8D2);
+    scene.fog = isNightMode
+      ? new THREE.Fog(0x0E1E1A, 18, 50)
+      : new THREE.Fog(0xD8D8D2, 24, 60);
     sceneRef.current = scene;
 
     const floorH = 1.55;
@@ -122,6 +156,9 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // Tone mapping for a more realistic concrete render
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = isNightMode ? 0.8 : 1.1;
     rendererRef.current = renderer;
 
     while (container.firstChild) {
@@ -129,56 +166,116 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     }
     container.appendChild(renderer.domElement);
 
+    // ── Lighting ─────────────────────────────────────────────────────────────
     if (isNightMode) {
-      const ambientNight = new THREE.AmbientLight(0x1B3D34, 1.2);
-      scene.add(ambientNight);
-
-      const moonLight = new THREE.DirectionalLight(0xE5E7EB, 0.8);
+      scene.add(new THREE.AmbientLight(0x1B3D34, 0.9));
+      const moonLight = new THREE.DirectionalLight(0xC8D4E0, 1.0);
       moonLight.position.set(-8, 15, -10);
+      moonLight.castShadow = true;
       scene.add(moonLight);
-
-      const warmGlow = new THREE.PointLight(0xF28C28, 2.2, 16);
-      warmGlow.position.set(0, 3, 3.5);
+      const warmGlow = new THREE.PointLight(0xF28C28, 2.5, 14);
+      warmGlow.position.set(0, 2.5, 3.5);
       scene.add(warmGlow);
     } else {
-      const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.88);
-      scene.add(ambientLight);
-
-      const sunLight = new THREE.DirectionalLight(0xFFFFFF, 1.25);
+      // Overcast diffuse sky – flatters concrete beautifully
+      scene.add(new THREE.AmbientLight(0xD0D8E0, 1.05));
+      // Key sun – slightly warm, angled hard light to cast shadows into surface texture
+      const sunLight = new THREE.DirectionalLight(0xFFF5E0, 1.6);
       sunLight.position.set(10, 22, 12);
       sunLight.castShadow = true;
-      sunLight.shadow.mapSize.width = 1024;
-      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
       sunLight.shadow.bias = -0.0005;
       scene.add(sunLight);
-
-      const fillLight = new THREE.DirectionalLight(0xF8F8F6, 0.45);
-      fillLight.position.set(-10, 10, -8);
+      // Cool sky fill from opposite direction
+      const fillLight = new THREE.DirectionalLight(0xC5D4E0, 0.55);
+      fillLight.position.set(-10, 8, -8);
       scene.add(fillLight);
+      // Ground bounce – warm light reflected off concrete ground
+      const bounceLight = new THREE.DirectionalLight(0xEEE8D8, 0.3);
+      bounceLight.position.set(0, -5, 0);
+      scene.add(bounceLight);
     }
 
     const buildingGroup = new THREE.Group();
     buildingGroupRef.current = buildingGroup;
     scene.add(buildingGroup);
 
+    // ── Procedural textures ───────────────────────────────────────────────────
+    // Wall concrete: medium grey with visible aggregate noise
+    const wallTex  = makeConcreteTexture(128, isNightMode ? 48 : 185, isNightMode ? 56 : 183, isNightMode ? 52 : 179, isNightMode ? 28 : 38);
+    // Slab concrete: slightly darker, more aggregate
+    const slabTex  = makeConcreteTexture(128, isNightMode ? 38 : 158, isNightMode ? 44 : 156, isNightMode ? 40 : 152, 32);
+    // Ground: sandy concrete
+    const groundTex = makeConcreteTexture(256, isNightMode ? 22 : 195, isNightMode ? 32 : 192, isNightMode ? 28 : 186, 24);
+    // Rough bump data (same noise, used as roughnessMap tint)
+    const bumpTex  = makeConcreteTexture(128, 128, 128, 128, 60);
+
+    // ── Materials ─────────────────────────────────────────────────────────────
+    // Exposed concrete facade – the star of the show
+    const facadeMat = new THREE.MeshStandardMaterial({
+      map: wallTex,
+      roughnessMap: bumpTex,
+      roughness: isNightMode ? 0.82 : 0.78,
+      metalness: 0.0,
+    });
+
+    // Slightly darker concrete for structural columns / fins
+    const concreteDarkTex = makeConcreteTexture(128, isNightMode ? 36 : 148, isNightMode ? 40 : 146, isNightMode ? 38 : 142, 28);
+    const accentMat = new THREE.MeshStandardMaterial({
+      map: concreteDarkTex,
+      roughness: 0.85,
+      metalness: 0.0,
+    });
+
+    // Flat concrete slab (slightly lighter, smoother surface)
+    const slabMat = new THREE.MeshStandardMaterial({
+      map: slabTex,
+      roughness: isNightMode ? 0.75 : 0.70,
+      metalness: 0.0,
+    });
+
+    // Wooden/steel door – keep dark charcoal
+    const doorMat = new THREE.MeshStandardMaterial({ color: 0x3A3F48, roughness: 0.6, metalness: 0.2 });
+
+    // Window frame – dark anodised aluminium
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x2A2E35, roughness: 0.35, metalness: 0.65 });
+
+    // Glass panels
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: isNightMode ? 0xFFB347 : 0x7BAFC8,
+      transparent: true,
+      opacity: isNightMode ? 0.82 : 0.38,
+      roughness: 0.04,
+      metalness: 0.15,
+      envMapIntensity: 1.2,
+    });
+
+    // Balcony railings – steel
+    const railingMat = new THREE.MeshStandardMaterial({ color: 0x3A3F48, metalness: 0.85, roughness: 0.15 });
+
+    // Ground material
+    const groundMat = new THREE.MeshStandardMaterial({
+      map: groundTex,
+      roughness: 0.92,
+      metalness: 0.0,
+    });
+
     // Site Landscaping & Baseplate
     const groundW = 9.8 * Math.max(0.85, plotAspect);
     const groundD = 9.2 / Math.max(0.85, plotAspect);
-
-    const groundColor = isNightMode ? 0x0E211C : 0xEFEFEA;
     const groundGeo = new THREE.BoxGeometry(groundW, 0.15, groundD);
-    const groundMat = new THREE.MeshStandardMaterial({ color: groundColor, roughness: 0.9 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.position.y = -0.075;
     ground.receiveShadow = true;
     buildingGroup.add(ground);
 
-    // Paved Pathway
-    const paveColor = isNightMode ? 0x1B3D34 : 0xDFE3E1;
+    // Paved Pathway – smooth poured concrete
+    const paveTex = makeConcreteTexture(128, isNightMode ? 30 : 168, isNightMode ? 36 : 165, isNightMode ? 33 : 160, 20);
+    const paveMat = new THREE.MeshStandardMaterial({ map: paveTex, roughness: 0.65, metalness: 0.0 });
     const paveW = 4.2 * Math.max(0.85, plotAspect);
     const paveD = groundD - 0.6;
     const paveGeo = new THREE.BoxGeometry(paveW, 0.16, paveD);
-    const paveMat = new THREE.MeshStandardMaterial({ color: paveColor, roughness: 0.6 });
     const pave = new THREE.Mesh(paveGeo, paveMat);
     pave.position.set(1.4, -0.065, 0);
     pave.receiveShadow = true;
@@ -219,35 +316,15 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     const footprintLine = new THREE.Line(footprintGeo, footprintMat);
     buildingGroup.add(footprintLine);
 
-    // Materials
-    const facadeHex = isNightMode ? 0x1E4239 : 0xFFFFFF;
-    const accentHex = 0x1B3D34; // Deep Hutty Green
-    const doorHex = 0x4B5563;
-    const roofHex = 0xF28C28; // Orange roof accent
-
-    const facadeMat = new THREE.MeshStandardMaterial({ color: facadeHex, roughness: 0.4 });
-    const accentMat = new THREE.MeshStandardMaterial({ color: accentHex, roughness: 0.35 });
-    const doorMat = new THREE.MeshStandardMaterial({ color: doorHex, roughness: 0.5 });
-    const slabMat = new THREE.MeshStandardMaterial({ color: isNightMode ? 0x1B3D34 : 0xE5E7EB, roughness: 0.5 });
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x1B3D34, roughness: 0.3 });
-    const glassMat = new THREE.MeshPhysicalMaterial({
-      color: isNightMode ? 0xF28C28 : 0x1B3D34,
-      transparent: true,
-      opacity: isNightMode ? 0.85 : 0.45,
-      roughness: 0.05,
-      metalness: 0.1,
-    });
-    const railingMat = new THREE.MeshStandardMaterial({ color: 0x1B3D34, metalness: 0.8, roughness: 0.2 });
-
     floorGroupsRef.current = [];
 
-    // Floor by Floor Construction (Exploded or Integrated)
+    // ── Floor by Floor Construction ───────────────────────────────────────────
     for (let f = 0; f < numFloors; f++) {
       const floorGroup = new THREE.Group();
       const yBase = f * (floorH + explodedGap);
       floorGroup.position.y = yBase;
 
-      // Concrete Slab
+      // Concrete Slab – exposed soffit visible in exploded view
       const slabGeo = new THREE.BoxGeometry(bWidth + 0.35, 0.12, bDepth + 0.35);
       const slab = new THREE.Mesh(slabGeo, slabMat);
       slab.position.set(0, 0.06, 0);
@@ -256,7 +333,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
       floorGroup.add(slab);
 
       if (f === 0 && isStilt) {
-        // Stilt Ground Columns
+        // Stilt Ground Columns – exposed RC concrete
         const colGeo = new THREE.BoxGeometry(0.3, floorH, 0.3);
         const colPositions = [
           [-bWidth / 2 + 0.5, floorH / 2, -bDepth / 2 + 0.5],
@@ -272,18 +349,33 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
           floorGroup.add(col);
         });
       } else {
-        // Walls
+        // Main wall body – exposed board-formed concrete
         const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(bWidth, floorH - 0.12, bDepth), facadeMat);
         wallMesh.position.set(0, floorH / 2, 0);
         wallMesh.castShadow = true;
         wallMesh.receiveShadow = true;
         floorGroup.add(wallMesh);
 
-        // Architectural Fin Accent
+        // Architectural Fin – darker concrete shear wall accent
         const fin = new THREE.Mesh(new THREE.BoxGeometry(0.18, floorH - 0.12, bDepth + 0.15), accentMat);
         fin.position.set(-bWidth / 3.8, floorH / 2, 0);
         fin.castShadow = true;
         floorGroup.add(fin);
+
+        // Column piers at corners for realism
+        const pierGeo = new THREE.BoxGeometry(0.22, floorH - 0.12, 0.22);
+        const pierPositions: [number, number, number][] = [
+          [bWidth / 2 - 0.11, floorH / 2, bDepth / 2 - 0.11],
+          [-bWidth / 2 + 0.11, floorH / 2, bDepth / 2 - 0.11],
+          [bWidth / 2 - 0.11, floorH / 2, -bDepth / 2 + 0.11],
+          [-bWidth / 2 + 0.11, floorH / 2, -bDepth / 2 + 0.11],
+        ];
+        pierPositions.forEach(([px, py, pz]) => {
+          const pier = new THREE.Mesh(pierGeo, accentMat);
+          pier.position.set(px, py, pz);
+          pier.castShadow = true;
+          floorGroup.add(pier);
+        });
 
         // Windows
         const createWindow = (wx: number, wy: number, wz: number, wW: number, wH: number) => {
@@ -300,10 +392,15 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         createWindow(1.2, floorH / 2 + 0.05, bDepth / 2 + 0.04, 1.3, 0.8);
 
         if (f === 0) {
+          // Door
           const door = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.05, 0.08), doorMat);
           door.position.set(0, 0.58, bDepth / 2 + 0.07);
           door.castShadow = true;
           floorGroup.add(door);
+          // Door frame reveal
+          const dFrame = new THREE.Mesh(new THREE.BoxGeometry(0.97, 1.14, 0.04), frameMat);
+          dFrame.position.set(0, 0.58, bDepth / 2 + 0.03);
+          floorGroup.add(dFrame);
         }
 
         // Balconies
@@ -327,7 +424,7 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
       buildingGroup.add(floorGroup);
     }
 
-    // Terrace Level Roof
+    // ── Terrace Level Roof ────────────────────────────────────────────────────
     const terraceGroup = new THREE.Group();
     const terraceY = numFloors * (floorH + explodedGap);
     terraceGroup.position.y = terraceY;
@@ -335,25 +432,28 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     const roof = new THREE.Mesh(new THREE.BoxGeometry(bWidth + 0.4, 0.14, bDepth + 0.4), slabMat);
     roof.position.set(0, 0.07, 0);
     roof.castShadow = true;
+    roof.receiveShadow = true;
     terraceGroup.add(roof);
 
     // Orange Roof Ridge Accent (Hutty signature detail)
     const ridgeGeo = new THREE.BoxGeometry(bWidth + 0.44, 0.08, 0.08);
-    const ridgeMat = new THREE.MeshStandardMaterial({ color: roofHex, roughness: 0.3 });
+    const ridgeMat = new THREE.MeshStandardMaterial({ color: 0xF28C28, roughness: 0.35, metalness: 0.1 });
     const ridge = new THREE.Mesh(ridgeGeo, ridgeMat);
     ridge.position.set(0, 0.16, bDepth / 2 + 0.2);
     terraceGroup.add(ridge);
 
-    // Parapet Wall
+    // Parapet Wall – smooth poured concrete
     const pHeight = 0.38;
-    const pMat = new THREE.MeshStandardMaterial({ color: facadeHex, roughness: 0.5 });
+    const parapetTex = makeConcreteTexture(128, isNightMode ? 42 : 172, isNightMode ? 48 : 170, isNightMode ? 44 : 166, 22);
+    const pMat = new THREE.MeshStandardMaterial({ map: parapetTex, roughness: 0.75, metalness: 0.0 });
     const pFront = new THREE.Mesh(new THREE.BoxGeometry(bWidth + 0.4, pHeight, 0.1), pMat);
     pFront.position.set(0, pHeight / 2 + 0.14, bDepth / 2 + 0.15);
+    pFront.castShadow = true;
     terraceGroup.add(pFront);
 
     // Staircase Headroom Cabin on Terrace
     const cabinH = hasLift ? 1.5 : 1.1;
-    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, cabinH, 1.8), facadeMat);
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, cabinH, 1.8), accentMat);
     cabin.position.set(-bWidth / 2 + 1.2, cabinH / 2 + 0.14, -bDepth / 2 + 1.2);
     cabin.castShadow = true;
     terraceGroup.add(cabin);
@@ -396,6 +496,8 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         container.removeChild(renderer.domElement);
       }
       renderer.dispose();
+      // Dispose procedural textures
+      [wallTex, slabTex, groundTex, bumpTex, concreteDarkTex, paveTex, parapetTex].forEach(t => t.dispose());
     };
   }, [
     numFloors,
