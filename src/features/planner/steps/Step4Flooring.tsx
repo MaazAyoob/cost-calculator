@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useArea } from '../../../store/useCalculationStore';
+import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step4Flooring: React.FC = () => {
   const { flooringZones, setFlooringZone } = useWizardStore();
   const area = useArea();
+  const { getFlooringRecommendation } = useRecommendations();
   const [activeZoneKey, setActiveZoneKey] = useState<keyof typeof flooringZones>('living');
 
   const totalBua = area.totalBUASqFt || 2400;
@@ -33,8 +35,8 @@ export const Step4Flooring: React.FC = () => {
       approxAreaSqFt: Math.round(totalBua * 0.18),
       options: [
         { label: 'Vitrified Tiles', rate: 110, desc: 'Dual-coat vitrified floor tiles with low water absorption.' },
-        { label: 'Granite', rate: 195, desc: 'Heavy-duty natural granite slabs resistant to spills.' },
         { label: 'Matte Anti-Skid Vitrified', rate: 135, desc: 'Non-slip matte textured surface for kitchen safety.' },
+        { label: 'Granite', rate: 195, desc: 'Heavy-duty natural granite slabs resistant to spills.' },
       ],
     },
     {
@@ -77,7 +79,8 @@ export const Step4Flooring: React.FC = () => {
   ];
 
   const currentZone = zones.find((z) => z.key === activeZoneKey) || zones[0];
-  const selectedOptionLabel = flooringZones[currentZone.key];
+  const recommendation = getFlooringRecommendation(currentZone.key);
+  const selectedOptionLabel = flooringZones[currentZone.key] || recommendation.recommendedValue;
 
   return (
     <div className="space-y-6 text-left select-none">
@@ -135,7 +138,9 @@ export const Step4Flooring: React.FC = () => {
         <div className="space-y-2">
           {currentZone.options.map((opt) => {
             const isSelected = selectedOptionLabel === opt.label;
+            const isRecommended = opt.label === recommendation.recommendedValue;
             const estimatedCost = Math.round(currentZone.approxAreaSqFt * opt.rate);
+
             return (
               <div
                 key={opt.label}
@@ -155,7 +160,14 @@ export const Step4Flooring: React.FC = () => {
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
-                    <h4 className="text-xs font-extrabold text-[#1B3D34]">{opt.label}</h4>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{opt.label}</h4>
+                      {isRecommended && (
+                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
+                          {recommendation.badgeLabel}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-[#4B5563] mt-0.5">{opt.desc}</p>
                   </div>
                 </div>

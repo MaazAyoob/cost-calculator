@@ -5,7 +5,8 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Sliders,
+  Plus,
+  Minus,
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
@@ -17,15 +18,14 @@ export const Step2SpaceRequirements: React.FC = () => {
     key: keyof RoomCounts;
     label: string;
     sub: string;
-    options: number[];
   }[] = [
-    { key: 'bedrooms', label: 'Bedrooms', sub: 'Primary sleeping quarters', options: [1, 2, 3, 4, 5, 6] },
-    { key: 'bathrooms', label: 'Attached Bathrooms', sub: 'En-suite toilet & shower', options: [1, 2, 3, 4, 5, 6] },
-    { key: 'commonToilets', label: 'Common Powder / Toilets', sub: 'Guest & common washrooms', options: [0, 1, 2, 3] },
-    { key: 'living', label: 'Living Rooms / Lounge', sub: 'Formal & family living', options: [1, 2, 3, 4] },
-    { key: 'kitchen', label: 'Kitchens', sub: 'Main cooking & prep area', options: [1, 2, 3] },
-    { key: 'dining', label: 'Dining Areas', sub: 'Family dining spaces', options: [1, 2, 3] },
-    { key: 'balcony', label: 'Balconies & Sit-outs', sub: 'Outdoor covered sit-outs', options: [0, 1, 2, 3, 4] },
+    { key: 'bedrooms', label: 'Bedrooms', sub: 'Primary sleeping quarters' },
+    { key: 'bathrooms', label: 'Attached Bathrooms', sub: 'En-suite toilet & shower' },
+    { key: 'commonToilets', label: 'Common Powder / Toilets', sub: 'Guest & common washrooms' },
+    { key: 'living', label: 'Living Rooms / Lounge', sub: 'Formal & family living areas' },
+    { key: 'kitchen', label: 'Kitchens', sub: 'Main cooking & prep area' },
+    { key: 'dining', label: 'Dining Areas', sub: 'Family dining spaces' },
+    { key: 'balcony', label: 'Balconies & Sit-outs', sub: 'Outdoor covered sit-outs' },
   ];
 
   const ancillaryRooms: {
@@ -38,19 +38,19 @@ export const Step2SpaceRequirements: React.FC = () => {
     { key: 'storeRoom', label: 'Store / Pantry' },
   ];
 
-  const handleSetExactCount = (key: keyof RoomCounts, count: number) => {
+  const handleStepDelta = (key: keyof RoomCounts, delta: number) => {
     const currentVal = rooms[key] || 0;
-    const delta = count - currentVal;
-    if (delta !== 0) {
-      updateRoomCount(key, delta);
-    }
+    const target = currentVal + delta;
+    if (target > 10) return; // Maximum ceiling of 10
+    if (target < 0) return; // Minimum floor of 0
+    updateRoomCount(key, delta);
   };
 
   const ancillaryCountTotal =
     (rooms.pooja || 0) + (rooms.utility || 0) + (rooms.office || 0) + (rooms.storeRoom || 0);
 
   return (
-    <div className="space-y-6 text-left select-none">
+    <div className="space-y-6 text-left select-none pb-4">
       
       {/* ── STEP HEADER ── */}
       <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
@@ -58,52 +58,64 @@ export const Step2SpaceRequirements: React.FC = () => {
           STEP 02
         </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          SHAPE YOUR HOME
+          CONFIGURE YOUR HOME
         </h1>
         <p className="text-xs sm:text-sm text-[#4B5563]">
-          Allocate rooms and vertical circulation. Quantities for doors, windows, and electrical points adjust automatically.
+          Allocate rooms and vertical circulation. Quantities for doors, windows, and fixtures adjust automatically.
         </p>
       </div>
 
-      {/* ── 1. PRIMARY ROOMS CONFIGURATION ── */}
+      {/* ── 1. PRIMARY LIVING SPACES (+ / - STEPPERS UP TO 10) ── */}
       <div className="space-y-2.5">
-        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          Living Spaces
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
+            Living Spaces
+          </label>
+          <span className="text-[10px] text-[#4B5563] font-mono">Up to 10 for each option</span>
+        </div>
         
         <div className="space-y-2">
           {primaryRooms.map((item) => {
             const currentCount = rooms[item.key] || 0;
+
             return (
               <div
                 key={item.key}
-                className="hutty-tactile-card py-2.5 px-3.5 flex items-center justify-between transition-colors"
+                className={cn(
+                  'hutty-tactile-card py-3 px-4 flex items-center justify-between transition-all',
+                  currentCount > 0 && 'border-[#1B3D34]/30 bg-white'
+                )}
               >
                 <div>
-                  <h4 className="text-xs font-bold text-[#1B3D34]">{item.label}</h4>
-                  <p className="text-[10px] text-[#4B5563]">{item.sub}</p>
+                  <h4 className="text-xs sm:text-sm font-bold text-[#1B3D34]">{item.label}</h4>
+                  <p className="text-[10px] sm:text-[11px] text-[#4B5563]">{item.sub}</p>
                 </div>
 
-                {/* Tactile Numeric Stepper Pills */}
-                <div className="flex items-center gap-1 bg-[#F8F8F6] p-1 rounded-xl border border-[#E5E7EB]">
-                  {item.options.map((opt) => {
-                    const isSelected = currentCount === opt;
-                    return (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => handleSetExactCount(item.key, opt)}
-                        className={cn(
-                          'w-7 h-7 rounded-lg text-xs font-extrabold font-mono transition-all cursor-pointer flex items-center justify-center',
-                          isSelected
-                            ? 'bg-[#1B3D34] text-white shadow-xs'
-                            : 'text-[#4B5563] hover:text-[#1B3D34] hover:bg-white'
-                        )}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
+                {/* Tactile + / - Stepper (0 to 10) */}
+                <div className="flex items-center border border-[#E5E7EB] rounded-xl bg-[#F8F8F6] p-1 shadow-2xs">
+                  <button
+                    type="button"
+                    disabled={currentCount <= 0}
+                    onClick={() => handleStepDelta(item.key, -1)}
+                    className="w-8 h-8 rounded-lg bg-white text-[#1B3D34] font-extrabold text-sm flex items-center justify-center border border-[#E5E7EB] hover:bg-gray-50 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all shadow-2xs"
+                    title={`Decrease ${item.label}`}
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+
+                  <span className="w-10 text-center text-sm font-black font-mono text-[#1B3D34]">
+                    {currentCount}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={currentCount >= 10}
+                    onClick={() => handleStepDelta(item.key, 1)}
+                    className="w-8 h-8 rounded-lg bg-white text-[#1B3D34] font-extrabold text-sm flex items-center justify-center border border-[#E5E7EB] hover:bg-gray-50 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all shadow-2xs"
+                    title={`Increase ${item.label} (up to 10)`}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             );
@@ -130,7 +142,7 @@ export const Step2SpaceRequirements: React.FC = () => {
         </button>
 
         {showAncillary && (
-          <div className="grid grid-cols-2 gap-2 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
             {ancillaryRooms.map((item) => {
               const count = rooms[item.key] || 0;
               return (
@@ -139,23 +151,23 @@ export const Step2SpaceRequirements: React.FC = () => {
                   className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between text-xs"
                 >
                   <span className="font-bold text-[#1B3D34]">{item.label}</span>
-                  <div className="flex items-center border border-[#E5E7EB] rounded-lg bg-white overflow-hidden shadow-2xs">
+                  <div className="flex items-center border border-[#E5E7EB] rounded-lg bg-white p-0.5 shadow-2xs">
                     <button
                       type="button"
                       disabled={count <= 0}
                       onClick={() => updateRoomCount(item.key, -1)}
-                      className="w-6 h-6 text-[#1B3D34] font-bold text-xs flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-gray-50"
+                      className="w-7 h-7 text-[#1B3D34] font-bold text-xs flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-gray-50 active:scale-95 transition-all"
                     >
-                      -
+                      <Minus className="w-3 h-3" />
                     </button>
-                    <span className="w-6 text-center text-xs font-extrabold text-[#1B3D34] font-mono">{count}</span>
+                    <span className="w-8 text-center text-xs font-black text-[#1B3D34] font-mono">{count}</span>
                     <button
                       type="button"
-                      disabled={count >= 3}
+                      disabled={count >= 10}
                       onClick={() => updateRoomCount(item.key, 1)}
-                      className="w-6 h-6 text-[#1B3D34] font-bold text-xs flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-gray-50"
+                      className="w-7 h-7 text-[#1B3D34] font-bold text-xs flex items-center justify-center disabled:opacity-30 cursor-pointer hover:bg-gray-50 active:scale-95 transition-all"
                     >
-                      +
+                      <Plus className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
@@ -165,7 +177,7 @@ export const Step2SpaceRequirements: React.FC = () => {
         )}
       </div>
 
-      {/* ── 3. VERTICAL TRANSIT (Elevator vs Staircase) ── */}
+      {/* ── 3. VERTICAL CIRCULATION (Elevator vs Staircase) ── */}
       <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Vertical Circulation
@@ -174,7 +186,7 @@ export const Step2SpaceRequirements: React.FC = () => {
           <div
             onClick={() => setLiftRequired(true)}
             className={cn(
-              'hutty-tactile-card',
+              'hutty-tactile-card cursor-pointer',
               liftRequired && 'hutty-tactile-card-selected'
             )}
           >
@@ -191,7 +203,7 @@ export const Step2SpaceRequirements: React.FC = () => {
               setLiftRequired(false);
             }}
             className={cn(
-              'hutty-tactile-card',
+              'hutty-tactile-card cursor-pointer',
               !liftRequired && 'hutty-tactile-card-selected',
               floors >= 4 && 'opacity-50 cursor-not-allowed bg-gray-50'
             )}

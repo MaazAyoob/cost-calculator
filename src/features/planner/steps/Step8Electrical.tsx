@@ -1,12 +1,15 @@
 import React from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
+import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step8Electrical: React.FC = () => {
   const { electrical, setElectricalSelection } = useWizardStore();
   const quantities = useQuantities();
+  const { getElectricalRecommendation } = useRecommendations();
+  const rec = getElectricalRecommendation();
 
   const wireM = quantities.electricalWireMetres || 850;
   const conduitM = quantities.conduitsMetres || 420;
@@ -41,6 +44,8 @@ export const Step8Electrical: React.FC = () => {
     },
   ];
 
+  const selectedTier = electrical.wireTier || rec.wireTier;
+
   return (
     <div className="space-y-6 text-left select-none">
       
@@ -64,7 +69,8 @@ export const Step8Electrical: React.FC = () => {
         </label>
         <div className="space-y-2">
           {wireTiers.map((tier) => {
-            const isSelected = electrical.wireTier === tier.id;
+            const isSelected = selectedTier === tier.id;
+            const isRecommended = tier.id === rec.wireTier;
             const approxWireCost = Math.round(wireM * tier.ratePerMetre);
             return (
               <div
@@ -85,11 +91,16 @@ export const Step8Electrical: React.FC = () => {
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#1B3D34]">{tier.title}</h4>
                       <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
                         {tier.brand}
                       </span>
+                      {isRecommended && (
+                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
+                          {rec.badgeLabel}
+                        </span>
+                      )}
                     </div>
                     <p className="text-[10px] text-[#4B5563] mt-0.5">{tier.desc}</p>
                   </div>

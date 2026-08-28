@@ -1,24 +1,27 @@
 import React from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
+import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step10Painting: React.FC = () => {
   const { painting, setPaintingSelection } = useWizardStore();
   const quantities = useQuantities();
+  const { getPaintingRecommendation } = useRecommendations();
+  const rec = getPaintingRecommendation();
 
   const interiorAreaSqFt = quantities.interiorPaintAreaSqFt || 5800;
   const exteriorAreaSqFt = quantities.exteriorPaintAreaSqFt || 2200;
 
-  const brands: { id: 'Asian Paints' | 'Berger Paints' | 'Dulux'; desc: string }[] = [
+  const brands: { id: string; desc: string }[] = [
     { id: 'Asian Paints', desc: 'Apex & Royale series' },
     { id: 'Berger Paints', desc: 'Silk & WeatherCoat' },
     { id: 'Dulux', desc: 'Velvet & Weathershield' },
   ];
 
   const internalOptions: {
-    id: 'Tractor Emulsion' | 'Premium Emulsion' | 'Royale Luxury Emulsion';
+    id: 'Tractor Emulsion' | 'Premium Emulsion' | 'Royale Luxury Emulsion' | string;
     title: string;
     ratePerSqFt: number;
     desc: string;
@@ -37,6 +40,10 @@ export const Step10Painting: React.FC = () => {
     { id: 'Ultima Weather Proof', title: 'Ultima Weather Proof', ratePerSqFt: 32, desc: 'Silicon-enhanced anti-fungal heavy rain & heat protection.' },
     { id: 'Texture Finish', title: 'Architectural Texture', ratePerSqFt: 55, desc: 'Granite/stone textured exterior protective coating.' },
   ];
+
+  const selectedBrand = painting.brand || rec.brand;
+  const selectedInternalPaint = painting.internalPaint || (rec.internalPaint.includes('Royale') ? 'Royale Luxury Emulsion' : rec.internalPaint);
+  const selectedExternalPaint = painting.externalPaint || 'Ultima Weather Proof';
 
   return (
     <div className="space-y-6 text-left select-none">
@@ -61,19 +68,28 @@ export const Step10Painting: React.FC = () => {
         </label>
         <div className="grid grid-cols-3 gap-2">
           {brands.map((b) => {
-            const isSelected = painting.brand === b.id;
+            const isSelected = selectedBrand.toLowerCase().includes(b.id.toLowerCase().split(' ')[0]);
+            const isRecommended = rec.brand.toLowerCase().includes(b.id.toLowerCase().split(' ')[0]);
+
             return (
               <div
                 key={b.id}
-                onClick={() => setPaintingSelection(painting.internalPaint, painting.externalPaint, b.id)}
+                onClick={() => setPaintingSelection(selectedInternalPaint, selectedExternalPaint, b.id)}
                 className={cn(
                   'hutty-tactile-card p-3 space-y-1',
                   isSelected && 'hutty-tactile-card-selected'
                 )}
               >
                 <div className="flex justify-between items-center">
-                  <h4 className="text-xs font-extrabold text-[#1B3D34]">{b.id}</h4>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34]" />}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h4 className="text-xs font-extrabold text-[#1B3D34]">{b.id}</h4>
+                    {isRecommended && (
+                      <span className="text-[8px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-1.5 py-0.5 rounded-full border border-[#1B3D34]/20">
+                        {rec.badgeLabel}
+                      </span>
+                    )}
+                  </div>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />}
                 </div>
                 <p className="text-[10px] text-[#4B5563] truncate">{b.desc}</p>
               </div>
@@ -95,12 +111,14 @@ export const Step10Painting: React.FC = () => {
 
         <div className="space-y-2">
           {internalOptions.map((opt) => {
-            const isSelected = painting.internalPaint === opt.id;
+            const isSelected = selectedInternalPaint === opt.id || (selectedInternalPaint.includes('Royale') && opt.id.includes('Royale'));
+            const isRecommended = rec.internalPaint === opt.id || (rec.internalPaint.includes('Royale') && opt.id.includes('Royale'));
             const optCost = Math.round(interiorAreaSqFt * opt.ratePerSqFt);
+
             return (
               <div
                 key={opt.id}
-                onClick={() => setPaintingSelection(opt.id, painting.externalPaint, painting.brand)}
+                onClick={() => setPaintingSelection(opt.id, selectedExternalPaint, selectedBrand)}
                 className={cn(
                   'hutty-tactile-card flex items-center justify-between',
                   isSelected && 'hutty-tactile-card-selected'
@@ -116,7 +134,14 @@ export const Step10Painting: React.FC = () => {
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
-                    <h4 className="text-xs font-extrabold text-[#1B3D34]">{opt.title}</h4>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{opt.title}</h4>
+                      {isRecommended && (
+                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
+                          Recommended
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-[#4B5563] mt-0.5">{opt.desc}</p>
                   </div>
                 </div>
@@ -146,12 +171,12 @@ export const Step10Painting: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {externalOptions.map((opt) => {
-            const isSelected = painting.externalPaint === opt.id;
+            const isSelected = selectedExternalPaint === opt.id;
             const optCost = Math.round(exteriorAreaSqFt * opt.ratePerSqFt);
             return (
               <div
                 key={opt.id}
-                onClick={() => setPaintingSelection(painting.internalPaint, opt.id, painting.brand)}
+                onClick={() => setPaintingSelection(selectedInternalPaint, opt.id, selectedBrand)}
                 className={cn(
                   'hutty-tactile-card space-y-2 flex flex-col justify-between',
                   isSelected && 'hutty-tactile-card-selected'

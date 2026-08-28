@@ -1,59 +1,18 @@
 // ============================================================
-// BUA MODULE – Built-up Area & Setback Geometry Engine
-// Strictly follows Hutty Pilot Specification (Section 5)
-//
-// Geometry Formulas:
-// Plot Area = Plot Length × Plot Width
-// Buildable Length = Plot Length − Front Setback − Rear Setback
-// Buildable Width = Plot Width − Left Setback − Right Setback
-// Buildable Footprint = Buildable Length × Buildable Width
-// Total Built-up Area = Sum of applicable floor areas
+// BUA MODULE – Authority-Based Built-Up Area & Setback Geometry Engine
+// Strictly integrates Bengaluru (BBMP/BDA) and Mysuru (MUDA/MDA)
+// statutory planning rules with an interactive user-adjustable BUA model.
 // ============================================================
 
 import { EngineInput, AreaResult, SetbackGeometry } from '../types';
-import { COVERAGE_FACTOR, SUPER_BUA_FACTOR } from '../data/coefficients';
-
-/**
- * Standard municipal setback estimator when site-specific survey is pending
- * Based on BBMP/BDA and MUDA residential plot classification
- */
-function getStatutorySetbacks(plotLength: number, plotWidth: number, authority: string): SetbackGeometry {
-  const plotArea = plotLength * plotWidth;
-
-  // If plot is small (<= 1200 sqft, e.g. 30×40)
-  if (plotArea <= 1200) {
-    return {
-      frontSetbackFt: 4.5,
-      rearSetbackFt: 3.5,
-      leftSetbackFt: 3.0,
-      rightSetbackFt: 3.0,
-      source: `${authority || 'BBMP/BDA'} Bylaws Table 1 (Plot ≤ 1200 sq.ft)`,
-    };
-  }
-  // Medium plot (1201 to 2400 sqft, e.g. 30×50, 40×60)
-  if (plotArea <= 2400) {
-    return {
-      frontSetbackFt: 6.0,
-      rearSetbackFt: 4.5,
-      leftSetbackFt: 3.5,
-      rightSetbackFt: 3.5,
-      source: `${authority || 'BBMP/BDA'} Bylaws Table 2 (Plot 1200–2400 sq.ft)`,
-    };
-  }
-  // Large plot (> 2400 sqft, e.g. 50×80, 60×90)
-  return {
-    frontSetbackFt: 9.0,
-    rearSetbackFt: 6.0,
-    leftSetbackFt: 5.0,
-    rightSetbackFt: 5.0,
-    source: `${authority || 'BBMP/BDA'} Bylaws Table 3 (Plot > 2400 sq.ft)`,
-  };
-}
+import { SUPER_BUA_FACTOR } from '../data/coefficients';
+import { evaluateAuthorityLimits, getAuthorityRules } from '../data/authorityRules';
 
 export function calculateArea(input: EngineInput): AreaResult {
   const length = Math.max(0, input.plotLength || 0);
   const width = Math.max(0, input.plotWidth || 0);
-  const floors = Math.max(0, input.floors || 0);
+  const floors = Math.max(1, input.floors || 1);
+  const roadWidthFt = input.roadWidthFt || 30;
 
   // 1. PLOT AREA
   const plotAreaSqFt = length * width;
@@ -62,18 +21,39 @@ export function calculateArea(input: EngineInput): AreaResult {
   const sqFtPerCar = input.parkingType === 'Stilt Parking' || input.parkingType === 'Stilt' ? 180 : 120;
   const parkingAreaSqFt = Math.round((input.carCount || 0) * sqFtPerCar + ((input.bikeCount || 0) * 35));
 
+  const rules = getAuthorityRules(input.city);
+
   // Zero state check: unconfigured project
-  if (plotAreaSqFt <= 0 || floors <= 0) {
+  if (plotAreaSqFt <= 0) {
+    const emptySetbacks: SetbackGeometry = {
+      frontSetbackFt: 0,
+      rearSetbackFt: 0,
+      leftSetbackFt: 0,
+      rightSetbackFt: 0,
+      source: 'None',
+    };
+
     return {
       plotAreaSqFt: 0,
       plotLength: length,
       plotWidth: width,
-      setbacks: { frontSetbackFt: 0, rearSetbackFt: 0, leftSetbackFt: 0, rightSetbackFt: 0, source: 'None' },
+      roadWidthFt,
+      setbacks: emptySetbacks,
+      statutorySetbacks: emptySetbacks,
       buildableLengthFt: 0,
       buildableWidthFt: 0,
       buildableFootprintSqFt: 0,
       maxAllowableBUAPerFloorSqFt: 0,
       buaPerFloorSqFt: 0,
+      recommendedBUAPerFloorSqFt: 0,
+      recommendedBUATotalSqFt: 0,
+      maximumPermissibleBUASqFt: 0,
+      minimumBUASqFt: 0,
+      userSelectedBUASqFt: 0,
+      maxPermissibleCoveragePct: 70,
+      maxPermissibleCoverageSqFt: 0,
+      permissibleFAR: 1.75,
+      validationState: 'valid',
       buildableAreaSqFt: 0,
       remainingGroundAreaSqFt: 0,
       remainingGroundArea: 0,
@@ -85,66 +65,108 @@ export function calculateArea(input: EngineInput): AreaResult {
       totalConstructedSqFt: 0,
       isWithinPermissibleLimit: true,
       requiresClientConfirmation: false,
+      authorityMetadata: {
+        city: rules.displayName,
+        authority: rules.authority,
+        authorityFullName: rules.authorityFullName,
+        governingFramework: rules.governingFramework,
+        ruleId: rules.ruleId,
+        ruleVersion: rules.ruleVersion,
+        effectiveDate: rules.effectiveDate,
+        source: rules.officialSourceDocument,
+        disclaimer: rules.disclaimer,
+        requiresConfirmation: false,
+      },
     };
   }
 
-  // 2. SETBACK GEOMETRY (PDF Section 5)
-  // Use explicitly supplied setbacks if available, otherwise statutory authority rules
-  const statutory = getStatutorySetbacks(length, width, input.authority);
-  const frontSetback = typeof input.frontSetback === 'number' ? input.frontSetback : statutory.frontSetbackFt;
-  const rearSetback  = typeof input.rearSetback  === 'number' ? input.rearSetback  : statutory.rearSetbackFt;
-  const leftSetback  = typeof input.leftSetback  === 'number' ? input.leftSetback  : statutory.leftSetbackFt;
-  const rightSetback = typeof input.rightSetback === 'number' ? input.rightSetback : statutory.rightSetbackFt;
+  // 2. EVALUATE AUTHORITATIVE SETBACKS, COVERAGE, FAR & RECOMMENDATIONS
+  const customSetbacks: Partial<SetbackGeometry> | undefined = (
+    typeof input.frontSetback === 'number' ||
+    typeof input.rearSetback === 'number' ||
+    typeof input.leftSetback === 'number' ||
+    typeof input.rightSetback === 'number'
+  ) ? {
+    frontSetbackFt: input.frontSetback,
+    rearSetbackFt: input.rearSetback,
+    leftSetbackFt: input.leftSetback,
+    rightSetbackFt: input.rightSetback,
+  } : undefined;
 
-  const setbacks: SetbackGeometry = {
-    frontSetbackFt: frontSetback,
-    rearSetbackFt: rearSetback,
-    leftSetbackFt: leftSetback,
-    rightSetbackFt: rightSetback,
-    source: typeof input.frontSetback === 'number' ? 'User-supplied Site Setbacks' : statutory.source,
+  const authEval = evaluateAuthorityLimits({
+    city: input.city,
+    plotLength: length,
+    plotWidth: width,
+    roadWidthFt,
+    floors,
+    customSetbacks,
+  });
+
+  const statutorySetbacks: SetbackGeometry = {
+    frontSetbackFt: authEval.statutoryFrontSetbackFt,
+    rearSetbackFt: authEval.statutoryRearSetbackFt,
+    leftSetbackFt: authEval.statutoryLeftSetbackFt,
+    rightSetbackFt: authEval.statutoryRightSetbackFt,
+    source: `${authEval.authority} (${authEval.ruleVersion})`,
   };
 
-  // 3. BUILDABLE LENGTH, WIDTH & FOOTPRINT
-  const buildableLengthFt = Math.max(0, length - frontSetback - rearSetback);
-  const buildableWidthFt  = Math.max(0, width - leftSetback - rightSetback);
-  const buildableFootprintSqFt = Math.round(buildableLengthFt * buildableWidthFt);
+  const appliedSetbacks: SetbackGeometry = {
+    frontSetbackFt: typeof customSetbacks?.frontSetbackFt === 'number' ? customSetbacks.frontSetbackFt : statutorySetbacks.frontSetbackFt,
+    rearSetbackFt:  typeof customSetbacks?.rearSetbackFt  === 'number' ? customSetbacks.rearSetbackFt  : statutorySetbacks.rearSetbackFt,
+    leftSetbackFt:  typeof customSetbacks?.leftSetbackFt  === 'number' ? customSetbacks.leftSetbackFt  : statutorySetbacks.leftSetbackFt,
+    rightSetbackFt: typeof customSetbacks?.rightSetbackFt === 'number' ? customSetbacks.rightSetbackFt : statutorySetbacks.rightSetbackFt,
+    source: customSetbacks ? 'User-Customized Site Setbacks' : statutorySetbacks.source,
+  };
 
-  // Maximum permissible BUA per floor by statutory coverage
-  const maxAllowableBUAPerFloorSqFt = Math.min(
-    buildableFootprintSqFt,
-    Math.round(plotAreaSqFt * COVERAGE_FACTOR)
-  );
+  // 3. BUILDABLE FOOTPRINT
+  const buildableLengthFt = authEval.buildableLengthFt;
+  const buildableWidthFt  = authEval.buildableWidthFt;
+  const buildableFootprintSqFt = authEval.buildableFootprintSqFt;
 
-  // 4. USER-SELECTED BUILT-UP AREA PER FLOOR
-  // Default to maximum allowable if user hasn't explicitly set a smaller BUA
-  let buaPerFloorSqFt = 0;
-  if (typeof input.builtUpAreaPerFloor === 'number' && input.builtUpAreaPerFloor > 0) {
-    buaPerFloorSqFt = input.builtUpAreaPerFloor;
+  // Maximum permissible BUA per floor and total
+  const maxAllowableBUAPerFloorSqFt = authEval.maxPermissibleCoverageSqFt;
+  const maximumPermissibleBUASqFt = authEval.maxPermissibleBUASqFt;
+  const recommendedBUAPerFloorSqFt = authEval.recommendedBUAPerFloorSqFt;
+  const recommendedBUATotalSqFt = authEval.recommendedBUATotalSqFt;
+  const minimumBUASqFt = authEval.minimumBUASqFt;
+
+  // 4. USER-SELECTED BUILT-UP AREA (Canonical Single Source of Truth)
+  let totalBUASqFt = 0;
+  if (typeof input.userSelectedBUA === 'number' && input.userSelectedBUA > 0) {
+    totalBUASqFt = Math.round(input.userSelectedBUA);
+  } else if (typeof input.builtUpAreaPerFloor === 'number' && input.builtUpAreaPerFloor > 0) {
+    totalBUASqFt = Math.round(input.builtUpAreaPerFloor * floors);
   } else {
-    // Default to buildable footprint or standard 60% coverage
-    buaPerFloorSqFt = maxAllowableBUAPerFloorSqFt > 0 ? maxAllowableBUAPerFloorSqFt : Math.round(plotAreaSqFt * COVERAGE_FACTOR);
+    totalBUASqFt = recommendedBUATotalSqFt;
   }
 
-  // 5. VALIDATION & CLIENT CONFIRMATION
-  const isWithinPermissibleLimit = buaPerFloorSqFt <= (buildableFootprintSqFt > 0 ? buildableFootprintSqFt : Math.round(plotAreaSqFt * COVERAGE_FACTOR));
-  const requiresClientConfirmation = !isWithinPermissibleLimit;
+  const buaPerFloorSqFt = Math.round(totalBUASqFt / floors);
+  const userSelectedBUASqFt = totalBUASqFt;
+
+  // 5. VALIDATION STATE
+  let validationState: 'valid' | 'above_recommended' | 'exceeds_permissible' = 'valid';
   let confirmationMessage: string | undefined;
-  if (!isWithinPermissibleLimit) {
-    confirmationMessage = `Selected BUA per floor (${buaPerFloorSqFt} sq.ft) exceeds the buildable footprint (${buildableFootprintSqFt} sq.ft) calculated from setback rules. Client confirmation / setback relaxation required.`;
+
+  if (totalBUASqFt > maximumPermissibleBUASqFt && maximumPermissibleBUASqFt > 0) {
+    validationState = 'exceeds_permissible';
+    confirmationMessage = `Selected BUA (${totalBUASqFt.toLocaleString()} sq.ft) exceeds calculated statutory maximum permissible limit (${maximumPermissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}). Authority approval / setback relaxation required.`;
+  } else if (totalBUASqFt > recommendedBUATotalSqFt) {
+    validationState = 'above_recommended';
+    confirmationMessage = `Selected BUA (${totalBUASqFt.toLocaleString()} sq.ft) is above the authority recommended baseline (${recommendedBUATotalSqFt.toLocaleString()} sq.ft). Verify your floor-to-floor setbacks.`;
   }
+
+  const isWithinPermissibleLimit = validationState !== 'exceeds_permissible';
+  const requiresClientConfirmation = authEval.requiresClientConfirmation || validationState === 'exceeds_permissible';
 
   // 6. GROUND COVERAGE & REMAINING GROUND AREA
   const remainingGroundAreaSqFt = Math.max(0, plotAreaSqFt - buaPerFloorSqFt);
   const remainingGroundArea = remainingGroundAreaSqFt;
   const groundCoveragePercentage = plotAreaSqFt > 0 ? parseFloat(((buaPerFloorSqFt / plotAreaSqFt) * 100).toFixed(1)) : 0;
 
-  // 7. TOTAL BUILT-UP AREA
-  const totalBUASqFt = Math.round(buaPerFloorSqFt * floors);
-
-  // 8. SUPER BUA (BUA + 15% common areas/walls/shaft)
+  // 7. SUPER BUA (BUA + 15% common areas/walls/shaft)
   const superBUASqFt = Math.round(totalBUASqFt * SUPER_BUA_FACTOR);
 
-  // 9. GROUND FOOTPRINT & TERRACE
+  // 8. GROUND FOOTPRINT & TERRACE
   const buildableAreaSqFt = buaPerFloorSqFt;
   const terraceSqFt = buaPerFloorSqFt; // Top slab exposed area
   const totalConstructedSqFt = totalBUASqFt + parkingAreaSqFt + terraceSqFt;
@@ -153,12 +175,23 @@ export function calculateArea(input: EngineInput): AreaResult {
     plotAreaSqFt,
     plotLength: length,
     plotWidth: width,
-    setbacks,
+    roadWidthFt,
+    setbacks: appliedSetbacks,
+    statutorySetbacks,
     buildableLengthFt,
     buildableWidthFt,
     buildableFootprintSqFt,
     maxAllowableBUAPerFloorSqFt,
     buaPerFloorSqFt,
+    recommendedBUAPerFloorSqFt,
+    recommendedBUATotalSqFt,
+    maximumPermissibleBUASqFt,
+    minimumBUASqFt,
+    userSelectedBUASqFt,
+    maxPermissibleCoveragePct: authEval.maxGroundCoveragePct,
+    maxPermissibleCoverageSqFt: authEval.maxPermissibleCoverageSqFt,
+    permissibleFAR: authEval.permissibleFAR,
+    validationState,
     buildableAreaSqFt,
     remainingGroundAreaSqFt,
     remainingGroundArea,
@@ -171,5 +204,18 @@ export function calculateArea(input: EngineInput): AreaResult {
     isWithinPermissibleLimit,
     requiresClientConfirmation,
     confirmationMessage,
+    authorityMetadata: {
+      city: authEval.city,
+      authority: authEval.authority,
+      authorityFullName: authEval.authorityFullName,
+      governingFramework: authEval.governingFramework,
+      ruleId: authEval.ruleId,
+      ruleVersion: authEval.ruleVersion,
+      effectiveDate: authEval.effectiveDate,
+      source: authEval.source,
+      disclaimer: authEval.disclaimer,
+      requiresConfirmation: authEval.requiresClientConfirmation,
+      confirmationReason: authEval.confirmationReason,
+    },
   };
 }

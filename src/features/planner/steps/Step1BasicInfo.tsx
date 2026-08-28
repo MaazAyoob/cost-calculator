@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWizardStore, CityLocation, HouseType, ParkingTypeOption } from '../../../store/useWizardStore';
 import { useArea } from '../../../store/useCalculationStore';
-import { AlertTriangle, Check, Ruler, Sparkles, MapPin, Building, Car, Sliders } from 'lucide-react';
+import { Check, Ruler, MapPin, ChevronDown, ChevronUp, Info, AlertTriangle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
 export const Step1BasicInfo: React.FC = () => {
@@ -9,7 +9,8 @@ export const Step1BasicInfo: React.FC = () => {
     city,
     plotLength,
     plotWidth,
-    builtUpAreaPerFloor,
+    roadWidthFt,
+    userSelectedBUA,
     floors,
     houseType,
     parkingType,
@@ -18,13 +19,13 @@ export const Step1BasicInfo: React.FC = () => {
     evCharging,
     setCity,
     setPlotDimensions,
-    setBuiltUpAreaPerFloor,
+    setRoadWidth,
+    setUserSelectedBUA,
     setHouseConfig,
     setParkingConfig,
     updateRoomCount,
     setLiftRequired,
     setCoreMaterials,
-    setFlooringZone,
     setDoorSelection,
     setWindowSelection,
     setBathroomFittingSelection,
@@ -32,13 +33,27 @@ export const Step1BasicInfo: React.FC = () => {
   } = useWizardStore();
 
   const area = useArea();
+  const [showHowCalculated, setShowHowCalculated] = useState(false);
+
   const plotArea = plotLength * plotWidth;
-  const maxAllowable = area.maxAllowableBUAPerFloorSqFt || Math.round(plotArea * 0.6);
-  const isExceeding = builtUpAreaPerFloor > maxAllowable && maxAllowable > 0;
+  const numFloors = Math.max(1, floors || 1);
+
+  // Authority values from calculation engine
+  const recBUA = area.recommendedBUATotalSqFt || (numFloors * 720);
+  const maxBUA = area.maximumPermissibleBUASqFt || (numFloors * 800);
+  const minBUA = area.minimumBUASqFt || (numFloors * 350);
+  const activeBUA = area.totalBUASqFt || recBUA;
+  const buaPerFloor = Math.round(activeBUA / numFloors);
+
+  // Slider bounds (allow slider up to maxBUA * 1.15 to let user see state C warning if needed)
+  const sliderMin = Math.max(100, Math.min(minBUA, activeBUA));
+  const sliderMax = Math.max(sliderMin + 200, Math.round(maxBUA * 1.15));
+
+  const validationState = area.validationState || 'valid';
 
   const cities: { id: CityLocation; name: string; authority: string }[] = [
     { id: 'Bangalore', name: 'Bengaluru', authority: 'BBMP / BDA' },
-    { id: 'Mysore', name: 'Mysuru', authority: 'MUDA' },
+    { id: 'Mysore', name: 'Mysuru', authority: 'MUDA / MDA' },
   ];
 
   const standardPlotPresets = [
@@ -48,6 +63,13 @@ export const Step1BasicInfo: React.FC = () => {
     { label: '50 × 80', l: 80, w: 50 },
   ];
 
+  const roadWidthOptions = [
+    { value: 24, label: '< 30 ft', sub: 'Narrow' },
+    { value: 30, label: '30 ft (9m)', sub: 'Standard' },
+    { value: 40, label: '40 ft (12m)', sub: 'Medium' },
+    { value: 50, label: '50 ft+ (15m+)', sub: 'Wide' },
+  ];
+
   const archetypePresets = [
     {
       id: 'duplex-3040',
@@ -55,8 +77,9 @@ export const Step1BasicInfo: React.FC = () => {
       city: 'Bangalore' as CityLocation,
       length: 40,
       width: 30,
+      roadWidth: 30,
       floors: 2,
-      buaPerFloor: 720,
+      buaTotal: 1440,
       houseType: 'Duplex' as HouseType,
       parking: 'Normal Ground' as ParkingTypeOption,
       rooms: { bedrooms: 3, bathrooms: 3, living: 1, kitchen: 1, dining: 1, balcony: 1, commonToilets: 1, pooja: 1, utility: 1, office: 0, storeRoom: 0 },
@@ -68,8 +91,9 @@ export const Step1BasicInfo: React.FC = () => {
       city: 'Bangalore' as CityLocation,
       length: 50,
       width: 30,
+      roadWidth: 30,
       floors: 3,
-      buaPerFloor: 900,
+      buaTotal: 2700,
       houseType: 'Triplex' as HouseType,
       parking: 'Normal Ground' as ParkingTypeOption,
       rooms: { bedrooms: 4, bathrooms: 4, living: 1, kitchen: 1, dining: 1, balcony: 2, commonToilets: 1, pooja: 1, utility: 1, office: 1, storeRoom: 1 },
@@ -81,32 +105,21 @@ export const Step1BasicInfo: React.FC = () => {
       city: 'Bangalore' as CityLocation,
       length: 60,
       width: 40,
+      roadWidth: 40,
       floors: 2,
-      buaPerFloor: 1440,
+      buaTotal: 2880,
       houseType: 'Duplex' as HouseType,
       parking: 'EV Charging Ready' as ParkingTypeOption,
       rooms: { bedrooms: 4, bathrooms: 5, living: 2, kitchen: 1, dining: 1, balcony: 2, commonToilets: 1, pooja: 1, utility: 1, office: 1, storeRoom: 1 },
       lift: false,
-    },
-    {
-      id: 'rental-3050',
-      label: '30×50 Rental G+3',
-      city: 'Bangalore' as CityLocation,
-      length: 50,
-      width: 30,
-      floors: 4,
-      buaPerFloor: 900,
-      houseType: 'Rental Units' as HouseType,
-      parking: 'Stilt' as ParkingTypeOption,
-      rooms: { bedrooms: 6, bathrooms: 6, living: 2, kitchen: 2, dining: 2, balcony: 2, commonToilets: 1, pooja: 1, utility: 2, office: 0, storeRoom: 0 },
-      lift: true,
     },
   ];
 
   const applyArchetype = (preset: typeof archetypePresets[0]) => {
     setCity(preset.city);
     setPlotDimensions(preset.length, preset.width);
-    setBuiltUpAreaPerFloor(preset.buaPerFloor);
+    setRoadWidth(preset.roadWidth);
+    setUserSelectedBUA(preset.buaTotal);
     setHouseConfig(preset.houseType, preset.floors);
     setParkingConfig(preset.parking, 1, 1, preset.parking === 'EV Charging Ready');
     setLiftRequired(preset.lift);
@@ -147,8 +160,11 @@ export const Step1BasicInfo: React.FC = () => {
     { id: 'EV Charging Ready', label: 'EV Dedicated', desc: 'Dedicated charging point' },
   ];
 
+  // Calculate percentage position of recommended marker on slider
+  const recMarkerPct = Math.max(0, Math.min(100, ((recBUA - sliderMin) / (sliderMax - sliderMin)) * 100));
+
   return (
-    <div className="space-y-6 text-left select-none">
+    <div className="space-y-6 text-left select-none pb-4">
       
       {/* ── STEP HEADER ── */}
       <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
@@ -156,7 +172,6 @@ export const Step1BasicInfo: React.FC = () => {
           <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
             STEP 01
           </span>
-          {/* Subtle preset templates */}
           <div className="flex items-center gap-1">
             <span className="text-[10px] font-bold uppercase text-[#4B5563] hidden sm:inline mr-1">
               Presets:
@@ -178,7 +193,7 @@ export const Step1BasicInfo: React.FC = () => {
           BUILD YOUR HOME
         </h1>
         <p className="text-xs sm:text-sm text-[#4B5563]">
-          Start with your site details and architectural storeys.
+          Authority-informed site planning, setbacks, and configurable Built-Up Area.
         </p>
       </div>
 
@@ -188,15 +203,18 @@ export const Step1BasicInfo: React.FC = () => {
         {/* City Location Cards */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-            Site Location
+            Site Location (Planning Authority)
           </label>
           <div className="grid grid-cols-2 gap-2">
             {cities.map((item) => {
-              const isSelected = city === item.id;
+              const isSelected = (city || 'Bangalore') === item.id;
               return (
                 <div
                   key={item.id}
-                  onClick={() => setCity(item.id)}
+                  onClick={() => {
+                    setCity(item.id);
+                    setUserSelectedBUA(null); // Reset to new city recommendation
+                  }}
                   className={cn(
                     'hutty-tactile-card flex items-center justify-between',
                     isSelected && 'hutty-tactile-card-selected'
@@ -230,7 +248,10 @@ export const Step1BasicInfo: React.FC = () => {
                   <button
                     key={p.label}
                     type="button"
-                    onClick={() => setPlotDimensions(p.l, p.w)}
+                    onClick={() => {
+                      setPlotDimensions(p.l, p.w);
+                      setUserSelectedBUA(null); // Auto-recalculate recommended BUA
+                    }}
                     className={cn(
                       'text-[10px] font-bold px-2 py-0.5 rounded border transition-all cursor-pointer',
                       isMatch
@@ -246,7 +267,7 @@ export const Step1BasicInfo: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {/* Tactile Length Box */}
+            {/* Length (Depth) */}
             <div className="hutty-number-box space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
@@ -265,12 +286,15 @@ export const Step1BasicInfo: React.FC = () => {
                 max={120}
                 step={1}
                 value={plotLength}
-                onChange={(e) => setPlotDimensions(Number(e.target.value), plotWidth || 30)}
+                onChange={(e) => {
+                  setPlotDimensions(Number(e.target.value), plotWidth || 30);
+                  setUserSelectedBUA(null);
+                }}
                 className="hutty-slider"
               />
             </div>
 
-            {/* Tactile Width Box */}
+            {/* Width (Frontage) */}
             <div className="hutty-number-box space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
@@ -289,29 +313,69 @@ export const Step1BasicInfo: React.FC = () => {
                 max={100}
                 step={1}
                 value={plotWidth}
-                onChange={(e) => setPlotDimensions(plotLength || 40, Number(e.target.value))}
+                onChange={(e) => {
+                  setPlotDimensions(plotLength || 40, Number(e.target.value));
+                  setUserSelectedBUA(null);
+                }}
                 className="hutty-slider"
               />
             </div>
           </div>
         </div>
 
+        {/* ── 2. ROAD WIDTH (Affects planning regulations) ── */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex justify-between items-baseline">
+            <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
+              Abutting Road Width
+            </label>
+            <span className="text-[10px] text-[#4B5563]">
+              Affects planning &amp; FAR limits
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {roadWidthOptions.map((rw) => {
+              const isSelected = (roadWidthFt || 30) === rw.value;
+              return (
+                <div
+                  key={rw.value}
+                  onClick={() => setRoadWidth(rw.value)}
+                  className={cn(
+                    'hutty-tactile-card text-center p-2 cursor-pointer',
+                    isSelected && 'hutty-tactile-card-selected'
+                  )}
+                >
+                  <span className="text-xs font-extrabold text-[#1B3D34] block font-mono">
+                    {rw.label}
+                  </span>
+                  <span className="text-[9px] text-[#4B5563] block">
+                    {rw.sub}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
 
-      {/* ── 2. NUMBER OF FLOORS (Tactile Architectural Tiles) ── */}
+      {/* ── 3. NUMBER OF FLOORS ── */}
       <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Number of Floors
         </label>
         <div className="grid grid-cols-5 gap-1.5">
           {floorOptions.map((opt) => {
-            const isSelected = floors === opt.value;
+            const isSelected = (floors || 2) === opt.value;
             return (
               <div
                 key={opt.value}
-                onClick={() => setHouseConfig(houseType || 'Duplex', opt.value)}
+                onClick={() => {
+                  setHouseConfig(houseType || 'Duplex', opt.value);
+                  setUserSelectedBUA(null); // Recalculate recommendation for new floor count
+                }}
                 className={cn(
-                  'hutty-tactile-card text-center p-2.5 flex flex-col items-center justify-center',
+                  'hutty-tactile-card text-center p-2.5 flex flex-col items-center justify-center cursor-pointer',
                   isSelected && 'hutty-tactile-card-selected'
                 )}
               >
@@ -327,7 +391,7 @@ export const Step1BasicInfo: React.FC = () => {
         </div>
       </div>
 
-      {/* ── 3. HOUSE TYPE & PARKING (Tactile Architectural Choice Cards) ── */}
+      {/* ── 4. HOUSE TYPE & PARKING ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E5E7EB]">
         
         {/* House Type */}
@@ -343,7 +407,7 @@ export const Step1BasicInfo: React.FC = () => {
                   key={ht.id}
                   onClick={() => setHouseConfig(ht.id, floors || 2)}
                   className={cn(
-                    'hutty-tactile-card py-2 px-3 flex items-center justify-between',
+                    'hutty-tactile-card py-2 px-3 flex items-center justify-between cursor-pointer',
                     isSelected && 'hutty-tactile-card-selected'
                   )}
                 >
@@ -371,7 +435,7 @@ export const Step1BasicInfo: React.FC = () => {
                   key={p.id}
                   onClick={() => setParkingConfig(p.id, carCount || 1, bikeCount || 1, p.id === 'EV Charging Ready' ? true : evCharging)}
                   className={cn(
-                    'hutty-tactile-card py-2 px-3 flex items-center justify-between',
+                    'hutty-tactile-card py-2 px-3 flex items-center justify-between cursor-pointer',
                     isSelected && 'hutty-tactile-card-selected'
                   )}
                 >
@@ -388,34 +452,203 @@ export const Step1BasicInfo: React.FC = () => {
 
       </div>
 
-      {/* ── 4. BUILT-UP FOOTPRINT & SETBACKS ── */}
-      <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-bold text-[#1B3D34] uppercase tracking-wider">
-            Built-Up Footprint per Floor
-          </span>
-          <span className="font-mono font-extrabold text-[#1B3D34] text-xs">
-            {builtUpAreaPerFloor > 0 ? `${builtUpAreaPerFloor.toLocaleString()} sq.ft` : '0 sq.ft'}
-          </span>
+      {/* ── 5. AUTHORITY-INFORMED USER-ADJUSTABLE BUA SLIDER ── */}
+      <div className="space-y-3 pt-3 border-t border-[#E5E7EB]">
+        
+        {/* Header with Large BUA readout */}
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+          <div>
+            <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
+              BUILT-UP AREA (BUA)
+            </label>
+            <span className="text-[11px] text-[#4B5563]">
+              Recommended based on your plot geometry and applicable planning rules.
+            </span>
+          </div>
+
+          <div className="text-left sm:text-right">
+            <div className="flex items-baseline gap-1.5 sm:justify-end">
+              <span className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading font-mono leading-none">
+                {activeBUA.toLocaleString()}
+              </span>
+              <span className="text-xs font-bold text-[#4B5563]">sq.ft</span>
+            </div>
+            {numFloors > 1 && (
+              <span className="text-[10px] font-mono text-[#4B5563]">
+                (~{buaPerFloor.toLocaleString()} sq.ft / floor across {numFloors} floors)
+              </span>
+            )}
+          </div>
         </div>
 
-        <input
-          type="range"
-          min={0}
-          max={plotArea > 0 ? plotArea : 3000}
-          step={10}
-          value={builtUpAreaPerFloor}
-          disabled={plotArea === 0}
-          onChange={(e) => setBuiltUpAreaPerFloor(Number(e.target.value))}
-          className="hutty-slider disabled:opacity-40"
-        />
+        {/* Interactive BUA Slider with Recommended Marker */}
+        <div className="space-y-2 pt-1">
+          <div className="relative pt-2 pb-1">
+            <input
+              type="range"
+              min={sliderMin}
+              max={sliderMax}
+              step={10}
+              value={activeBUA}
+              disabled={plotArea === 0}
+              onChange={(e) => setUserSelectedBUA(Number(e.target.value))}
+              className="hutty-slider w-full cursor-pointer disabled:opacity-40"
+            />
 
+            {/* Recommended Marker Dot on Track */}
+            {plotArea > 0 && recMarkerPct >= 0 && recMarkerPct <= 100 && (
+              <div
+                className="absolute top-0 flex flex-col items-center pointer-events-none -translate-x-1/2"
+                style={{ left: `${recMarkerPct}%` }}
+              >
+                <span className="text-[9px] font-bold font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.1)] px-1.5 py-0.2 rounded border border-[#1B3D34]/20 shadow-2xs whitespace-nowrap">
+                  Rec: {recBUA.toLocaleString()}
+                </span>
+                <div className="w-1.5 h-1.5 bg-[#1B3D34] rotate-45 mt-0.5" />
+              </div>
+            )}
+          </div>
+
+          {/* Slider Min/Max Readouts */}
+          <div className="flex justify-between items-center text-[10px] font-mono text-[#4B5563]">
+            <span>Min: {sliderMin.toLocaleString()} sq.ft</span>
+            <span className="font-bold text-[#1B3D34]">
+              Recommended: {recBUA.toLocaleString()} sq.ft
+            </span>
+            <span>Max Permissible: {maxBUA.toLocaleString()} sq.ft</span>
+          </div>
+        </div>
+
+        {/* ── 3 VALIDATION STATES ── */}
         {plotArea > 0 && (
-          <div className="flex justify-between items-center text-[11px] text-[#4B5563] pt-0.5">
-            <span>Setbacks: Front {area.setbacks?.frontSetbackFt ?? 3.5}' • Rear {area.setbacks?.rearSetbackFt ?? 3.0}' • Sides {area.setbacks?.leftSetbackFt ?? 3.0}'</span>
-            <span className="font-mono">Max: {maxAllowable.toLocaleString()} sq.ft</span>
+          <div>
+            {validationState === 'valid' && (
+              <div className="p-3 bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/20 rounded-xl flex items-center gap-2.5 text-xs text-[#1B3D34]">
+                <CheckCircle2 className="w-4 h-4 text-[#1B3D34] shrink-0" />
+                <div>
+                  <span className="font-bold">✓ Valid configuration:</span>
+                  <span className="text-[11px] text-[#4B5563] ml-1">Within the calculated permissible authority range.</span>
+                </div>
+              </div>
+            )}
+
+            {validationState === 'above_recommended' && (
+              <div className="p-3 bg-[rgba(242,140,40,0.1)] border border-[#F28C28]/30 rounded-xl flex items-center gap-2.5 text-xs text-[#1B3D34]">
+                <AlertTriangle className="w-4 h-4 text-[#F28C28] shrink-0" />
+                <div>
+                  <span className="font-bold text-[#1B3D34]">⚠ Above recommended BUA:</span>
+                  <span className="text-[11px] text-[#4B5563] ml-1">Permissible under FAR, but exceeds baseline conservative coverage. Review your planning configuration before finalizing.</span>
+                </div>
+              </div>
+            )}
+
+            {validationState === 'exceeds_permissible' && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2.5 text-xs text-red-900">
+                <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+                <div>
+                  <span className="font-bold text-red-800">⚠ Exceeds calculated permissible BUA:</span>
+                  <span className="text-[11px] text-red-700 ml-1">This exceeds the statutory maximum limit calculated for this plot and road width. Authority approval or premium FAR required.</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Floor-wise BUA breakdown for multi-storey */}
+        {numFloors > 1 && plotArea > 0 && (
+          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-1.5 text-xs">
+            <span className="font-bold text-[#1B3D34] text-[11px] uppercase tracking-wider block">
+              Floor-Wise Area Allocation ({numFloors} Floors)
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+              {Array.from({ length: numFloors }).map((_, idx) => (
+                <div key={idx} className="bg-white p-2 rounded-lg border border-[#E5E7EB] flex justify-between">
+                  <span className="text-[#4B5563]">{idx === 0 ? 'Ground Floor' : `Floor ${idx + 1}`}:</span>
+                  <span className="font-bold text-[#1B3D34] font-mono">{buaPerFloor.toLocaleString()} sq.ft</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── EXPANDABLE "HOW IS THIS CALCULATED?" AUTHORITY EXPLAINER ── */}
+        {plotArea > 0 && (
+          <div className="border border-[#E5E7EB] rounded-xl overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowHowCalculated(!showHowCalculated)}
+              className="w-full p-3 bg-[#F8F8F6] hover:bg-white flex items-center justify-between text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <span>How is this calculated? (Authority Breakdown)</span>
+              </div>
+              {showHowCalculated ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            {showHowCalculated && (
+              <div className="p-4 bg-white border-t border-[#E5E7EB] space-y-3 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Plot Area</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{plotArea.toLocaleString()} sq.ft</span>
+                  </div>
+                  <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Buildable Footprint</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{area.buildableFootprintSqFt?.toLocaleString() || 0} sq.ft</span>
+                  </div>
+                  <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Applicable Coverage</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{area.maxPermissibleCoveragePct || 70}%</span>
+                  </div>
+                  <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Permissible FAR</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{area.permissibleFAR || 1.75}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Recommended BUA</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{recBUA.toLocaleString()} sq.ft</span>
+                  </div>
+                  <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Max Permissible BUA</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{maxBUA.toLocaleString()} sq.ft</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#E5E7EB] space-y-1">
+                  <span className="text-[11px] font-bold text-[#1B3D34] block">Required Statutory Setbacks:</span>
+                  <div className="flex flex-wrap gap-2 text-[11px] font-mono text-[#4B5563]">
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                      Front: {area.setbacks?.frontSetbackFt?.toFixed(1) || 3.3} ft
+                    </span>
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                      Rear: {area.setbacks?.rearSetbackFt?.toFixed(1) || 3.3} ft
+                    </span>
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                      Left: {area.setbacks?.leftSetbackFt?.toFixed(1) || 3.3} ft
+                    </span>
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                      Right: {area.setbacks?.rightSetbackFt?.toFixed(1) || 3.3} ft
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#E5E7EB] text-[10px] text-[#4B5563] space-y-1">
+                  <p>
+                    <strong className="text-[#1B3D34]">Planning Authority:</strong> {area.authorityMetadata?.city} &bull; {area.authorityMetadata?.authorityFullName || area.authorityMetadata?.authority}
+                  </p>
+                  <p>
+                    <strong className="text-[#1B3D34]">Rule Reference:</strong> {area.authorityMetadata?.source} (Version: {area.authorityMetadata?.ruleVersion})
+                  </p>
+                  <p className="italic text-[#1B3D34] pt-1">
+                    "{area.authorityMetadata?.disclaimer || 'Authority-informed estimate. Final approval is subject to applicable local authority regulations and professional verification.'}"
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
 
     </div>

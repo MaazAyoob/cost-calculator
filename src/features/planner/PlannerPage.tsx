@@ -328,7 +328,7 @@ export const PlannerPage: React.FC = () => {
             >
               
               {/* Scrollable Configuration Panel */}
-              <div className="flex-1 overflow-y-auto p-5 sm:p-6 lg:p-7 xl:p-8 space-y-6 scrollbar-thin">
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 lg:p-7 xl:p-8 pb-28 sm:pb-24 lg:pb-8 space-y-6 scrollbar-thin">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentStep}
@@ -393,7 +393,7 @@ export const PlannerPage: React.FC = () => {
 
             {/* ── RIGHT PANEL (55% Desktop): LIVE PREVIEW & ARCHITECTURAL 3D ── */}
             <div
-              className={`w-full lg:w-[55%] xl:w-[56%] 2xl:w-[58%] flex-col h-full bg-[#F8F8F6] overflow-y-auto p-4 sm:p-5 lg:p-6 scrollbar-thin ${
+              className={`w-full lg:w-[55%] xl:w-[56%] 2xl:w-[58%] flex-col h-full bg-[#F8F8F6] overflow-y-auto p-4 sm:p-5 lg:p-6 pb-28 lg:pb-6 scrollbar-thin ${
                 mobileActiveTab === 'preview' ? 'flex' : 'hidden lg:flex'
               }`}
             >

@@ -59,11 +59,13 @@ export interface EngineInput {
   authority: string;
   plotLength: number; // ft
   plotWidth: number;  // ft
+  roadWidthFt?: number; // Road width (ft), affects FAR and height restrictions
   frontSetback?: number; // ft
   rearSetback?: number;  // ft
   leftSetback?: number;  // ft
   rightSetback?: number; // ft
   builtUpAreaPerFloor?: number; // User-selected desired BUA per floor (sq.ft)
+  userSelectedBUA?: number; // Total user-selected BUA across floors (sq.ft)
   houseType: HouseType;
   floors: number;     // 1=G, 2=G+1, 3=G+2, 4=G+3, 5=G+4
   parkingType: 'Stilt' | 'Stilt Parking' | 'Normal Ground' | 'EV Charging Ready';
@@ -212,12 +214,23 @@ export interface AreaResult {
   plotAreaSqFt: number;
   plotLength: number;
   plotWidth: number;
+  roadWidthFt: number;
   setbacks: SetbackGeometry;
+  statutorySetbacks: SetbackGeometry;
   buildableLengthFt: number;
   buildableWidthFt: number;
   buildableFootprintSqFt: number;
   maxAllowableBUAPerFloorSqFt: number;
   buaPerFloorSqFt: number;
+  recommendedBUAPerFloorSqFt: number;
+  recommendedBUATotalSqFt: number;
+  maximumPermissibleBUASqFt: number;
+  minimumBUASqFt: number;
+  userSelectedBUASqFt: number;
+  maxPermissibleCoveragePct: number;
+  maxPermissibleCoverageSqFt: number;
+  permissibleFAR: number;
+  validationState: 'valid' | 'above_recommended' | 'exceeds_permissible';
   buildableAreaSqFt: number;
   remainingGroundAreaSqFt: number;
   remainingGroundArea: number;
@@ -230,6 +243,19 @@ export interface AreaResult {
   isWithinPermissibleLimit: boolean;
   requiresClientConfirmation: boolean;
   confirmationMessage?: string;
+  authorityMetadata: {
+    city: string;
+    authority: string;
+    authorityFullName?: string;
+    governingFramework?: string;
+    ruleId: string;
+    ruleVersion: string;
+    effectiveDate: string;
+    source: string;
+    disclaimer: string;
+    requiresConfirmation: boolean;
+    confirmationReason?: string;
+  };
 }
 
 // ────────────────────────────────────────────────────────────

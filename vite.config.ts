@@ -27,6 +27,7 @@ export default defineConfig({
           'vendor-animation': ['framer-motion', 'gsap'],
           'vendor-icons': ['lucide-react'],
           'vendor-charts': ['recharts'],
+          'vendor-pdf': ['@react-pdf/renderer'],
         },
       },
     },

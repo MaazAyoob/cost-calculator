@@ -1,12 +1,15 @@
 import React from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
+import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step7Windows: React.FC = () => {
   const { windows, setWindowSelection } = useWizardStore();
   const quantities = useQuantities();
+  const { getWindowRecommendation } = useRecommendations();
+  const rec = getWindowRecommendation();
 
   const totalWindowAreaSqFt = quantities.windowAreaSqFt || 200;
   const windowsCount = quantities.windowsCount || 10;
@@ -32,8 +35,9 @@ export const Step7Windows: React.FC = () => {
     ],
   };
 
-  const selectedMaterial = windows.primaryMaterial || 'uPVC';
+  const selectedMaterial = windows.primaryMaterial || rec.primaryMaterial;
   const currentSubGrades = subGradeMap[selectedMaterial] || subGradeMap['uPVC'];
+  const selectedSubGrade = windows.subGrade || (selectedMaterial === rec.primaryMaterial ? rec.subGrade : currentSubGrades[0].label);
 
   return (
     <div className="space-y-6 text-left select-none">
@@ -58,7 +62,8 @@ export const Step7Windows: React.FC = () => {
         </label>
         <div className="grid grid-cols-3 gap-2">
           {materials.map((mat) => {
-            const isSelected = windows.primaryMaterial === mat.id;
+            const isSelected = selectedMaterial === mat.id;
+            const isRecommended = mat.id === rec.primaryMaterial;
             return (
               <div
                 key={mat.id}
@@ -69,7 +74,14 @@ export const Step7Windows: React.FC = () => {
                 )}
               >
                 <div className="flex justify-between items-center">
-                  <h4 className="text-xs font-extrabold text-[#1B3D34]">{mat.title}</h4>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h4 className="text-xs font-extrabold text-[#1B3D34]">{mat.title}</h4>
+                    {isRecommended && (
+                      <span className="text-[8px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-1.5 py-0.5 rounded-full border border-[#1B3D34]/20">
+                        {rec.badgeLabel}
+                      </span>
+                    )}
+                  </div>
                   {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />}
                 </div>
                 <p className="text-[10px] text-[#4B5563] truncate">{mat.desc}</p>
@@ -90,7 +102,8 @@ export const Step7Windows: React.FC = () => {
 
         <div className="space-y-2">
           {currentSubGrades.map((sg) => {
-            const isSelected = windows.subGrade === sg.label;
+            const isSelected = selectedSubGrade === sg.label;
+            const isRecommended = sg.label === rec.subGrade;
             const subCost = Math.round(totalWindowAreaSqFt * sg.ratePerSqFt);
             return (
               <div
@@ -111,7 +124,14 @@ export const Step7Windows: React.FC = () => {
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
-                    <h4 className="text-xs font-extrabold text-[#1B3D34]">{sg.label}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{sg.label}</h4>
+                      {isRecommended && (
+                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
+                          Recommended
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-[#4B5563] mt-0.5">{sg.desc}</p>
                   </div>
                 </div>

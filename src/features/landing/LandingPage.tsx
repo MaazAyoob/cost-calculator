@@ -1,6 +1,7 @@
 import React from 'react';
 import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
+import { FourOfferingsSection } from './sections/FourOfferingsSection';
 import { TrustStatsSection } from './sections/TrustStatsSection';
 import { WhyPlanningSection } from './sections/WhyPlanningSection';
 import { CalculatorSolutionsSection } from './sections/CalculatorSolutionsSection';
@@ -23,6 +24,9 @@ export const LandingPage: React.FC = () => {
 
       {/* 01. Hero */}
       <HeroSection />
+
+      {/* 01b. 4 Core Offerings */}
+      <FourOfferingsSection />
 
       {/* 02. Trust Strip */}
       <TrustStatsSection />

@@ -1,12 +1,15 @@
 import React from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
+import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step9BathroomFittings: React.FC = () => {
   const { bathroomFittings, setBathroomFittingSelection } = useWizardStore();
   const quantities = useQuantities();
+  const { getBathroomRecommendation } = useRecommendations();
+  const rec = getBathroomRecommendation();
 
   const fixtureSets = quantities.bathroomFixtureSets || 3;
   const cpvcMetres = quantities.cpvcSupplyMetres || 180;
@@ -47,6 +50,9 @@ export const Step9BathroomFittings: React.FC = () => {
     { id: 'Astral', name: 'Astral CPVC Pro', desc: 'Lead-free NSF certified CPVC' },
   ];
 
+  const selectedSanitaryTier = bathroomFittings.sanitaryTier || rec.sanitaryTier;
+  const selectedCpvcBrand = bathroomFittings.cpvcBrand || rec.cpvcBrand;
+
   return (
     <div className="space-y-6 text-left select-none">
       
@@ -74,12 +80,14 @@ export const Step9BathroomFittings: React.FC = () => {
 
         <div className="space-y-2">
           {sanitaryTiers.map((tier) => {
-            const isSelected = bathroomFittings.sanitaryTier === tier.id;
+            const isSelected = selectedSanitaryTier === tier.id;
+            const isRecommended = tier.id === rec.sanitaryTier || (rec.sanitaryTier.includes('Cera') && tier.id.includes('Cera')) || (rec.sanitaryTier.includes('Jaquar') && tier.id.includes('Jaquar')) || (rec.sanitaryTier.includes('Toto') && tier.id.includes('Toto'));
             const approxTotal = Math.round(fixtureSets * tier.ratePerSet);
+
             return (
               <div
                 key={tier.id}
-                onClick={() => setBathroomFittingSelection(tier.id, bathroomFittings.cpvcBrand)}
+                onClick={() => setBathroomFittingSelection(tier.id, selectedCpvcBrand)}
                 className={cn(
                   'hutty-tactile-card flex items-center justify-between',
                   isSelected && 'hutty-tactile-card-selected'
@@ -95,11 +103,16 @@ export const Step9BathroomFittings: React.FC = () => {
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#1B3D34]">{tier.title}</h4>
                       <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
                         {tier.brands}
                       </span>
+                      {isRecommended && (
+                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
+                          {rec.badgeLabel}
+                        </span>
+                      )}
                     </div>
                     <p className="text-[10px] text-[#4B5563] mt-0.5">{tier.desc}</p>
                   </div>
@@ -128,11 +141,11 @@ export const Step9BathroomFittings: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {cpvcBrands.map((b) => {
-            const isSelected = bathroomFittings.cpvcBrand === b.id;
+            const isSelected = selectedCpvcBrand === b.id;
             return (
               <div
                 key={b.id}
-                onClick={() => setBathroomFittingSelection(bathroomFittings.sanitaryTier, b.id)}
+                onClick={() => setBathroomFittingSelection(selectedSanitaryTier, b.id)}
                 className={cn(
                   'hutty-tactile-card p-3 space-y-1',
                   isSelected && 'hutty-tactile-card-selected'

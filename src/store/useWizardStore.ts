@@ -54,7 +54,13 @@ export interface ConfiguratorState {
   authority: AuthorityOption | null;
   plotLength: number;
   plotWidth: number;
+  roadWidthFt: number; // Front abutting road width (ft)
   builtUpAreaPerFloor: number; // Desired built-up area per floor (sq.ft)
+  userSelectedBUA: number | null; // Total user-selected BUA across floors (sq.ft)
+  frontSetback: number | null;
+  rearSetback: number | null;
+  leftSetback: number | null;
+  rightSetback: number | null;
   floors: number;
   houseType: HouseType | null;
   parkingType: ParkingTypeOption | null;
@@ -66,7 +72,8 @@ export interface ConfiguratorState {
   rooms: RoomCounts;
   liftRequired: boolean;
 
-  // Screen 03 to 10: Material & Finishing Selections (Starts null)
+  // Quality / Specification Tier
+  specificationTier: 'standard' | 'premium' | 'luxury';
   qualityTier: QualityTier;
   materialBrands: MaterialBrandSelection;
   flooringZones: ZoneFlooringSelection;
@@ -91,12 +98,17 @@ export interface ConfiguratorState {
   nextStep: () => void;
   prevStep: () => void;
 
+  setSpecificationTier: (tier: 'standard' | 'premium' | 'luxury') => void;
   setCity: (city: CityLocation) => void;
   setPlotDimensions: (length: number, width: number) => void;
+  setRoadWidth: (roadWidthFt: number) => void;
   setBuiltUpAreaPerFloor: (bua: number) => void;
+  setUserSelectedBUA: (bua: number | null) => void;
+  setCustomSetbacks: (front?: number | null, rear?: number | null, left?: number | null, right?: number | null) => void;
   setHouseConfig: (type: HouseType, floors: number) => void;
   setParkingConfig: (parkingType: ParkingTypeOption, carCount: number, bikeCount: number, evCharging: boolean) => void;
   updateRoomCount: (room: keyof RoomCounts, delta: number) => void;
+  setRoomCount: (room: keyof RoomCounts, count: number) => void;
   setLiftRequired: (required: boolean) => void;
   setCoreMaterials: (
     steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT',
@@ -128,7 +140,13 @@ export function getFreshZeroState() {
     authority: null as any,
     plotLength: 0,
     plotWidth: 0,
+    roadWidthFt: 30,
     builtUpAreaPerFloor: 0,
+    userSelectedBUA: null as number | null,
+    frontSetback: null as number | null,
+    rearSetback: null as number | null,
+    leftSetback: null as number | null,
+    rightSetback: null as number | null,
     floors: 0,
     houseType: null as any,
     parkingType: null as any,
@@ -152,7 +170,8 @@ export function getFreshZeroState() {
     },
     liftRequired: false,
 
-    // Material Selections: completely unselected (null)
+    // Material Selections & Specification Tier
+    specificationTier: 'premium' as 'standard' | 'premium' | 'luxury',
     qualityTier: 'Premium' as QualityTier,
     materialBrands: {
       steel: null as any,
@@ -238,6 +257,19 @@ export const useWizardStore = create<ConfiguratorState>()(
         set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) }));
       },
 
+      setSpecificationTier: (specificationTier) => {
+        const qualityTierMap: Record<'standard' | 'premium' | 'luxury', QualityTier> = {
+          standard: 'Essential',
+          premium: 'Premium',
+          luxury: 'Luxury',
+        };
+        set({
+          specificationTier,
+          qualityTier: qualityTierMap[specificationTier],
+          hasStartedSelection: true,
+        });
+      },
+
       // Rule 1: Bangalore -> BBMP/BDA, Mysore -> MUDA
       setCity: (city) => {
         const authority: AuthorityOption = city === 'Bangalore' ? 'BBMP/BDA' : 'MUDA';
@@ -250,8 +282,26 @@ export const useWizardStore = create<ConfiguratorState>()(
         set({ plotLength, plotWidth, hasStartedSelection: true });
       },
 
+      setRoadWidth: (roadWidthFt) => {
+        set({ roadWidthFt: Math.max(10, Math.min(200, roadWidthFt)), hasStartedSelection: true });
+      },
+
       setBuiltUpAreaPerFloor: (builtUpAreaPerFloor) => {
         set({ builtUpAreaPerFloor: Math.max(0, builtUpAreaPerFloor), hasStartedSelection: true });
+      },
+
+      setUserSelectedBUA: (userSelectedBUA) => {
+        set({ userSelectedBUA: userSelectedBUA !== null ? Math.max(0, userSelectedBUA) : null, hasStartedSelection: true });
+      },
+
+      setCustomSetbacks: (front, rear, left, right) => {
+        set({
+          frontSetback: front !== undefined ? front : get().frontSetback,
+          rearSetback: rear !== undefined ? rear : get().rearSetback,
+          leftSetback: left !== undefined ? left : get().leftSetback,
+          rightSetback: right !== undefined ? right : get().rightSetback,
+          hasStartedSelection: true,
+        });
       },
 
       // Rule 2 & Rule 4 enforcement:
@@ -276,13 +326,32 @@ export const useWizardStore = create<ConfiguratorState>()(
       },
 
       updateRoomCount: (room, delta) => {
-        set((state) => ({
-          hasStartedSelection: true,
-          rooms: {
-            ...state.rooms,
-            [room]: Math.max(0, state.rooms[room] + delta),
-          },
-        }));
+        set((state) => {
+          const maxCount = (room === 'bedrooms' || room === 'bathrooms') ? 10 : 10;
+          const currentVal = state.rooms[room] || 0;
+          const newVal = Math.max(0, Math.min(maxCount, currentVal + delta));
+          return {
+            hasStartedSelection: true,
+            rooms: {
+              ...state.rooms,
+              [room]: newVal,
+            },
+          };
+        });
+      },
+
+      setRoomCount: (room, count) => {
+        set((state) => {
+          const maxCount = (room === 'bedrooms' || room === 'bathrooms') ? 10 : 10;
+          const newVal = Math.max(0, Math.min(maxCount, count));
+          return {
+            hasStartedSelection: true,
+            rooms: {
+              ...state.rooms,
+              [room]: newVal,
+            },
+          };
+        });
       },
 
       setLiftRequired: (liftRequired) => {
