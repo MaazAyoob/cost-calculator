@@ -199,11 +199,50 @@
 /* ============================================================
    ARCHITECTURAL GRID & LINEWORK
    ============================================================ */
+/* ============================================================
+   ARCHITECTURAL TEXTURES & GLASS UTILITIES
+   ============================================================ */
 .arch-grid-bg {
-  background-size: 32px 32px;
+  background-size: 24px 24px;
   background-image: 
     linear-gradient(to right, rgba(27, 61, 52, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(27, 61, 52, 0.05) 1px, transparent 1px);
+}
+
+.arch-grid-fine {
+  background-size: 12px 12px;
+  background-image: 
+    linear-gradient(to right, rgba(27, 61, 52, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(27, 61, 52, 0.035) 1px, transparent 1px);
+}
+
+.arch-blueprint-dark {
+  background-size: 20px 20px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-dark-hud {
+  background: rgba(19, 44, 37, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tactile-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.tactile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(27, 61, 52, 0.08);
 }
 
 .arch-grid-dark {

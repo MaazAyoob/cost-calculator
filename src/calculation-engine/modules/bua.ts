@@ -48,6 +48,9 @@ export function calculateArea(input: EngineInput): AreaResult {
       recommendedBUAPerFloorSqFt: 0,
       recommendedBUATotalSqFt: 0,
       maximumPermissibleBUASqFt: 0,
+      permissibleBUASqFt: 0,
+      proposedBUASqFt: 0,
+      excessBUASqFt: 0,
       minimumBUASqFt: 0,
       userSelectedBUASqFt: 0,
       maxPermissibleCoveragePct: 70,
@@ -126,6 +129,7 @@ export function calculateArea(input: EngineInput): AreaResult {
   // Maximum permissible BUA per floor and total
   const maxAllowableBUAPerFloorSqFt = authEval.maxPermissibleCoverageSqFt;
   const maximumPermissibleBUASqFt = authEval.maxPermissibleBUASqFt;
+  const permissibleBUASqFt = maximumPermissibleBUASqFt;
   const recommendedBUAPerFloorSqFt = authEval.recommendedBUAPerFloorSqFt;
   const recommendedBUATotalSqFt = authEval.recommendedBUATotalSqFt;
   const minimumBUASqFt = authEval.minimumBUASqFt;
@@ -142,21 +146,29 @@ export function calculateArea(input: EngineInput): AreaResult {
 
   const buaPerFloorSqFt = Math.round(totalBUASqFt / floors);
   const userSelectedBUASqFt = totalBUASqFt;
+  const proposedBUASqFt = totalBUASqFt;
+  const excessBUASqFt = Math.max(0, proposedBUASqFt - permissibleBUASqFt);
 
   // 5. VALIDATION STATE
-  let validationState: 'valid' | 'above_recommended' | 'exceeds_permissible' = 'valid';
+  let validationState: 'valid' | 'above_recommended' | 'exceeds_permissible' | 'verification_required' = 'valid';
   let confirmationMessage: string | undefined;
 
-  if (totalBUASqFt > maximumPermissibleBUASqFt && maximumPermissibleBUASqFt > 0) {
+  // When authority regulations cannot be definitively determined
+  if (authEval.requiresClientConfirmation && roadWidthFt < 30) {
+    validationState = 'verification_required';
+    confirmationMessage = `Road width (${roadWidthFt} ft) is below standard 9m (30ft) residential minimum. Regulatory verification required for permissible FAR and height.`;
+  } else if (permissibleBUASqFt > 0 && proposedBUASqFt > permissibleBUASqFt) {
     validationState = 'exceeds_permissible';
-    confirmationMessage = `Selected BUA (${totalBUASqFt.toLocaleString()} sq.ft) exceeds calculated statutory maximum permissible limit (${maximumPermissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}). Authority approval / setback relaxation required.`;
-  } else if (totalBUASqFt > recommendedBUATotalSqFt) {
+    confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}) by ${excessBUASqFt.toLocaleString()} sq.ft.`;
+  } else if (proposedBUASqFt > recommendedBUATotalSqFt && recommendedBUATotalSqFt > 0) {
     validationState = 'above_recommended';
-    confirmationMessage = `Selected BUA (${totalBUASqFt.toLocaleString()} sq.ft) is above the authority recommended baseline (${recommendedBUATotalSqFt.toLocaleString()} sq.ft). Verify your floor-to-floor setbacks.`;
+    confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) is above the authority recommended baseline (${recommendedBUATotalSqFt.toLocaleString()} sq.ft). Verify your floor-to-floor setbacks.`;
+  } else {
+    validationState = 'valid';
   }
 
   const isWithinPermissibleLimit = validationState !== 'exceeds_permissible';
-  const requiresClientConfirmation = authEval.requiresClientConfirmation || validationState === 'exceeds_permissible';
+  const requiresClientConfirmation = authEval.requiresClientConfirmation || validationState === 'exceeds_permissible' || validationState === 'verification_required';
 
   // 6. GROUND COVERAGE & REMAINING GROUND AREA
   const remainingGroundAreaSqFt = Math.max(0, plotAreaSqFt - buaPerFloorSqFt);
@@ -186,6 +198,9 @@ export function calculateArea(input: EngineInput): AreaResult {
     recommendedBUAPerFloorSqFt,
     recommendedBUATotalSqFt,
     maximumPermissibleBUASqFt,
+    permissibleBUASqFt,
+    proposedBUASqFt,
+    excessBUASqFt,
     minimumBUASqFt,
     userSelectedBUASqFt,
     maxPermissibleCoveragePct: authEval.maxGroundCoveragePct,

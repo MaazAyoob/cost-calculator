@@ -7,6 +7,10 @@ import {
   useQuantities,
   useBuildingModel,
 } from '../../store/useCalculationStore';
+import {
+  getCustomizationDiff,
+  getPackageConfig,
+} from '../../calculation-engine/data/packageConfig';
 import { formatCurrency } from '../../utils/cn';
 import { AnimatedNumber } from '../../components/common/AnimatedNumber';
 import { Architectural3DViewer } from '../../components/3d/Architectural3DViewer';
@@ -16,11 +20,19 @@ import {
   Info,
   Calculator,
   X,
-  Compass,
+  Sparkles,
+  Award,
   Layers,
 } from 'lucide-react';
 
-export const LivePreviewPanel: React.FC = () => {
+interface LivePreviewPanelProps {
+  onOpenPackageComparison?: () => void;
+}
+
+export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
+  onOpenPackageComparison,
+}) => {
+  const store = useWizardStore();
   const {
     currentStep,
     city,
@@ -43,7 +55,8 @@ export const LivePreviewPanel: React.FC = () => {
     qualityTier,
     rooms,
     parkingType,
-  } = useWizardStore();
+    selectedPackage,
+  } = store;
 
   const budget = useBudgetResult();
   const area = useArea();
@@ -55,6 +68,10 @@ export const LivePreviewPanel: React.FC = () => {
   const ratePerSqFt = totalCost > 0 && buaSqFt > 0 ? Math.round(totalCost / buaSqFt) : 0;
   const plotArea = area.plotAreaSqFt || plotLength * plotWidth || 0;
   const remainingGround = area.remainingGroundAreaSqFt || area.remainingGroundArea || Math.max(0, plotArea - (area.buaPerFloorSqFt || 0));
+
+  // Package & customizations
+  const pkgConfig = getPackageConfig(selectedPackage || 'PREMIUM');
+  const customizations = getCustomizationDiff(selectedPackage || 'PREMIUM', store);
 
   // Head breakdown
   const structureCost = budget.structuralCost || 0;
@@ -103,7 +120,7 @@ export const LivePreviewPanel: React.FC = () => {
       {/* ── 1. PROMINENT ESTIMATE HERO AREA ── */}
       <div className="space-y-3 pb-3 border-b border-[#E5E7EB]">
         
-        {/* Top Status & Delta Bar */}
+        {/* Top Status, Package Badge & Delta Bar */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${isZeroState ? 'bg-[#4B5563]' : 'bg-[#1B3D34] animate-pulse'}`} />
@@ -152,6 +169,45 @@ export const LivePreviewPanel: React.FC = () => {
             <span className="text-xs sm:text-sm font-mono font-bold text-[#4B5563] tabular-nums">
               @ ₹<AnimatedNumber value={ratePerSqFt} duration={350} /> / sq.ft BUA
             </span>
+          )}
+        </div>
+
+        {/* Construction Package Active Status & Compare Trigger */}
+        <div className="p-2.5 bg-[rgba(27,61,52,0.03)] rounded-xl border border-[#1B3D34]/15 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+              {selectedPackage?.charAt(0) || 'P'}
+            </div>
+            <div className="min-w-0 truncate">
+              <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">
+                Standard Profile
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-extrabold text-[#1B3D34] truncate">
+                  {pkgConfig.title} Package
+                </span>
+                {customizations.length > 0 ? (
+                  <span className="text-[10px] font-bold text-[#F28C28] bg-[rgba(242,140,40,0.12)] px-1.5 py-0.2 rounded border border-[#F28C28]/25 shrink-0">
+                    {customizations.length} customized
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-[#4B5563] font-medium shrink-0">
+                    · Pure Spec
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {onOpenPackageComparison && (
+            <button
+              type="button"
+              onClick={onOpenPackageComparison}
+              className="text-[11px] font-bold text-[#1B3D34] hover:text-[#132C25] bg-white border border-[#E5E7EB] hover:border-[#1B3D34]/30 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
+            >
+              <Sparkles className="w-3 h-3 text-[#F28C28]" />
+              <span>Compare 3 Tiers</span>
+            </button>
           )}
         </div>
 

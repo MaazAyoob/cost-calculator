@@ -92,9 +92,9 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
   const hasLift = liftRequired || numFloors >= 4;
   const balconyCount = Math.max(0, rooms?.balcony ?? (numFloors > 1 ? 1 : 0));
 
-  const pLength = Math.max(25, Math.min(120, plotLength || 40));
-  const pWidth = Math.max(20, Math.min(100, plotWidth || 30));
-  const plotAspect = Math.max(0.65, Math.min(1.5, pWidth / pLength));
+  const pLength = Math.max(15, plotLength || 40);
+  const pWidth = Math.max(15, plotWidth || 30);
+  const plotAspect = Math.max(0.4, Math.min(2.5, pWidth / pLength));
 
   // ── Procedural concrete texture generator ──────────────────────────────────
   const makeConcreteTexture = (

@@ -10,6 +10,7 @@ import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsM
 import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
 import { QuoteReviewModal } from '../../components/modals/QuoteReviewModal';
 import { BuildTrackingModal } from '../../components/modals/BuildTrackingModal';
+import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
 import { generateAndDownloadDetailedReportPdf } from '../report/pdfService';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
@@ -29,6 +30,7 @@ import {
   Activity,
   Layers,
   Award,
+  Sparkles,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -37,13 +39,14 @@ export const DashboardPage: React.FC = () => {
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showTrackModal, setShowTrackModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const budget = useBudgetResult();
   const area = useArea();
   const boq = useBOQ();
   const { result } = useCalculationStore();
-  const { city, plotLength, plotWidth, floors, houseType, specificationTier } = useWizardStore();
+  const { city, plotLength, plotWidth, floors, houseType, specificationTier, selectedPackage } = useWizardStore();
   const { hasDetailedReportAccess } = useEntitlementStore();
   const { preparedFor } = useReportStore();
 
@@ -110,14 +113,24 @@ export const DashboardPage: React.FC = () => {
             <ChevronLeft className="w-4 h-4" />
             Back to Calculator
           </button>
-          <button
-            type="button"
-            onClick={() => setShowSavedModal(true)}
-            className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer shadow-2xs"
-          >
-            <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
-            Saved Projects
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowCompareModal(true)}
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] px-3 py-1.5 rounded-lg border border-[#1B3D34]/20 bg-[rgba(27,61,52,0.06)] hover:bg-[rgba(27,61,52,0.12)] transition-colors cursor-pointer shadow-2xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
+              Compare Standards
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSavedModal(true)}
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer shadow-2xs"
+            >
+              <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
+              Saved Projects
+            </button>
+          </div>
         </div>
 
         {/* Page Header */}
@@ -136,9 +149,18 @@ export const DashboardPage: React.FC = () => {
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#4B5563]">
               ACTIVE PROJECT ESTIMATE
             </span>
-            <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
-              TIER: {(specificationTier || 'Premium').toUpperCase()}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
+                PACKAGE: {(selectedPackage || 'PREMIUM').toUpperCase()}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowCompareModal(true)}
+                className="text-[10px] font-bold text-[#F28C28] hover:underline cursor-pointer"
+              >
+                Compare 3 Standards &rarr;
+              </button>
+            </div>
           </div>
 
           {hasProject ? (
@@ -158,7 +180,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-[#4B5563] uppercase block">SPECIFICATION</span>
-                  <span className="text-base font-bold text-[#1B3D34] font-heading capitalize">{specificationTier || 'Premium'}</span>
+                  <span className="text-base font-bold text-[#1B3D34] font-heading capitalize">{selectedPackage || 'Premium'}</span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-[#4B5563] uppercase block">PLOT &amp; LOCATION</span>
@@ -368,6 +390,10 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Modals */}
+      <PackageComparisonModal
+        isOpen={showCompareModal}
+        onClose={() => setShowCompareModal(false)}
+      />
       <SavedEstimationsModal
         isOpen={showSavedModal}
         onClose={() => setShowSavedModal(false)}

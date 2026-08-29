@@ -9,6 +9,11 @@ import {
   BathroomFittingSelection,
   PaintingSelection,
 } from '../calculation-engine/types';
+import {
+  ConstructionPackageId,
+  getPackageConfig,
+  normalizePackageId,
+} from '../calculation-engine/data/packageConfig';
 
 export type QualityTier = 'Essential' | 'Premium' | 'Luxury';
 export type CityLocation = 'Bangalore' | 'Mysore';
@@ -43,11 +48,14 @@ export interface MaterialBrandSelection {
 }
 
 export interface ConfiguratorState {
-  // Session & Steps (00 = Splash, 01-11 = Steps)
+  // Session & Steps (00 = Package Selection Splash, 01-10 = Steps, 11 = Loading/Complete)
   sessionId: string;
   currentStep: number;
   totalSteps: number;
   hasStartedSelection: boolean;
+
+  // Selected Construction Package
+  selectedPackage: ConstructionPackageId;
 
   // Screen 01: Basic Project Info (Starts null/0)
   city: CityLocation | null;
@@ -98,6 +106,7 @@ export interface ConfiguratorState {
   nextStep: () => void;
   prevStep: () => void;
 
+  setSelectedPackage: (packageId: ConstructionPackageId | string, applyDefaults?: boolean) => void;
   setSpecificationTier: (tier: 'standard' | 'premium' | 'luxury') => void;
   setCity: (city: CityLocation) => void;
   setPlotDimensions: (length: number, width: number) => void;
@@ -129,11 +138,17 @@ export interface ConfiguratorState {
 }
 
 export function getFreshZeroState() {
+  const defaultPackage: ConstructionPackageId = 'PREMIUM';
+  const pkg = getPackageConfig(defaultPackage);
+
   return {
     sessionId: 'sess_' + Math.random().toString(36).substring(2, 9),
-    currentStep: 1,
+    currentStep: 0,
     totalSteps: 11,
     hasStartedSelection: false,
+
+    // Construction Package
+    selectedPackage: defaultPackage,
 
     // Basic Info: completely unselected
     city: null as any,
@@ -170,55 +185,27 @@ export function getFreshZeroState() {
     },
     liftRequired: false,
 
-    // Material Selections & Specification Tier
-    specificationTier: 'premium' as 'standard' | 'premium' | 'luxury',
-    qualityTier: 'Premium' as QualityTier,
+    // Material Selections & Specification Tier (initialized from default package)
+    specificationTier: pkg.specificationTier,
+    qualityTier: pkg.qualityTier,
     materialBrands: {
-      steel: null as any,
-      cement: null as any,
-      masonry: null as any,
-      doors: null as any,
-      windows: null as any,
-      flooring: null as any,
-      bathroom: null as any,
-      electrical: null as any,
-      paint: null as any,
+      steel: pkg.specs.steel,
+      cement: pkg.specs.cement,
+      masonry: pkg.specs.masonry,
+      doors: pkg.specs.doors.mainDoor,
+      windows: pkg.specs.windows.primaryMaterial,
+      flooring: pkg.specs.flooring.living,
+      bathroom: pkg.specs.bathroomFittings.sanitaryTier,
+      electrical: pkg.specs.electrical.wireTier,
+      paint: pkg.specs.painting.internalPaint,
     },
-    flooringZones: {
-      living: null as any,
-      kitchenDining: null as any,
-      bedrooms: null as any,
-      bathrooms: null as any,
-      parkingUtility: null as any,
-      balconies: null as any,
-    },
-    wallCladding: {
-      kitchenDadoHeight: null as any,
-      bathroomTileHeight: null as any,
-    },
-    doors: {
-      mainDoor: null as any,
-      internalDoor: null as any,
-      bathroomDoor: null as any,
-    },
-    windows: {
-      primaryMaterial: null as any,
-      subGrade: null as any,
-    },
-    electrical: {
-      conduit: 'Heavy-Duty ISI Marked PVC' as const,
-      wireTier: null as any,
-    },
-    bathroomFittings: {
-      sanitaryTier: null as any,
-      cpvcBrand: null as any,
-    },
-    painting: {
-      baseLayer: 'Putty + Primer' as const,
-      internalPaint: null as any,
-      externalPaint: null as any,
-      brand: null as any,
-    },
+    flooringZones: { ...pkg.specs.flooring },
+    wallCladding: { ...pkg.specs.wallCladding },
+    doors: { ...pkg.specs.doors },
+    windows: { ...pkg.specs.windows },
+    electrical: { ...pkg.specs.electrical },
+    bathroomFittings: { ...pkg.specs.bathroomFittings },
+    painting: { ...pkg.specs.painting },
 
     // Computed metrics: 0
     calculatedAreaSqFt: 0,
@@ -257,15 +244,56 @@ export const useWizardStore = create<ConfiguratorState>()(
         set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) }));
       },
 
+      setSelectedPackage: (packageId, applyDefaults = true) => {
+        const normalized = normalizePackageId(packageId);
+        const pkg = getPackageConfig(normalized);
+        const qualityTierMap: Record<'standard' | 'premium' | 'luxury', QualityTier> = {
+          standard: 'Essential',
+          premium: 'Premium',
+          luxury: 'Luxury',
+        };
+
+        const updates: any = {
+          selectedPackage: normalized,
+          specificationTier: pkg.specificationTier,
+          qualityTier: qualityTierMap[pkg.specificationTier],
+          hasStartedSelection: true,
+        };
+
+        if (applyDefaults) {
+          updates.materialBrands = {
+            ...get().materialBrands,
+            steel: pkg.specs.steel,
+            cement: pkg.specs.cement,
+            masonry: pkg.specs.masonry,
+          };
+          updates.flooringZones = { ...pkg.specs.flooring };
+          updates.wallCladding = { ...pkg.specs.wallCladding };
+          updates.doors = { ...pkg.specs.doors };
+          updates.windows = { ...pkg.specs.windows };
+          updates.electrical = { ...pkg.specs.electrical };
+          updates.bathroomFittings = { ...pkg.specs.bathroomFittings };
+          updates.painting = { ...pkg.specs.painting };
+        }
+
+        set(updates);
+      },
+
       setSpecificationTier: (specificationTier) => {
         const qualityTierMap: Record<'standard' | 'premium' | 'luxury', QualityTier> = {
           standard: 'Essential',
           premium: 'Premium',
           luxury: 'Luxury',
         };
+        const packageMap: Record<'standard' | 'premium' | 'luxury', ConstructionPackageId> = {
+          standard: 'STANDARD',
+          premium: 'PREMIUM',
+          luxury: 'LUXURY',
+        };
         set({
           specificationTier,
           qualityTier: qualityTierMap[specificationTier],
+          selectedPackage: packageMap[specificationTier],
           hasStartedSelection: true,
         });
       },
@@ -277,8 +305,8 @@ export const useWizardStore = create<ConfiguratorState>()(
       },
 
       setPlotDimensions: (length, width) => {
-        const plotLength = Math.max(0, Math.min(200, length));
-        const plotWidth = Math.max(0, Math.min(200, width));
+        const plotLength = Math.max(0, Number.isFinite(Number(length)) ? Math.round(Number(length) * 10) / 10 : 0);
+        const plotWidth = Math.max(0, Number.isFinite(Number(width)) ? Math.round(Number(width) * 10) / 10 : 0);
         set({ plotLength, plotWidth, hasStartedSelection: true });
       },
 
@@ -443,7 +471,12 @@ export const useWizardStore = create<ConfiguratorState>()(
       },
 
       setQualityTier: (qualityTier) => {
-        set({ qualityTier, hasStartedSelection: true });
+        const packageMap: Record<QualityTier, ConstructionPackageId> = {
+          Essential: 'STANDARD',
+          Premium: 'PREMIUM',
+          Luxury: 'LUXURY',
+        };
+        set({ qualityTier, selectedPackage: packageMap[qualityTier] || 'PREMIUM', hasStartedSelection: true });
       },
 
       resetConfigurator: () => {
@@ -461,6 +494,11 @@ export const useWizardStore = create<ConfiguratorState>()(
       migrate: (persistedState: any, version: number) => {
         if (version < 4 || !persistedState || !persistedState.hasStartedSelection) {
           return getFreshZeroState();
+        }
+        if (!persistedState.selectedPackage) {
+          persistedState.selectedPackage = persistedState.specificationTier
+            ? (persistedState.specificationTier.toUpperCase() as ConstructionPackageId)
+            : 'PREMIUM';
         }
         return persistedState;
       },

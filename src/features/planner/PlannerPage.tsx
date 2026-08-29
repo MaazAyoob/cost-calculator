@@ -8,6 +8,10 @@ import { formatCurrency } from '../../utils/cn';
 import { LivePreviewPanel } from './LivePreviewPanel';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
+import {
+  getCustomizationDiff,
+  getPackageConfig,
+} from '../../calculation-engine/data/packageConfig';
 
 import { Step0Onboarding } from './steps/Step0Onboarding';
 import { Step1BasicInfo } from './steps/Step1BasicInfo';
@@ -34,9 +38,11 @@ import {
   Copy,
   Sliders,
   Box,
-  Home,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
 import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsModal';
+import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
 
 const STEPS = [
   { num: '01', key: 'Plot', title: 'Plot Dimensions & Site', shortTitle: 'Plot' },
@@ -53,7 +59,16 @@ const STEPS = [
 
 export const PlannerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentStep, nextStep, prevStep, setStep, startNewProject } = useWizardStore();
+  const store = useWizardStore();
+  const {
+    currentStep,
+    nextStep,
+    prevStep,
+    setStep,
+    startNewProject,
+    selectedPackage,
+  } = store;
+
   const budget = useBudgetResult();
   const area = useArea();
 
@@ -61,6 +76,7 @@ export const PlannerPage: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Mobile View Switcher: 'form' | 'preview'
@@ -70,6 +86,11 @@ export const PlannerPage: React.FC = () => {
   const buaSqFt = area.totalBUASqFt || 0;
   const currentStepDef = STEPS[currentStep - 1] || STEPS[0];
   const progressPct = Math.min(100, Math.round((currentStep / 10) * 100));
+
+  // Customization tracking
+  const customizations = getCustomizationDiff(selectedPackage || 'PREMIUM', store);
+  const customCount = customizations.length;
+  const pkgConfig = getPackageConfig(selectedPackage || 'PREMIUM');
 
   const handleReset = () => {
     startNewProject();
@@ -90,16 +111,21 @@ export const PlannerPage: React.FC = () => {
       }
       if (e.key === 'ArrowRight' && currentStep < 10) {
         nextStep();
-      } else if (e.key === 'ArrowLeft' && currentStep > 1) {
-        prevStep();
+      } else if (e.key === 'ArrowLeft' && currentStep > 0) {
+        if (currentStep === 1) {
+          setStep(0);
+        } else {
+          prevStep();
+        }
       } else if (e.key === 'Escape') {
         setShowSavedModal(false);
         setShowResetConfirm(false);
         setShowHelpModal(false);
         setShowShareModal(false);
+        setShowCompareModal(false);
       }
     },
-    [currentStep, nextStep, prevStep]
+    [currentStep, nextStep, prevStep, setStep]
   );
 
   useEffect(() => {
@@ -116,17 +142,21 @@ export const PlannerPage: React.FC = () => {
       className="h-[100dvh] max-h-[100dvh] flex flex-col bg-[#F8F8F6] text-[#1B3D34] font-sans select-none overflow-hidden"
     >
       <SEO
-        title={`Step ${currentStep} of 10: ${currentStepDef.title} | Hutty Calculator`}
+        title={
+          currentStep === 0
+            ? 'Choose Construction Standard | Hutty Cost Calculator'
+            : `Step ${currentStep} of 10: ${currentStepDef.title} | Hutty Calculator`
+        }
         description="Configure plot dimensions, room allocations, structural materials, and finishes to compute your deterministic home construction estimate."
       />
 
       {/* ── TOP BAR (Clean, Minimal Architectural Header) ── */}
       {currentStep > 0 && currentStep < 11 && (
         <header className="relative shrink-0 bg-white border-b border-[#E5E7EB] z-30">
-          <div className="h-14 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+          <div className="h-14 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-4">
             
-            {/* Left: Brand Logo */}
-            <div className="flex items-center gap-2 shrink-0">
+            {/* Left: Brand Logo & Package Badge */}
+            <div className="flex items-center gap-3 shrink-0">
               <div
                 onClick={() => navigate('/')}
                 className="cursor-pointer group flex items-center"
@@ -135,6 +165,22 @@ export const PlannerPage: React.FC = () => {
               >
                 <HuttyLogo variant="compact" width={92} />
               </div>
+
+              {/* Package Tag & Comparison Quick Opener */}
+              <button
+                type="button"
+                onClick={() => setShowCompareModal(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[rgba(27,61,52,0.06)] text-[#1B3D34] border border-[#1B3D34]/20 hover:bg-[rgba(27,61,52,0.12)] transition-colors cursor-pointer"
+                title="Click to compare construction packages"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28]" />
+                <span>{pkgConfig.title}</span>
+                {customCount > 0 ? (
+                  <span className="text-[#F28C28] font-bold">· {customCount} custom</span>
+                ) : (
+                  <span className="text-[#4B5563] font-normal">· Standard Spec</span>
+                )}
+              </button>
             </div>
 
             {/* Center: Dynamic Sleek Step Timeline (Desktop) & Switcher (Mobile) */}
@@ -237,8 +283,18 @@ export const PlannerPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Actions (Save, Reset, Share, Help, Close) */}
+            {/* Right: Actions (Compare, Save, Reset, Share, Help, Close) */}
             <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowCompareModal(true)}
+                className="text-xs font-semibold text-[#1B3D34] bg-[rgba(27,61,52,0.05)] hover:bg-[rgba(27,61,52,0.1)] p-1.5 sm:px-2.5 sm:py-1 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer border border-[#1B3D34]/15"
+                title="Compare Packages"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
+                <span className="hidden xl:inline">Compare</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setShowSavedModal(true)}
@@ -303,16 +359,49 @@ export const PlannerPage: React.FC = () => {
         </header>
       )}
 
+      {/* ── STEP 0 HEADER BAR (When on Package Starting Screen) ── */}
+      {currentStep === 0 && (
+        <header className="shrink-0 bg-white border-b border-[#E5E7EB] px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between z-30">
+          <div
+            onClick={() => navigate('/')}
+            className="cursor-pointer flex items-center"
+            role="button"
+            aria-label="Back to home"
+          >
+            <HuttyLogo variant="compact" width={96} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSavedModal(true)}
+              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            >
+              <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
+              <span>Saved Projects</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer"
+              title="Exit to home"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </header>
+      )}
+
       {/* ── MAIN WORKSPACE (Desktop 45% Left Form / 55% Right Live Preview) ── */}
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {currentStep === 0 && (
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scrollbar-thin">
             <Step0Onboarding />
           </div>
         )}
 
         {currentStep === 11 && (
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
             <Step10LoadingExperience />
           </div>
         )}
@@ -356,14 +445,17 @@ export const PlannerPage: React.FC = () => {
               <div className="hidden lg:flex p-4 bg-white border-t border-[#E5E7EB] items-center justify-between gap-4 shrink-0 z-10">
                 <button
                   type="button"
-                  onClick={prevStep}
-                  disabled={currentStep <= 1}
-                  className={`hutty-btn-secondary text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 ${
-                    currentStep <= 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
-                  }`}
+                  onClick={() => {
+                    if (currentStep === 1) {
+                      setStep(0);
+                    } else {
+                      prevStep();
+                    }
+                  }}
+                  className="hutty-btn-secondary text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back</span>
+                  <span>{currentStep === 1 ? 'Package Standards' : 'Back'}</span>
                 </button>
 
                 {/* Compact Step Progress Indicator */}
@@ -397,7 +489,7 @@ export const PlannerPage: React.FC = () => {
                 mobileActiveTab === 'preview' ? 'flex' : 'hidden lg:flex'
               }`}
             >
-              <LivePreviewPanel />
+              <LivePreviewPanel onOpenPackageComparison={() => setShowCompareModal(true)} />
             </div>
 
           </div>
@@ -414,7 +506,7 @@ export const PlannerPage: React.FC = () => {
             className="flex-1 text-left cursor-pointer"
           >
             <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
-              Estimated Total ({buaSqFt > 0 ? `${buaSqFt} sq.ft` : 'Live'})
+              Estimated Total ({buaSqFt > 0 ? `${buaSqFt} sq.ft` : 'Live'}) &bull; {selectedPackage}
             </span>
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-extrabold text-[#1B3D34] font-heading leading-tight">
@@ -430,11 +522,14 @@ export const PlannerPage: React.FC = () => {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
-              onClick={prevStep}
-              disabled={currentStep <= 1}
-              className={`p-2.5 rounded-xl border border-[#E5E7EB] bg-white text-[#1B3D34] ${
-                currentStep <= 1 ? 'opacity-30' : 'cursor-pointer active:bg-gray-100'
-              }`}
+              onClick={() => {
+                if (currentStep === 1) {
+                  setStep(0);
+                } else {
+                  prevStep();
+                }
+              }}
+              className="p-2.5 rounded-xl border border-[#E5E7EB] bg-white text-[#1B3D34] cursor-pointer active:bg-gray-100"
               aria-label="Previous step"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -450,6 +545,12 @@ export const PlannerPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Package Comparison Modal */}
+      <PackageComparisonModal
+        isOpen={showCompareModal}
+        onClose={() => setShowCompareModal(false)}
+      />
 
       {/* Share Modal */}
       {showShareModal && (
@@ -536,6 +637,11 @@ export const PlannerPage: React.FC = () => {
             </div>
 
             <div className="space-y-3 text-xs text-[#4B5563] leading-relaxed">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-1">
+                <span className="font-bold text-[#1B3D34] block">3-Tier Construction Standards</span>
+                <p>Start with Standard, Premium, or Luxury specifications, then customize individual structural, finish, and MEP items as needed.</p>
+              </div>
+
               <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-1">
                 <span className="font-bold text-[#1B3D34] block">Deterministic Quantity Surveying</span>
                 <p>Calculations compute true structural concrete volumes, rebar tonnage, and exact masonry counts based on geometry and Bangalore/Mysore municipal bylaws.</p>

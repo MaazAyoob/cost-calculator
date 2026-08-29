@@ -27,9 +27,9 @@ export interface WallCladdingSelection {
 }
 
 export interface DoorSelection {
-  mainDoor: 'Premium Teak' | 'Normal Teak';
-  internalDoor: 'Flush Door' | 'Laminate Door';
-  bathroomDoor: 'WPC Door' | 'FRP / ERP Door';
+  mainDoor: 'Premium Teak' | 'Normal Teak' | 'Burma Teak Custom Carved' | string;
+  internalDoor: 'Flush Door' | 'Laminate Door' | 'Burma Teak Frame Flush' | string;
+  bathroomDoor: 'WPC Door' | 'FRP / ERP Door' | 'FRP / WPC Laminated' | string;
 }
 
 export interface WindowSelection {
@@ -43,15 +43,21 @@ export interface ElectricalSelection {
 }
 
 export interface BathroomFittingSelection {
-  sanitaryTier: 'Mass Market (Cera / Hindware / Parryware)' | 'Premium (Jaquar / Kohler / Grohe)' | 'Luxury (Toto / Duravit)';
-  cpvcBrand: 'Ashirwad' | 'Supreme' | 'Astral';
+  sanitaryTier:
+    | 'Mass Market (Cera / Hindware / Parryware)'
+    | 'Essential (Cera / Hindware / Parryware)'
+    | 'Premium (Jaquar / Kohler / Grohe)'
+    | 'Luxury (Toto / Duravit)'
+    | 'Luxury (Toto / Hansgrohe / Duravit)'
+    | string;
+  cpvcBrand: 'Ashirwad' | 'Supreme' | 'Astral' | string;
 }
 
 export interface PaintingSelection {
   baseLayer: 'Putty + Primer';
-  internalPaint: 'Tractor Emulsion' | 'Premium Emulsion' | 'Royale Luxury Emulsion';
-  externalPaint: 'Ultima Weather Proof' | 'Texture Finish';
-  brand: 'Asian Paints' | 'Berger Paints' | 'Dulux';
+  internalPaint: 'Tractor Emulsion' | 'Premium Emulsion' | 'Royale Luxury Emulsion' | 'Royale Luxury Silk' | string;
+  externalPaint: 'Ultima Weather Proof' | 'Texture Finish' | 'Ace Exterior Emulsion' | 'Apex Ultima Protek' | string;
+  brand: 'Asian Paints' | 'Berger Paints' | 'Dulux' | 'Asian Paints Royale' | string;
 }
 
 export interface EngineInput {
@@ -225,12 +231,15 @@ export interface AreaResult {
   recommendedBUAPerFloorSqFt: number;
   recommendedBUATotalSqFt: number;
   maximumPermissibleBUASqFt: number;
+  permissibleBUASqFt: number;
+  proposedBUASqFt: number;
+  excessBUASqFt: number;
   minimumBUASqFt: number;
   userSelectedBUASqFt: number;
   maxPermissibleCoveragePct: number;
   maxPermissibleCoverageSqFt: number;
   permissibleFAR: number;
-  validationState: 'valid' | 'above_recommended' | 'exceeds_permissible';
+  validationState: 'valid' | 'above_recommended' | 'exceeds_permissible' | 'verification_required';
   buildableAreaSqFt: number;
   remainingGroundAreaSqFt: number;
   remainingGroundArea: number;

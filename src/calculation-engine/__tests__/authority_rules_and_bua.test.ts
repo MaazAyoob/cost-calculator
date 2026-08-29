@@ -176,5 +176,102 @@ describe('Authority-Based BUA & Setback Engine Suite', () => {
     expect(zeroRes.plotAreaSqFt).toBe(0);
     expect(zeroRes.totalBUASqFt).toBe(0);
     expect(zeroRes.buildableFootprintSqFt).toBe(0);
+    expect(zeroRes.excessBUASqFt).toBe(0);
+  });
+
+  it('9. Supports large plots (120x100, 150x150, 200x200) through entire calculation engine deterministically', () => {
+    const plotDimensions = [
+      { l: 40, w: 30, expectedArea: 1200 },
+      { l: 80, w: 50, expectedArea: 4000 },
+      { l: 120, w: 100, expectedArea: 12000 },
+      { l: 150, w: 150, expectedArea: 22500 },
+      { l: 200, w: 200, expectedArea: 40000 },
+    ];
+
+    for (const plot of plotDimensions) {
+      const res = runCalculator({
+        ...baseInput,
+        plotLength: plot.l,
+        plotWidth: plot.w,
+      });
+
+      expect(res.area.plotAreaSqFt).toBe(plot.expectedArea);
+      expect(res.area.maximumPermissibleBUASqFt).toBeGreaterThan(0);
+      expect(res.budget.totalProjectCost).toBeGreaterThan(0);
+      expect(res.quantities.steelTonnes).toBeGreaterThan(0);
+      expect(res.quantities.cementBags).toBeGreaterThan(0);
+      expect(Number.isFinite(res.budget.totalProjectCost)).toBe(true);
+      expect(Number.isNaN(res.budget.totalProjectCost)).toBe(false);
+    }
+  });
+
+  it('10. Separates Plot Area, Permissible BUA, and Proposed BUA with accurate excess calculation', () => {
+    // Large plot: 150x150 = 22,500 sq.ft
+    const largePlotArea = calculateArea({
+      ...baseInput,
+      plotLength: 150,
+      plotWidth: 150,
+      floors: 3,
+      userSelectedBUA: 35000,
+    });
+
+    expect(largePlotArea.plotAreaSqFt).toBe(22500);
+    expect(largePlotArea.proposedBUASqFt).toBe(35000);
+    expect(largePlotArea.permissibleBUASqFt).toBe(largePlotArea.maximumPermissibleBUASqFt);
+    expect(largePlotArea.excessBUASqFt).toBe(35000 - largePlotArea.permissibleBUASqFt);
+    expect(largePlotArea.validationState).toBe('exceeds_permissible');
+
+    // Valid proposed BUA
+    const validBUA = calculateArea({
+      ...baseInput,
+      plotLength: 150,
+      plotWidth: 150,
+      floors: 3,
+      userSelectedBUA: 15000,
+    });
+
+    expect(validBUA.proposedBUASqFt).toBe(15000);
+    expect(validBUA.excessBUASqFt).toBe(0);
+    expect(validBUA.validationState).toBe('valid');
+  });
+
+  it('11. Flags regulatory verification required when road width is narrow without conclusive bylaw FAR', () => {
+    const narrowRoadRes = calculateArea({
+      ...baseInput,
+      roadWidthFt: 20, // Narrow road (<30ft)
+    });
+
+    expect(narrowRoadRes.validationState).toBe('verification_required');
+    expect(narrowRoadRes.requiresClientConfirmation).toBe(true);
+  });
+
+  it('12. Changing package on large plots does NOT alter physical structural geometry', () => {
+    const stdRes = runCalculator({
+      ...baseInput,
+      plotLength: 200,
+      plotWidth: 200,
+      qualityTier: 'Essential',
+    });
+
+    const premRes = runCalculator({
+      ...baseInput,
+      plotLength: 200,
+      plotWidth: 200,
+      qualityTier: 'Premium',
+    });
+
+    const luxRes = runCalculator({
+      ...baseInput,
+      plotLength: 200,
+      plotWidth: 200,
+      qualityTier: 'Luxury',
+    });
+
+    // Structural steel and concrete quantities must be identical across packages
+    expect(stdRes.quantities.steelTonnes).toBe(premRes.quantities.steelTonnes);
+    expect(premRes.quantities.steelTonnes).toBe(luxRes.quantities.steelTonnes);
+    expect(stdRes.area.plotAreaSqFt).toBe(40000);
+    expect(premRes.area.plotAreaSqFt).toBe(40000);
+    expect(luxRes.area.plotAreaSqFt).toBe(40000);
   });
 });
