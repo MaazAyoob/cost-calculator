@@ -59,9 +59,9 @@ export function generateFixtureSchedule(
     fixtures.push({
       slNo,
       category: 'Windows',
-      item: w.description,
+      item: `${w.description} (${w.count} Nos)`,
       brand: w.material,
-      specification: `${w.openingSize} – ${w.specification}`,
+      specification: `${w.openingSize} (${w.count} × ${w.unitAreaSqFt} sq.ft = ${w.totalOpeningAreaSqFt} sq.ft) – ${w.specification}`,
       quantity: w.quantity,
       unit: w.unit,
       unitRate: w.unitRate,

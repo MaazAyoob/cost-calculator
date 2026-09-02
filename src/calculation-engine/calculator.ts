@@ -50,9 +50,10 @@ import { generateMaterialSchedule, generateProcurementList } from './modules/mat
 import { generateFixtureSchedule }   from './modules/fixtures';
 import { calculateBudget }           from './modules/budget';
 import { calculateTimeline }         from './modules/timeline';
-import { calculatePaymentPlan }      from './modules/payment';
+import { calculatePaymentPlan, getPaymentPlanSummary } from './modules/payment';
 import { generateCalculationTrace }  from './modules/trace';
 import { assembleReport }            from './modules/report';
+import { runQAGate }                 from './modules/qaGate';
 import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from './data/engineeringAssumptions';
 
 export function runCalculator(input: EngineInput): CalculationResult {
@@ -240,6 +241,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
 
   // ── STEP 10: Payment Plan ─────────────────────────────────
   const paymentPlan = calculatePaymentPlan(input, budget, timeline);
+  const paymentSummary = getPaymentPlanSummary(paymentPlan, budget.totalProjectCost);
 
   // ── STEP 11: Procurement List ─────────────────────────────
   const procurement = generateProcurementList(input, quantities, materialSchedule);
@@ -266,8 +268,11 @@ export function runCalculator(input: EngineInput): CalculationResult {
   );
 
   const parameterTable: QSParameterItem[] = Object.values(CENTRALIZED_ENGINEERING_ASSUMPTIONS);
+  const commercialReconciliation = budget.commercialReconciliation;
 
-  return {
+  // Partial calculation result for QA gate validation
+  const calculatedAt = new Date().toISOString();
+  const partialResult: CalculationResult = {
     input,
     area,
     buildingModel,
@@ -280,10 +285,21 @@ export function runCalculator(input: EngineInput): CalculationResult {
     budget,
     timeline,
     paymentPlan,
+    paymentSummary,
     procurement,
     report,
     trace,
     parameterTable,
-    calculatedAt: new Date().toISOString(),
+    commercialReconciliation,
+    calculatedAt,
   };
+
+  // ── STEP 14: Automated QA Gate (P0.7) ───────────────────────
+  const qaResult = runQAGate(partialResult);
+  partialResult.qaResult = qaResult;
+  partialResult.report.qaResult = qaResult;
+  partialResult.report.commercialReconciliation = commercialReconciliation;
+  partialResult.report.paymentSummary = paymentSummary;
+
+  return partialResult;
 }

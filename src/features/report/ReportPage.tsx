@@ -7,8 +7,9 @@ import { useCalculationStore } from '../../store/useCalculationStore';
 import { useWizardStore } from '../../store/useWizardStore';
 import { useEntitlementStore } from '../../store/useEntitlementStore';
 import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
+import { CalculationTraceModal } from '../../components/modals/CalculationTraceModal';
 import { generateAndDownloadDetailedReportPdf } from './pdfService';
-import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Check, Sparkles, FileText, ArrowRight } from 'lucide-react';
+import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Check, Sparkles, FileText, ArrowRight, Calculator } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
@@ -25,6 +26,7 @@ export const ReportPage: React.FC = () => {
   const isUnlocked = hasDetailedReportAccess(projectId);
 
   const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [showTraceModal, setShowTraceModal] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const handleDownloadPdf = async () => {
@@ -88,6 +90,14 @@ export const ReportPage: React.FC = () => {
           </button>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowTraceModal(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
+            >
+              <Calculator className="w-3.5 h-3.5 text-[#F28C28]" /> How Calculated
+            </button>
+
             {isUnlocked ? (
               <>
                 <button
@@ -192,9 +202,18 @@ export const ReportPage: React.FC = () => {
 
           {/* 3. Key Quantities Summary (Free Preview) */}
           <section className="space-y-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-              2. Key Structural Quantities
-            </h2>
+            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                2. Key Structural Quantities
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowTraceModal(true)}
+                className="text-[11px] font-bold text-[#F28C28] hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <Sparkles className="w-3 h-3" /> Inspect calculation trace
+              </button>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                 <span className="text-[#4B5563] block">Structural Steel</span>
@@ -357,7 +376,7 @@ export const ReportPage: React.FC = () => {
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                        <th className="py-2 font-bold uppercase">Trade Category / Statutory Head</th>
+                        <th className="py-2 font-bold uppercase">Trade Category</th>
                         <th className="py-2 font-bold uppercase text-right">Amount (INR)</th>
                         <th className="py-2 font-bold uppercase text-right">% of Total</th>
                       </tr>
@@ -459,20 +478,23 @@ export const ReportPage: React.FC = () => {
             </section>
           )}
 
-          {/* 7. Engineering Notes & Trace */}
+          {/* 7. Preliminary Estimate Disclaimers & Engineering Notice */}
           <section className="space-y-2 text-xs text-[#4B5563] border-t border-[#E5E7EB] pt-4">
-            <h3 className="font-bold text-[#1B3D34]">Engineering Assumptions &amp; Disclaimers</h3>
+            <h3 className="font-bold text-[#1B3D34]">IMPORTANT — PRELIMINARY ESTIMATE &amp; ENGINEERING NOTICE</h3>
             <p>
-              * Estimates calculated using deterministic formula algorithms conforming to IS 456 (Plain and Reinforced Concrete), IS 1786 (High Strength Deformed Steel Bars), and Hutty Pilot Quantity Specification.
+              * Generated using Hutty's preliminary estimation rules; final structural design is by the appointed engineer.
             </p>
             <p>
-              * Final structural sizes, rebar schedules, and soil bearing capacities must be validated by a registered structural engineer prior to construction.
+              * This report is a preliminary construction cost and quantity estimate generated from the project configuration. Actual quantities and costs may vary based on architectural/structural drawings, soil and site conditions, construction methods, specifications, brands, supplier quotations, taxes and market conditions.
+            </p>
+            <p>
+              * Structural member sizes, reinforcement detailing schedules, foundation design, soil bearing capacity and other engineering requirements must be determined and certified by the appointed qualified engineer before construction.
             </p>
           </section>
 
           {/* Document Footer */}
           <div className="pt-6 border-t border-[#E5E7EB] flex items-center justify-between text-[10px] text-[#4B5563]">
-            <span>Hutty &bull; Verified Engineering Dossier</span>
+            <span>Hutty &bull; Construction Estimate &amp; BOQ</span>
             <span>https://hutty.in</span>
           </div>
 
@@ -483,6 +505,12 @@ export const ReportPage: React.FC = () => {
       <UnlockReportModal
         isOpen={showUnlockModal}
         onClose={() => setShowUnlockModal(false)}
+      />
+
+      <CalculationTraceModal
+        isOpen={showTraceModal}
+        onClose={() => setShowTraceModal(false)}
+        trace={result.trace}
       />
     </motion.div>
   );

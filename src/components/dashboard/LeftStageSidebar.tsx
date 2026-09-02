@@ -164,9 +164,9 @@ export const LeftStageSidebar: React.FC = () => {
           <span className="text-slate-600">Total Project Cost</span>
           <span className="text-blue-700 text-sm font-extrabold">{formatCurrency(totalCost)}</span>
         </div>
-        <div className="text-[10px] text-slate-400 mt-0.5">
-          {CONSTRUCTION_STAGES.length} stages · IS 456 compliant estimate
-        </div>
+        <p className="text-[11px] text-[#4B5563]">
+          {CONSTRUCTION_STAGES.length} stages · Preliminary Quantity Estimate
+        </p>
       </div>
     </aside>
   );

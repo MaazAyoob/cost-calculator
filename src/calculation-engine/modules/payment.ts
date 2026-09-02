@@ -1,5 +1,4 @@
-// Payment Plan Module
-import { EngineInput, BudgetResult, TimelineResult, PaymentMilestone } from '../types';
+import { EngineInput, BudgetResult, TimelineResult, PaymentMilestone, PaymentPlanSummary } from '../types';
 
 interface MilestoneDef {
   stage: number;
@@ -71,4 +70,24 @@ export function calculatePaymentPlan(
   });
 
   return milestones;
+}
+
+export function getPaymentPlanSummary(
+  milestones: PaymentMilestone[],
+  totalProjectCost: number
+): PaymentPlanSummary {
+  const totalAllocatedPercentage = milestones.reduce((sum, m) => sum + (m.percentage || 0), 0);
+  const totalAllocatedAmount = milestones.reduce((sum, m) => sum + (m.amount || 0), 0);
+  const unallocatedPercentage = Math.max(0, 100 - totalAllocatedPercentage);
+  const unallocatedAmount = Math.max(0, totalProjectCost - totalAllocatedAmount);
+  const isComplete = Math.abs(totalAllocatedPercentage - 100) < 0.01 && Math.abs(totalAllocatedAmount - totalProjectCost) <= 1;
+
+  return {
+    isComplete,
+    totalAllocatedPercentage: parseFloat(totalAllocatedPercentage.toFixed(1)),
+    unallocatedPercentage: parseFloat(unallocatedPercentage.toFixed(1)),
+    totalAllocatedAmount,
+    unallocatedAmount,
+    scheduleType: isComplete ? 'Complete' : 'Early-Stage',
+  };
 }

@@ -75,6 +75,10 @@ export const BUDGET_HEAD_COLORS: Record<string, string> = {
   'Painting':              '#EA580C',
   'Fixtures & Finishes':   '#6366F1',
   'Contingency & GST':     '#94A3B8',
+  'Contractor Execution Margin (15%)': '#8B5CF6',
+  'Contingency Reserve (6%)': '#F59E0B',
+  'Professional Architecture & Engineering Fees (5%)': '#3B82F6',
+  'GST & Statutory Taxes (18%)': '#64748B',
 };
 
 /** Material quality multipliers per category */

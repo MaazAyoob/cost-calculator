@@ -75,18 +75,25 @@ export function calculateWindows(input: EngineInput): {
   // 3. Authoritative Schedule
   const schedule: WindowScheduleItem[] = [];
 
-  const addWin = (code: string, desc: string, spaceType: string, count: number, size: string, unitArea: number) => {
+  const addWin = (code: string, desc: string, spaceType: string, count: number, widthFt: number, heightFt: number) => {
     if (count <= 0) return;
+    const unitArea = widthFt * heightFt;
     const totalArea = count * unitArea;
+    const size = `${widthFt.toFixed(1)} ft × ${heightFt.toFixed(1)} ft`;
     schedule.push({
       code,
       description: desc,
       spaceType,
-      quantity: count,
+      count,
+      widthFt,
+      heightFt,
+      unitAreaSqFt: unitArea,
+      totalOpeningAreaSqFt: totalArea,
+      totalAreaSqFt: totalArea,
+      quantity: totalArea,
       unit: 'Sq Ft',
       openingSize: size,
       openingAreaSqFt: unitArea,
-      totalOpeningAreaSqFt: totalArea,
       frameAreaSqFt: totalArea,
       shutterAreaSqFt: totalArea,
       grillAreaSqFt: Math.round(totalArea * 0.8),
@@ -97,13 +104,13 @@ export function calculateWindows(input: EngineInput): {
     });
   };
 
-  addWin('W-BED', 'Bedroom 2-Track Glazed Window with Mosquito Mesh', 'Bedrooms', bedCount, '5.0 ft × 4.0 ft', 20);
-  addWin('W-LIV', 'Living Room 3-Track Picture Window (Full Height)', 'Living Room', livingCount, '6.0 ft × 5.0 ft', 30);
-  addWin('W-KIT', 'Kitchen Sliding Window with Exhaust Louver Provision', 'Kitchen', kitchenCount, '4.0 ft × 3.0 ft', 12);
-  addWin('W-BATH', 'Bathroom Louvered Ventilator with Exhaust Opening', 'Bathrooms / Toilets', bathCount, '2.0 ft × 3.0 ft', 6);
-  addWin('W-DIN', 'Dining Room Glazed Sliding Window', 'Dining Area', diningCount, '5.0 ft × 3.0 ft', 15);
-  addWin('W-OFF', 'Study / Office Natural Light Window', 'Home Office', officeCount, '5.0 ft × 3.0 ft', 15);
-  addWin('W-UTL', 'Utility Service Ventilator Window', 'Utility Area', utilityCount, '4.0 ft × 2.0 ft', 8);
+  addWin('W-BED', 'Bedroom 2-Track Glazed Window with Mosquito Mesh', 'Bedrooms', bedCount, 5.0, 4.0);
+  addWin('W-LIV', 'Living Room 3-Track Picture Window (Full Height)', 'Living Room', livingCount, 6.0, 5.0);
+  addWin('W-KIT', 'Kitchen Sliding Window with Exhaust Louver Provision', 'Kitchen', kitchenCount, 4.0, 3.0);
+  addWin('W-BATH', 'Bathroom Louvered Ventilator with Exhaust Opening', 'Bathrooms / Toilets', bathCount, 2.0, 3.0);
+  addWin('W-DIN', 'Dining Room Glazed Sliding Window', 'Dining Area', diningCount, 5.0, 3.0);
+  addWin('W-OFF', 'Study / Office Natural Light Window', 'Home Office', officeCount, 5.0, 3.0);
+  addWin('W-UTL', 'Utility Service Ventilator Window', 'Utility Area', utilityCount, 4.0, 2.0);
 
   return {
     windowsCount,

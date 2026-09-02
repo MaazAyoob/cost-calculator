@@ -58,11 +58,19 @@ export function calculatePlumbing(
     };
   }
 
-  // 1. Sum fixture counts & points directly from canonical SpaceModel
-  const wcCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.wcCount, 0);
-  const washBasinCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.washBasinCount, 0);
-  const showerCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.showerCount, 0);
-  const healthFaucetCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.healthFaucetCount, 0);
+  // 1. Sum fixture counts & points directly from canonical SpaceModel with explicit override support
+  const overrides = input.fixtureOverrides || input.bathroomFittings?.fixtureOverrides;
+
+  const rawWcCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.wcCount, 0);
+  const rawWashBasinCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.washBasinCount, 0);
+  const rawShowerCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.showerCount, 0);
+  const rawHealthFaucetCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.healthFaucetCount, 0);
+
+  const wcCount = overrides?.wcCount !== undefined ? Math.max(0, overrides.wcCount) : rawWcCount;
+  const washBasinCount = overrides?.washBasinCount !== undefined ? Math.max(0, overrides.washBasinCount) : rawWashBasinCount;
+  const showerCount = overrides?.showerCount !== undefined ? Math.max(0, overrides.showerCount) : rawShowerCount;
+  const healthFaucetCount = overrides?.healthFaucetCount !== undefined ? Math.max(0, overrides.healthFaucetCount) : rawHealthFaucetCount;
+
   const floorTrapsCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.floorDrainCount, 0);
   const kitchenSinkCount = buildingModel.allSpaces.reduce((sum, s) => sum + s.sinkCount, 0);
 

@@ -157,7 +157,7 @@ export const DownloadsTab: React.FC = () => {
               Download bank-ready reports, full BOQ spreadsheets, material schedules, and shareable project links for your contractor and bank manager.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-slate-400">
-              <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-emerald-400" /> IS 456 Code Compliant</span>
+              <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-emerald-400" /> Preliminary QS Estimate</span>
               <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-emerald-400" /> Bank Loan Disbursement Friendly</span>
               <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-emerald-400" /> Contractor-Ready Format</span>
             </div>

@@ -4,6 +4,10 @@
 // verified source notes, and normalized units.
 // ============================================================
 
+export type RateBasis = 'material-only' | 'labour-only' | 'composite' | 'installed';
+export type GstTreatment = 'included' | 'excluded' | 'not-applicable';
+export type TransportTreatment = 'included' | 'excluded' | 'separate';
+
 export interface BrandOption {
   id: string;
   name: string;
@@ -17,7 +21,25 @@ export interface BrandOption {
   grade?: string;
   location?: string;
   effectiveDate?: string;
+  rateBasis?: RateBasis;
+  gstTreatment?: GstTreatment;
+  transportTreatment?: TransportTreatment;
   source?: string;
+  notes?: string;
+}
+
+export interface RateMasterItem {
+  id: string;
+  item: string;
+  specification: string;
+  unit: string;
+  location: string;
+  rate: number;
+  effectiveDate: string;
+  rateBasis: RateBasis;
+  gstTreatment: GstTreatment;
+  transportTreatment: TransportTreatment;
+  source: string;
   notes?: string;
 }
 
@@ -678,4 +700,49 @@ export function getBrandTier(categoryId: string, brandName: string): 'Essential'
     return bNorm.includes(normalized) || normalized.includes(bNorm);
   });
   return brand?.qualityTier ?? 'Premium';
+}
+
+/**
+ * Resolves complete Rate Master metadata for any category item
+ * Strictly follows Hutty Rate Master Specification (Section 6.1)
+ */
+export function getRateMasterMetadata(
+  categoryId: string,
+  brandName: string,
+  fallbackRate = 0,
+  fallbackUnit = 'Nos'
+): RateMasterItem {
+  const cat = BRAND_DATABASE.find((c) => c.id === categoryId);
+  const normalized = (brandName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  let brand = cat?.brands.find((b) => b.name === brandName);
+  if (!brand && cat && normalized) {
+    brand = cat.brands.find((b) => {
+      const bNorm = b.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return bNorm.includes(normalized) || normalized.includes(bNorm);
+    });
+  }
+
+  // Determine standard rate basis per trade
+  let defaultRateBasis: RateBasis = 'material-only';
+  if (['doors', 'windows', 'bathroom'].includes(categoryId)) {
+    defaultRateBasis = 'installed';
+  } else if (['electrical', 'plumbing'].includes(categoryId)) {
+    defaultRateBasis = 'composite';
+  }
+
+  return {
+    id: brand?.id || `rate-${categoryId}-${normalized || 'default'}`,
+    item: brand?.material || brandName || categoryId,
+    specification: brand?.description || brand?.notes || brand?.name || 'Standard specification',
+    unit: brand?.unit || fallbackUnit,
+    location: brand?.location || 'Bengaluru / Mysuru',
+    rate: brand?.unitRate || fallbackRate,
+    effectiveDate: brand?.effectiveDate || '2026-Q1',
+    rateBasis: brand?.rateBasis || defaultRateBasis,
+    gstTreatment: brand?.gstTreatment || 'excluded',
+    transportTreatment: brand?.transportTreatment || 'included',
+    source: brand?.source || 'Current planning / internal QS basis',
+    notes: brand?.notes,
+  };
 }

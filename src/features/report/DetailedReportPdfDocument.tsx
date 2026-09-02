@@ -235,12 +235,12 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         <View style={styles.coverTitleContainer}>
-          <Text style={styles.coverDocType}>Detailed Construction Cost &amp; BOQ Report</Text>
+          <Text style={styles.coverDocType}>Construction Estimate &amp; BOQ</Text>
           <Text style={styles.coverMainTitle}>
             {input?.houseType || 'Residential Home'} &bull; {area?.totalBUASqFt?.toLocaleString() || 0} sq.ft
           </Text>
           <Text style={styles.coverSubtitle}>
-            Authoritative, deterministic material takeoff, trade work breakdown, and commercial construction schedule for {input?.city || 'Bangalore'}.
+            Calculated preliminary material quantity estimate, trade work breakdown, and commercial construction schedule for {input?.city || 'Bangalore'}.
           </Text>
         </View>
 
@@ -259,7 +259,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
               <Text style={styles.metaValue}>{currentDate}</Text>
             </View>
             <View style={styles.coverMetaItem}>
-              <Text style={styles.metaLabel}>Specification Tier</Text>
+              <Text style={styles.metaLabel}>Selected Package</Text>
               <Text style={styles.metaValue}>{specificationTier.toUpperCase()}</Text>
             </View>
             <View style={styles.coverMetaItem}>
@@ -276,7 +276,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         <View style={styles.footer}>
-          <Text>Hutty Construction Technologies &bull; Confidential Quantity Survey</Text>
+          <Text>Hutty Construction Technologies &bull; Construction Estimate &amp; BOQ</Text>
           <Text>https://hutty.in</Text>
         </View>
       </Page>
@@ -432,7 +432,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         <Text style={styles.sectionTitle}>SECTION D — WHAT IT COSTS (Trade Head Allocation)</Text>
         <View style={styles.table}>
           <View style={styles.tableHeaderRow}>
-            <Text style={[{ width: '50%' }, styles.th]}>Trade Category / Statutory Head</Text>
+            <Text style={[{ width: '50%' }, styles.th]}>Trade Category</Text>
             <Text style={[{ width: '25%', textAlign: 'right' }, styles.th]}>Amount (INR)</Text>
             <Text style={[{ width: '25%', textAlign: 'right' }, styles.th]}>% of Total</Text>
           </View>
@@ -458,50 +458,59 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           </View>
         </View>
 
-        {/* Milestone Payment Roadmap */}
+        {/* Milestone Payment Roadmap (All Milestones Totaling 100%) */}
         {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
           <>
-            <Text style={[styles.sectionTitle, { marginTop: 12 }]}>Milestone Payment Roadmap</Text>
+            <Text style={[styles.sectionTitle, { marginTop: 12 }]}>Milestone Payment Roadmap (Complete Schedule)</Text>
             <View style={styles.table}>
               <View style={styles.tableHeaderRow}>
                 <Text style={[{ width: '50%' }, styles.th]}>Stage / Construction Milestone</Text>
                 <Text style={[{ width: '25%', textAlign: 'right' }, styles.th]}>Disbursement</Text>
                 <Text style={[{ width: '25%', textAlign: 'right' }, styles.th]}>Stage %</Text>
               </View>
-              {paymentPlan.slice(0, 6).map((stage, idx) => (
+              {paymentPlan.map((stage, idx) => (
                 <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
-                  <Text style={{ width: '50%', fontSize: 8 }}>
+                  <Text style={{ width: '50%', fontSize: 7.5 }}>
                     Stage {stage.stage}: {stage.title}
                   </Text>
-                  <Text style={{ width: '25%', textAlign: 'right', fontSize: 8, fontFamily: 'Helvetica-Bold' }}>
+                  <Text style={{ width: '25%', textAlign: 'right', fontSize: 7.5, fontFamily: 'Helvetica-Bold' }}>
                     {formatINR(stage.amount)}
                   </Text>
-                  <Text style={{ width: '25%', textAlign: 'right', fontSize: 8 }}>{stage.percentage}%</Text>
+                  <Text style={{ width: '25%', textAlign: 'right', fontSize: 7.5 }}>{stage.percentage}%</Text>
                 </View>
               ))}
+              <View style={styles.totalRow}>
+                <Text style={{ width: '50%', fontFamily: 'Helvetica-Bold', fontSize: 8, textTransform: 'uppercase' }}>
+                  Total Payment Milestones
+                </Text>
+                <Text style={{ width: '25%', textAlign: 'right', fontFamily: 'Helvetica-Bold', fontSize: 8, color: '#1B3D34' }}>
+                  {formatINR(budget?.totalProjectCost)}
+                </Text>
+                <Text style={{ width: '25%', textAlign: 'right', fontFamily: 'Helvetica-Bold', fontSize: 8 }}>100.0%</Text>
+              </View>
             </View>
           </>
         )}
 
-        {/* Engineering Assumptions & Disclaimers */}
+        {/* Preliminary Estimate Disclaimers & Engineering Notice */}
         <View style={styles.disclaimerBox}>
           <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#1B3D34', marginBottom: 3 }}>
-            Engineering Assumptions &amp; Disclaimers
+            IMPORTANT — PRELIMINARY ESTIMATE &amp; ENGINEERING NOTICE
           </Text>
-          <Text style={{ fontSize: 7, color: '#4B5563', marginBottom: 2 }}>
-            &bull; Estimates calculated using deterministic formula algorithms conforming to IS 456 (Plain and Reinforced Concrete), IS 1786 (High Strength Deformed Steel Bars), and Hutty Pilot Quantity Specification.
+          <Text style={{ fontSize: 6.8, color: '#4B5563', marginBottom: 2 }}>
+            &bull; Generated using Hutty's preliminary estimation rules; final structural design is by the appointed engineer.
           </Text>
-          <Text style={{ fontSize: 7, color: '#4B5563', marginBottom: 2 }}>
-            &bull; Brand rates reflect prevailing wholesale contractor distributor indexes in Bangalore / Mysore market as of current quarter.
+          <Text style={{ fontSize: 6.8, color: '#4B5563', marginBottom: 2 }}>
+            &bull; This report is a preliminary construction cost and quantity estimate generated from the project configuration. Actual quantities and costs may vary based on architectural/structural drawings, soil and site conditions, construction methods, specifications, brands, supplier quotations, taxes and market conditions.
           </Text>
-          <Text style={{ fontSize: 7, color: '#4B5563' }}>
-            &bull; Final structural member sizing, rebar detailing schedules, and soil bearing capacity must be validated by a certified structural engineer before site excavation.
+          <Text style={{ fontSize: 6.8, color: '#4B5563' }}>
+            &bull; Structural member sizes, reinforcement detailing schedules, foundation design, soil bearing capacity and other engineering requirements must be determined and certified by the appointed qualified engineer before construction.
           </Text>
         </View>
 
         <View style={styles.footer}>
           <Text>Hutty Detailed Report &bull; Page 4</Text>
-          <Text>Total Commercials &bull; Verified Dossier</Text>
+          <Text>Total Commercials &bull; Construction Estimate &amp; BOQ</Text>
         </View>
       </Page>
 

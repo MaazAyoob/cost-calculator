@@ -2,6 +2,7 @@ import React from 'react';
 import { pdf } from '@react-pdf/renderer';
 import { CalculationResult } from '../../calculation-engine/types';
 import { DetailedReportPdfDocument } from './DetailedReportPdfDocument';
+import { runQAGate } from '../../calculation-engine/modules/qaGate';
 
 export interface GeneratePdfOptions {
   data: CalculationResult;
@@ -12,6 +13,14 @@ export interface GeneratePdfOptions {
 
 export async function generateAndDownloadDetailedReportPdf(options: GeneratePdfOptions): Promise<void> {
   const { data, projectName = 'Hutty Residential Estimate', preparedFor = 'Valued Homeowner', specificationTier = 'Premium' } = options;
+
+  // ── MANDATORY AUTOMATED QA GATE (P0.7) ──
+  const qaResult = data.qaResult || runQAGate(data);
+  if (!qaResult.passed) {
+    const errorMsg = `PDF Generation Blocked by Automated QA Gate:\n${qaResult.blockingErrors.join('\n')}`;
+    console.error(errorMsg, qaResult);
+    throw new Error(errorMsg);
+  }
 
   const docElement = React.createElement(DetailedReportPdfDocument, {
     data,

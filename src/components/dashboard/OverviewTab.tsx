@@ -87,7 +87,7 @@ export const OverviewTab: React.FC = () => {
               )}
             </div>
             <p className="text-xs text-slate-500">
-              Calculated based on your selected materials and IS 456 structural standards.
+              Calculated based on your selected materials and Hutty preliminary estimation rules.
             </p>
           </div>
         </div>

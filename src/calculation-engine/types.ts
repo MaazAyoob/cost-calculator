@@ -42,6 +42,13 @@ export interface ElectricalSelection {
   wireTier: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)';
 }
 
+export interface SanitaryFixtureOverrides {
+  wcCount?: number;
+  washBasinCount?: number;
+  showerCount?: number;
+  healthFaucetCount?: number;
+}
+
 export interface BathroomFittingSelection {
   sanitaryTier:
     | 'Mass Market (Cera / Hindware / Parryware)'
@@ -51,6 +58,7 @@ export interface BathroomFittingSelection {
     | 'Luxury (Toto / Hansgrohe / Duravit)'
     | string;
   cpvcBrand: 'Ashirwad' | 'Supreme' | 'Astral' | string;
+  fixtureOverrides?: SanitaryFixtureOverrides;
 }
 
 export interface PaintingSelection {
@@ -82,6 +90,7 @@ export interface EngineInput {
   rooms: RoomCounts;
   qualityTier: QualityTier;
   materialBrands: MaterialBrandSelection;
+  fixtureOverrides?: SanitaryFixtureOverrides;
   // Granular client selections
   flooringZones: ZoneFlooringSelection;
   wallCladding: WallCladdingSelection;
@@ -190,18 +199,23 @@ export interface WindowScheduleItem {
   code: string;
   description: string;
   spaceType: string;
-  quantity: number;
-  unit: string;
-  openingSize: string; // e.g. "5.0 ft × 4.0 ft"
-  openingAreaSqFt: number;
-  totalOpeningAreaSqFt: number;
+  count: number;              // Explicit opening count
+  widthFt: number;            // Opening width in ft
+  heightFt: number;           // Opening height in ft
+  unitAreaSqFt: number;       // widthFt × heightFt
+  totalOpeningAreaSqFt: number; // count × unitAreaSqFt
+  totalAreaSqFt: number;      // count × unitAreaSqFt (alias for totalOpeningAreaSqFt)
+  quantity: number;           // equals totalOpeningAreaSqFt when unit is 'Sq Ft' so quantity × unitRate = amount holds
+  unit: string;               // 'Sq Ft'
+  openingSize: string;        // e.g. "5.0 ft × 4.0 ft"
+  openingAreaSqFt: number;    // unitAreaSqFt per opening
   frameAreaSqFt: number;
   shutterAreaSqFt: number;
   grillAreaSqFt: number;
   material: string;
   specification: string;
-  unitRate: number;
-  amount: number;
+  unitRate: number;           // area rate per Sq Ft
+  amount: number;             // totalOpeningAreaSqFt × unitRate
 }
 
 // ────────────────────────────────────────────────────────────
@@ -425,6 +439,20 @@ export interface BudgetHead {
   color: string;
 }
 
+export interface CommercialReconciliation {
+  directMaterialCost: number; // Section B physical material takeoff
+  directLabourCost: number;   // Works execution labour
+  equipmentCost: number;      // Machinery, staging, site setup
+  contractorMargin: number;   // Execution margin
+  contingency: number;        // Risk allowance
+  gstAmount: number;          // Statutory taxes
+  professionalFees: number;   // Architecture & Engineering design fees
+  totalProjectCost: number;
+  reconciledSum: number;
+  unexplainedResidual: number;
+  isFullyReconciled: boolean;
+}
+
 export interface BudgetResult {
   heads: BudgetHead[];
   structuralCost: number;
@@ -437,6 +465,7 @@ export interface BudgetResult {
   gstAmount: number;
   totalProjectCost: number;
   costPerSqFt: number;
+  commercialReconciliation?: CommercialReconciliation;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -444,11 +473,19 @@ export interface BudgetResult {
 // ────────────────────────────────────────────────────────────
 
 export interface CalculationTraceStep {
+  ruleId?: string;
   parameter: string;
   category: string;
   inputs: Record<string, any>;
   formula: string;
+  rawQuantity?: number;
+  adjustments?: string | number;
+  finalQuantity?: number;
+  unitRate?: number;
+  amount?: number;
+  tradeCategory?: string;
   assumption: string;
+  explanation?: string;
   result: number | string;
   unit: string;
 }
@@ -480,6 +517,15 @@ export interface PaymentMilestone {
   bankDisbursement: boolean;
 }
 
+export interface PaymentPlanSummary {
+  isComplete: boolean;
+  totalAllocatedPercentage: number;
+  unallocatedPercentage: number;
+  totalAllocatedAmount: number;
+  unallocatedAmount: number;
+  scheduleType: 'Complete' | 'Early-Stage';
+}
+
 export interface ProcurementItem {
   id: string;
   trade: string;
@@ -492,6 +538,27 @@ export interface ProcurementItem {
   totalCost: number;
   supplierNote: string;
   leadTimeDays: number;
+}
+
+// ────────────────────────────────────────────────────────────
+// AUTOMATED QA GATE TYPES (P0.7)
+// ────────────────────────────────────────────────────────────
+
+export interface QACheckResult {
+  id: string;
+  name: string;
+  passed: boolean;
+  isBlocking: boolean;
+  message: string;
+  details?: Record<string, any>;
+}
+
+export interface QAGateResult {
+  passed: boolean;
+  blockingErrors: string[];
+  warnings: string[];
+  checks: QACheckResult[];
+  validatedAt: string;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -518,10 +585,13 @@ export interface ReportData {
   windowSchedule: WindowScheduleItem[];
   timeline: TimelineResult;
   paymentPlan: PaymentMilestone[];
+  paymentSummary?: PaymentPlanSummary;
   procurement: ProcurementItem[];
   recommendations: string[];
   trace: CalculationTraceStep[];
   parameterTable: QSParameterItem[];
+  qaResult?: QAGateResult;
+  commercialReconciliation?: CommercialReconciliation;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -541,9 +611,12 @@ export interface CalculationResult {
   budget: BudgetResult; // Section D
   timeline: TimelineResult;
   paymentPlan: PaymentMilestone[];
+  paymentSummary?: PaymentPlanSummary;
   procurement: ProcurementItem[];
   report: ReportData;
   trace: CalculationTraceStep[];
   parameterTable: QSParameterItem[];
+  qaResult?: QAGateResult;
+  commercialReconciliation?: CommercialReconciliation;
   calculatedAt: string;
 }

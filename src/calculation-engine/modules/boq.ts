@@ -279,7 +279,17 @@ export function generateBOQ(
   );
   if (hasWindowsSelection && windowSchedule.length > 0) {
     windowSchedule.forEach((w) => {
-      add('Windows & Glazing', 'WG', w.description, w.unit, w.quantity, w.unitRate, w.specification, w.openingSize, 'Window Area × Rate');
+      add(
+        'Windows & Glazing',
+        'WG',
+        `${w.description} (${w.count} Nos)`,
+        w.unit,
+        w.quantity,
+        w.unitRate,
+        w.specification,
+        `${w.count} Nos • ${w.openingSize} (Total ${w.totalOpeningAreaSqFt} sq.ft)`,
+        `${w.count} Nos × ${w.unitAreaSqFt} sq.ft = ${w.totalOpeningAreaSqFt} sq.ft × ₹${w.unitRate.toLocaleString('en-IN')}`
+      );
     });
     add('Windows & Glazing', 'WG', 'MS Safety Grille Fabrication, Primer & Polyurethane Fitting', 'Sq Ft', qty.grillAreaSqFt, rate(280, m.structural), 'SS 304 / MS Grille', 'powder coated black safety grill', 'Grille Area × Rate');
   }
