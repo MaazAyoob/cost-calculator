@@ -8,7 +8,8 @@ import { useWizardStore } from '../../store/useWizardStore';
 import { useEntitlementStore } from '../../store/useEntitlementStore';
 import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
 import { CalculationTraceModal } from '../../components/modals/CalculationTraceModal';
-import { generateAndDownloadDetailedReportPdf } from './pdfService';
+import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from './pdfService';
+import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Check, Sparkles, FileText, ArrowRight, Calculator } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
@@ -24,10 +25,53 @@ export const ReportPage: React.FC = () => {
   const { report, area, quantities, budget, timeline, paymentPlan, boq, materialSchedule, fixtureSchedule } = result;
   const projectId = report?.projectId || 'HUTTY-2026-BLR';
   const isUnlocked = hasDetailedReportAccess(projectId);
+  const devTestingActive = isDevPdfTestingEnabled();
 
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [showTraceModal, setShowTraceModal] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [isGeneratingDevPdf, setIsGeneratingDevPdf] = useState(false);
+  const [devPdfError, setDevPdfError] = useState<string | null>(null);
+
+  const handleDevViewPdf = async () => {
+    if (!isDevPdfTestingEnabled()) return;
+    setDevPdfError(null);
+    setIsGeneratingDevPdf(true);
+    try {
+      await viewDetailedReportPdfInNewTab({
+        data: result,
+        projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+        preparedFor: preparedFor || 'Developer Testing',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Dev PDF preview error:', err);
+      setDevPdfError(msg);
+    } finally {
+      setIsGeneratingDevPdf(false);
+    }
+  };
+
+  const handleDevDownloadPdf = async () => {
+    if (!isDevPdfTestingEnabled()) return;
+    setDevPdfError(null);
+    setIsGeneratingDevPdf(true);
+    try {
+      await generateAndDownloadDetailedReportPdf({
+        data: result,
+        projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+        preparedFor: preparedFor || 'Developer Testing',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Dev PDF download error:', err);
+      setDevPdfError(msg);
+    } finally {
+      setIsGeneratingDevPdf(false);
+    }
+  };
 
   const handleDownloadPdf = async () => {
     if (!isUnlocked) {
@@ -118,14 +162,50 @@ export const ReportPage: React.FC = () => {
                 </button>
               </>
             ) : (
-              <button
-                type="button"
-                onClick={() => setShowUnlockModal(true)}
-                className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
-              >
-                <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                <span>Unlock Detailed Report — ₹4,999</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {devTestingActive && (
+                  <div className="flex flex-col gap-1 print:hidden">
+                    <div className="flex items-center gap-1.5 p-1 bg-amber-50 border border-amber-300 rounded-lg text-xs shadow-2xs">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">
+                        DEV ONLY
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleDevViewPdf}
+                        disabled={isGeneratingDevPdf}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold transition-colors cursor-pointer text-[11px] disabled:opacity-60"
+                        title="Developer Testing: View full paid PDF in new browser tab"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-amber-700" />
+                        <span>{isGeneratingDevPdf ? 'Compiling...' : 'View Full PDF (Testing)'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDevDownloadPdf}
+                        disabled={isGeneratingDevPdf}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold transition-colors cursor-pointer text-[11px] disabled:opacity-60"
+                        title="Developer Testing: Download full paid PDF file"
+                      >
+                        <Download className="w-3.5 h-3.5 text-white" />
+                        <span>Download Full PDF (Testing)</span>
+                      </button>
+                    </div>
+                    {devPdfError && (
+                      <div className="text-[10px] text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 font-mono max-w-xs break-words">
+                        ⛔ {devPdfError}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowUnlockModal(true)}
+                  className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <span>Unlock Detailed Report — ₹4,999</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -172,6 +252,7 @@ export const ReportPage: React.FC = () => {
               <p><strong className="text-[#1B3D34]">Date:</strong> {currentDate}</p>
               <p><strong className="text-[#1B3D34]">Specification:</strong> {(specificationTier || 'Premium').toUpperCase()}</p>
               <p><strong className="text-[#1B3D34]">Prepared For:</strong> {preparedFor || 'Residential Client'}</p>
+              <p><strong className="text-[#1B3D34]">Rate Master:</strong> {report?.rateSourceMetadata?.datasetVersion || result.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'} ({report?.rateSourceMetadata?.isLive ? 'Live API' : '2026-Q1 Fallback'})</p>
             </div>
           </div>
 
@@ -451,6 +532,40 @@ export const ReportPage: React.FC = () => {
                   <span>Unlock Detailed Report — ₹4,999</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
+
+                {devTestingActive && (
+                  <div className="mt-4 pt-3 border-t border-dashed border-amber-300 flex flex-col items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-2 py-0.5 rounded">
+                        DEV TESTING BYPASS
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleDevViewPdf}
+                        disabled={isGeneratingDevPdf}
+                        className="text-xs font-bold text-amber-900 hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-60"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-amber-700" />
+                        <span>{isGeneratingDevPdf ? 'Compiling...' : 'View Full PDF (Testing)'}</span>
+                      </button>
+                      <span className="text-amber-400 hidden sm:inline">&bull;</span>
+                      <button
+                        type="button"
+                        onClick={handleDevDownloadPdf}
+                        disabled={isGeneratingDevPdf}
+                        className="text-xs font-bold text-amber-900 hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-60"
+                      >
+                        <Download className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Download Full PDF (Testing)</span>
+                      </button>
+                    </div>
+                    {devPdfError && (
+                      <div className="text-[10px] text-red-700 bg-red-50 border border-red-200 rounded px-3 py-1.5 font-mono max-w-lg text-left break-words w-full">
+                        ⛔ {devPdfError}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -485,6 +600,9 @@ export const ReportPage: React.FC = () => {
               * Generated using Hutty's preliminary estimation rules; final structural design is by the appointed engineer.
             </p>
             <p>
+              * Electrical Notice: Hutty's electrical quantities are preliminary estimation quantities. They are not a substitute for final electrical design. Final conductor sizing, circuit loading, voltage-drop checks, protection, DB design and installation details must be verified by a qualified electrical designer/engineer for the actual project.
+            </p>
+            <p>
               * This report is a preliminary construction cost and quantity estimate generated from the project configuration. Actual quantities and costs may vary based on architectural/structural drawings, soil and site conditions, construction methods, specifications, brands, supplier quotations, taxes and market conditions.
             </p>
             <p>
@@ -493,9 +611,9 @@ export const ReportPage: React.FC = () => {
           </section>
 
           {/* Document Footer */}
-          <div className="pt-6 border-t border-[#E5E7EB] flex items-center justify-between text-[10px] text-[#4B5563]">
-            <span>Hutty &bull; Construction Estimate &amp; BOQ</span>
-            <span>https://hutty.in</span>
+          <div className="pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[#4B5563]">
+            <span>Hutty &bull; Construction Estimate &amp; BOQ &bull; Engine {result.rateSourceMetadata?.calculationEngineVersion || 'v2.6.0'}</span>
+            <span>Rate Master: {result.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'} &bull; https://hutty.in</span>
           </div>
 
         </div>

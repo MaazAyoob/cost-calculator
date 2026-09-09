@@ -20,7 +20,8 @@ import {
   BOQCategory,
 } from '../types';
 import { UNIT_RATES_PREMIUM, MATERIAL_QUALITY_MULTIPLIER } from '../data/qualityTiers';
-import { getBrandRate } from '../data/brandDatabase';
+import { getBrandRate, getElectricalWireRate } from '../data/brandDatabase';
+import { rateService } from '../data/rateService';
 
 let _seq = 0;
 function nextCode(prefix: string): string {
@@ -106,11 +107,11 @@ export function generateBOQ(
 
   // ── Brand Selection Rates ──
   const steelRate = materialBrands?.steel
-    ? (getBrandRate('steel', materialBrands.steel) || DEFAULT_STEEL_RATE_PER_TONNE)
+    ? (rateService.getRate('steel', materialBrands.steel) || DEFAULT_STEEL_RATE_PER_TONNE)
     : DEFAULT_STEEL_RATE_PER_TONNE;
 
   const cementRate = materialBrands?.cement
-    ? (getBrandRate('cement', materialBrands.cement) || DEFAULT_CEMENT_RATE_PER_BAG)
+    ? (rateService.getRate('cement', materialBrands.cement) || DEFAULT_CEMENT_RATE_PER_BAG)
     : DEFAULT_CEMENT_RATE_PER_BAG;
 
   const concreteRate = Math.round(rate(DEFAULT_CONCRETE_RATE_PER_CUM, m.structural) + ((cementRate - DEFAULT_CEMENT_RATE_PER_BAG) * 7.5));
@@ -300,30 +301,144 @@ export function generateBOQ(
     electrical?.wireTier
   );
   if (hasElectricalSelection) {
-    let wireRate = rate(r.wirePerMetre, m.mep);
-    let switchRate = rate(r.switchModulePerUnit, m.mep);
     const tier = electrical?.wireTier || '';
+    const brand = materialBrands?.electrical || tier || 'Finolex';
 
-    if (tier.includes('Premium') || materialBrands?.electrical === 'Finolex' || materialBrands?.electrical === 'Polycab') {
-      wireRate = 48;
+    let switchRate = rate(r.switchModulePerUnit, m.mep);
+    if (tier.includes('Premium') || brand === 'Finolex' || brand === 'Polycab') {
       switchRate = rate(240, m.mep);
-    } else if (tier.includes('Mid-range') || materialBrands?.electrical === 'V-Guard') {
-      wireRate = 36;
+    } else if (tier.includes('Mid-range') || brand === 'V-Guard') {
       switchRate = rate(185, m.mep);
-    } else if (tier.includes('Economy') || materialBrands?.electrical === 'Anchor') {
-      wireRate = 28;
+    } else if (tier.includes('Economy') || brand === 'Anchor') {
       switchRate = rate(140, m.mep);
-    } else if (materialBrands?.electrical) {
-      wireRate = getBrandRate('electrical', materialBrands.electrical) || wireRate;
     }
 
-    add('Electrical', 'EL', 'FRLS Copper Circuit Wire Pulling & Jointing', 'Metres', qty.electricalWireMetres, wireRate, electrical?.wireTier || materialBrands?.electrical || 'Finolex FRLS', '1.5/2.5/4.0 sq.mm circuits', 'Wire Length × Rate');
-    add('Electrical', 'EL', 'Heavy-Duty PVC Conduit Pipe & Junction Boxes Embedded in Walls', 'Metres', qty.conduitsMetres, rate(r.conduitPerMetre, m.mep), 'Precision PVC ISI', '25mm fire-retardant conduit', 'Conduit Length × Rate');
-    add('Electrical', 'EL', 'Modular Switches, Power Sockets & Regulator Plates', 'Modules', qty.switchModules, switchRate, electrical?.wireTier || 'Modular Plates', 'child-safe shuttered sockets', 'Switch Modules × Rate');
-    add('Electrical', 'EL', 'LED Concealed Spotlights & Batten Points Fitting', 'Points', qty.lightingPoints, rate(r.lightPointPerUnit, m.mep), 'Philips / Havells LED', 'warm/neutral white CRI>85', 'Lighting Points × Rate');
-    add('Electrical', 'EL', 'Chemical Earthing Pits with Copper Electrode (x2 Pits)', 'Units', 2, rate(22000, m.mep), 'Marconite Gel Earth System', '< 1 Ohm verified resistance', 'Earthing Pits × Rate');
-    add('Electrical', 'EL', 'Distribution Boards with MCB, RCCB & Isolators', 'Units', Math.max(1, input.floors || 1), rate(24000, m.mep), 'Schneider / Legrand DB', '30mA human shock protection', 'DB Units × Rate');
-    add('Electrical', 'EL', 'Armoured Main Feeder Cable from Supply Meter to Panel', 'RM', 15, rate(1800, m.mep), '4 Core 16 sq.mm XLPE', 'underground GI trench run', 'Cable Length × Rate');
+    const rate1_5 = rate(getElectricalWireRate(brand, '1.5'), m.mep);
+    const rate2_5 = rate(getElectricalWireRate(brand, '2.5'), m.mep);
+    const rate4_0 = rate(getElectricalWireRate(brand, '4.0'), m.mep);
+    const rate6_0 = rate(getElectricalWireRate(brand, '6.0'), m.mep);
+
+    add(
+      'Electrical',
+      'EL',
+      '1.5 sq.mm FRLS Copper Wire Pulling (Lighting & Fan Circuits)',
+      'Metres',
+      qty.wire1_5SqMmMetres,
+      rate1_5,
+      brand,
+      '1.5 sq.mm Phase, Neutral & Earth loop conductors',
+      'Conductor Length × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      '2.5 sq.mm FRLS Copper Wire Pulling (Power Sockets & TV/Data Outlets)',
+      'Metres',
+      qty.wire2_5SqMmMetres,
+      rate2_5,
+      brand,
+      '2.5 sq.mm modular socket & console power circuits',
+      'Conductor Length × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      '4.0 sq.mm FRLS Copper Dedicated Circuit Wire (AC & Geyser Loads)',
+      'Metres',
+      qty.wire4SqMmMetres,
+      rate4_0,
+      brand,
+      '4.0 sq.mm dedicated home-run appliance circuits',
+      'Conductor Length × Rate'
+    );
+
+    if (qty.wire6SqMmMetres > 0) {
+      add(
+        'Electrical',
+        'EL',
+        '6.0 sq.mm FRLS Copper Sub-Main Distribution Risers & EV Supply',
+        'Metres',
+        qty.wire6SqMmMetres,
+        rate6_0,
+        brand,
+        '6.0 sq.mm Main DB to Floor Sub-DBs + EV Charger line',
+        'Conductor Length × Rate'
+      );
+    }
+
+    add(
+      'Electrical',
+      'EL',
+      'Heavy-Duty PVC Conduit Pipe & Junction Boxes Embedded in Walls',
+      'Metres',
+      qty.conduitsMetres,
+      rate(r.conduitPerMetre, m.mep),
+      'Precision PVC ISI',
+      '25mm fire-retardant conduit',
+      'Conduit Length × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      'Modular Switches, Power Sockets & Regulator Plates',
+      'Modules',
+      qty.switchModules,
+      switchRate,
+      electrical?.wireTier || 'Modular Plates',
+      'child-safe shuttered sockets',
+      'Switch Modules × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      'LED Concealed Spotlights & Batten Points Fitting',
+      'Points',
+      qty.lightingPoints,
+      rate(r.lightPointPerUnit, m.mep),
+      'Philips / Havells LED',
+      'warm/neutral white CRI>85',
+      'Lighting Points × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      'Chemical Earthing Pits with Copper Electrode (x2 Pits)',
+      'Units',
+      2,
+      rate(22000, m.mep),
+      'Marconite Gel Earth System',
+      '< 1 Ohm verified resistance',
+      'Earthing Pits × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      'Distribution Boards with MCB, RCCB & Isolators',
+      'Units',
+      Math.max(1, input.floors || 1),
+      rate(24000, m.mep),
+      'Schneider / Legrand DB',
+      '30mA human shock protection',
+      'DB Units × Rate'
+    );
+
+    add(
+      'Electrical',
+      'EL',
+      'Armoured Main Feeder Cable from Supply Meter to Panel',
+      'RM',
+      15,
+      rate(1800, m.mep),
+      '4 Core 16 sq.mm XLPE',
+      'underground GI trench run',
+      'Cable Length × Rate'
+    );
   }
 
   // ── 12. Plumbing & Sanitary ──

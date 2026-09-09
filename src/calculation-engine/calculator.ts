@@ -55,6 +55,7 @@ import { generateCalculationTrace }  from './modules/trace';
 import { assembleReport }            from './modules/report';
 import { runQAGate }                 from './modules/qaGate';
 import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from './data/engineeringAssumptions';
+import { rateService }               from './data/rateService';
 
 export function runCalculator(input: EngineInput): CalculationResult {
   // ── STEP 1: Built-Up Area & Setback Geometry ──────────────
@@ -132,10 +133,19 @@ export function runCalculator(input: EngineInput): CalculationResult {
     fanPoints,
     socketPoints,
     acPoints,
+    geyserPoints,
+    tvDataPoints,
+    evPoints,
+    mainDBCount,
+    floorDBCount,
     totalElectricalPoints,
     switchModules,
     conduitsMetres,
     electricalWireMetres,
+    wire1_5SqMmMetres,
+    wire2_5SqMmMetres,
+    wire4SqMmMetres,
+    wire6SqMmMetres,
   } = calculateElectrical(input, area, buildingModel);
 
   const {
@@ -207,9 +217,18 @@ export function runCalculator(input: EngineInput): CalculationResult {
     fanPoints,
     socketPoints,
     acPoints,
+    geyserPoints,
+    tvDataPoints,
+    evPoints,
+    mainDBCount,
+    floorDBCount,
     switchModules,
     conduitsMetres,
     electricalWireMetres,
+    wire1_5SqMmMetres,
+    wire2_5SqMmMetres,
+    wire4SqMmMetres,
+    wire6SqMmMetres,
     totalWaterPoints,
     totalDrainagePoints,
     cpvcSupplyMetres,
@@ -269,6 +288,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
 
   const parameterTable: QSParameterItem[] = Object.values(CENTRALIZED_ENGINEERING_ASSUMPTIONS);
   const commercialReconciliation = budget.commercialReconciliation;
+  const rateSourceMetadata = rateService.getSourceMetadata();
 
   // Partial calculation result for QA gate validation
   const calculatedAt = new Date().toISOString();
@@ -290,6 +310,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     report,
     trace,
     parameterTable,
+    rateSourceMetadata,
     commercialReconciliation,
     calculatedAt,
   };
@@ -300,6 +321,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
   partialResult.report.qaResult = qaResult;
   partialResult.report.commercialReconciliation = commercialReconciliation;
   partialResult.report.paymentSummary = paymentSummary;
+  partialResult.report.rateSourceMetadata = rateSourceMetadata;
 
   return partialResult;
 }

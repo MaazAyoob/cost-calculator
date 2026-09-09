@@ -666,7 +666,117 @@ export const BRAND_DATABASE: BrandCategory[] = [
       },
     ],
   },
+  {
+    id: 'electrical',
+    label: 'Electrical Cables & Switchgear',
+    unit: '₹/Metre',
+    brands: [
+      {
+        id: 'el-anchor',
+        name: 'Anchor',
+        material: 'FRLS Multi-Strand Copper Wire',
+        category: 'MEP',
+        grade: 'IS 694 Class 5 Electrolytic Copper (1100V)',
+        qualityTier: 'Essential',
+        unitRate: 35, // Blended 2.5 sq.mm benchmark
+        unit: '₹/Metre',
+        location: 'Bengaluru / Mysuru',
+        effectiveDate: '2026-Q1',
+        rateBasis: 'material-only',
+        gstTreatment: 'excluded',
+        transportTreatment: 'included',
+        source: 'Anchor by Panasonic Karnataka Trade Catalogue 2026',
+        description: 'Standard residential fire-retardant electrolytic copper wiring',
+        warranty: '5 yr',
+        notes: 'Oxygen-free copper conductor, standard flame-retardant PVC insulation.'
+      },
+      {
+        id: 'el-vguard',
+        name: 'V-Guard',
+        material: 'FRLS Multi-Strand Copper Wire',
+        category: 'MEP',
+        grade: 'Super Shield FRLS Class 5 (1100V)',
+        qualityTier: 'Premium',
+        unitRate: 44, // Blended 2.5 sq.mm benchmark
+        unit: '₹/Metre',
+        location: 'Bengaluru / Mysuru',
+        effectiveDate: '2026-Q1',
+        rateBasis: 'material-only',
+        gstTreatment: 'excluded',
+        transportTreatment: 'included',
+        source: 'V-Guard South Regional Trade Price List 2026',
+        description: 'Triple-layer insulated flame retardant low smoke copper wiring',
+        warranty: '10 yr',
+        notes: 'Low smoke emission, enhanced thermal degradation threshold.'
+      },
+      {
+        id: 'el-finolex',
+        name: 'Finolex',
+        material: 'FRLS Multi-Strand Copper Wire',
+        category: 'MEP',
+        grade: 'High Insulation Flame Retardant (1100V)',
+        qualityTier: 'Luxury',
+        unitRate: 55, // Blended 2.5 sq.mm benchmark
+        unit: '₹/Metre',
+        location: 'Bengaluru / Mysuru',
+        effectiveDate: '2026-Q1',
+        rateBasis: 'material-only',
+        gstTreatment: 'excluded',
+        transportTreatment: 'included',
+        source: 'Finolex Cables National Wholesale Index 2026',
+        description: 'Industrial-grade high insulation resistance flame retardant cables',
+        warranty: '15 yr',
+        notes: '99.97% pure electrolytic bright annealed copper.'
+      },
+      {
+        id: 'el-polycab',
+        name: 'Polycab',
+        material: 'FRLS Multi-Strand Copper Wire',
+        category: 'MEP',
+        grade: 'Green Wire FRLS-H Zero Halogen (1100V)',
+        qualityTier: 'Luxury',
+        unitRate: 55, // Blended 2.5 sq.mm benchmark
+        unit: '₹/Metre',
+        location: 'Bengaluru / Mysuru',
+        effectiveDate: '2026-Q1',
+        rateBasis: 'material-only',
+        gstTreatment: 'excluded',
+        transportTreatment: 'included',
+        source: 'Polycab India Price Circular 2026',
+        description: 'Lead-free eco-friendly flame retardant low smoke copper cable',
+        warranty: '15 yr',
+        notes: 'High current-carrying capacity with low dielectric loss.'
+      },
+    ],
+  },
 ];
+
+/** Gauge-specific wire rates matrix (₹/metre single core FRLS copper) */
+export const ELECTRICAL_WIRE_RATE_MATRIX: Record<
+  string,
+  { '1.5': number; '2.5': number; '4.0': number; '6.0': number }
+> = {
+  anchor:  { '1.5': 22, '2.5': 35, '4.0': 55, '6.0': 82 },
+  vguard:  { '1.5': 28, '2.5': 44, '4.0': 68, '6.0': 102 },
+  finolex: { '1.5': 35, '2.5': 55, '4.0': 85, '6.0': 128 },
+  polycab: { '1.5': 35, '2.5': 55, '4.0': 85, '6.0': 128 },
+};
+
+/**
+ * Returns gauge-specific wire rate (₹/m) for a given brand/tier
+ */
+export function getElectricalWireRate(
+  brandName?: string,
+  gauge: '1.5' | '2.5' | '4.0' | '6.0' = '2.5'
+): number {
+  const norm = (brandName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (norm.includes('finolex')) return ELECTRICAL_WIRE_RATE_MATRIX.finolex[gauge];
+  if (norm.includes('polycab')) return ELECTRICAL_WIRE_RATE_MATRIX.polycab[gauge];
+  if (norm.includes('vguard') || norm.includes('midrange')) return ELECTRICAL_WIRE_RATE_MATRIX.vguard[gauge];
+  if (norm.includes('anchor') || norm.includes('economy')) return ELECTRICAL_WIRE_RATE_MATRIX.anchor[gauge];
+  // Default to Premium (Finolex/Polycab)
+  return ELECTRICAL_WIRE_RATE_MATRIX.finolex[gauge];
+}
 
 /** Get brand unit rate for a given selection; fuzzy matches brand names */
 export function getBrandRate(categoryId: string, brandName: string): number {

@@ -11,7 +11,8 @@ import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
 import { QuoteReviewModal } from '../../components/modals/QuoteReviewModal';
 import { BuildTrackingModal } from '../../components/modals/BuildTrackingModal';
 import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
-import { generateAndDownloadDetailedReportPdf } from '../report/pdfService';
+import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from '../report/pdfService';
+import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
@@ -75,6 +76,43 @@ export const DashboardPage: React.FC = () => {
       console.error('PDF generation error:', err);
     } finally {
       setIsGeneratingPdf(false);
+    }
+  };
+
+  const [isGeneratingDevPdf, setIsGeneratingDevPdf] = useState(false);
+  const devTestingActive = isDevPdfTestingEnabled();
+
+  const handleDevViewPdf = async () => {
+    if (!isDevPdfTestingEnabled()) return;
+    setIsGeneratingDevPdf(true);
+    try {
+      await viewDetailedReportPdfInNewTab({
+        data: result,
+        projectName: `${houseType || 'Residential'} Construction Dossier`,
+        preparedFor: preparedFor || 'Developer Testing',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      console.error('Dev PDF preview error:', err);
+    } finally {
+      setIsGeneratingDevPdf(false);
+    }
+  };
+
+  const handleDevDownloadPdf = async () => {
+    if (!isDevPdfTestingEnabled()) return;
+    setIsGeneratingDevPdf(true);
+    try {
+      await generateAndDownloadDetailedReportPdf({
+        data: result,
+        projectName: `${houseType || 'Residential'} Construction Dossier`,
+        preparedFor: preparedFor || 'Developer Testing',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      console.error('Dev PDF download error:', err);
+    } finally {
+      setIsGeneratingDevPdf(false);
     }
   };
 
@@ -291,14 +329,43 @@ export const DashboardPage: React.FC = () => {
                     <span>Download PDF</span>
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowUnlockModal(true)}
-                    className="hutty-btn-primary px-3.5 py-1.5 text-xs rounded-lg font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                    <span>Unlock Detailed Report &bull; ₹4,999</span>
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                    {devTestingActive && (
+                      <div className="flex items-center gap-1 p-1 bg-amber-50 border border-amber-300 rounded-lg text-xs shadow-2xs">
+                        <span className="text-[9px] font-mono font-bold uppercase bg-amber-200 text-amber-900 px-1 py-0.5 rounded">
+                          DEV
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleDevViewPdf}
+                          disabled={isGeneratingDevPdf}
+                          className="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold transition-colors cursor-pointer text-[10px] inline-flex items-center gap-1"
+                          title="Developer Testing: View full paid PDF in new tab"
+                        >
+                          <FileText className="w-3 h-3 text-amber-700" />
+                          <span>View Full (Test)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDevDownloadPdf}
+                          disabled={isGeneratingDevPdf}
+                          className="px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold transition-colors cursor-pointer text-[10px] inline-flex items-center gap-1"
+                          title="Developer Testing: Download full paid PDF file"
+                        >
+                          <Download className="w-3 h-3 text-white" />
+                          <span>Download (Test)</span>
+                        </button>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowUnlockModal(true)}
+                      className="hutty-btn-primary px-3.5 py-1.5 text-xs rounded-lg font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
+                      <span>Unlock Detailed Report &bull; ₹4,999</span>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

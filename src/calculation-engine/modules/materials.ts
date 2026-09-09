@@ -16,7 +16,7 @@ import {
   MaterialScheduleItem,
   ProcurementItem,
 } from '../types';
-import { getBrandRate } from '../data/brandDatabase';
+import { getBrandRate, getElectricalWireRate } from '../data/brandDatabase';
 
 export function generateMaterialSchedule(
   input: EngineInput,
@@ -285,20 +285,92 @@ export function generateMaterialSchedule(
     sourceFormula: 'Drainage Points × 3.5m + Vertical Soil Stack Risers',
   });
 
-  // 14. Electrical FRLS Copper Wire
-  slNo++;
-  items.push({
-    slNo,
-    material: 'FRLS Multi-Strand Copper Electrical Cable',
-    category: 'Pipes & Wire',
-    brand: materialBrands?.electrical || input.electrical?.wireTier || 'Finolex / Polycab',
-    specification: 'Flame Retardant Low Smoke IS 694 copper single-core wire (1.5, 2.5, 4.0 sq.mm)',
-    quantity: qty.electricalWireMetres,
-    unit: 'Metres',
-    unitRate: 38,
-    amount: qty.electricalWireMetres * 38,
-    sourceFormula: 'Electrical Points × 5.5m + Main Circuit Runs + EV Charger Allowance',
-  });
+  // 14. Electrical Wiring & Conduit (Segregated by Conductor Gauge)
+  const elecBrand = materialBrands?.electrical || input.electrical?.wireTier || 'Finolex / Polycab';
+  const wireRate1_5 = getElectricalWireRate(elecBrand, '1.5');
+  const wireRate2_5 = getElectricalWireRate(elecBrand, '2.5');
+  const wireRate4_0 = getElectricalWireRate(elecBrand, '4.0');
+  const wireRate6_0 = getElectricalWireRate(elecBrand, '6.0');
+
+  if (qty.wire1_5SqMmMetres > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: '1.5 sq.mm FRLS Copper Electrical Wire (Lighting & Fans)',
+      category: 'Pipes & Wire',
+      brand: elecBrand,
+      specification: 'Flame Retardant Low Smoke IS 694 copper single-core wire',
+      quantity: qty.wire1_5SqMmMetres,
+      unit: 'Metres',
+      unitRate: wireRate1_5,
+      amount: qty.wire1_5SqMmMetres * wireRate1_5,
+      sourceFormula: '(Light Points + Fan Points) × 8.5m circuit loop',
+    });
+  }
+
+  if (qty.wire2_5SqMmMetres > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: '2.5 sq.mm FRLS Copper Electrical Wire (Sockets & Consoles)',
+      category: 'Pipes & Wire',
+      brand: elecBrand,
+      specification: 'Flame Retardant Low Smoke IS 694 copper single-core wire',
+      quantity: qty.wire2_5SqMmMetres,
+      unit: 'Metres',
+      unitRate: wireRate2_5,
+      amount: qty.wire2_5SqMmMetres * wireRate2_5,
+      sourceFormula: '(Socket Points + TV/Data Points) × 12.5m run',
+    });
+  }
+
+  if (qty.wire4SqMmMetres > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: '4.0 sq.mm FRLS Copper Dedicated Circuit Wire (AC & Geysers)',
+      category: 'Pipes & Wire',
+      brand: elecBrand,
+      specification: 'Flame Retardant Low Smoke IS 694 heavy appliance conductor',
+      quantity: qty.wire4SqMmMetres,
+      unit: 'Metres',
+      unitRate: wireRate4_0,
+      amount: qty.wire4SqMmMetres * wireRate4_0,
+      sourceFormula: '(AC Points + Geyser Points) × 22m dedicated homerun',
+    });
+  }
+
+  if (qty.wire6SqMmMetres > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: '6.0 sq.mm FRLS Copper Sub-Main Distribution Risers & EV Supply',
+      category: 'Pipes & Wire',
+      brand: elecBrand,
+      specification: 'Flame Retardant Low Smoke IS 694 sub-main distribution cable',
+      quantity: qty.wire6SqMmMetres,
+      unit: 'Metres',
+      unitRate: wireRate6_0,
+      amount: qty.wire6SqMmMetres * wireRate6_0,
+      sourceFormula: 'Upper Floors × 35m + EV Charger 35m',
+    });
+  }
+
+  if (qty.conduitsMetres > 0) {
+    slNo++;
+    items.push({
+      slNo,
+      material: 'Heavy-Duty PVC Conduit Pipe (25mm ISI Embedded)',
+      category: 'Pipes & Wire',
+      brand: 'Precision PVC ISI',
+      specification: '25mm diameter heavy-gauge rigid PVC conduit with accessories',
+      quantity: qty.conduitsMetres,
+      unit: 'Metres',
+      unitRate: 35,
+      amount: qty.conduitsMetres * 35,
+      sourceFormula: 'Points × 2.6m + Floor Risers + EV Conduit',
+    });
+  }
 
   return items;
 }

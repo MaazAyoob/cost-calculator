@@ -209,6 +209,22 @@ export function generateFixtureSchedule(
     location: 'Each Floor Electrical Shaft',
   });
 
+  if (input.evCharging) {
+    slNo++;
+    fixtures.push({
+      slNo,
+      category: 'Electrical Fixtures',
+      item: 'Dedicated EV Charging Station Point (32A Level 2 Provision)',
+      brand: 'Schneider / Legrand',
+      specification: '32A industrial socket with dedicated MCB isolator & weatherproof IP66 enclosure',
+      quantity: 1,
+      unit: 'Units',
+      unitRate: 12500,
+      amount: 12500,
+      location: 'Parking Bay / Garage',
+    });
+  }
+
   // ── 5. Plumbing Tanks & Pumps ──
   if (qty.overheadTankLitres > 0) {
     slNo++;

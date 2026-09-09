@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWizardStore, CityLocation, HouseType, ParkingTypeOption } from '../../../store/useWizardStore';
 import { useArea } from '../../../store/useCalculationStore';
 import {
@@ -14,6 +14,8 @@ import {
   HelpCircle,
   ArrowRight,
   Sparkles,
+  Plus,
+  Minus,
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
@@ -59,9 +61,17 @@ export const Step1BasicInfo: React.FC = () => {
   const buaPerFloor = Math.round(activeBUA / numFloors);
   const excessBUA = area.excessBUASqFt || Math.max(0, activeBUA - maxBUA);
 
-  // Dynamic Slider Bounds (Support large plots without arbitrary limits)
-  const sliderMin = Math.max(100, Math.min(minBUA, activeBUA));
-  const sliderMax = Math.max(sliderMin + 200, Math.max(Math.round(maxBUA * 1.2), Math.round(activeBUA * 1.15)));
+  // Dynamic Slider Bounds: strictly bounded by plot dimensions (plotArea * numFloors)
+  const plotDimensionBUA = plotArea > 0 ? plotArea * numFloors : 2000;
+  const sliderMin = Math.max(100, Math.round(minBUA));
+  const sliderMax = Math.max(sliderMin + 100, plotDimensionBUA);
+
+  // Keep userSelectedBUA clamped if it ever exceeds the plot dimension ceiling
+  useEffect(() => {
+    if (plotArea > 0 && userSelectedBUA !== null && userSelectedBUA > sliderMax) {
+      setUserSelectedBUA(sliderMax);
+    }
+  }, [sliderMax, userSelectedBUA, plotArea, setUserSelectedBUA]);
 
   // Dynamic Plot Slider Limits (keep smooth slider UX while letting slider expand to match entered values)
   const lengthSliderMax = Math.max(120, Math.ceil((plotLength || 40) * 1.25));
@@ -202,7 +212,12 @@ export const Step1BasicInfo: React.FC = () => {
   const handleBUAChange = (valStr: string) => {
     const parsed = parseFloat(valStr);
     const safeVal = isNaN(parsed) ? 0 : Math.max(0, Math.round(parsed));
-    setUserSelectedBUA(safeVal > 0 ? safeVal : null);
+    if (safeVal > 0) {
+      const capped = plotArea > 0 ? Math.min(safeVal, sliderMax) : safeVal;
+      setUserSelectedBUA(capped);
+    } else {
+      setUserSelectedBUA(null);
+    }
   };
 
   return (
@@ -580,10 +595,10 @@ export const Step1BasicInfo: React.FC = () => {
             <div className="flex items-center gap-1 mt-0.5 bg-white px-2 py-0.5 rounded-md border border-[#E5E7EB] focus-within:border-[#1B3D34] shadow-2xs">
               <input
                 type="number"
-                min={1}
-                max={1000000}
+                min={sliderMin}
+                max={sliderMax}
                 step={10}
-                value={activeBUA === 0 ? '' : activeBUA}
+                value={activeBUA === 0 ? '' : Math.min(sliderMax, activeBUA)}
                 placeholder="0"
                 onChange={(e) => handleBUAChange(e.target.value)}
                 className="w-full text-right font-mono text-base font-black text-[#1B3D34] bg-transparent focus:outline-none"
@@ -607,30 +622,65 @@ export const Step1BasicInfo: React.FC = () => {
             </span>
           </div>
 
-          <div className="relative pt-2 pb-1">
-            <input
-              type="range"
-              min={sliderMin}
-              max={sliderMax}
-              step={10}
-              value={activeBUA}
-              disabled={plotArea === 0}
-              onChange={(e) => setUserSelectedBUA(Number(e.target.value))}
-              className="hutty-slider w-full cursor-pointer disabled:opacity-40"
-            />
+          <div className="flex items-center gap-2 pt-2 pb-1">
+            {/* Minus Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const current = activeBUA || sliderMin;
+                const nextVal = Math.max(sliderMin, current - 10);
+                setUserSelectedBUA(nextVal);
+              }}
+              disabled={plotArea === 0 || activeBUA <= sliderMin}
+              aria-label="Decrease proposed BUA by 10 sq.ft"
+              title="Decrease BUA by 10 sq.ft"
+              className="w-8 h-8 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] hover:bg-[#1B3D34] hover:text-white hover:border-[#1B3D34] text-[#1B3D34] flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer shrink-0 shadow-2xs"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
 
-            {/* Recommended Marker Dot on Track */}
-            {plotArea > 0 && recMarkerPct >= 0 && recMarkerPct <= 100 && (
-              <div
-                className="absolute top-0 flex flex-col items-center pointer-events-none -translate-x-1/2"
-                style={{ left: `${recMarkerPct}%` }}
-              >
-                <span className="text-[9px] font-bold font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.1)] px-1.5 py-0.2 rounded border border-[#1B3D34]/20 shadow-2xs whitespace-nowrap">
-                  Rec: {recBUA.toLocaleString()}
-                </span>
-                <div className="w-1.5 h-1.5 bg-[#1B3D34] rotate-45 mt-0.5" />
-              </div>
-            )}
+            {/* Slider Track with Recommended Marker */}
+            <div className="relative flex-1">
+              <input
+                type="range"
+                min={sliderMin}
+                max={sliderMax}
+                step={10}
+                value={Math.min(sliderMax, Math.max(sliderMin, activeBUA))}
+                disabled={plotArea === 0}
+                onChange={(e) => setUserSelectedBUA(Number(e.target.value))}
+                className="hutty-slider w-full cursor-pointer disabled:opacity-40"
+              />
+
+              {/* Recommended Marker Dot on Track */}
+              {plotArea > 0 && recMarkerPct >= 0 && recMarkerPct <= 100 && (
+                <div
+                  className="absolute top-0 flex flex-col items-center pointer-events-none -translate-x-1/2"
+                  style={{ left: `${recMarkerPct}%` }}
+                >
+                  <span className="text-[9px] font-bold font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.1)] px-1.5 py-0.2 rounded border border-[#1B3D34]/20 shadow-2xs whitespace-nowrap">
+                    Rec: {recBUA.toLocaleString()}
+                  </span>
+                  <div className="w-1.5 h-1.5 bg-[#1B3D34] rotate-45 mt-0.5" />
+                </div>
+              )}
+            </div>
+
+            {/* Plus Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const current = activeBUA || sliderMin;
+                const nextVal = Math.min(sliderMax, current + 10);
+                setUserSelectedBUA(nextVal);
+              }}
+              disabled={plotArea === 0 || activeBUA >= sliderMax}
+              aria-label="Increase proposed BUA by 10 sq.ft"
+              title="Increase BUA by 10 sq.ft"
+              className="w-8 h-8 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] hover:bg-[#1B3D34] hover:text-white hover:border-[#1B3D34] text-[#1B3D34] flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer shrink-0 shadow-2xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <div className="flex justify-between items-center text-[10px] font-mono text-[#4B5563]">

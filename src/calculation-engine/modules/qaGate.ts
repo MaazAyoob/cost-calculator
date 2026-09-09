@@ -13,7 +13,7 @@
 // 7. Bathroom fixture counts match configuration or explicit overrides
 // 8. Unit consistency (no unit mismatches)
 // 9. Required mandatory inputs exist
-// 10. Rate metadata exists
+// 10. Rate Master metadata & Electrical pricing reconciliation
 // 11. Traceability metadata exists
 // ============================================================
 
@@ -274,25 +274,72 @@ export function runQAGate(data: CalculationResult): QAGateResult {
     blockingErrors.push('Missing mandatory project configuration inputs.');
   }
 
-  // ── CHECK 10: Rate Metadata Completeness ──
-  // Check that items have rates > 0
+  // ── CHECK 10: Rate Master Metadata & Electrical Reconciliation (P0.8) ──
+  // Verifies all items have positive rates, conductor sizing is segregated, and
+  // electrical line items mathematically reconcile with active Rate Master metadata
   let missingRateCount = 0;
+  const rateErrors: string[] = [];
+
   (boq || []).forEach((item) => {
-    if (!item.unitRate || item.unitRate <= 0) missingRateCount++;
+    if (!item.unitRate || item.unitRate <= 0) {
+      missingRateCount++;
+      rateErrors.push(`Item '${item.description}' missing positive unit rate`);
+    }
   });
+
+  const electricalBoqItems = (boq || []).filter(
+    (item) => item.category === 'Electrical' || item.code.startsWith('EL-') || item.code.startsWith('BOQ-ELEC-')
+  );
+
+  if (!isZeroState && (input?.floors || 0) > 0) {
+    if (electricalBoqItems.length === 0) {
+      missingRateCount++;
+      rateErrors.push('Missing segregated electrical BOQ line items.');
+    }
+
+    electricalBoqItems.forEach((item) => {
+      const expected = Math.round(item.quantity * item.unitRate);
+      if (Math.abs(expected - item.amount) > 2) {
+        missingRateCount++;
+        rateErrors.push(`Electrical item '${item.description}': ${item.quantity} × ₹${item.unitRate} = ₹${expected}, recorded ₹${item.amount}`);
+      }
+    });
+
+    const conduitVal = quantities?.conduitsMetres || (quantities as any)?.conduitMetres || 0;
+    // wire1_5SqMmMetres (lighting/fans) and conduit are always present when floors > 0.
+    // wire2_5SqMmMetres (sockets) is only expected when rooms with sockets are configured.
+    const hasSocketRooms = (input?.rooms?.bedrooms || 0) + (input?.rooms?.living || 0) +
+      (input?.rooms?.kitchen || 0) + (input?.rooms?.dining || 0) + (input?.rooms?.office || 0) > 0;
+    const wire2_5Passes = !hasSocketRooms || (quantities?.wire2_5SqMmMetres || 0) > 0;
+    if (
+      (quantities?.wire1_5SqMmMetres || 0) <= 0 ||
+      !wire2_5Passes ||
+      conduitVal <= 0
+    ) {
+      missingRateCount++;
+      rateErrors.push('Segregated conductor or conduit takeoff has non-positive quantities.');
+    }
+
+    const rateMeta = data.rateSourceMetadata || data.report?.rateSourceMetadata;
+    if (!rateMeta || (!rateMeta.datasetVersion && !rateMeta.version)) {
+      missingRateCount++;
+      rateErrors.push('Missing Rate Source Metadata / Rate Master dataset version.');
+    }
+  }
+
   const check10Passed = missingRateCount === 0;
   checks.push({
     id: 'CHECK_RATE_METADATA',
-    name: 'Rate Master Metadata & Pricing',
+    name: 'Rate Master Metadata & Electrical Pricing Reconciliation',
     passed: check10Passed,
     isBlocking: true,
     message: check10Passed
-      ? 'All active items have verified positive rates.'
-      : `${missingRateCount} item(s) have missing or zero unit rates.`,
-    details: { missingRateCount },
+      ? `All active items have verified positive rates and all ${electricalBoqItems.length} electrical line items mathematically reconcile.`
+      : `${missingRateCount} item(s) failed rate or electrical reconciliation: ${rateErrors.slice(0, 3).join('; ')}`,
+    details: { missingRateCount, rateErrors: rateErrors.slice(0, 5) },
   });
   if (!check10Passed && !isZeroState) {
-    blockingErrors.push(`${missingRateCount} line item(s) missing valid rate metadata.`);
+    blockingErrors.push(`Rate Master / Electrical failure: ${rateErrors[0]}`);
   }
 
   // ── CHECK 11: Calculation Traceability Metadata ──

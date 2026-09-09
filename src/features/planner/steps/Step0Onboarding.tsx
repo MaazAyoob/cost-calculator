@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useWizardStore } from '../../../store/useWizardStore';
 import {
   CONSTRUCTION_PACKAGES,
   ConstructionPackageId,
 } from '../../../calculation-engine/data/packageConfig';
-import { ArrowRight, Check, Shield, Award, Sparkles, Play, Layers } from 'lucide-react';
+import { Check, Shield, Award, Sparkles, Play } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
 export const Step0Onboarding: React.FC = () => {
   const { selectedPackage, setSelectedPackage, hasStartedSelection, setStep } = useWizardStore();
+  const isNavigatingRef = useRef(false);
+
+  useEffect(() => {
+    isNavigatingRef.current = false;
+  }, []);
 
   const packagesList: {
     id: ConstructionPackageId;
@@ -49,12 +54,17 @@ export const Step0Onboarding: React.FC = () => {
     },
   ];
 
-  const handleSelectPackage = (pkgId: ConstructionPackageId) => {
-    setSelectedPackage(pkgId, true);
-  };
+  const handleSelectPackageAndAdvance = (pkgId: ConstructionPackageId, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (isNavigatingRef.current) return;
+    isNavigatingRef.current = true;
 
-  const handleContinue = () => {
-    setSelectedPackage(selectedPackage || 'PREMIUM', true);
+    // 1. Select package & apply default specifications
+    setSelectedPackage(pkgId, true);
+
+    // 2. Immediately navigate from Step 0 to Step 1 (Plot Dimensions & Site)
     setStep(1);
   };
 
@@ -91,7 +101,7 @@ export const Step0Onboarding: React.FC = () => {
               key={id}
               whileHover={{ y: -3 }}
               transition={{ duration: 0.2 }}
-              onClick={() => handleSelectPackage(id)}
+              onClick={(e) => handleSelectPackageAndAdvance(id, e)}
               className={cn(
                 'relative p-6 sm:p-7 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-5 bg-white tactile-card',
                 isSelected
@@ -176,51 +186,44 @@ export const Step0Onboarding: React.FC = () => {
               </div>
 
               <div className="pt-3 border-t border-[#E5E7EB]">
-                <div
+                <button
+                  type="button"
+                  onClick={(e) => handleSelectPackageAndAdvance(id, e)}
                   className={cn(
-                    'w-full py-2 px-3 rounded-lg text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5',
+                    'w-full py-2.5 px-3 rounded-lg text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer',
                     isSelected
                       ? 'bg-[#1B3D34] text-white shadow-2xs'
-                      : 'bg-[#F8F8F6] text-[#4B5563] hover:text-[#1B3D34]'
+                      : 'bg-[#F8F8F6] text-[#4B5563] hover:bg-[rgba(27,61,52,0.06)] hover:text-[#1B3D34]'
                   )}
                 >
                   {isSelected ? (
                     <>
                       <Check className="w-3.5 h-3.5" />
-                      <span>Selected Standard</span>
+                      <span>Selected {pkg.title}</span>
                     </>
                   ) : (
                     <span>Select {pkg.title}</span>
                   )}
-                </div>
+                </button>
               </div>
             </motion.div>
           );
         })}
       </div>
 
-      {/* Action Footer */}
-      <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="hutty-btn-primary px-8 py-3.5 rounded-xl text-xs sm:text-sm font-bold w-full sm:w-auto cursor-pointer shadow-xs flex items-center justify-center gap-2"
-        >
-          <span>Continue with {CONSTRUCTION_PACKAGES[selectedPackage || 'PREMIUM']?.title}</span>
-          <ArrowRight className="w-4 h-4 text-[#F28C28]" />
-        </button>
-
-        {hasStartedSelection && (
+      {/* Action Footer: Resume Project (when user has already started a project) */}
+      {hasStartedSelection && (
+        <div className="pt-2 flex items-center justify-center">
           <button
             type="button"
             onClick={() => setStep(1)}
-            className="hutty-btn-secondary px-6 py-3.5 rounded-xl text-xs font-bold w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2"
+            className="hutty-btn-secondary px-6 py-3 rounded-xl text-xs font-bold w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2"
           >
             <Play className="w-3.5 h-3.5 text-[#1B3D34]" />
             <span>Resume Current Project</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Reassurance text */}
       <p className="text-[11px] text-[#4B5563]">

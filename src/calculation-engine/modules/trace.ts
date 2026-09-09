@@ -221,32 +221,157 @@ export function generateCalculationTrace(
     result: quantities.cpvcSupplyMetres,
   });
 
-  // 8. Electrical Wiring Cable (P0.4 Specification)
-  const cableRate = 38;
-  const cableAmount = quantities.electricalWireMetres * cableRate;
+  // 8. Electrical Wiring & Conduit Traceability (P0.4 & Electrical Developer Audit)
+  const elecBrand = input.materialBrands?.electrical || input.electrical?.wireTier || 'Finolex';
+  const r1_5 = 28;
+  const r2_5 = 44;
+  const r4_0 = 68;
+  const r6_0 = 102;
+  const rConduit = 35;
+
+  const totalWireMetres = (quantities.wire1_5SqMmMetres || 0) + (quantities.wire2_5SqMmMetres || 0) + (quantities.wire4SqMmMetres || 0) + (quantities.wire6SqMmMetres || 0);
   steps.push({
     ruleId: 'RULE-CABLE-01',
-    parameter: 'electricalWireMetres',
+    parameter: 'electricalWiringTakeoff',
     category: 'MEP / ELECTRICAL',
     tradeCategory: 'Electrical MEP',
     inputs: {
-      totalElectricalPoints: quantities.totalElectricalPoints,
+      totalBUASqFt: bua,
+      floorsCount: floors,
       lightingPoints: quantities.lightingPoints,
-      powerSockets: quantities.socketPoints,
+      socketPoints: quantities.socketPoints,
       acPoints: quantities.acPoints,
-      circuitAssumptionMetersPerPoint: 5.2,
-      mainDistributionLoopFactor: 1.15,
+      geyserPoints: quantities.geyserPoints,
+      evCharging: input.evCharging,
     },
-    formula: 'Total Electrical Points × 5.2m routing factor × 1.15 circuit homerun factor',
-    rawQuantity: Math.round(quantities.totalElectricalPoints * 5.2),
-    adjustments: '15% circuit home-run allowance to distribution boards',
-    finalQuantity: quantities.electricalWireMetres,
+    formula: 'Segregated Point-to-Point Conductor Sizing (1.5, 2.5, 4.0, 6.0 sq.mm Takeoff)',
+    rawQuantity: totalWireMetres,
+    adjustments: '1.5mm² (8.5m/pt), 2.5mm² (12.5m/pt), 4.0mm² (22m/pt), 6.0mm² (risers & EV)',
+    finalQuantity: totalWireMetres,
     unit: 'Metres',
-    unitRate: cableRate,
-    amount: cableAmount,
-    assumption: 'FRLS Copper multi-strand wiring (1.5, 2.5, 4.0 sq.mm circuits) in concealed PVC conduit.',
-    explanation: `${quantities.totalElectricalPoints} electrical draw points (lights, fans, 16A power sockets, ACs) require ${quantities.electricalWireMetres} metres of FRLS copper wire.`,
-    result: quantities.electricalWireMetres,
+    unitRate: r2_5,
+    amount: totalWireMetres * r2_5,
+    assumption: 'Segregated FRLS copper multi-strand conductors sized according to circuit load.',
+    explanation: `Total segregated electrical wire takeoff of ${totalWireMetres} metres across 1.5mm², 2.5mm², 4.0mm², and 6.0mm² gauges derived from room-driven points.`,
+    result: totalWireMetres,
+  });
+
+  steps.push({
+    ruleId: 'RULE-WIRE-1.5MM-01',
+    parameter: 'wire1_5SqMmMetres',
+    category: 'MEP / ELECTRICAL',
+    tradeCategory: 'Electrical MEP',
+    inputs: {
+      lightingPoints: quantities.lightingPoints,
+      fanPoints: quantities.fanPoints,
+      conductorsPerPoint: 3, // Phase, Neutral, Earth
+      averageRouteLengthM: 2.8,
+      singleCoreMultiplier: 8.5,
+    },
+    formula: '(Lighting Points + Fan Points) × 8.5m single-core conductor run',
+    rawQuantity: (quantities.lightingPoints + quantities.fanPoints) * 8.5,
+    adjustments: 'Includes switch-to-ceiling loop and return neutral',
+    finalQuantity: quantities.wire1_5SqMmMetres,
+    unit: 'Metres',
+    unitRate: r1_5,
+    amount: quantities.wire1_5SqMmMetres * r1_5,
+    assumption: '1.5 sq.mm FRLS copper multi-strand wire for all lighting and fan draw points.',
+    explanation: `${quantities.lightingPoints + quantities.fanPoints} lighting and fan points require ${quantities.wire1_5SqMmMetres} metres of 1.5 sq.mm FRLS copper wire.`,
+    result: quantities.wire1_5SqMmMetres,
+  });
+
+  steps.push({
+    ruleId: 'RULE-WIRE-2.5MM-01',
+    parameter: 'wire2_5SqMmMetres',
+    category: 'MEP / ELECTRICAL',
+    tradeCategory: 'Electrical MEP',
+    inputs: {
+      socketPoints: quantities.socketPoints,
+      tvDataPoints: quantities.tvDataPoints,
+      conductorsPerPoint: 3,
+      averageRouteLengthM: 4.1,
+      singleCoreMultiplier: 12.5,
+    },
+    formula: '(Socket Points + TV/Data Points) × 12.5m single-core conductor run',
+    rawQuantity: (quantities.socketPoints + quantities.tvDataPoints) * 12.5,
+    adjustments: 'Ring circuit / radial circuit loop to floor sub-DB',
+    finalQuantity: quantities.wire2_5SqMmMetres,
+    unit: 'Metres',
+    unitRate: r2_5,
+    amount: quantities.wire2_5SqMmMetres * r2_5,
+    assumption: '2.5 sq.mm FRLS copper wire for 6A/16A utility and power outlets.',
+    explanation: `${quantities.socketPoints + quantities.tvDataPoints} socket and entertainment console outlets require ${quantities.wire2_5SqMmMetres} metres of 2.5 sq.mm wire.`,
+    result: quantities.wire2_5SqMmMetres,
+  });
+
+  steps.push({
+    ruleId: 'RULE-WIRE-4.0MM-01',
+    parameter: 'wire4SqMmMetres',
+    category: 'MEP / ELECTRICAL',
+    tradeCategory: 'Electrical MEP',
+    inputs: {
+      acPoints: quantities.acPoints,
+      geyserPoints: quantities.geyserPoints,
+      dedicatedHomerunMeters: 22.0,
+    },
+    formula: '(AC Points + Geyser Points) × 22.0m dedicated circuit run',
+    rawQuantity: (quantities.acPoints + quantities.geyserPoints) * 22.0,
+    adjustments: 'Dedicated independent home-run cable per high-draw appliance',
+    finalQuantity: quantities.wire4SqMmMetres,
+    unit: 'Metres',
+    unitRate: r4_0,
+    amount: quantities.wire4SqMmMetres * r4_0,
+    assumption: '4.0 sq.mm heavy-duty FRLS copper wire for AC compressor and geyser heating loads.',
+    explanation: `${quantities.acPoints + quantities.geyserPoints} heavy appliance points (ACs & Geysers) require ${quantities.wire4SqMmMetres} metres of 4.0 sq.mm dedicated wiring.`,
+    result: quantities.wire4SqMmMetres,
+  });
+
+  if (quantities.wire6SqMmMetres > 0) {
+    steps.push({
+      ruleId: 'RULE-WIRE-6.0MM-01',
+      parameter: 'wire6SqMmMetres',
+      category: 'MEP / ELECTRICAL',
+      tradeCategory: 'Electrical MEP',
+      inputs: {
+        floors: input.floors,
+        upperFloors: Math.max(0, (input.floors || 1) - 1),
+        evCharging: input.evCharging,
+        shaftRiserRunPerFloorM: 35.0,
+      },
+      formula: 'Upper Floors × 35m + (EV Charging ? 35m : 0m)',
+      rawQuantity: quantities.wire6SqMmMetres,
+      adjustments: 'Distribution shaft risers connecting Main DB to each Floor Sub-DB + EV Charger line',
+      finalQuantity: quantities.wire6SqMmMetres,
+      unit: 'Metres',
+      unitRate: r6_0,
+      amount: quantities.wire6SqMmMetres * r6_0,
+      assumption: '6.0 sq.mm heavy sub-main distribution cable for inter-floor supply and Level 2 EV charging.',
+      explanation: `${quantities.wire6SqMmMetres} metres of 6.0 sq.mm cable installed for electrical vertical riser distribution and EV supply.`,
+      result: quantities.wire6SqMmMetres,
+    });
+  }
+
+  steps.push({
+    ruleId: 'RULE-CONDUIT-01',
+    parameter: 'conduitsMetres',
+    category: 'MEP / ELECTRICAL',
+    tradeCategory: 'Electrical MEP',
+    inputs: {
+      totalPoints: quantities.totalElectricalPoints,
+      conduitPerPointM: 2.6,
+      verticalShaftAllowanceM: Math.max(0, (input.floors || 1) - 1) * 15,
+      evConduitM: input.evCharging ? 12 : 0,
+    },
+    formula: 'Total Points × 2.6m + Floor Risers × 15m + EV Conduit',
+    rawQuantity: quantities.conduitsMetres,
+    adjustments: 'Includes ceiling slab casting embedment and brick wall chase drops',
+    finalQuantity: quantities.conduitsMetres,
+    unit: 'Metres',
+    unitRate: rConduit,
+    amount: quantities.conduitsMetres * rConduit,
+    assumption: 'Heavy-Duty 25mm ISI marked rigid PVC conduit embedded in slab and walls.',
+    explanation: `${quantities.totalElectricalPoints} total points across ${input.floors || 1} floors require ${quantities.conduitsMetres} metres of concealed rigid conduit.`,
+    result: quantities.conduitsMetres,
   });
 
   // 9. Windows & Fenestration (P0.1 Specification)

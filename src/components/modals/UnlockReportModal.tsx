@@ -3,7 +3,8 @@ import { useEntitlementStore } from '../../store/useEntitlementStore';
 import { useReportStore } from '../../store/useReportStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { useWizardStore } from '../../store/useWizardStore';
-import { generateAndDownloadDetailedReportPdf } from '../../features/report/pdfService';
+import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from '../../features/report/pdfService';
+import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { X, Check, Lock, Download, ShieldCheck, FileText, ArrowRight, Loader2 } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 
@@ -25,10 +26,45 @@ export const UnlockReportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'netbanking'>('upi');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isDevGenerating, setIsDevGenerating] = useState(false);
 
   if (!isOpen) return null;
 
   const projectId = result.report?.projectId || 'HUTTY-PROJ-01';
+
+  const handleDevViewPdf = async () => {
+    if (!isDevPdfTestingEnabled()) return;
+    setIsDevGenerating(true);
+    try {
+      await viewDetailedReportPdfInNewTab({
+        data: result,
+        projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+        preparedFor: name || preparedFor || 'Developer Testing',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      console.error('Dev PDF preview error:', err);
+    } finally {
+      setIsDevGenerating(false);
+    }
+  };
+
+  const handleDevDownloadPdf = async () => {
+    if (!isDevPdfTestingEnabled()) return;
+    setIsDevGenerating(true);
+    try {
+      await generateAndDownloadDetailedReportPdf({
+        data: result,
+        projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+        preparedFor: name || preparedFor || 'Developer Testing',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      console.error('Dev PDF download error:', err);
+    } finally {
+      setIsDevGenerating(false);
+    }
+  };
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,6 +255,38 @@ export const UnlockReportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
                   </>
                 )}
               </button>
+
+              {/* Developer Testing Mode (Explicit dev env only) */}
+              {isDevPdfTestingEnabled() && (
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-300 rounded-xl space-y-2 text-left">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">
+                      DEVELOPER TESTING ONLY
+                    </span>
+                    <span className="text-[10px] text-amber-800 font-medium">Bypass payment for testing</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleDevViewPdf}
+                      disabled={isDevGenerating}
+                      className="w-full py-2 px-3 bg-amber-100 hover:bg-amber-200 text-amber-950 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-amber-700" />
+                      <span>{isDevGenerating ? 'Compiling...' : 'View Full PDF (Testing)'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDevDownloadPdf}
+                      disabled={isDevGenerating}
+                      className="w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <Download className="w-3.5 h-3.5 text-white" />
+                      <span>Download Full PDF (Testing)</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </form>
           </>
         ) : (

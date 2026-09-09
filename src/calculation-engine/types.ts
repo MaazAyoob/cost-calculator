@@ -5,8 +5,10 @@
 
 import { QualityTier, CityLocation, HouseType, RoomCounts, MaterialBrandSelection } from '../store/useWizardStore';
 import { QSParameterItem } from './data/engineeringAssumptions';
+import { RateSourceMetadata } from './data/rateService';
 
 export type { QSParameterItem } from './data/engineeringAssumptions';
+export type { RateSourceMetadata } from './data/rateService';
 
 // ────────────────────────────────────────────────────────────
 // INPUT MODEL
@@ -346,9 +348,18 @@ export interface MaterialQuantities {
   fanPoints: number;
   socketPoints: number;
   acPoints: number;
+  geyserPoints: number;
+  tvDataPoints: number;
+  evPoints: number;
+  mainDBCount: number;
+  floorDBCount: number;
   switchModules: number;
   conduitsMetres: number;
   electricalWireMetres: number;
+  wire1_5SqMmMetres: number;
+  wire2_5SqMmMetres: number;
+  wire4SqMmMetres: number;
+  wire6SqMmMetres: number;
   // Plumbing & Sanitary
   totalWaterPoints: number;
   totalDrainagePoints: number;
@@ -590,6 +601,7 @@ export interface ReportData {
   recommendations: string[];
   trace: CalculationTraceStep[];
   parameterTable: QSParameterItem[];
+  rateSourceMetadata?: RateSourceMetadata;
   qaResult?: QAGateResult;
   commercialReconciliation?: CommercialReconciliation;
 }
@@ -616,6 +628,7 @@ export interface CalculationResult {
   report: ReportData;
   trace: CalculationTraceStep[];
   parameterTable: QSParameterItem[];
+  rateSourceMetadata?: RateSourceMetadata;
   qaResult?: QAGateResult;
   commercialReconciliation?: CommercialReconciliation;
   calculatedAt: string;

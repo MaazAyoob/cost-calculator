@@ -1,24 +1,33 @@
 import { AuthorityRuleSet, AuthorityCalculationResult, SetbackRuleSlab, FARRuleSlab } from './types';
 import { BENGALURU_AUTHORITY_RULES } from './bengaluru';
 import { MYSURU_AUTHORITY_RULES } from './mysuru';
+import { GRAM_PANCHAYAT_AUTHORITY_RULES } from './gramPanchayat';
 import { SetbackGeometry } from '../../types';
 
 export * from './types';
 export { BENGALURU_AUTHORITY_RULES } from './bengaluru';
 export { MYSURU_AUTHORITY_RULES } from './mysuru';
+export { GRAM_PANCHAYAT_AUTHORITY_RULES } from './gramPanchayat';
 
 const AUTHORITY_REGISTRY: Record<string, AuthorityRuleSet> = {
   bangalore: BENGALURU_AUTHORITY_RULES,
   bengaluru: BENGALURU_AUTHORITY_RULES,
+  bbmp: BENGALURU_AUTHORITY_RULES,
+  bda: BENGALURU_AUTHORITY_RULES,
   mysore: MYSURU_AUTHORITY_RULES,
   mysuru: MYSURU_AUTHORITY_RULES,
+  muda: MYSURU_AUTHORITY_RULES,
+  'gram panchayat': GRAM_PANCHAYAT_AUTHORITY_RULES,
+  'grama panchayat': GRAM_PANCHAYAT_AUTHORITY_RULES,
+  panchayat: GRAM_PANCHAYAT_AUTHORITY_RULES,
+  rural: GRAM_PANCHAYAT_AUTHORITY_RULES,
 };
 
 /**
- * Returns the verified authority rule set for a given city
+ * Returns the verified authority rule set for a given city or municipal authority
  */
-export function getAuthorityRules(city?: string | null): AuthorityRuleSet {
-  const normalized = (city || 'bangalore').toLowerCase().trim();
+export function getAuthorityRules(cityOrAuthority?: string | null): AuthorityRuleSet {
+  const normalized = (cityOrAuthority || 'bangalore').toLowerCase().trim();
   return AUTHORITY_REGISTRY[normalized] || BENGALURU_AUTHORITY_RULES;
 }
 
