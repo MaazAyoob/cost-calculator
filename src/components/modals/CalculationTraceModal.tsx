@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalculationTraceStep } from '../../calculation-engine/types';
-import { X, ChevronDown, ChevronUp, Calculator, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, Calculator, ShieldAlert } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 
 export interface CalculationTraceModalProps {

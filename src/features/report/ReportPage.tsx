@@ -10,7 +10,7 @@ import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
 import { CalculationTraceModal } from '../../components/modals/CalculationTraceModal';
 import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from './pdfService';
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
-import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Check, Sparkles, FileText, ArrowRight, Calculator } from 'lucide-react';
+import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Sparkles, FileText, ArrowRight, Calculator } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';

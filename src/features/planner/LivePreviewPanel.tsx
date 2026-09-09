@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useWizardStore } from '../../store/useWizardStore';
 import {
   useBudgetResult,
   useArea,
   useQuantities,
-  useBuildingModel,
 } from '../../store/useCalculationStore';
 import {
   getCustomizationDiff,
@@ -21,8 +20,6 @@ import {
   Calculator,
   X,
   Sparkles,
-  Award,
-  Layers,
 } from 'lucide-react';
 
 interface LivePreviewPanelProps {
@@ -61,7 +58,6 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
   const budget = useBudgetResult();
   const area = useArea();
   const quantities = useQuantities();
-  const buildingModel = useBuildingModel();
 
   const totalCost = budget.totalProjectCost || 0;
   const buaSqFt = area.totalBUASqFt || 0;

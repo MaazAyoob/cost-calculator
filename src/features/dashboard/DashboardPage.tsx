@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { pageFadeVariant } from '../../animations/variants';
-import { useBudgetResult, useArea, useBOQ, useCalculationStore } from '../../store/useCalculationStore';
+import { useBudgetResult, useArea, useCalculationStore } from '../../store/useCalculationStore';
 import { useWizardStore } from '../../store/useWizardStore';
 import { useEntitlementStore } from '../../store/useEntitlementStore';
 import { useReportStore } from '../../store/useReportStore';
@@ -14,23 +14,16 @@ import { PackageComparisonModal } from '../../components/modals/PackageCompariso
 import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from '../report/pdfService';
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { formatCurrency } from '../../utils/cn';
-import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
 import {
   ChevronLeft,
   FileText,
-  PencilLine,
   Save,
   ArrowRight,
   Download,
   Lock,
   ShieldCheck,
   CheckCircle2,
-  HelpCircle,
-  TrendingUp,
-  Activity,
-  Layers,
-  Award,
   Sparkles,
 } from 'lucide-react';
 
@@ -45,9 +38,8 @@ export const DashboardPage: React.FC = () => {
 
   const budget = useBudgetResult();
   const area = useArea();
-  const boq = useBOQ();
   const { result } = useCalculationStore();
-  const { city, plotLength, plotWidth, floors, houseType, specificationTier, selectedPackage } = useWizardStore();
+  const { city, plotLength, plotWidth, houseType, specificationTier, selectedPackage } = useWizardStore();
   const { hasDetailedReportAccess } = useEntitlementStore();
   const { preparedFor } = useReportStore();
 

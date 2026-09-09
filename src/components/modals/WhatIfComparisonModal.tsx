@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Check, ArrowRight } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { useWizardStore, QualityTier } from '../../store/useWizardStore';
 import { useUIStore } from '../../store/useUIStore';

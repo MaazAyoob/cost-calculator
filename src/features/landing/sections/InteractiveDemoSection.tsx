@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Sliders, Check, TrendingUp, TrendingDown, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, TrendingUp, TrendingDown } from 'lucide-react';
 import { runCalculator } from '../../../calculation-engine/calculator';
 import { EngineInput } from '../../../calculation-engine/types';
 import { formatCurrency } from '../../../utils/cn';

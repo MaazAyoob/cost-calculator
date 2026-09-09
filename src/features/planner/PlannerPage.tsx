@@ -38,7 +38,6 @@ import {
   Copy,
   Sliders,
   Box,
-  Layers,
   Sparkles,
 } from 'lucide-react';
 import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsModal';

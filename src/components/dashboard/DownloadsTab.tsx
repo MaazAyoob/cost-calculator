@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { containerStaggerVariant, itemFadeUpVariant } from '../../animations/variants';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { StatusBadge } from '../common/StatusBadge';
 import {

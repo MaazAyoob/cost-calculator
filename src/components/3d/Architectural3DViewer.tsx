@@ -10,7 +10,6 @@ import {
   Sun,
   Moon,
   Layers,
-  Sparkles,
   PaintBucket,
 } from 'lucide-react';
 import {

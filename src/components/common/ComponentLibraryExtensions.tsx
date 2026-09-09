@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
 import { Card, CardContent } from '../ui/Card';
-import { Search, Bell, X, Check, AlertCircle, ChevronDown, Layers, FileText } from 'lucide-react';
+import { Search, Check, AlertCircle, FileText } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 /* Icon Button */

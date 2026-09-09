@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { runCalculator } from '../calculator';
 import { calculateArea } from '../modules/bua';
-import { getAuthorityRules, evaluateAuthorityLimits } from '../data/authorityRules';
 import { EngineInput } from '../types';
 
 describe('Authority-Based BUA & Setback Engine Suite', () => {

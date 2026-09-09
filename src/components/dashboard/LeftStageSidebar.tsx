@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDashboardStore } from '../../store/useDashboardStore';
-import { CONSTRUCTION_STAGES, ConstructionStage } from '../../constants/constructionStages';
+import { CONSTRUCTION_STAGES } from '../../constants/constructionStages';
 import { StatusBadge } from '../common/StatusBadge';
 import { ProgressIndicator } from '../common/ProgressIndicator';
 import { StageProgressRing } from './StageProgressRing';

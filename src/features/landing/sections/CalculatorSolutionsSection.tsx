@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, MapPin, Home, Layers, PackageCheck, Banknote, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPin, Home, Layers, PackageCheck, Banknote } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
 
 export const CalculatorSolutionsSection: React.FC = () => {

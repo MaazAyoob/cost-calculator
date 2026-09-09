@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../../store/useUIStore';
 import { useProjectStore } from '../../store/useProjectStore';
-import { Menu, Search, Bell, ChevronDown, Building2 } from 'lucide-react';
+import { Menu, Search, ChevronDown, Building2 } from 'lucide-react';
 import { HuttyLogo } from '../brand/HuttyLogo';
 
 export const TopNavigation: React.FC = () => {

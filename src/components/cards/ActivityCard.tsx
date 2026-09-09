@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent } from '../ui/Card';
-import { cn } from '../../utils/cn';
 import { Calendar, User, CheckCircle2, Clock } from 'lucide-react';
 
 export interface ActivityCardProps {

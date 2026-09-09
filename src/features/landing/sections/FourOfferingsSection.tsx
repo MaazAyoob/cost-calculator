@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Calculator, FileText, FileCheck, TrendingUp, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Calculator, FileText, FileCheck, TrendingUp } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { QuoteReviewModal } from '../../../components/modals/QuoteReviewModal';
 import { BuildTrackingModal } from '../../../components/modals/BuildTrackingModal';
@@ -86,7 +86,6 @@ export const FourOfferingsSection: React.FC = () => {
         {/* 4 Cards Grid - Architectural & Clean */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
           {offerings.map((item) => {
-            const Icon = item.icon;
             return (
               <div
                 key={item.num}

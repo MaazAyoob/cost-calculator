@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, TrendingUp, HelpCircle, Flame, DollarSign, PieChart, Layers, ShieldX } from 'lucide-react';
+import { AlertCircle, TrendingUp, Flame, PieChart, ShieldX } from 'lucide-react';
 
 export const CostProblemsSection: React.FC = () => {
   const problems = [

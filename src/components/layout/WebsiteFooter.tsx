@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, ArrowRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useWizardStore } from '../../store/useWizardStore';
 import { HuttyLogo } from '../brand/HuttyLogo';
 import { QuoteReviewModal } from '../modals/QuoteReviewModal';

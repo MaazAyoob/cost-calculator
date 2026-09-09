@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { drawerSlideVariant } from '../../animations/variants';
 import { useUIStore } from '../../store/useUIStore';
-import { X, Layers, FileText, CheckCircle2, ChevronRight } from 'lucide-react';
+import { X, Layers, FileText, ChevronRight } from 'lucide-react';
 
 export const DetailDrawer: React.FC = () => {
   const { isDrawerOpen, drawerTitle, drawerContentId, closeDrawer } = useUIStore();

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, DollarSign, CalendarCheck, BarChart3, ArrowRight, Shield, Layers, CheckCircle2 } from 'lucide-react';
+import { X, CalendarCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { formatCurrency } from '../../utils/cn';
 
@@ -10,14 +10,12 @@ interface Props {
 
 export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { result } = useCalculationStore();
-  const [activeTab, setActiveTab] = useState<'overview' | 'enroll'>('overview');
   const [email, setEmail] = useState('');
   const [enrolled, setEnrolled] = useState(false);
 
   if (!isOpen) return null;
 
   const totalCost = result.budget?.totalProjectCost || 5000000;
-  const buaSqFt = result.area?.totalBUASqFt || 1440;
 
   return (
     <div className="fixed inset-0 z-50 bg-[#1B3D34]/40 backdrop-blur-xs flex items-center justify-center p-4 select-none">

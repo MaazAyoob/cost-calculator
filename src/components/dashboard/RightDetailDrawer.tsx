@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { drawerSlideVariant } from '../../animations/variants';
 import { useDashboardStore } from '../../store/useDashboardStore';
 import { CONSTRUCTION_STAGES, ActivityDetail } from '../../constants/constructionStages';
 import { TechnicalDiagram } from '../common/TechnicalDiagram';
-import { Button } from '../ui/Button';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatCurrency } from '../../utils/cn';
 import {
   X,
-  CheckSquare,
   AlertTriangle,
   Lightbulb,
   BookOpen,

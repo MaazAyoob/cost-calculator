@@ -6,7 +6,6 @@ import { useWizardStore } from '../../store/useWizardStore';
 import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from '../../features/report/pdfService';
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { X, Check, Lock, Download, ShieldCheck, FileText, ArrowRight, Loader2 } from 'lucide-react';
-import { formatCurrency } from '../../utils/cn';
 
 interface Props {
   isOpen: boolean;

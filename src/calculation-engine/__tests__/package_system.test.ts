@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  CONSTRUCTION_PACKAGES,
   getPackageConfig,
-  normalizePackageId,
   createEngineInputForPackage,
   computeMultiPackageComparison,
-  generateHuttyRecommendation,
   getCustomizationDiff,
 } from '../data/packageConfig';
 import { runCalculator } from '../calculator';

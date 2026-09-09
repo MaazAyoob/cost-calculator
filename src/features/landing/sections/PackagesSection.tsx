@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Sparkles, Layers, ShieldCheck, Award } from 'lucide-react';
+import { ArrowRight, Check, Sparkles, Layers } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
-import { CONSTRUCTION_PACKAGES } from '../../../calculation-engine/data/packageConfig';
 
 export const PackagesSection: React.FC = () => {
   const navigate = useNavigate();

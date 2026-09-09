@@ -2,10 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReportStore } from '../../store/useReportStore';
 import { FileText, ShieldCheck, ArrowRight, User, Phone, Mail, X } from 'lucide-react';
-import { useCalculationStore } from '../../store/useCalculationStore';
-import { useWizardStore } from '../../store/useWizardStore';
-import { formatCurrency } from '../../utils/cn';
-import { HuttyLogo } from '../common/HuttyLogo';
 
 interface LeadCaptureModalProps {
   isOpen: boolean;
@@ -26,9 +22,6 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
-
-  const { budget, area } = useCalculationStore((s) => s.result);
-  const { city, plotLength, plotWidth, floors } = useWizardStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

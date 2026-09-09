@@ -1,12 +1,7 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Check, X, AlertTriangle, ShieldCheck, ArrowRight, Layers } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useWizardStore } from '../../../store/useWizardStore';
+import React from 'react';
+import { Check, X, ShieldCheck } from 'lucide-react';
 
 export const WhyPlanningSection: React.FC = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'with' | 'without'>('with');
 
   const comparisonData = {
     without: {

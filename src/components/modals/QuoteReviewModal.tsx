@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, UploadCloud, FileCheck, CheckCircle2, Shield, ArrowRight, AlertCircle } from 'lucide-react';
+import { X, UploadCloud, FileCheck, CheckCircle2, ArrowRight } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;

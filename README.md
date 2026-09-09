@@ -1,158 +1,251 @@
-# Cost Calculator — Home Construction Planning & Engineering Platform
+# Hutty — Residential Construction Cost Estimation Platform
 
-> **Production SaaS Platform for Homeowners, Architects & Contractors in India.**  
-> *Deterministic IS 456 & IS 13920 Calculation Engine · Bank-Ready BOQ & Payment Schedules · Real-Time Regional Material Price Indices*
-
----
-
-## 🌟 Executive Summary
-
-Cost Calculator is NOT a simple marketing site or CRUD dashboard. It is an enterprise-grade SaaS application designed to empower Indian homeowners to configure every architectural, structural, material, and electrical detail of their dream home before ground breaking.
-
-### Core Capabilities
-- **10-Step Interactive Guided Configurator**: Visual Tesla-style wizard with live instant recalculation (<2ms).
-- **Deterministic Engineering Engine**: Built on IS 456, IS 13920, IS 1905 & NBC 2016 civil engineering standards.
-- **50+ Item BOQ Generator**: Automatically groups line items across 13 construction categories.
-- **11-Stage Construction Journey Workspace**: Interactive sidebar, activity cards, and 9-section detail inspector.
-- **Side-by-Side Activity Comparison**: Compare costs, durations, and specifications of any two construction tasks.
-- **Bank Disbursement Schedule**: 11-milestone payment roadmap aligned with bank housing loan release protocols.
-- **Multi-Format Exporters**: Instant export to Bank-Ready PDF, Multi-Sheet Excel Workbooks, and CSV material lists.
-- **Production Admin Portal**: Live regional price management for Bangalore & Mysore, brand catalogue manager, and system audit logs.
+> A structured web application for parameterized residential construction planning, quantity estimation, and bill of quantities (BOQ) generation for homebuilders, architects, and contractors in Karnataka, India.
 
 ---
 
-## 🏗 Technology Stack
+## Overview
 
-### Frontend
-- **Core**: React 19, TypeScript 5.3, Vite 6.4
-- **State Management**: Zustand 4.5 (unidirectional reactive stores)
-- **Styling**: Tailwind CSS v4, Vanilla CSS Design System Tokens
-- **Animations**: Framer Motion 11 (smooth spring physics & layoutId transitions)
-- **Charts**: Recharts 2.12
-- **Icons**: Lucide React
-
-### Backend (`/server`)
-- **Runtime**: Node.js 20, Express 4.18
-- **Language**: TypeScript 5.3
-- **ORM**: Prisma 5.10
-- **Database**: PostgreSQL (Supabase / Neon)
-- **Security**: JWT authentication, bcryptjs, Helmet, Rate Limiter, Zod validation
-- **Logging**: Morgan HTTP logger + Prisma Audit Logs
+Hutty provides an interactive, structured workflow for estimating residential construction costs before site breaking. The application combines user inputs (plot dimensions, room schedules, floor counts, structural specifications, and finish tiers) with regional market rates and parameterized civil engineering quantity estimation rules to produce an itemized Bill of Quantities, milestone disbursement schedules, and downloadable technical documentation.
 
 ---
 
-## 📁 Repository Structure
+## Core Architecture
+
+Hutty is built as a single-page client application with an optional Node.js/Express API backend. The core calculation pipeline runs entirely client-side, enabling instant recalculation (<5ms) as users configure parameters.
 
 ```
-.
-├── public/
-│   ├── robots.txt              ← Search engine crawler directives
-│   └── sitemap.xml             ← XML sitemap for SEO
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml           ← Automated GitHub Actions pipeline
-├── server/                     ← Express API Backend
-│   ├── prisma/
-│   │   ├── schema.prisma       ← 12 PostgreSQL models
-│   │   └── seed.ts             ← Database seed script
-│   └── src/
-│       ├── config/             ← Environment configuration
-│       ├── controllers/        ← Auth, download & project controllers
-│       ├── middlewares/        ← JWT auth, error handling, rate limiting
-│       ├── routes/             ← API v1 router (/auth, /download, /health)
-│       └── services/           ← PDF, Excel, and CSV export engines
-├── src/                        ← Frontend Application
-│   ├── animations/             ← Framer Motion variants
-│   ├── app/                    ← Router configuration & providers
-│   ├── calculation-engine/     ← IS-Code Deterministic Engine (16 modules)
-│   │   ├── data/               ← Engineering coefficients & brand database
-│   │   ├── modules/            ← Area, Steel, Cement, BOQ, Payment, etc.
-│   │   └── calculator.ts       ← Master orchestrator
-│   ├── components/             ← Reusable UI component library
-│   │   ├── common/             ← SEO, ErrorBoundary, StatusBadge, PageHeader
-│   │   ├── dashboard/          ← MetricCard, OverviewTab, CompareDrawer, DownloadsTab
-│   │   ├── layout/             ← AppLayout, TopNavigation, Sidebar
-│   │   └── ui/                 ← Button, Card, Modal, Toast
-│   ├── constants/              ← 13 construction stages & 40+ activities
-│   ├── features/               ← Page features (Landing, Planner, Dashboard, Report, Admin)
-│   ├── store/                  ← Zustand stores (Wizard, Calculation, Dashboard, UI)
-│   └── utils/                  ← Analytics, currency formatters, classnames
-├── DEPLOYMENT.md               ← Production Cloud Deployment Guide
-└── README.md                   ← Master project documentation
+USER INPUT (Plot, Rooms, Materials, Tiers)
+    ↓
+AUTHORITY RULES & SETBACK EVALUATION (BBMP / MUDA / Gram Panchayat)
+    ↓
+BUILT-UP AREA (BUA) & GEOMETRY ENGINE
+    ↓
+CANONICAL SPACE & BUILDING MODEL (Rooms, Wall Perimeters, Heights)
+    ↓
+OPENING SCHEDULES (Doors, Windows, Ventilation Deductions)
+    ↓
+PHYSICAL MATERIAL TAKEOFF (Steel, Cement, Masonry, Aggregates, Finishing, MEP)
+    ↓
+WORKS BILL OF QUANTITIES (BOQ) (Itemized line items across 13 trade categories)
+    ↓
+BUDGET ENGINE & COMMERCIAL RECONCILIATION
+    ↓
+TIMELINE & MILESTONE DISBURSEMENT ROADMAP
+    ↓
+AUTOMATED QA GATE (Invariance & reconciliation checks)
+    ↓
+UNIFIED MASTER CALCULATION RESULT (Single Source of Truth)
+    ├── Interactive Dashboard & Visual Breakdowns
+    ├── Calculation Audit Trace
+    └── Client-Side PDF Report Generation (@react-pdf/renderer)
+```
+
+### Key Architectural Invariants
+1. **Single Source of Truth**: All presentation views (Planner, Dashboard, Live Preview, and PDF Report) consume the exact same `CalculationResult` compiled by `runCalculator()`.
+2. **Deterministic Computation**: Calculations do not rely on asynchronous network calls or probabilistic AI generation; identical inputs produce identical outputs.
+3. **Automated QA Gate**: Prior to result exposure, `runQAGate()` validates mathematical invariants (reconciled BOQ sums, milestone payment totals equaling 100%, and physical quantity integrity).
+4. **Physical Brand Invariance**: Selecting a different material brand (e.g., Tata Tiscon vs. JSW Neosteel) updates unit rates while keeping physical consumption quantities (tonnes, bags, cubic metres) invariant.
+
+---
+
+## Directory Structure
+
+```
+├── public/                     # Static assets (favicons, brand logos, robots.txt)
+├── server/                     # Backend API & export service (Node.js/Express)
+│   ├── prisma/                 # Database schema & seed scripts (PostgreSQL)
+│   └── src/                    # API controllers, routes, middleware, services
+├── src/                        # Frontend Application
+│   ├── animations/             # Framer Motion animation variants
+│   ├── app/                    # Application router and top-level layout
+│   ├── calculation-engine/     # Centralized deterministic calculation engine
+│   │   ├── __tests__/          # Vitest test suites (99 automated test cases)
+│   │   ├── data/               # Material databases, authority rules, coefficients
+│   │   │   ├── authorityRules/ # Bengaluru (BBMP), Mysuru (MUDA), Gram Panchayat rules
+│   │   │   ├── brandDatabase.ts
+│   │   │   ├── coefficients.ts
+│   │   │   ├── engineeringAssumptions.ts
+│   │   │   ├── packageConfig.ts
+│   │   │   └── rateService.ts
+│   │   ├── modules/            # Domain calculation modules
+│   │   │   ├── boq.ts          # Bill of Quantities compilation
+│   │   │   ├── brick.ts        # Masonry and aggregate quantities
+│   │   │   ├── bua.ts          # Built-up area and setbacks
+│   │   │   ├── budget.ts       # Cost aggregation and commercial reconciliation
+│   │   │   ├── cement.ts       # Cement consumption takeoff
+│   │   │   ├── doors.ts        # Door schedule and opening areas
+│   │   │   ├── electrical.ts   # MEP electrical point and conductor takeoff
+│   │   │   ├── fixtures.ts     # Plumbing and sanitary fixture schedule
+│   │   │   ├── flooring.ts     # Flooring, cladding, and waterproofing areas
+│   │   │   ├── materials.ts    # Material schedule and procurement listings
+│   │   │   ├── paint.ts        # Plaster, paint, and putty areas
+│   │   │   ├── payment.ts      # 11-stage bank loan disbursement plan
+│   │   │   ├── plumbing.ts     # Water supply, drainage, and tank sizing
+│   │   │   ├── qaGate.ts       # Automated QA and validation gate
+│   │   │   ├── report.ts       # Dossier assembly
+│   │   │   ├── spaceModel.ts   # Canonical room geometry engine
+│   │   │   ├── steel.ts        # TMT reinforcement takeoff
+│   │   │   ├── timeline.ts     # Construction duration estimation
+│   │   │   ├── trace.ts        # Audit step trace generator
+│   │   │   └── windows.ts      # Window schedule and opening areas
+│   │   ├── calculator.ts       # Master orchestrator pipeline
+│   │   └── types.ts            # Canonical domain TypeScript interfaces
+│   ├── components/             # Reusable UI component library
+│   │   ├── 3d/                 # Three.js architectural volume visualizer
+│   │   ├── brand/              # Brand assets and SVG components
+│   │   ├── common/             # Error boundaries, SEO, technical diagrams
+│   │   ├── dashboard/          # Dashboard cards, activity workspaces, drawers
+│   │   ├── layout/             # Navigation headers, sidebars, footer
+│   │   ├── modals/             # Calculation trace, comparison, and review modals
+│   │   └── ui/                 # Base UI elements (buttons, cards, badges)
+│   ├── constants/              # Construction stages and activity definitions
+│   ├── features/               # Route-level feature views
+│   │   ├── admin/              # Price and catalog administration interface
+│   │   ├── dashboard/          # Construction management workspace
+│   │   ├── error/              # 404 and error boundaries
+│   │   ├── landing/            # Overview landing and comparison sections
+│   │   ├── planner/            # 10-step interactive configuration wizard
+│   │   ├── report/             # Report page and @react-pdf renderer document
+│   │   └── settings/           # Platform preferences and units
+│   ├── hooks/                  # Custom React hooks
+│   ├── store/                  # Zustand reactive state stores
+│   ├── styles/                 # Global styles and Tailwind CSS v4 design tokens
+│   └── utils/                  # Currency formatting, class utility helpers
+├── .env.example                # Example client-side environment configuration
+├── CALCULATION_AUDIT_NOTES.md  # Detailed technical audit notes for external reviewers
+├── DEPLOYMENT.md               # Infrastructure and cloud deployment documentation
+├── package.json                # Project dependencies and npm scripts
+├── tsconfig.json               # TypeScript workspace configuration
+├── vite.config.ts              # Vite bundler configuration
+└── vitest.config.ts            # Vitest test runner configuration
 ```
 
 ---
 
-## ⚡ Getting Started (Local Development)
+## Technology Stack
+
+- **Frontend Framework**: React 19, TypeScript 5.7
+- **Build Tool**: Vite 6.1
+- **Styling**: Tailwind CSS v4, Vanilla CSS tokens
+- **State Management**: Zustand 5.0 (persisted stores)
+- **3D Visualization**: Three.js 0.185
+- **PDF Compilation**: `@react-pdf/renderer` 4.2 (client-side PDF generation)
+- **Animations**: Framer Motion 12
+- **Testing**: Vitest 3.2
+- **Backend (Optional API Engine)**: Node.js 20, Express 4.18, Prisma ORM 5.10, PostgreSQL
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- **Node.js** >= 20.0.0
-- **npm** >= 10.0.0
+- **Node.js**: `>= 20.0.0`
+- **npm**: `>= 10.0.0`
 
 ### 1. Installation
 
-Clone the repository and install dependencies for both frontend and backend:
+Clone the repository and install root frontend dependencies:
 
 ```bash
-# Install frontend dependencies
 npm install
+```
 
-# Install backend dependencies
+*(Optional)* Install backend server dependencies:
+
+```bash
 cd server
 npm install
 cd ..
 ```
 
-### 2. Running Locally
+### 2. Environment Configuration
 
-Start the Vite frontend development server:
+Copy the example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+#### Developer PDF Testing Bypass
+By default, the 22-section PDF export requires lead information and completed checkout in production. For local development and technical review, a full PDF testing bypass is available:
+
+```env
+# .env.local
+VITE_DEVELOPMENT_FULL_PDF_TESTING=true
+```
+
+> **Security Note**: This bypass is strictly development-gated (`import.meta.env.DEV`). In production builds (`npm run build`), Vite replaces `import.meta.env.DEV` with `false`, compiling out the bypass logic entirely.
+
+---
+
+## Development, Testing & Production Commands
+
+### Running Locally
+
+Start the Vite development server:
 
 ```bash
 npm run dev
-# App running at http://localhost:3000
 ```
 
-Start the Express API server:
+The application will be accessible at `http://localhost:5173`.
+
+### Running Tests
+
+Run the Vitest automated test suite:
 
 ```bash
-cd server
-npm run dev
-# Server running at http://localhost:4000
+npm test
+```
+
+To run once without watch mode:
+
+```bash
+npm test -- --run
+```
+
+The suite validates:
+- Core calculation invariants (geometry, setbacks, and coverage)
+- Material takeoff completeness (steel, cement, sand, aggregates)
+- Electrical points and conductor sizing formulas
+- Authority BUA and setback rules (Bengaluru, Mysuru, Gram Panchayat)
+- 3-package specification consistency and brand invariance
+- Benchmark validation against standard residential plot cases (30x40, 30x50, 60x90)
+- Single-source-of-truth PDF generation and automated QA Gate enforcement
+
+### Type Checking & Linting
+
+Run TypeScript type check across the application:
+
+```bash
+npm run lint
+```
+
+### Production Build
+
+Create an optimized production bundle in `dist/`:
+
+```bash
+npm run build
+```
+
+Preview the production build locally:
+
+```bash
+npm run preview
 ```
 
 ---
 
-## 📊 Deterministic Engineering Calculation Engine
+## Important Calculation Engine Notes & Disclaimers
 
-The engine converts user inputs (plot dimensions, floors, house type, room counts, quality tier, city, parking type, brands) into deterministic structural & financial outputs without external API latency:
-
-$$ \text{Plot Area} = \text{Length} \times \text{Width} $$
-$$ \text{Ground Coverage} = \text{Plot Area} \times 0.60 \quad (\text{BBMP 60\% Coverage Rule}) $$
-$$ \text{Total Built-Up Area (BUA)} = \text{Ground Coverage} \times 0.92 \times \text{Floors} $$
-$$ \text{Super BUA} = \text{BUA} \times 1.15 \quad (\text{15\% Common Area \& Wall Thickness}) $$
-
-### Material Consumption Coefficients (IS 456)
-- **TMT Steel**: 3.8 kg/sqft (Essential) · 4.5 kg/sqft (Premium) · 5.5 kg/sqft (Luxury)
-- **OPC 53 Cement**: 0.38 bags/sqft (Essential) · 0.44 bags/sqft (Premium) · 0.50 bags/sqft (Luxury)
-- **M25 RMC Concrete**: 0.052 $\text{m}^3$/sqft
+1. **Parametric Estimation**: Quantities and costs generated by Hutty are derived from empirical civil engineering thumb rules, regional market indices (Bengaluru and Mysuru), and statutory setback frameworks.
+2. **Not Certified Engineering Advice**: Output estimates are intended for preliminary budgeting, contractor tendering, and home loan documentation planning. They do not substitute for certified structural drawings, soil bearing capacity tests (SBC), or site-specific architectural drawings prepared by a licensed structural engineer or architect.
+3. **Audit Documentation**: An external technical review summary of all calculation modules, parametric assumptions, and items requiring client verification is documented in [`CALCULATION_AUDIT_NOTES.md`](file:///c:/Users/Avita/Desktop/Programming/big%20bnglore%20client/cost%20calculator%20rightcon/CALCULATION_AUDIT_NOTES.md).
 
 ---
 
-## 🚀 Production Deployment
+## License & Copyright
 
-Refer to [`DEPLOYMENT.md`](file:///c:/Users/Avita/Desktop/Programming/big%20bnglore%20client/cost%20calculator%20rightcon/DEPLOYMENT.md) for full instructions on deploying:
-- **Frontend**: Vercel / Netlify
-- **Backend**: Railway / Render
-- **Database**: Supabase / Neon PostgreSQL
-
----
-
-## 🔒 Security & Quality Assurance
-- Zero TypeScript warnings or errors (`npx tsc --noEmit`)
-- WCAG 2.2 AA compliant keyboard navigation & high contrast colors
-- Strict input sanitization & JWT authentication
-- Automated GitHub Actions CI/CD pipeline (`.github/workflows/ci-cd.yml`)
-
----
-
-© 2026 Cost Calculator · Rightcon Constructions. All Rights Reserved.
+© 2026 Hutty / Rightcon Constructions. All rights reserved.

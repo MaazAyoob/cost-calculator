@@ -3,21 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowRight,
-  Play,
   Check,
-  Ruler,
-  Building,
   Layers,
-  Sparkles,
   ShieldCheck,
-  Box,
-  Compass,
 } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
-import { useBudgetResult, useArea, useQuantities } from '../../../store/useCalculationStore';
+import { useArea, useQuantities } from '../../../store/useCalculationStore';
 import { Architectural3DViewer } from '../../../components/3d/Architectural3DViewer';
-import { formatCurrency } from '../../../utils/cn';
-import { AnimatedNumber } from '../../../components/common/AnimatedNumber';
 
 const PRESET_PLOTS = [
   { label: "30' × 40'", length: 40, width: 30, desc: '1,200 sq.ft' },
@@ -30,16 +22,12 @@ export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
   const store = useWizardStore();
   const { plotLength, plotWidth, floors, houseType, setPlotDimensions, setHouseConfig, setSelectedPackage } = store;
-  const budget = useBudgetResult();
   const area = useArea();
   const quantities = useQuantities();
 
   const [activePlotIdx, setActivePlotIdx] = useState(0);
   const [selectedFloorCount, setSelectedFloorCount] = useState(floors || 2);
-
-  const totalCost = budget.totalProjectCost || 5115696;
   const buaSqFt = area.totalBUASqFt || 1440;
-  const ratePerSqFt = totalCost > 0 && buaSqFt > 0 ? Math.round(totalCost / buaSqFt) : 3553;
 
   // Scroll parallax for hero 3D viewer
   const { scrollY } = useScroll();

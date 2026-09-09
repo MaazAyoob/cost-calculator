@@ -16,9 +16,7 @@ import {
   Bookmark,
   BookmarkCheck,
   GitCompare,
-  Layers,
   Package,
-  Sparkles,
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';

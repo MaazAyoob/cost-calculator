@@ -5,7 +5,6 @@ import { useCalculationStore } from '../../store/useCalculationStore';
 import {
   computeMultiPackageComparison,
   ConstructionPackageId,
-  CONSTRUCTION_PACKAGES,
 } from '../../calculation-engine/data/packageConfig';
 import { formatCurrency, cn } from '../../utils/cn';
 import {
@@ -14,10 +13,7 @@ import {
   Award,
   Sparkles,
   Shield,
-  Layers,
   ArrowRight,
-  HelpCircle,
-  TrendingUp,
 } from 'lucide-react';
 
 interface PackageComparisonModalProps {
@@ -29,7 +25,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { selectedPackage, setSelectedPackage, setStep } = useWizardStore();
+  const { selectedPackage, setSelectedPackage } = useWizardStore();
   const { result } = useCalculationStore();
 
   if (!isOpen) return null;

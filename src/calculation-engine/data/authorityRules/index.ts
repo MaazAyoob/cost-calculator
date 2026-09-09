@@ -1,4 +1,4 @@
-import { AuthorityRuleSet, AuthorityCalculationResult, SetbackRuleSlab, FARRuleSlab } from './types';
+import { AuthorityRuleSet, AuthorityCalculationResult } from './types';
 import { BENGALURU_AUTHORITY_RULES } from './bengaluru';
 import { MYSURU_AUTHORITY_RULES } from './mysuru';
 import { GRAM_PANCHAYAT_AUTHORITY_RULES } from './gramPanchayat';

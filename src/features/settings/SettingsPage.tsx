@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { pageFadeVariant } from '../../animations/variants';
 import { PageHeader } from '../../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Settings, Shield, User, Sliders } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   return (

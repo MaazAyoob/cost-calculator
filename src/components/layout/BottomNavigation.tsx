@@ -7,7 +7,7 @@ import { cn } from '../../utils/cn';
 
 export const BottomNavigation: React.FC = () => {
   const location = useLocation();
-  const { activeTab, setActiveTab } = useDashboardStore();
+  const { setActiveTab } = useDashboardStore();
   const { openBottomSheet } = useUIStore();
 
   const items = [

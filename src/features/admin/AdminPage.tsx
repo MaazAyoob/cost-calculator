@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { pageFadeVariant, containerStaggerVariant, itemFadeUpVariant } from '../../animations/variants';
+import { pageFadeVariant, containerStaggerVariant } from '../../animations/variants';
 import { PageHeader } from '../../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import {
-  Shield,
   Database,
   Activity,
-  DollarSign,
-  Building2,
-  Users,
-  Download,
   TrendingUp,
   Sliders,
   Save,
   CheckCircle2,
-  Edit2,
-  Package,
 } from 'lucide-react';
-import { formatCurrency } from '../../utils/cn';
 
 interface MaterialPriceRow {
   id: string;

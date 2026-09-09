@@ -7,7 +7,7 @@ import { cn, formatCurrency } from '../../../utils/cn';
 import { getElectricalWireRate } from '../../../calculation-engine/data/brandDatabase';
 
 export const Step8Electrical: React.FC = () => {
-  const { electrical, setElectricalSelection, rooms, floors, evCharging } = useWizardStore();
+  const { electrical, setElectricalSelection, rooms, floors } = useWizardStore();
   const { result } = useCalculationStore();
   const { quantities, boq } = result;
   const { getElectricalRecommendation } = useRecommendations();

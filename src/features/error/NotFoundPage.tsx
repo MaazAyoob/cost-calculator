@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { pageFadeVariant } from '../../animations/variants';
-import { Home, ArrowLeft, Calculator } from 'lucide-react';
+import { Home, Calculator } from 'lucide-react';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 
 export const NotFoundPage: React.FC = () => {

@@ -3,7 +3,7 @@ import { Card, CardContent } from '../ui/Card';
 import { MaterialItem } from '../../types';
 import { formatCurrency } from '../../utils/cn';
 import { useUIStore } from '../../store/useUIStore';
-import { Layers, ChevronRight, Check } from 'lucide-react';
+import { ChevronRight, Check } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 export interface MaterialCardProps {

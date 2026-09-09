@@ -2,7 +2,6 @@ import React from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
-import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 
 export const Step6Doors: React.FC = () => {

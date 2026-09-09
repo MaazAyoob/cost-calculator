@@ -1,5 +1,5 @@
-import React, { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { Loader } from '../components/common/Skeleton';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
