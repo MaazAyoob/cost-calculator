@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsModal';
 import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
+import { analytics } from '../../utils/analytics';
 
 const STEPS = [
   { num: '01', key: 'Plot', title: 'Plot Dimensions & Site', shortTitle: 'Plot' },
@@ -131,6 +132,16 @@ export const PlannerPage: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
+
+  // Analytics: Record step entry and clean exit timing without double-counting
+  useEffect(() => {
+    const stepName = currentStep === 0 ? 'Onboarding' : STEPS[currentStep - 1]?.title || `Step ${currentStep}`;
+    analytics.recordStepEnter(stepName, selectedPackage || 'PREMIUM', store.city || 'Bangalore', currentStep);
+
+    return () => {
+      analytics.recordStepExit(stepName, selectedPackage || 'PREMIUM', store.city || 'Bangalore');
+    };
+  }, [currentStep, selectedPackage, store.city]);
 
   return (
     <motion.div

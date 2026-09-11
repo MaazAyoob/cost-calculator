@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -13,6 +15,16 @@ app.use(morgan('dev'));
 
 // Mount API routes under /api/v1
 app.use('/api/v1', apiRoutes);
+
+// Serve frontend static build in production if present
+const clientDistPath = path.resolve(__dirname, '../../dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 // Global Error Handler
 app.use(errorHandler);

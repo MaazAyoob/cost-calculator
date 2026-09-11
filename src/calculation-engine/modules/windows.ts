@@ -10,6 +10,7 @@
 
 import { EngineInput, WindowScheduleItem } from '../types';
 import { getBrandRate } from '../data/brandDatabase';
+import { rateService } from '../data/rateService';
 
 export function calculateWindows(input: EngineInput): {
   windowsCount: number;
@@ -54,23 +55,30 @@ export function calculateWindows(input: EngineInput): {
   // 2. Resolve Rate
   const prim = windows?.primaryMaterial || 'uPVC';
   const sub = windows?.subGrade || 'Standard uPVC';
-  let windowRate = 650;
+  let defaultWindowRate = 650;
 
   if (prim === 'uPVC') {
-    if (sub === 'Luxury / Fenesta uPVC' || materialBrands?.windows === 'Fenesta uPVC') windowRate = 850;
-    else if (sub === 'Standard uPVC') windowRate = 550;
-    else windowRate = 650;
+    if (sub === 'Luxury / Fenesta uPVC' || materialBrands?.windows === 'Fenesta uPVC') defaultWindowRate = 850;
+    else if (sub === 'Standard uPVC') defaultWindowRate = 550;
+    else defaultWindowRate = 650;
   } else if (prim === 'Wood') {
-    if (sub === 'Teak Wood Frame') windowRate = 950;
-    else if (sub === 'Sal Frame / Honne Shutter') windowRate = 680;
-    else windowRate = 850;
+    if (sub === 'Teak Wood Frame') defaultWindowRate = 950;
+    else if (sub === 'Sal Frame / Honne Shutter') defaultWindowRate = 680;
+    else defaultWindowRate = 850;
   } else if (prim === 'Aluminium') {
-    if (sub === 'Powder Coated Jindal Aluminium') windowRate = 620;
-    else if (sub === 'Anodized Aluminium') windowRate = 480;
-    else windowRate = 520;
+    if (sub === 'Powder Coated Jindal Aluminium') defaultWindowRate = 620;
+    else if (sub === 'Anodized Aluminium') defaultWindowRate = 480;
+    else defaultWindowRate = 520;
   } else if (materialBrands?.windows) {
-    windowRate = getBrandRate('windows', materialBrands.windows) || windowRate;
+    defaultWindowRate = getBrandRate('windows', materialBrands.windows) || defaultWindowRate;
   }
+
+  const winBrand = materialBrands?.windows || sub;
+  const windowRate = rateService.getEffectiveRate(
+    'windows.upvc_standard',
+    { packageTier: input.qualityTier, location: input.city, brand: winBrand },
+    defaultWindowRate
+  );
 
   // 3. Authoritative Schedule
   const schedule: WindowScheduleItem[] = [];

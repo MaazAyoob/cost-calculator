@@ -19,6 +19,8 @@ import {
   CONTINGENCY_RATE,
 } from '../data/coefficients';
 
+import { rateService } from '../data/rateService';
+
 export function calculateBudget(
   input: EngineInput,
   area: AreaResult,
@@ -47,11 +49,20 @@ export function calculateBudget(
     };
   }
 
-  // 2. Statutory / Project Additions (Configurable parameters from coefficients)
-  const professionalFees = Math.round(baseConstructionCost * PROFESSIONAL_FEES_RATE); // 5%
-  const contractorMargin = Math.round(baseConstructionCost * CONTRACTOR_MARGIN_RATE); // 15%
-  const contingency      = Math.round(baseConstructionCost * CONTINGENCY_RATE);      // 6%
-  const gstAmount        = Math.round((baseConstructionCost + professionalFees) * GST_RATE); // 18%
+  // 2. Statutory / Project Additions (Configurable parameters from rateService or coefficients)
+  const cfg = rateService.getConfig();
+  const profFeesRate =
+    (cfg as any).architectFeesRate !== undefined || (cfg as any).structuralFeesRate !== undefined
+      ? ((cfg as any).architectFeesRate || 0) + ((cfg as any).structuralFeesRate || 0)
+      : cfg.professionalFeesRate ?? PROFESSIONAL_FEES_RATE;
+  const contractorMarginRate = cfg.contractorMarginRate ?? CONTRACTOR_MARGIN_RATE;
+  const contingencyRate = cfg.contingencyRate ?? CONTINGENCY_RATE;
+  const gstRate = cfg.gstRate ?? GST_RATE;
+
+  const professionalFees = Math.round(baseConstructionCost * profFeesRate);
+  const contractorMargin = Math.round(baseConstructionCost * contractorMarginRate);
+  const contingency      = Math.round(baseConstructionCost * contingencyRate);
+  const gstAmount        = Math.round((baseConstructionCost + professionalFees) * gstRate);
 
   // 3. Final Total Project Cost
   const totalProjectCost = baseConstructionCost + professionalFees + contractorMargin + contingency + gstAmount;

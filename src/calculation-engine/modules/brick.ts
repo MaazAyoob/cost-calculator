@@ -22,6 +22,7 @@ import {
 } from '../data/coefficients';
 import { getMasonrySpecification } from '../data/masonrySpecifications';
 import { getBrandRate } from '../data/brandDatabase';
+import { rateService } from '../data/rateService';
 
 export function calculateMasonry(
   input: EngineInput,
@@ -85,7 +86,12 @@ export function calculateMasonry(
 
   // Rate and brand determination
   const brandName = input.materialBrands?.masonry || spec.brand;
-  const brandRate = getBrandRate('masonry', brandName) || spec.unitRate;
+  const defaultBrandRate = getBrandRate('masonry', brandName) || spec.unitRate;
+  const brandRate = rateService.getEffectiveRate(
+    'masonry.aac_block_birla',
+    { packageTier: input.qualityTier, location: input.city, brand: brandName },
+    defaultBrandRate
+  );
   const masonryAmount = Math.round(masonryUnitsCount * brandRate);
 
   return {

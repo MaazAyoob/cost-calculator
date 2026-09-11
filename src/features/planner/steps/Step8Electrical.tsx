@@ -5,6 +5,7 @@ import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check, ChevronDown, ChevronUp, Zap, Box, Layers, HelpCircle } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
 import { getElectricalWireRate } from '../../../calculation-engine/data/brandDatabase';
+import { rateService } from '../../../calculation-engine/data/rateService';
 
 export const Step8Electrical: React.FC = () => {
   const { electrical, setElectricalSelection, rooms, floors } = useWizardStore();
@@ -49,12 +50,14 @@ export const Step8Electrical: React.FC = () => {
     ? 'V-Guard'
     : 'Finolex';
 
-  // Resolved rates per gauge
-  const rate1_5 = getElectricalWireRate(brandIdentifier, '1.5');
-  const rate2_5 = getElectricalWireRate(brandIdentifier, '2.5');
-  const rate4_0 = getElectricalWireRate(brandIdentifier, '4.0');
-  const rate6_0 = getElectricalWireRate(brandIdentifier, '6.0');
-  const rateConduit = 35;
+  const brandKey = brandIdentifier === 'Anchor' ? 'anchor' : brandIdentifier === 'V-Guard' ? 'vguard' : 'finolex';
+
+  // Resolved rates per gauge via centralized rate service
+  const rate1_5 = rateService.getEffectiveRate(`electrical.wire_1_5_${brandKey}`, undefined, getElectricalWireRate(brandIdentifier, '1.5'));
+  const rate2_5 = rateService.getEffectiveRate(`electrical.wire_2_5_${brandKey}`, undefined, getElectricalWireRate(brandIdentifier, '2.5'));
+  const rate4_0 = rateService.getEffectiveRate(`electrical.wire_4_0_${brandKey}`, undefined, getElectricalWireRate(brandIdentifier, '4.0'));
+  const rate6_0 = rateService.getEffectiveRate(`electrical.wire_6_0_${brandKey}`, undefined, getElectricalWireRate(brandIdentifier, '6.0'));
+  const rateConduit = rateService.getEffectiveRate('electrical.conduit_pvc_25mm', undefined, 35);
 
   // Electrical BOQ items for subtotal
   const electricalBOQItems = (boq || []).filter((item) => item.category === 'Electrical');

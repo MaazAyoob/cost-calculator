@@ -21,6 +21,7 @@ import {
   FixtureScheduleItem,
 } from '../types';
 import { getBrandRate } from '../data/brandDatabase';
+import { rateService } from '../data/rateService';
 
 export function generateFixtureSchedule(
   input: EngineInput,
@@ -72,14 +73,19 @@ export function generateFixtureSchedule(
 
   // ── 3. Sanitary Fixtures ──
   const sanBrand = materialBrands?.bathroom || bathroomFittings?.sanitaryTier || 'Kohler / Jaquar';
-  let sanRate = 38000;
+  let defaultSanRate = 38000;
   if (bathroomFittings?.sanitaryTier?.includes('Luxury') || materialBrands?.bathroom === 'Toto') {
-    sanRate = 85000;
+    defaultSanRate = 85000;
   } else if (bathroomFittings?.sanitaryTier?.includes('Mass') || materialBrands?.bathroom === 'Cera') {
-    sanRate = 18000;
+    defaultSanRate = 18000;
   } else if (materialBrands?.bathroom) {
-    sanRate = getBrandRate('bathroom', materialBrands.bathroom) || sanRate;
+    defaultSanRate = getBrandRate('bathroom', materialBrands.bathroom) || defaultSanRate;
   }
+  const sanRate = rateService.getEffectiveRate(
+    'sanitary.jaquar_fittings_set',
+    { packageTier: input.qualityTier, location: input.city, brand: sanBrand },
+    defaultSanRate
+  );
 
   if (qty.wcCount > 0) {
     slNo++;

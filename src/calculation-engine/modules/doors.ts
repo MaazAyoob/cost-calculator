@@ -12,6 +12,7 @@
 
 import { EngineInput, DoorScheduleItem } from '../types';
 import { getBrandRate } from '../data/brandDatabase';
+import { rateService } from '../data/rateService';
 
 export function calculateDoors(input: EngineInput): {
   mainDoorsCount: number;
@@ -59,24 +60,29 @@ export function calculateDoors(input: EngineInput): {
   // 4. Authoritative Door Schedule (PDF Section 13)
   const schedule: DoorScheduleItem[] = [];
 
-  // Rates resolution
+  // Rates resolution through centralized Rate Master
+  const ctx = { packageTier: input.qualityTier, location: input.city };
+
   const mainDoorChoice = (doors?.mainDoor || materialBrands?.doors || 'Premium Teak') as string;
-  let mainDoorRate = 65000;
-  if (mainDoorChoice.includes('Burma')) mainDoorRate = 145000;
-  else if (mainDoorChoice === 'Premium Teak') mainDoorRate = 65000;
-  else if (mainDoorChoice === 'Normal Teak') mainDoorRate = 42000;
-  else if (mainDoorChoice.includes('Flush')) mainDoorRate = 18500;
-  else if (materialBrands?.doors) mainDoorRate = getBrandRate('doors', materialBrands.doors) || mainDoorRate;
+  let defaultMainRate = 65000;
+  if (mainDoorChoice.includes('Burma')) defaultMainRate = 145000;
+  else if (mainDoorChoice === 'Premium Teak') defaultMainRate = 65000;
+  else if (mainDoorChoice === 'Normal Teak') defaultMainRate = 42000;
+  else if (mainDoorChoice.includes('Flush')) defaultMainRate = 18500;
+  else if (materialBrands?.doors) defaultMainRate = getBrandRate('doors', materialBrands.doors) || defaultMainRate;
+  const mainDoorRate = rateService.getEffectiveRate('doors.main_teak_african', { ...ctx, brand: mainDoorChoice }, defaultMainRate);
 
   const internalChoice = (doors?.internalDoor || 'Flush Door') as string;
-  let internalDoorRate = 12500;
-  if (internalChoice.includes('Laminate')) internalDoorRate = 16500;
-  else if (internalChoice.includes('Flush')) internalDoorRate = 12500;
+  let defaultInternalRate = 12500;
+  if (internalChoice.includes('Laminate')) defaultInternalRate = 16500;
+  else if (internalChoice.includes('Flush')) defaultInternalRate = 12500;
+  const internalDoorRate = rateService.getEffectiveRate('doors.internal_flush', { ...ctx, brand: internalChoice }, defaultInternalRate);
 
   const bathChoice = (doors?.bathroomDoor || 'WPC Door') as string;
-  let bathDoorRate = 11000;
-  if (bathChoice.includes('FRP') || bathChoice.includes('ERP')) bathDoorRate = 8500;
-  else if (bathChoice.includes('WPC')) bathDoorRate = 11000;
+  let defaultBathRate = 11000;
+  if (bathChoice.includes('FRP') || bathChoice.includes('ERP')) defaultBathRate = 8500;
+  else if (bathChoice.includes('WPC')) defaultBathRate = 11000;
+  const bathDoorRate = rateService.getEffectiveRate('doors.bath_frp_wpc', { ...ctx, brand: bathChoice }, defaultBathRate);
 
   if (mainDoorsCount > 0) {
     schedule.push({

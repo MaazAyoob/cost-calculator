@@ -17,12 +17,17 @@ import {
   ProcurementItem,
 } from '../types';
 import { getBrandRate, getElectricalWireRate } from '../data/brandDatabase';
+import { rateService } from '../data/rateService';
 
 export function generateMaterialSchedule(
   input: EngineInput,
   qty: MaterialQuantities
 ): MaterialScheduleItem[] {
   const { materialBrands, flooringZones, painting } = input;
+  const ctx = {
+    packageTier: ((input as any).packageTier || input.qualityTier || 'STANDARD').toUpperCase(),
+    location: input.city || 'Bangalore',
+  };
   const items: MaterialScheduleItem[] = [];
   let slNo = 0;
 
@@ -32,7 +37,11 @@ export function generateMaterialSchedule(
 
   // 1. TMT Rebar Steel
   const steelBrand = materialBrands?.steel || 'Tata Tiscon';
-  const steelRatePerTonne = getBrandRate('steel', steelBrand) || 74000;
+  const defaultSteelRate = getBrandRate('steel', steelBrand) || 74000;
+  const steelRes = rateService.getEffectiveResult('steel.fe550d_tmt', ctx);
+  const steelRatePerTonne = steelRes.sourceType !== 'BASELINE' && steelRes.sourceType !== 'FALLBACK'
+    ? steelRes.effectiveRate
+    : defaultSteelRate;
   slNo++;
   items.push({
     slNo,
@@ -49,7 +58,11 @@ export function generateMaterialSchedule(
 
   // 2. Portland Cement (50 kg bags)
   const cementBrand = materialBrands?.cement || 'UltraTech';
-  const cementRatePerBag = getBrandRate('cement', cementBrand) || 420;
+  const defaultCementRate = getBrandRate('cement', cementBrand) || 420;
+  const cementRes = rateService.getEffectiveResult('cement.opc53_grade', ctx);
+  const cementRatePerBag = cementRes.sourceType !== 'BASELINE' && cementRes.sourceType !== 'FALLBACK'
+    ? cementRes.effectiveRate
+    : defaultCementRate;
   slNo++;
   items.push({
     slNo,
@@ -65,6 +78,7 @@ export function generateMaterialSchedule(
   });
 
   // 3. Manufactured Sand (M-Sand)
+  const mSandRate = rateService.getEffectiveRate('aggregate.msand_zone2', ctx, 65);
   slNo++;
   items.push({
     slNo,
@@ -74,12 +88,13 @@ export function generateMaterialSchedule(
     specification: 'Zone II double-washed cubical shape manufactured sand, silt content < 3%',
     quantity: qty.mSandCuFt,
     unit: 'Cu Ft',
-    unitRate: 65,
-    amount: qty.mSandCuFt * 65,
+    unitRate: mSandRate,
+    amount: qty.mSandCuFt * mSandRate,
     sourceFormula: 'Total BUA × 0.60 CFT/sqft (Pilot Specification Section 9)',
   });
 
   // 4. Plaster Sand (P-Sand)
+  const pSandRate = rateService.getEffectiveRate('aggregate.psand_fine', ctx, 70);
   slNo++;
   items.push({
     slNo,
@@ -89,12 +104,13 @@ export function generateMaterialSchedule(
     specification: 'Zone IV ultra-fine washed plastering sand for smooth internal & external wall finish',
     quantity: qty.pSandCuFt,
     unit: 'Cu Ft',
-    unitRate: 70,
-    amount: qty.pSandCuFt * 70,
+    unitRate: pSandRate,
+    amount: qty.pSandCuFt * pSandRate,
     sourceFormula: 'Total BUA × 0.60 CFT/sqft (Pilot Specification Section 10)',
   });
 
   // 5. Coarse Aggregate (20mm & 12mm)
+  const coarseAggRate = rateService.getEffectiveRate('aggregate.coarse_granite', ctx, 52);
   slNo++;
   items.push({
     slNo,
@@ -104,8 +120,8 @@ export function generateMaterialSchedule(
     specification: 'IS 383 angular crushed blue metal granite aggregate (60:40 20mm/12mm blend)',
     quantity: qty.coarseAggregateCuFt,
     unit: 'Cu Ft',
-    unitRate: 52,
-    amount: qty.coarseAggregateCuFt * 52,
+    unitRate: coarseAggRate,
+    amount: qty.coarseAggregateCuFt * coarseAggRate,
     sourceFormula: 'Total BUA × 1.35 CFT/sqft (Pilot Specification Section 11)',
   });
 
@@ -266,12 +282,13 @@ export function generateMaterialSchedule(
     specification: 'SDR 11 chlorinated polyvinyl chloride pipes rated for 82°C at 10 bar (IS 15778)',
     quantity: qty.cpvcSupplyMetres,
     unit: 'Metres',
-    unitRate: 140,
-    amount: qty.cpvcSupplyMetres * 140,
+    unitRate: rateService.getEffectiveRate('plumbing.cpvc_pipe_ashirwad', ctx, 140),
+    amount: qty.cpvcSupplyMetres * rateService.getEffectiveRate('plumbing.cpvc_pipe_ashirwad', ctx, 140),
     sourceFormula: 'Water Points × 4.5m + Vertical Shaft Risers',
   });
 
   slNo++;
+  const swrRate = rateService.getEffectiveRate('plumbing.swr_pipe', ctx, 180);
   items.push({
     slNo,
     material: 'SWR Ring-Fit Drainage & Soil Pipes (110mm & 75mm)',
@@ -280,17 +297,22 @@ export function generateMaterialSchedule(
     specification: 'Type B rubber ring seal leak-proof soil, waste, and rainwater drainage pipe',
     quantity: qty.swrDrainMetres,
     unit: 'Metres',
-    unitRate: 180,
-    amount: qty.swrDrainMetres * 180,
+    unitRate: swrRate,
+    amount: qty.swrDrainMetres * swrRate,
     sourceFormula: 'Drainage Points × 3.5m + Vertical Soil Stack Risers',
   });
 
   // 14. Electrical Wiring & Conduit (Segregated by Conductor Gauge)
   const elecBrand = materialBrands?.electrical || input.electrical?.wireTier || 'Finolex / Polycab';
-  const wireRate1_5 = getElectricalWireRate(elecBrand, '1.5');
-  const wireRate2_5 = getElectricalWireRate(elecBrand, '2.5');
-  const wireRate4_0 = getElectricalWireRate(elecBrand, '4.0');
-  const wireRate6_0 = getElectricalWireRate(elecBrand, '6.0');
+  let elecBrandKey = 'finolex';
+  if (elecBrand.toLowerCase().includes('anchor')) elecBrandKey = 'anchor';
+  else if (elecBrand.toLowerCase().includes('vguard') || elecBrand.toLowerCase().includes('v-guard')) elecBrandKey = 'vguard';
+
+  const wireRate1_5 = rateService.getEffectiveRate(`electrical.wire_1_5_${elecBrandKey}`, ctx, getElectricalWireRate(elecBrand, '1.5'));
+  const wireRate2_5 = rateService.getEffectiveRate(`electrical.wire_2_5_${elecBrandKey}`, ctx, getElectricalWireRate(elecBrand, '2.5'));
+  const wireRate4_0 = rateService.getEffectiveRate(`electrical.wire_4_0_${elecBrandKey}`, ctx, getElectricalWireRate(elecBrand, '4.0'));
+  const wireRate6_0 = rateService.getEffectiveRate(`electrical.wire_6_0_${elecBrandKey}`, ctx, getElectricalWireRate(elecBrand, '6.0'));
+  const conduitRate = rateService.getEffectiveRate('electrical.conduit_pvc_25mm', ctx, 35);
 
   if (qty.wire1_5SqMmMetres > 0) {
     slNo++;
@@ -366,8 +388,8 @@ export function generateMaterialSchedule(
       specification: '25mm diameter heavy-gauge rigid PVC conduit with accessories',
       quantity: qty.conduitsMetres,
       unit: 'Metres',
-      unitRate: 35,
-      amount: qty.conduitsMetres * 35,
+      unitRate: conduitRate,
+      amount: qty.conduitsMetres * conduitRate,
       sourceFormula: 'Points × 2.6m + Floor Risers + EV Conduit',
     });
   }

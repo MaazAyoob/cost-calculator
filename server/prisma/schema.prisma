@@ -204,3 +204,174 @@ model AuditLog {
   @@index([userId])
   @@index([timestamp])
 }
+
+model RateOverride {
+  id          String   @id @default(uuid())
+  rateId      String
+  rate        Float
+  category    String
+  unit        String
+  location    String   @default("ALL") // 'Bangalore' | 'Mysore' | 'ALL'
+  packageTier String   @default("ALL") // 'STANDARD' | 'PREMIUM' | 'LUXURY' | 'ALL'
+  isActive    Boolean  @default(true)
+  reason      String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([rateId, packageTier, location], name: "rate_dimension_unique")
+  @@index([rateId])
+  @@index([category])
+  @@index([isActive])
+  @@map("rate_overrides")
+}
+
+model RateAuditLog {
+  id          String   @id @default(uuid())
+  rateId      String
+  rateName    String
+  category    String
+  unit        String
+  oldValue    Float?
+  newValue    Float
+  action      String   // 'CREATE_OVERRIDE' | 'UPDATE_OVERRIDE' | 'REMOVE_OVERRIDE' | 'RESET_DEFAULT'
+  location    String   @default("ALL")
+  packageTier String   @default("ALL")
+  adminEmail  String
+  reason      String?
+  timestamp   DateTime @default(now())
+
+  @@index([rateId])
+  @@index([adminEmail])
+  @@index([timestamp])
+  @@map("rate_audit_logs")
+}
+
+model CalculatorConfig {
+  id        String   @id @default("global-calculator-config")
+  key       String   @unique
+  valueJson Json
+  updatedBy String
+  updatedAt DateTime @updatedAt
+
+  @@map("calculator_configs")
+}
+
+model AnalyticsEvent {
+  id              String   @id @default(uuid())
+  eventName       String
+  sessionId       String
+  step            Int?
+  stepName        String?
+  timeSpentMs     Int?
+  selectedPackage String?
+  plotLength      Float?
+  plotWidth       Float?
+  builtUpArea     Float?
+  estimatedCost   Float?
+  costPerSqFt     Float?
+  metadataJson    Json?
+  createdAt       DateTime @default(now())
+
+  @@index([eventName])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+enum ProposalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVIEW
+  UNVERIFIED
+  FAILED
+}
+
+model PriceUpdateRun {
+  id            String                @id @default(uuid())
+  provider      String
+  status        String                @default("COMPLETED")
+  totalProposed Int                   @default(0)
+  totalApproved Int                   @default(0)
+  totalRejected Int                   @default(0)
+  scope         String                @default("ALL")
+  category      String?
+  runBy         String
+  notes         String?
+  proposals     PriceUpdateProposal[]
+  createdAt     DateTime              @default(now())
+  completedAt   DateTime?
+
+  @@index([provider])
+  @@index([createdAt])
+  @@map("price_update_runs")
+}
+
+model PriceUpdateProposal {
+  id                String         @id @default(uuid())
+  runId             String
+  run               PriceUpdateRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  rateId            String
+  rateName          String
+  category          String
+  unit              String
+  currentRate       Float
+  proposedRate      Float
+  difference        Float
+  differencePercent Float
+  currency          String         @default("INR")
+  location          String         @default("ALL")
+  packageTier       String         @default("ALL")
+  source            String
+  sourceUrl         String?
+  confidence        String         @default("MEDIUM")
+  status            ProposalStatus @default(PENDING)
+  notes             String?
+  warning           String?
+  isAiAssisted      Boolean        @default(false)
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  createdAt         DateTime       @default(now())
+
+  @@index([runId])
+  @@index([rateId])
+  @@index([status])
+  @@index([category])
+  @@map("price_update_proposals")
+}
+
+model AdminSession {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String
+  deviceInfo   String?
+  ipAddress    String?
+  userAgent    String?
+  isActive     Boolean   @default(true)
+  lastActiveAt DateTime  @default(now())
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("admin_sessions")
+}
+
+model SecurityAuditEvent {
+  id        String   @id @default(uuid())
+  userId    String?
+  userEmail String
+  action    String   // 'PASSWORD_CHANGED' | 'EMAIL_CHANGED' | 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'LOGOUT' | 'SESSIONS_REVOKED'
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userEmail])
+  @@index([action])
+  @@index([createdAt])
+  @@map("security_audit_events")
+}
+
