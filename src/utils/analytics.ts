@@ -5,6 +5,8 @@
 // Strict timer accuracy: prevents double-counting, tracks page and step timing
 // ============================================================
 
+import { getApiUrl } from '../config/api';
+
 export type CalculatorEventType =
   | 'calculator_started'
   | 'package_selected'
@@ -219,11 +221,12 @@ class CalculatorAnalytics {
       };
 
       // Fire and forget via fetch or sendBeacon
+      const eventEndpoint = getApiUrl('/api/v1/admin/analytics/event');
       if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
         const blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
-        navigator.sendBeacon('/api/v1/admin/analytics/event', blob);
+        navigator.sendBeacon(eventEndpoint, blob);
       } else if (typeof fetch !== 'undefined') {
-        fetch('/api/v1/admin/analytics/event', {
+        fetch(eventEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),

@@ -15,6 +15,7 @@ import {
   Share2,
   RefreshCw,
 } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 interface DownloadItem {
   id: string;
@@ -97,17 +98,15 @@ export const DownloadsTab: React.FC = () => {
     );
 
     try {
-      const API_BASE = 'http://localhost:4000/api/v1';
-
       if (id === 'dl-1') {
         // PDF Report — opens in new tab (server returns HTML)
-        window.open(`${API_BASE}/download/pdf?name=Dream%20Home%20Villa&city=Bangalore`, '_blank');
+        window.open(getApiUrl('/api/v1/download/pdf?name=Dream%20Home%20Villa&city=Bangalore'), '_blank');
       } else if (id === 'dl-2') {
         // Excel — trigger file download
-        triggerAnchorDownload(`${API_BASE}/download/excel`, 'cost_calculator_report.xlsx');
+        triggerAnchorDownload(getApiUrl('/api/v1/download/excel'), 'cost_calculator_report.xlsx');
       } else if (id === 'dl-3') {
         // CSV — trigger file download
-        triggerAnchorDownload(`${API_BASE}/download/csv?type=boq`, 'cost_calculator_boq.csv');
+        triggerAnchorDownload(getApiUrl('/api/v1/download/csv?type=boq'), 'cost_calculator_boq.csv');
       } else if (id === 'dl-4') {
         // Shareable link — simulated (no auth system yet)
         await new Promise((r) => setTimeout(r, 1200));

@@ -9,7 +9,41 @@ import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 
-app.use(cors({ origin: ENV.CORS_ORIGIN }));
+const configuredOrigins = (ENV.CORS_ORIGIN || '*')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, mobile apps, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // Wildcard enabled
+      if (configuredOrigins.includes('*')) return callback(null, true);
+
+      // Explicitly allow Hutty production Vercel frontend and any Vercel preview branch
+      if (
+        origin === 'https://cost-calculator-ten-kappa.vercel.app' ||
+        origin.endsWith('.vercel.app') ||
+        configuredOrigins.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      // Local development origins
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 app.use(express.json());
 app.use(morgan('dev'));
 

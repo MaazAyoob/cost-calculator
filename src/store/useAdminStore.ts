@@ -25,6 +25,7 @@ import {
 } from '../calculation-engine/data/rateMasterDefaults';
 import { rateService } from '../calculation-engine/data/rateService';
 import { useCalculationStore } from './useCalculationStore';
+import { getApiUrl } from '../config/api';
 
 export type AdminTab =
   | 'overview'
@@ -181,7 +182,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
   login: async (password: string, email = 'admin@hutty.in'): Promise<boolean> => {
     set({ isLoading: true, authError: null });
     try {
-      const res = await fetch('/api/v1/auth/login', {
+      const res = await fetch(getApiUrl('/api/v1/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -272,9 +273,9 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const [overridesRes, configRes, auditRes] = await Promise.allSettled([
-        fetch('/api/v1/admin/rates/overrides', { headers }),
-        fetch('/api/v1/admin/config', { headers }),
-        fetch('/api/v1/admin/audit', { headers }),
+        fetch(getApiUrl('/api/v1/admin/rates/overrides'), { headers }),
+        fetch(getApiUrl('/api/v1/admin/config'), { headers }),
+        fetch(getApiUrl('/api/v1/admin/audit'), { headers }),
       ]);
 
       let loadedOverrides: RateOverride[] = [];
@@ -322,7 +323,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/rates/override', {
+      const res = await fetch(getApiUrl('/api/v1/admin/rates/override'), {
         method: 'POST',
         headers,
         body: JSON.stringify(data),
@@ -391,7 +392,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      await fetch(`/api/v1/admin/rates/override/${id}`, {
+      await fetch(getApiUrl(`/api/v1/admin/rates/override/${id}`), {
         method: 'DELETE',
         headers,
         body: JSON.stringify({ reason }),
@@ -431,7 +432,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/config', {
+      const res = await fetch(getApiUrl('/api/v1/admin/config'), {
         method: 'PUT',
         headers,
         body: JSON.stringify({ settings, reason }),
@@ -477,8 +478,8 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const [propsRes, provRes] = await Promise.allSettled([
-        fetch('/api/v1/admin/price-updates', { headers }),
-        fetch('/api/v1/admin/price-updates/providers', { headers }),
+        fetch(getApiUrl('/api/v1/admin/price-updates'), { headers }),
+        fetch(getApiUrl('/api/v1/admin/price-updates/providers'), { headers }),
       ]);
 
       if (propsRes.status === 'fulfilled' && propsRes.value.ok) {
@@ -507,7 +508,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/price-updates/run', {
+      const res = await fetch(getApiUrl('/api/v1/admin/price-updates/run'), {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -628,7 +629,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch(`/api/v1/admin/price-updates/${id}/approve`, {
+      const res = await fetch(getApiUrl(`/api/v1/admin/price-updates/${id}/approve`), {
         method: 'POST',
         headers,
         body: JSON.stringify({ approvedRate, notes }),
@@ -708,7 +709,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      await fetch(`/api/v1/admin/price-updates/${id}/reject`, {
+      await fetch(getApiUrl(`/api/v1/admin/price-updates/${id}/reject`), {
         method: 'POST',
         headers,
         body: JSON.stringify({ reason }),
@@ -738,7 +739,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/price-updates/bulk-approve', {
+      const res = await fetch(getApiUrl('/api/v1/admin/price-updates/bulk-approve'), {
         method: 'POST',
         headers,
         body: JSON.stringify({ proposalIds }),
@@ -778,13 +779,13 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      let url = `/api/v1/admin/analytics?filter=${analyticsFilter}`;
+      let path = `/api/v1/admin/analytics?filter=${analyticsFilter}`;
       if (analyticsFilter === 'custom') {
-        if (analyticsStartDate) url += `&startDate=${analyticsStartDate}`;
-        if (analyticsEndDate) url += `&endDate=${analyticsEndDate}`;
+        if (analyticsStartDate) path += `&startDate=${analyticsStartDate}`;
+        if (analyticsEndDate) path += `&endDate=${analyticsEndDate}`;
       }
 
-      const res = await fetch(url, { headers });
+      const res = await fetch(getApiUrl(path), { headers });
       if (res.ok) {
         const d = await res.json();
         set({ analytics: d.metrics || null });
@@ -811,13 +812,13 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      let url = `/api/v1/admin/analytics/export?filter=${analyticsFilter}`;
+      let path = `/api/v1/admin/analytics/export?filter=${analyticsFilter}`;
       if (analyticsFilter === 'custom') {
-        if (analyticsStartDate) url += `&startDate=${analyticsStartDate}`;
-        if (analyticsEndDate) url += `&endDate=${analyticsEndDate}`;
+        if (analyticsStartDate) path += `&startDate=${analyticsStartDate}`;
+        if (analyticsEndDate) path += `&endDate=${analyticsEndDate}`;
       }
 
-      const res = await fetch(url, { headers });
+      const res = await fetch(getApiUrl(path), { headers });
       if (!res.ok) throw new Error('Export failed');
 
       const blob = await res.blob();
@@ -844,8 +845,8 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const [profRes, secRes] = await Promise.allSettled([
-        fetch('/api/v1/admin/account/profile', { headers }),
-        fetch('/api/v1/admin/account/security-audit', { headers }),
+        fetch(getApiUrl('/api/v1/admin/account/profile'), { headers }),
+        fetch(getApiUrl('/api/v1/admin/account/security-audit'), { headers }),
       ]);
 
       if (profRes.status === 'fulfilled' && profRes.value.ok) {
@@ -873,7 +874,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/account/password', {
+      const res = await fetch(getApiUrl('/api/v1/admin/account/password'), {
         method: 'POST',
         headers,
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
@@ -908,7 +909,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/account/email', {
+      const res = await fetch(getApiUrl('/api/v1/admin/account/email'), {
         method: 'POST',
         headers,
         body: JSON.stringify({ currentPassword, newEmail, confirmEmail }),
@@ -946,7 +947,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('/api/v1/admin/account/revoke-sessions', {
+      const res = await fetch(getApiUrl('/api/v1/admin/account/revoke-sessions'), {
         method: 'POST',
         headers,
       });
