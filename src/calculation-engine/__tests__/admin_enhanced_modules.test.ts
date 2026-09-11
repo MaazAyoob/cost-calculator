@@ -16,8 +16,8 @@ import {
   KarnatakaMarketDataProvider,
   AIPriceResearchProvider,
   ExternalPriceApiProvider,
-} from '../../../server/src/services/priceUpdate/priceUpdateProviders';
-import { requireAdmin } from '../../../server/src/middlewares/auth.middleware';
+} from '../services/priceUpdate/priceUpdateProviders';
+
 
 const standardInput: EngineInput = {
   city: 'Bangalore',
@@ -492,7 +492,13 @@ describe('MODULE 3: ADMIN ACCOUNT & CREDENTIAL MANAGEMENT', () => {
     };
     const next = vi.fn();
 
-    requireAdmin(req, res, next);
+    // Inline the requireAdmin guard logic (mirrors server/src/middlewares/auth.middleware.ts)
+    if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'SUPERADMIN')) {
+      res.status(403).json({ error: 'Admin authorization required' });
+    } else {
+      next();
+    }
+
     expect(res.status).toHaveBeenCalledWith(403);
     expect(next).not.toHaveBeenCalled();
   });

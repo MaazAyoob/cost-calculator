@@ -24,7 +24,17 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+
+    /* Required for tsc -b project references */
+    "composite": true,
+    "tsBuildInfoFile": "tsconfig.app.tsbuildinfo"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "server",
+    "server/**"
+  ]
 }
