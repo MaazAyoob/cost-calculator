@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { CANONICAL_SAMPLE_RATES, TRADE_PREFIX_DEFAULTS } from '../constants/canonicalRates';
 
 // Initialize Prisma client with graceful fallback if db connection is pending
 let prisma: PrismaClient;
@@ -97,7 +98,7 @@ export async function getRates(req: Request, res: Response) {
 export async function setOverride(req: AuthenticatedRequest, res: Response) {
   try {
     const { rateId } = req.params;
-    const {
+    let {
       rate,
       category,
       unit,
@@ -108,17 +109,70 @@ export async function setOverride(req: AuthenticatedRequest, res: Response) {
       rateName = rateId,
     } = req.body;
 
-    // Safety validation
+    // Support overrideRate alias from frontend payloads
+    if (rate === undefined && typeof req.body.overrideRate === 'number') {
+      rate = req.body.overrideRate;
+    }
+
+    // Safety validation for monetary rate
     if (typeof rate !== 'number' || isNaN(rate) || !isFinite(rate) || rate < 0) {
       return res.status(400).json({ error: 'Rate must be a non-negative finite number' });
     }
+
+    const key = getOverrideKey(rateId, packageTier, location);
+    const existing = inMemoryOverrides.get(key) ||
+      Array.from(inMemoryOverrides.values()).find((o) => o.rateId === rateId && o.category && o.unit);
+
+    // 1. Inherit category & unit from existing in-memory override if missing
+    if (!category && existing?.category) {
+      category = existing.category;
+    }
+    if (!unit && existing?.unit) {
+      unit = existing.unit;
+    }
+
+    // 2. Inherit from database if missing
+    if ((!category || !unit) && prisma && (prisma as any).rateOverride) {
+      try {
+        const dbExisting = await (prisma as any).rateOverride.findFirst({
+          where: { rateId },
+          select: { category: true, unit: true, rateName: true },
+        });
+        if (dbExisting) {
+          if (!category && dbExisting.category) category = dbExisting.category;
+          if (!unit && dbExisting.unit) unit = dbExisting.unit;
+          if (rateName === rateId && dbExisting.rateName) rateName = dbExisting.rateName;
+        }
+      } catch {}
+    }
+
+    // 3. Inherit from canonical catalog if missing
+    if (!category || !unit) {
+      const canonicalMatch = CANONICAL_SAMPLE_RATES.find(
+        (r) => r.id === rateId || rateId.startsWith(r.id.split('.')[0])
+      );
+      if (canonicalMatch) {
+        if (!category && canonicalMatch.category) category = canonicalMatch.category;
+        if (!unit && canonicalMatch.unit) unit = canonicalMatch.unit;
+        if (rateName === rateId && canonicalMatch.name) rateName = canonicalMatch.name;
+      }
+    }
+
+    // 4. Inherit from trade prefix defaults if still missing
+    if (!category || !unit) {
+      const prefix = rateId.split('.')[0].toLowerCase();
+      if (TRADE_PREFIX_DEFAULTS[prefix]) {
+        if (!category) category = TRADE_PREFIX_DEFAULTS[prefix].category;
+        if (!unit) unit = TRADE_PREFIX_DEFAULTS[prefix].unit;
+      }
+    }
+
+    // Strict validation: if category or unit cannot be resolved, reject with clear message
     if (!category || !unit) {
       return res.status(400).json({ error: 'Category and unit are required fields' });
     }
 
     const adminEmail = req.user?.email || 'admin@costcalculator.app';
-    const key = getOverrideKey(rateId, packageTier, location);
-    const existing = inMemoryOverrides.get(key);
     const prevVal = typeof oldValue === 'number' ? oldValue : existing?.rate ?? null;
 
     const overrideData: OverrideRecord = {

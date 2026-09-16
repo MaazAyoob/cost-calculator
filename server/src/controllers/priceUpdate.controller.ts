@@ -22,37 +22,7 @@ export const inMemoryProposals: Map<string, MarketPriceProposal> = new Map();
 
 // Helper to access overrides from admin.controller if available
 import { inMemoryOverrides, inMemoryAuditLogs } from './admin.controller';
-
-// Canonical fallback sample rates for when database is empty
-const CANONICAL_SAMPLE_RATES = [
-  { id: 'steel.fe550d_tmt', name: 'TMT Reinforcement Steel Fe 550D / Fe 500D', category: 'Steel', rate: 74000, unit: '₹/Tonne' },
-  { id: 'steel.indus_fe500d', name: 'Indus TMT Fe 500D Rebar', category: 'Steel', rate: 68000, unit: '₹/Tonne' },
-  { id: 'steel.jsw_neosteel', name: 'JSW Neosteel Fe 550D Rebar', category: 'Steel', rate: 75000, unit: '₹/Tonne' },
-  { id: 'steel.tata_tiscon', name: 'Tata Tiscon 550D Super Ductile Rebar', category: 'Steel', rate: 79000, unit: '₹/Tonne' },
-  { id: 'cement.coromandel_super', name: 'Coromandel King Super Power PPC', category: 'Cement', rate: 380, unit: '₹/Bag' },
-  { id: 'cement.birla_super', name: 'Birla Super 53-Grade / PPC Cement', category: 'Cement', rate: 400, unit: '₹/Bag' },
-  { id: 'cement.ultratech_super', name: 'UltraTech Super Weather Plus Cement', category: 'Cement', rate: 425, unit: '₹/Bag' },
-  { id: 'sand.m_sand', name: 'Manufactured M-Sand (Concrete Grade)', category: 'Sand', rate: 55, unit: '₹/CFT' },
-  { id: 'sand.p_sand', name: 'Manufactured Plastering P-Sand', category: 'Sand', rate: 65, unit: '₹/CFT' },
-  { id: 'aggregate.20mm', name: 'Crushed Granite Aggregate 20mm', category: 'Aggregate', rate: 40, unit: '₹/CFT' },
-  { id: 'aggregate.40mm', name: 'Crushed Granite Aggregate 40mm', category: 'Aggregate', rate: 36, unit: '₹/CFT' },
-  { id: 'masonry.solid_block_8in', name: 'Dense Concrete Solid Block (8-inch)', category: 'Masonry', rate: 42, unit: '₹/Block' },
-  { id: 'masonry.solid_block_6in', name: 'Dense Concrete Solid Block (6-inch)', category: 'Masonry', rate: 34, unit: '₹/Block' },
-  { id: 'masonry.solid_block_4in', name: 'Dense Concrete Solid Block (4-inch)', category: 'Masonry', rate: 28, unit: '₹/Block' },
-  { id: 'masonry.red_clay_brick', name: 'Wire-Cut Kiln Red Clay Bricks', category: 'Masonry', rate: 11.5, unit: '₹/Brick' },
-  { id: 'paint.asian_tractor_emulsion', name: 'Asian Paints Tractor Emulsion (Interior)', category: 'Paint', rate: 16, unit: '₹/SqFt' },
-  { id: 'paint.asian_apcolite_premium', name: 'Asian Paints Apcolite Premium Emulsion', category: 'Paint', rate: 24, unit: '₹/SqFt' },
-  { id: 'paint.asian_royale_luxury', name: 'Asian Paints Royale Luxury Emulsion', category: 'Paint', rate: 36, unit: '₹/SqFt' },
-  { id: 'flooring.vitrified_tiles', name: 'Double Charged Vitrified Tiles 800x800mm', category: 'Flooring', rate: 85, unit: '₹/SqFt' },
-  { id: 'flooring.granite_slab', name: 'Sadahalli Grey Granite Polished Slab', category: 'Flooring', rate: 145, unit: '₹/SqFt' },
-  { id: 'doors.flush_door', name: 'Waterproof Membrane Flush Door (32mm)', category: 'Doors', rate: 3500, unit: '₹/Door' },
-  { id: 'windows.upvc_slider', name: '2.5-Track uPVC Sliding Window with Mosquito Mesh', category: 'Windows', rate: 650, unit: '₹/SqFt' },
-  { id: 'electrical.wire_bundle', name: 'Finolex / Havells FRLS Copper Wire Bundle (1.5 sq mm)', category: 'Electrical wiring', rate: 2200, unit: '₹/Bundle' },
-  { id: 'plumbing.cpvc_pipe', name: 'Astral SDR 11 CPVC Plumbing Pipe 1-inch (3m)', category: 'Plumbing', rate: 480, unit: '₹/Length' },
-  { id: 'sanitaryware.wall_hung_ewc', name: 'Jaquar Rimless Wall Hung EWC with Soft Close Seat', category: 'Sanitaryware', rate: 7800, unit: '₹/Unit' },
-  { id: 'labour.mason_daily', name: 'Lead Mason Daily Labour Wage', category: 'Labour', rate: 1050, unit: '₹/Day' },
-  { id: 'labour.helper_daily', name: 'Helper Daily Construction Wage', category: 'Labour', rate: 700, unit: '₹/Day' },
-];
+import { CANONICAL_SAMPLE_RATES } from '../constants/canonicalRates';
 
 /**
  * GET /api/v1/admin/price-updates/providers

@@ -87,6 +87,8 @@ interface AdminStoreState {
   fetchData: () => Promise<void>;
   saveOverride: (data: {
     rateId: string;
+    category?: string;
+    unit?: string;
     packageTier: string;
     location: string;
     overrideRate: number;
@@ -325,17 +327,32 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
   },
 
   saveOverride: async (data): Promise<boolean> => {
-    const { token } = get();
+    const { token, rates, overrides } = get();
     set({ isLoading: true, error: null, successMessage: null });
 
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
+      // Defensive metadata resolution: ensure category and unit are present
+      const targetRate = rates.find((r) => r.id === data.rateId || r.rateId === data.rateId);
+      const existingOverride = overrides.find(
+        (o) => o.rateId === data.rateId && (o.category || o.unit)
+      );
+      const category = data.category || targetRate?.category || existingOverride?.category;
+      const unit = data.unit || targetRate?.unit || existingOverride?.unit;
+
+      const payload = {
+        ...data,
+        category,
+        unit,
+        rate: data.overrideRate,
+      };
+
       const res = await fetch(getApiUrl('/api/v1/admin/rates/override'), {
         method: 'POST',
         headers,
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {

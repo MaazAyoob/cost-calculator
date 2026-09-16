@@ -262,6 +262,8 @@ export const AdminPage: React.FC = () => {
     if (!editingItem) return;
     await saveOverride({
       rateId: editingItem.id,
+      category: editingItem.category,
+      unit: editingItem.unit,
       packageTier: editPackage,
       location: editLocation,
       overrideRate: editRate,
