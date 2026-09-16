@@ -35,6 +35,7 @@ import {
   HUTTY_BASELINE_RATES,
   HUTTY_BASELINE_CONFIG,
 } from './rateMasterDefaults';
+import { getApiUrl } from '../../config/api';
 
 export interface RateSourceMetadata {
   sourceId?: string;
@@ -105,6 +106,38 @@ export class DefaultQSRateProvider implements IRateProvider {
   }
 }
 
+export const CANONICAL_RATE_ALIASES: Record<string, string[]> = {
+  'windows.upvc_slider': ['windows.standard_upvc', 'windows.upvc_standard'],
+  'windows.standard_upvc': ['windows.upvc_slider', 'windows.upvc_standard'],
+  'windows.upvc_standard': ['windows.upvc_slider', 'windows.standard_upvc'],
+  'sand.m_sand': ['aggregate.msand_zone2', 'aggregate.m_sand'],
+  'sand.p_sand': ['aggregate.psand_fine', 'aggregate.p_sand'],
+  'aggregate.msand_zone2': ['sand.m_sand', 'aggregate.m_sand'],
+  'aggregate.psand_fine': ['sand.p_sand', 'aggregate.p_sand'],
+  'aggregate.coarse_granite': ['aggregate.20mm', 'aggregate.coarse_20mm'],
+  'aggregate.20mm': ['aggregate.coarse_granite', 'aggregate.coarse_20mm'],
+  'doors.flush_door': ['doors.internal_flush'],
+  'doors.internal_flush': ['doors.flush_door'],
+  'doors.teak_wood': ['doors.main_teak_african'],
+  'doors.main_teak_african': ['doors.teak_wood'],
+};
+
+export function normalizePackageTier(pkg?: string): PackageTierDimension {
+  if (!pkg) return 'ALL';
+  const p = pkg.trim().toUpperCase();
+  if (p === 'STANDARD' || p === 'PREMIUM' || p === 'LUXURY') return p;
+  return 'ALL';
+}
+
+export function normalizeLocation(loc?: string): LocationDimension {
+  if (!loc) return 'ALL';
+  const l = loc.trim().toLowerCase();
+  if (l.includes('bangalore') || l.includes('bengaluru')) return 'Bangalore';
+  if (l.includes('mysore') || l.includes('mysuru')) return 'Mysore';
+  if (l === 'all') return 'ALL';
+  return 'ALL';
+}
+
 /**
  * Centralized Rate Master & Resolver Engine
  * Authoritative source for every rate consumed by calculation modules.
@@ -118,14 +151,39 @@ class RateService {
   private auditLogs: RateAuditEntry[] = [];
   private config: CalculatorConfigSettings = { ...HUTTY_BASELINE_CONFIG };
   private listeners: Array<() => void> = [];
+  private isSyncing = false;
 
   constructor() {
     this.defaultProvider = new DefaultQSRateProvider();
     this.activeProvider = this.defaultProvider;
+
+    // Hydrate cached overrides and config synchronously from localStorage if available in browser
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const cachedOverrides = localStorage.getItem('hutty_active_overrides');
+        if (cachedOverrides) {
+          const parsed = JSON.parse(cachedOverrides);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.setOverrides(parsed);
+          }
+        }
+        const cachedConfig = localStorage.getItem('hutty_calculator_config');
+        if (cachedConfig) {
+          const parsedCfg = JSON.parse(cachedConfig);
+          if (parsedCfg && typeof parsedCfg === 'object') {
+            this.setConfig(parsedCfg);
+          }
+        }
+      } catch (e) {
+        console.warn('[RateService] Failed to hydrate cached rates from localStorage:', e);
+      }
+    }
   }
 
-  private getCompositeKey(rateId: string, packageTier = 'ALL', location = 'ALL'): string {
-    return `${rateId}:::${packageTier}:::${location}`;
+  private getCompositeKey(rateId: string, packageTier: string = 'ALL', location: string = 'ALL'): string {
+    const pkg = normalizePackageTier(packageTier);
+    const loc = normalizeLocation(location);
+    return `${rateId}:::${pkg}:::${loc}`;
   }
 
   public subscribe(fn: () => void): () => void {
@@ -143,6 +201,60 @@ class RateService {
         console.error('[RateService] Listener error:', e);
       }
     });
+  }
+
+  /**
+   * Synchronizes active rate overrides and calculator configuration with the backend server.
+   * Caches successful responses in localStorage and notifies all listeners (e.g. useCalculationStore).
+   */
+  public async syncWithServer(customBaseUrl?: string): Promise<boolean> {
+    if (typeof window === 'undefined') return false;
+    if (this.isSyncing) return false;
+    this.isSyncing = true;
+
+    try {
+      const overridesUrl = customBaseUrl
+        ? `${customBaseUrl.replace(/\/+$/, '')}/api/v1/admin/rates/overrides`
+        : getApiUrl('/api/v1/admin/rates/overrides');
+      const configUrl = customBaseUrl
+        ? `${customBaseUrl.replace(/\/+$/, '')}/api/v1/admin/config`
+        : getApiUrl('/api/v1/admin/config');
+
+      const [ratesRes, configRes] = await Promise.allSettled([
+        fetch(overridesUrl),
+        fetch(configUrl),
+      ]);
+
+      let hasUpdates = false;
+
+      if (ratesRes.status === 'fulfilled' && ratesRes.value.ok) {
+        const d = await ratesRes.value.json();
+        const serverOverrides = d.overrides || d.data || [];
+        if (Array.isArray(serverOverrides)) {
+          this.setOverrides(serverOverrides);
+          hasUpdates = true;
+        }
+      }
+
+      if (configRes.status === 'fulfilled' && configRes.value.ok) {
+        const d = await configRes.value.json();
+        const serverConfig = d.config || d.data;
+        if (serverConfig && typeof serverConfig === 'object') {
+          this.setConfig(serverConfig);
+          hasUpdates = true;
+        }
+      }
+
+      if (hasUpdates) {
+        this.notify();
+      }
+      return true;
+    } catch (e) {
+      console.warn('[RateService] syncWithServer network error, continuing with cached rates:', e);
+      return false;
+    } finally {
+      this.isSyncing = false;
+    }
   }
 
   // ────────────────────────────────────────────────────────────
@@ -172,12 +284,19 @@ class RateService {
   private resolveEffectiveRate(rateId: string, context?: EffectiveRateContext): EffectiveRateResult {
     const rawPkg = context?.packageTier || context?.package || 'ALL';
     const rawLoc = context?.location || context?.city || 'ALL';
-    const pkg = (rawPkg as string).toUpperCase() as PackageTierDimension;
-    const loc = rawLoc as LocationDimension;
+    const pkg = normalizePackageTier(rawPkg);
+    const loc = normalizeLocation(rawLoc);
     const brandStr = (context?.brand || '').trim();
 
     // Default item for the generic/requested rateId
     let defaultItem = HUTTY_BASELINE_RATES.find((r) => r.id === rateId);
+    if (!defaultItem) {
+      const aliases = CANONICAL_RATE_ALIASES[rateId] || [];
+      for (const alias of aliases) {
+        defaultItem = HUTTY_BASELINE_RATES.find((r) => r.id === alias);
+        if (defaultItem) break;
+      }
+    }
 
     // Contextual brand item resolution
     const findBrandItem = (): RateMasterItem | undefined => {
@@ -260,32 +379,47 @@ class RateService {
 
     const getVal = (o: RateOverride | undefined): number | null => {
       if (!o || o.isActive === false) return null;
-      if (typeof o.overrideRate === 'number' && !isNaN(o.overrideRate) && isFinite(o.overrideRate)) return o.overrideRate;
-      if (typeof o.rate === 'number' && !isNaN(o.rate) && isFinite(o.rate)) return o.rate;
+      if (typeof o.overrideRate === 'number' && !isNaN(o.overrideRate) && isFinite(o.overrideRate) && o.overrideRate >= 0) return o.overrideRate;
+      if (typeof o.rate === 'number' && !isNaN(o.rate) && isFinite(o.rate) && o.rate >= 0) return o.rate;
+      return null;
+    };
+
+    const checkOverrideForId = (
+      candId: string
+    ): { val: number; sourceType: EffectiveRateResult['sourceType']; pkgTier: string; location: string } | null => {
+      // 1. Exact: [id, pkg, loc]
+      if (pkg !== 'ALL' && loc !== 'ALL') {
+        const val = getVal(this.overrides.get(this.getCompositeKey(candId, pkg, loc)));
+        if (val !== null) return { val, sourceType: 'OVERRIDE_PACKAGE_LOCATION', pkgTier: pkg, location: loc };
+      }
+      // 2. Package: [id, pkg, 'ALL']
+      if (pkg !== 'ALL') {
+        const val = getVal(this.overrides.get(this.getCompositeKey(candId, pkg, 'ALL')));
+        if (val !== null) return { val, sourceType: 'OVERRIDE_PACKAGE', pkgTier: pkg, location: 'ALL' };
+      }
+      // 3. Location: [id, 'ALL', loc]
+      if (loc !== 'ALL') {
+        const val = getVal(this.overrides.get(this.getCompositeKey(candId, 'ALL', loc)));
+        if (val !== null) return { val, sourceType: 'OVERRIDE_LOCATION', pkgTier: 'ALL', location: loc };
+      }
+      // 4. Global: [id, 'ALL', 'ALL']
+      const val = getVal(this.overrides.get(this.getCompositeKey(candId, 'ALL', 'ALL')));
+      if (val !== null) return { val, sourceType: 'OVERRIDE_GLOBAL', pkgTier: 'ALL', location: 'ALL' };
+
       return null;
     };
 
     const lookupOverride = (
       id: string
     ): { val: number; sourceType: EffectiveRateResult['sourceType']; pkgTier: string; location: string } | null => {
-      // 1. Exact: [id, pkg, loc]
-      if (pkg !== 'ALL' && loc !== 'ALL') {
-        const val = getVal(this.overrides.get(this.getCompositeKey(id, pkg, loc)));
-        if (val !== null) return { val, sourceType: 'OVERRIDE_PACKAGE_LOCATION', pkgTier: pkg, location: loc };
+      const direct = checkOverrideForId(id);
+      if (direct !== null) return direct;
+
+      const aliases = CANONICAL_RATE_ALIASES[id] || [];
+      for (const alias of aliases) {
+        const aliasMatch = checkOverrideForId(alias);
+        if (aliasMatch !== null) return aliasMatch;
       }
-      // 2. Package: [id, pkg, 'ALL']
-      if (pkg !== 'ALL') {
-        const val = getVal(this.overrides.get(this.getCompositeKey(id, pkg, 'ALL')));
-        if (val !== null) return { val, sourceType: 'OVERRIDE_PACKAGE', pkgTier: pkg, location: 'ALL' };
-      }
-      // 3. Location: [id, 'ALL', loc]
-      if (loc !== 'ALL') {
-        const val = getVal(this.overrides.get(this.getCompositeKey(id, 'ALL', loc)));
-        if (val !== null) return { val, sourceType: 'OVERRIDE_LOCATION', pkgTier: 'ALL', location: loc };
-      }
-      // 4. Global: [id, 'ALL', 'ALL']
-      const val = getVal(this.overrides.get(this.getCompositeKey(id, 'ALL', 'ALL')));
-      if (val !== null) return { val, sourceType: 'OVERRIDE_GLOBAL', pkgTier: 'ALL', location: 'ALL' };
 
       return null;
     };
@@ -411,17 +545,27 @@ class RateService {
       throw new Error(`Invalid override rate: ${val}. Must be a non-negative number.`);
     }
 
-    const key = this.getCompositeKey(override.rateId, override.packageTier, override.location);
+    const pkg = normalizePackageTier(override.packageTier);
+    const loc = normalizeLocation(override.location);
+    const key = this.getCompositeKey(override.rateId, pkg, loc);
     const existing = this.overrides.get(key);
     const prevRate = existing?.overrideRate ?? existing?.rate ?? null;
 
     this.overrides.set(key, {
       ...override,
+      packageTier: pkg,
+      location: loc,
       rate: val,
       overrideRate: val,
       isActive: true,
       updatedAt: new Date().toISOString(),
     });
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem('hutty_active_overrides', JSON.stringify(Array.from(this.overrides.values())));
+      } catch {}
+    }
 
     const auditEntry: RateAuditEntry = {
       id: `aud-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -432,8 +576,8 @@ class RateService {
       oldValue: prevRate,
       newValue: val,
       action: existing ? 'UPDATE_OVERRIDE' : 'CREATE_OVERRIDE',
-      location: override.location,
-      packageTier: override.packageTier,
+      location: loc,
+      packageTier: pkg,
       adminEmail,
       reason: reason || 'Admin updated rate in Rate Master CMS',
       timestamp: new Date().toISOString(),
@@ -449,16 +593,17 @@ class RateService {
     adminEmail = 'admin@costcalculator.app',
     reason?: string
   ): void {
+    const pkg = normalizePackageTier(packageTier);
+    const loc = normalizeLocation(location);
+
     // Check if rateIdOrId matches an existing override id directly
     for (const [k, o] of this.overrides.entries()) {
-      if (o.id === rateIdOrId) {
+      if (o.id === rateIdOrId || (o.rateId === rateIdOrId && o.packageTier === pkg && o.location === loc)) {
         this.overrides.delete(k);
-        this.notify();
-        return;
       }
     }
 
-    const key = this.getCompositeKey(rateIdOrId, packageTier, location);
+    const key = this.getCompositeKey(rateIdOrId, pkg, loc);
     const existing = this.overrides.get(key);
     if (existing) {
       this.overrides.delete(key);
@@ -472,19 +617,30 @@ class RateService {
         oldValue: existing.rate ?? null,
         newValue: defaultItem?.rate ?? 0,
         action: 'REMOVE_OVERRIDE',
-        location,
-        packageTier,
+        location: loc,
+        packageTier: pkg,
         adminEmail,
         reason: reason || 'Reset to Hutty Baseline default by admin',
         timestamp: new Date().toISOString(),
       };
       this.auditLogs.unshift(auditEntry);
-      this.notify();
     }
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem('hutty_active_overrides', JSON.stringify(Array.from(this.overrides.values())));
+      } catch {}
+    }
+    this.notify();
   }
 
   public resetAllToDefault(adminEmail = 'admin@costcalculator.app'): void {
     this.overrides.clear();
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.removeItem('hutty_active_overrides');
+      } catch {}
+    }
     this.auditLogs.unshift({
       id: `aud-${Date.now()}`,
       rateId: 'ALL',
@@ -506,29 +662,55 @@ class RateService {
   public resetToDefaults(): void {
     this.overrides.clear();
     this.config = { ...HUTTY_BASELINE_CONFIG };
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.removeItem('hutty_active_overrides');
+        localStorage.removeItem('hutty_calculator_config');
+      } catch {}
+    }
     this.notify();
   }
 
   public setOverrides(overrides: RateOverride[]): void {
     this.overrides.clear();
     overrides.forEach((o) => {
-      const key = this.getCompositeKey(o.rateId, o.packageTier, o.location);
-      this.overrides.set(key, o);
+      const val = typeof o.overrideRate === 'number' ? o.overrideRate : o.rate;
+      if (typeof val === 'number' && !isNaN(val) && val >= 0) {
+        const pkg = normalizePackageTier(o.packageTier);
+        const loc = normalizeLocation(o.location);
+        const key = this.getCompositeKey(o.rateId, pkg, loc);
+        this.overrides.set(key, {
+          ...o,
+          packageTier: pkg,
+          location: loc,
+          rate: val,
+          overrideRate: val,
+          isActive: o.isActive !== false,
+        });
+      }
     });
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem('hutty_active_overrides', JSON.stringify(Array.from(this.overrides.values())));
+      } catch {}
+    }
+
     this.notify();
   }
 
   public setConfig(settings: Partial<CalculatorConfigSettings>): void {
     this.config = { ...HUTTY_BASELINE_CONFIG, ...settings };
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem('hutty_calculator_config', JSON.stringify(this.config));
+      } catch {}
+    }
     this.notify();
   }
 
   public syncOverrides(overrides: RateOverride[]): void {
-    overrides.forEach((o) => {
-      const key = this.getCompositeKey(o.rateId, o.packageTier, o.location);
-      this.overrides.set(key, o);
-    });
-    this.notify();
+    this.setOverrides(overrides);
   }
 
   public getAllOverrides(): RateOverride[] {

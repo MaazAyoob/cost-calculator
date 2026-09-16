@@ -3,11 +3,11 @@
 // Central Zustand store for all engine outputs.
 // Automatically recalculates whenever useWizardStore state changes!
 // ============================================================
-
 import { create } from 'zustand';
 import { CalculationResult, EngineInput } from '../calculation-engine/types';
 import { runCalculator } from '../calculation-engine/calculator';
 import { useWizardStore } from './useWizardStore';
+import { rateService } from '../calculation-engine/data/rateService';
 
 // Build EngineInput from the wizard store state
 function buildInput(): EngineInput {
@@ -69,10 +69,21 @@ export const useCalculationStore = create<CalculationStore>((set) => ({
   },
 }));
 
+
 // Automatically subscribe to any change in useWizardStore!
 useWizardStore.subscribe(() => {
   useCalculationStore.getState().recalculate();
 });
+
+// Automatically subscribe to any change in rateService (server overrides or admin edits)!
+rateService.subscribe(() => {
+  useCalculationStore.getState().recalculate();
+});
+
+// Initial background sync with server
+if (typeof window !== 'undefined') {
+  rateService.syncWithServer();
+}
 
 // ── Selector helpers (for clean component usage) ──────────
 export const useArea              = () => useCalculationStore((s) => s.result.area);

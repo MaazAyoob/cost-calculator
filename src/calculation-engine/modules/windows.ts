@@ -56,26 +56,42 @@ export function calculateWindows(input: EngineInput): {
   const prim = windows?.primaryMaterial || 'uPVC';
   const sub = windows?.subGrade || 'Standard uPVC';
   let defaultWindowRate = 650;
+  let targetRateId = 'windows.upvc_slider';
 
   if (prim === 'uPVC') {
-    if (sub === 'Luxury / Fenesta uPVC' || materialBrands?.windows === 'Fenesta uPVC') defaultWindowRate = 850;
-    else if (sub === 'Standard uPVC') defaultWindowRate = 550;
-    else defaultWindowRate = 650;
+    if (sub === 'Luxury / Fenesta uPVC' || materialBrands?.windows === 'Fenesta uPVC') {
+      targetRateId = 'windows.fenesta_upvc';
+      defaultWindowRate = 850;
+    } else if (sub === 'Standard uPVC') {
+      targetRateId = 'windows.upvc_slider';
+      defaultWindowRate = 550;
+    } else {
+      targetRateId = 'windows.upvc_slider';
+      defaultWindowRate = 650;
+    }
   } else if (prim === 'Wood') {
+    targetRateId = 'windows.teak_wood';
     if (sub === 'Teak Wood Frame') defaultWindowRate = 950;
     else if (sub === 'Sal Frame / Honne Shutter') defaultWindowRate = 680;
     else defaultWindowRate = 850;
   } else if (prim === 'Aluminium') {
-    if (sub === 'Powder Coated Jindal Aluminium') defaultWindowRate = 620;
-    else if (sub === 'Anodized Aluminium') defaultWindowRate = 480;
-    else defaultWindowRate = 520;
+    if (sub === 'Powder Coated Jindal Aluminium') {
+      targetRateId = 'windows.powder_coated_aluminium';
+      defaultWindowRate = 620;
+    } else if (sub === 'Anodized Aluminium') {
+      targetRateId = 'windows.anodized_aluminium';
+      defaultWindowRate = 480;
+    } else {
+      targetRateId = 'windows.anodized_aluminium';
+      defaultWindowRate = 520;
+    }
   } else if (materialBrands?.windows) {
     defaultWindowRate = getBrandRate('windows', materialBrands.windows) || defaultWindowRate;
   }
 
   const winBrand = materialBrands?.windows || sub;
   const windowRate = rateService.getEffectiveRate(
-    'windows.upvc_standard',
+    targetRateId,
     { packageTier: input.qualityTier, location: input.city, brand: winBrand },
     defaultWindowRate
   );

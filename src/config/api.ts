@@ -8,7 +8,9 @@
  * - Development: Defaults to '' (using Vite reverse proxy to localhost:4000) unless VITE_API_BASE_URL is specified
  */
 function resolveApiBaseUrl(): string {
-  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+  const metaEnv = typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env : {};
+  const procEnv = typeof process !== 'undefined' && process.env ? process.env : {};
+  const envUrl = metaEnv.VITE_API_BASE_URL || metaEnv.VITE_API_URL || procEnv.VITE_API_BASE_URL || procEnv.VITE_API_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) {
     let clean = envUrl.trim().replace(/\/+$/, '');
     // Guard against accidental '/api/v1' suffix in the base URL configuration
@@ -17,7 +19,7 @@ function resolveApiBaseUrl(): string {
     }
     return clean;
   }
-  return import.meta.env.PROD ? 'https://hutty-api.onrender.com' : '';
+  return metaEnv.PROD ? 'https://hutty-api.onrender.com' : (metaEnv.DEV ? '' : 'https://hutty-api.onrender.com');
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();

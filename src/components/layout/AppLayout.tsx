@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { WebsiteHeader } from './WebsiteHeader';
 import { WebsiteFooter } from './WebsiteFooter';
 import { ToastContainer } from '../ui/Toast';
+import { rateService } from '../../calculation-engine/data/rateService';
 
 export const AppLayout: React.FC = () => {
   const location = useLocation();
+
+  useEffect(() => {
+    // Sync active rate overrides and configuration from backend on initial mount
+    rateService.syncWithServer();
+
+    // Re-sync whenever the window regains focus (e.g. after changing price in an Admin tab)
+    const handleFocus = () => {
+      rateService.syncWithServer();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const isCalculatorRoute = location.pathname === '/calculator' || location.pathname === '/planner';
 
