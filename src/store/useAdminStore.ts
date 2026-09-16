@@ -130,17 +130,24 @@ const getStoredToken = (): string | null => {
   try {
     const t = localStorage.getItem('hutty_admin_token');
     if (t) return t;
-    // Default dev preview token so API calls and admin operations succeed in development
-    return 'dev-admin-mock-token-2026';
+    // Allow dev preview token strictly in local development environments
+    if (import.meta.env.DEV) {
+      return 'dev-admin-mock-token-2026';
+    }
+    return null;
   } catch {
-    return 'dev-admin-mock-token-2026';
+    return import.meta.env.DEV ? 'dev-admin-mock-token-2026' : null;
   }
 };
 
+const initialToken = getStoredToken();
+
 export const useAdminStore = create<AdminStoreState>((set, get) => ({
-  token: getStoredToken(),
-  adminUser: { id: 'admin-1', email: 'admin@hutty.in', role: 'ADMIN', name: 'Hutty System Admin' },
-  isAuthenticated: true,
+  token: initialToken,
+  adminUser: initialToken
+    ? { id: 'admin-1', email: 'admin@hutty.in', role: 'ADMIN', name: 'Hutty System Admin' }
+    : null,
+  isAuthenticated: Boolean(initialToken),
   authError: null,
 
   rates: Object.values(HUTTY_BASELINE_RATES),
@@ -223,8 +230,8 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       get().fetchAccountDetails();
       return true;
     } catch {
-      // In standalone dev/preview mode if backend API is not responding
-      if (password === 'admin123' || password === 'admin' || password === 'Admin@123456') {
+      // Allow standalone fallback strictly in local development environments
+      if (import.meta.env.DEV && (password === 'admin123' || password === 'admin' || password === 'Admin@123456')) {
         const devToken = 'dev-admin-mock-token-2026';
         try { localStorage.setItem('hutty_admin_token', devToken); } catch {}
         set({
@@ -242,7 +249,9 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       }
       set({
         isLoading: false,
-        authError: 'Could not connect to server. Use password "Admin@123456" for dev preview.',
+        authError: import.meta.env.DEV
+          ? 'Could not connect to server. Use password "Admin@123456" for dev preview.'
+          : 'Could not reach authentication server. Please verify your connection or try again later.',
         isAuthenticated: false,
       });
       return false;

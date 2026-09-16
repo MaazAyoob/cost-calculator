@@ -409,9 +409,11 @@ export const AdminPage: React.FC = () => {
             </Button>
           </form>
 
-          <div className="pt-2 text-[11px] text-slate-400">
-            Preview access: <span className="font-mono text-slate-600">Admin@123456</span>
-          </div>
+          {import.meta.env.DEV && (
+            <div className="pt-2 text-[11px] text-slate-400">
+              Preview access: <span className="font-mono text-slate-600">Admin@123456</span>
+            </div>
+          )}
         </div>
       </div>
     );

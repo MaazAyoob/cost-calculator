@@ -18,8 +18,8 @@ export function authenticateToken(req: AuthenticatedRequest, res: Response, next
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  // Allow dev mock token for local frontend preview environments
-  if (token === 'dev-admin-mock-token-2026') {
+  // Allow dev mock token strictly in non-production local development environments
+  if (ENV.NODE_ENV !== 'production' && token === 'dev-admin-mock-token-2026') {
     req.user = {
       id: 'admin-1',
       email: 'admin@hutty.in',
