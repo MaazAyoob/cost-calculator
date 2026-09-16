@@ -141,19 +141,34 @@ export const Step10LoadingExperience: React.FC = () => {
             </p>
           </div>
 
-          <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
             <button
-              onClick={() => navigate('/report')}
+              onClick={() => {
+                useWizardStore.getState().setStep(0);
+                navigate('/report');
+              }}
               className="hutty-btn-primary px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm cursor-pointer"
             >
               <span>View Construction Report</span>
               <ArrowRight className="w-4 h-4 text-[#F28C28]" />
             </button>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => {
+                useWizardStore.getState().setStep(0);
+                navigate('/dashboard');
+              }}
               className="hutty-btn-secondary px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm cursor-pointer"
             >
               <span>Project Summary</span>
+            </button>
+            <button
+              onClick={() => {
+                useWizardStore.getState().startNewProject();
+                navigate('/calculator');
+              }}
+              className="px-5 py-3.5 rounded-xl font-bold text-xs sm:text-sm text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] border border-[#E5E7EB] bg-white cursor-pointer transition-colors"
+            >
+              <span>Start New Project</span>
             </button>
           </div>
         </motion.div>

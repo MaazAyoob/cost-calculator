@@ -2,12 +2,14 @@ import { Router, Request, Response } from 'express';
 import authRoutes from './auth.routes';
 import downloadRoutes from './download.routes';
 import adminRoutes from './admin.routes';
+import ratesRoutes from './rates.routes';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/download', downloadRoutes);
 router.use('/admin', adminRoutes);
+router.use('/rates', ratesRoutes);
 
 
 // Health check

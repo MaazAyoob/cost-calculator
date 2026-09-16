@@ -3,6 +3,7 @@ import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
 import { FourOfferingsSection } from './sections/FourOfferingsSection';
 import { TrustStatsSection } from './sections/TrustStatsSection';
+import { LiveMaterialPricesSection } from './sections/LiveMaterialPricesSection';
 import { WhyPlanningSection } from './sections/WhyPlanningSection';
 import { CalculatorSolutionsSection } from './sections/CalculatorSolutionsSection';
 import { InteractiveDemoSection } from './sections/InteractiveDemoSection';
@@ -30,6 +31,9 @@ export const LandingPage: React.FC = () => {
 
       {/* 02. Trust Strip */}
       <TrustStatsSection />
+
+      {/* 02b. Public Live Material Prices */}
+      <LiveMaterialPricesSection />
 
       {/* 03. Why Planning */}
       <WhyPlanningSection />

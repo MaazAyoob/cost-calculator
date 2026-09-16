@@ -10,7 +10,7 @@ import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
 import { CalculationTraceModal } from '../../components/modals/CalculationTraceModal';
 import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from './pdfService';
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
-import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Sparkles, FileText, ArrowRight, Calculator } from 'lucide-react';
+import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Sparkles, FileText, ArrowRight, Calculator, RotateCcw } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
@@ -125,13 +125,25 @@ export const ReportPage: React.FC = () => {
 
         {/* Top Control Bar (Hidden on print) */}
         <div className="flex items-center justify-between gap-4 print:hidden">
-          <button
-            type="button"
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1.5 text-xs font-bold text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-1.5 text-xs font-bold text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                useWizardStore.getState().startNewProject();
+                navigate('/calculator');
+              }}
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white transition-colors cursor-pointer shadow-2xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-[#F28C28]" /> Start New Project
+            </button>
+          </div>
 
           <div className="flex items-center gap-2">
             <button

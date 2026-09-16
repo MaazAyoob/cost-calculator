@@ -14,6 +14,8 @@ import {
   getPackageConfig,
   normalizePackageId,
 } from '../calculation-engine/data/packageConfig';
+import { useProjectStore } from './useProjectStore';
+import { useReportStore } from './useReportStore';
 
 export type QualityTier = 'Essential' | 'Premium' | 'Luxury';
 export type CityLocation = 'Bangalore' | 'Mysore';
@@ -225,6 +227,13 @@ export const useWizardStore = create<ConfiguratorState>()(
         try {
           localStorage.removeItem('cost_calculator_wizard_state_v4');
           localStorage.removeItem('buildplan_wizard_state');
+        } catch {}
+        try {
+          useProjectStore.getState().resetProject();
+        } catch {}
+        try {
+          useReportStore.getState().setPreparedFor('Valued Client');
+          useReportStore.getState().setClientNotes('Custom residential construction feasibility & BOQ report.');
         } catch {}
         set(getFreshZeroState());
       },

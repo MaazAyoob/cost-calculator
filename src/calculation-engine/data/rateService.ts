@@ -812,6 +812,68 @@ class RateService {
   public getSourceMetadata(): RateSourceMetadata {
     return this.activeProvider.getSourceMetadata();
   }
+
+  public getPublicBenchmarkRates(location = 'Bengaluru', packageTier = 'Standard'): PublicBenchmarkRate[] {
+    const benchmarks = [
+      { id: 'steel.fe550d_tmt', name: 'Fe550D TMT Reinforcement Steel', category: 'Steel', unit: '₹/Tonne', defaultRate: 74000 },
+      { id: 'cement.birla_super', name: 'Birla Super 53-Grade / PPC Cement', category: 'Cement', unit: '₹/Bag', defaultRate: 400 },
+      { id: 'sand.m_sand', name: 'Manufactured M-Sand (Zone II)', category: 'Sand', unit: '₹/CFT', defaultRate: 55 },
+      { id: 'sand.p_sand', name: 'Manufactured Plastering P-Sand', category: 'Sand', unit: '₹/CFT', defaultRate: 65 },
+      { id: 'aggregate.20mm', name: 'Crushed Granite Aggregate 20mm', category: 'Aggregates', unit: '₹/CFT', defaultRate: 40 },
+      { id: 'masonry.solid_block_6in', name: 'Dense Concrete Solid Block (6-inch)', category: 'Masonry', unit: '₹/Block', defaultRate: 34 },
+      { id: 'masonry.aac_block', name: 'Autoclaved Aerated Concrete (AAC) Block', category: 'Masonry', unit: '₹/Block', defaultRate: 65 },
+      { id: 'flooring.vitrified_tiles', name: 'Double Charged Vitrified Tiles 800x800', category: 'Finishes', unit: '₹/SqFt', defaultRate: 85 },
+      { id: 'flooring.granite_slab', name: 'Sadahalli Grey Polished Granite', category: 'Finishes', unit: '₹/SqFt', defaultRate: 145 },
+      { id: 'windows.upvc_slider', name: '2.5-Track uPVC Sliding Window w/ Mesh', category: 'Glazing', unit: '₹/SqFt', defaultRate: 650 },
+      { id: 'doors.teak_wood', name: 'Burma Teak Engineered Main Door', category: 'Joinery', unit: '₹/Door', defaultRate: 28000 },
+      { id: 'paint.asian_tractor_emulsion', name: 'Asian Paints Tractor Emulsion', category: 'Painting', unit: '₹/SqFt', defaultRate: 16 },
+    ];
+
+    return benchmarks.map((item) => {
+      const ctx = { packageTier, location };
+      const result = this.getEffectiveResult(item.id, ctx);
+      const isOverridden = result.sourceType !== 'BASELINE' && result.sourceType !== 'MISSING_RATE' && result.sourceType !== 'FALLBACK';
+      return {
+        rateId: item.id,
+        displayName: item.name,
+        category: item.category,
+        unit: item.unit,
+        rate: result.effectiveRate > 0 ? result.effectiveRate : item.defaultRate,
+        packageTier,
+        location,
+        source: isOverridden ? ('OVERRIDE' as const) : ('BASELINE' as const),
+        updatedAt: undefined,
+      };
+    });
+  }
+
+  public async fetchPublicBenchmarkRates(location = 'Bengaluru', packageTier = 'Standard'): Promise<PublicBenchmarkRate[]> {
+    try {
+      const url = getApiUrl(`/api/v1/rates/latest?location=${encodeURIComponent(location)}&packageTier=${encodeURIComponent(packageTier)}`);
+      const res = await fetch(url, { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.materials)) {
+          return json.materials;
+        }
+      }
+    } catch {
+      // Fallback seamlessly to local rateService resolution
+    }
+    return this.getPublicBenchmarkRates(location, packageTier);
+  }
+}
+
+export interface PublicBenchmarkRate {
+  rateId: string;
+  displayName: string;
+  category: string;
+  unit: string;
+  rate: number;
+  packageTier: string;
+  location: string;
+  source: 'OVERRIDE' | 'BASELINE';
+  updatedAt?: string;
 }
 
 export const rateService = new RateService();

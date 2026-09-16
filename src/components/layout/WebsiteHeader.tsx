@@ -155,6 +155,15 @@ export const WebsiteHeader: React.FC = () => {
               Engineering
             </button>
             <button
+              onClick={() => {
+                useWizardStore.getState().startNewProject();
+                navigate('/calculator');
+              }}
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] transition-all cursor-pointer"
+            >
+              Calculator
+            </button>
+            <button
               onClick={() => handleNavClick({ label: 'Dashboard', action: () => navigate('/dashboard') })}
               className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] transition-all cursor-pointer"
             >

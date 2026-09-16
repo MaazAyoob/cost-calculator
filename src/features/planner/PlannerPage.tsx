@@ -87,6 +87,14 @@ export const PlannerPage: React.FC = () => {
   const currentStepDef = STEPS[currentStep - 1] || STEPS[0];
   const progressPct = Math.min(100, Math.round((currentStep / 10) * 100));
 
+  useEffect(() => {
+    // If navigating to calculator and the previous state was at completion/loading step (11),
+    // immediately reset to step 0 so the user never gets trapped in the old calculation loading loop
+    if (currentStep >= 11) {
+      setStep(0);
+    }
+  }, []);
+
   // Customization tracking
   const customizations = getCustomizationDiff(selectedPackage || 'PREMIUM', store);
   const customCount = customizations.length;
