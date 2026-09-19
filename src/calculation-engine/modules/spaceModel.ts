@@ -21,8 +21,10 @@ import {
   BATHROOM_WATERPROOFING_UPTURN_FT,
 } from '../data/coefficients';
 import { getMasonrySpecification } from '../data/masonrySpecifications';
+import { configResolver } from '../config/configurationResolver';
 
 export function generateBuildingModel(input: EngineInput, area: AreaResult): BuildingModel {
+  const activeWallHeight = configResolver.resolveParameter('config.structure.wall_height_ft', undefined, WALL_HEIGHT_FT);
   const floorsCount = Math.max(0, input.floors || 0);
   const rooms = input.rooms;
   const isZeroState = area.totalBUASqFt <= 0 && area.plotAreaSqFt <= 0;
@@ -58,7 +60,12 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
     floorDistributionStrategy: 'groundFirst' | 'allFloors' | 'upperFloors' = 'allFloors'
   ) => {
     const validCount = Math.max(0, count || 0);
-    const def = ROOM_SIZE_ASSUMPTIONS[type] || ROOM_SIZE_ASSUMPTIONS.bedroom;
+    const normalizedType =
+      type === 'bedrooms' ? 'bedroom' :
+      type === 'bathrooms' ? 'bathroom' :
+      type === 'commonToilets' ? 'commonToilet' :
+      type;
+    const def = ROOM_SIZE_ASSUMPTIONS[type] || ROOM_SIZE_ASSUMPTIONS[normalizedType] || ROOM_SIZE_ASSUMPTIONS.bedroom;
 
     for (let i = 0; i < validCount; i++) {
       spaceSeq++;
@@ -74,11 +81,19 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
         }
       }
 
-      const length = def.estimatedLength;
-      const width = def.estimatedWidth;
-      const spaceArea = def.estimatedArea;
+      const length = configResolver.resolveParameter(
+        `space.room.${normalizedType}.length_ft`,
+        undefined,
+        configResolver.resolveParameter(`space.room.${type}.length_ft`, undefined, def.estimatedLength)
+      );
+      const width = configResolver.resolveParameter(
+        `space.room.${normalizedType}.width_ft`,
+        undefined,
+        configResolver.resolveParameter(`space.room.${type}.width_ft`, undefined, def.estimatedWidth)
+      );
+      const spaceArea = length * width;
       const perimeter = 2 * (length + width);
-      const height = WALL_HEIGHT_FT; // 10 ft from centralized parameter
+      const height = activeWallHeight; // Dynamically resolved from configResolver (fallback WALL_HEIGHT_FT)
 
       const doorCount = def.doorRequirement;
       const doorOpeningAreaSqFt = def.doorOpeningAreaSqFt;
@@ -94,7 +109,12 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
       let dadoTileAreaSqFt = 0;
       if (type === 'bathrooms' || type === 'commonToilets') {
         const isFullHeight = input.wallCladding?.bathroomTileHeight === 'Full Height (Ceiling)';
-        const dadoHeight = isFullHeight ? BATHROOM_DADO_HEIGHT_FULL_FT : BATHROOM_DADO_HEIGHT_STANDARD_FT;
+        const configuredDadoHeight = configResolver.resolveParameter(
+          `space.room.${normalizedType}.dado_height_ft`,
+          undefined,
+          configResolver.resolveParameter('config.cladding.bathroom_dado_standard_ft', undefined, BATHROOM_DADO_HEIGHT_STANDARD_FT)
+        );
+        const dadoHeight = isFullHeight ? BATHROOM_DADO_HEIGHT_FULL_FT : configuredDadoHeight;
         const grossDado = perimeter * dadoHeight;
         // Deduct door and ventilator opening within dado height
         dadoTileAreaSqFt = Math.max(0, grossDado - (doorOpeningAreaSqFt * (dadoHeight / height)) - windowOpeningAreaSqFt);
@@ -108,7 +128,8 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
       let waterproofingAreaSqFt = 0;
       const isWetArea = type === 'bathrooms' || type === 'commonToilets' || type === 'balcony' || type === 'utility';
       if (type === 'bathrooms' || type === 'commonToilets') {
-        waterproofingAreaSqFt = spaceArea + perimeter * BATHROOM_WATERPROOFING_UPTURN_FT;
+        const upturnFt = configResolver.resolveParameter('config.waterproofing.bathroom_upturn_ft', undefined, BATHROOM_WATERPROOFING_UPTURN_FT);
+        waterproofingAreaSqFt = spaceArea + perimeter * upturnFt;
       } else if (type === 'balcony' || type === 'utility') {
         waterproofingAreaSqFt = spaceArea + perimeter * 0.5; // 6 inch curb
       }
@@ -124,7 +145,11 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
       if (type === 'bedrooms') {
         lightPoints = 3;
         fanPoints = 1;
-        socketPoints = 4;
+        socketPoints = configResolver.resolveParameter(
+          'space.room.bedroom.socket_points',
+          undefined,
+          configResolver.resolveParameter('config.electrical.bedroom_socket_points', undefined, 4)
+        );
         acPoints = 1;
         tvDataPoints = 1;
       } else if (type === 'living') {
@@ -279,7 +304,7 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
   const buildableWidth = area.buildableWidthFt > 0 ? area.buildableWidthFt : Math.sqrt(area.buildableAreaSqFt || 100);
   const externalPerimeterFt = Math.max(0, 2 * (buildableLength + buildableWidth));
 
-  const grossExternalWallAreaSqFt = externalPerimeterFt * WALL_HEIGHT_FT * floorsCount;
+  const grossExternalWallAreaSqFt = externalPerimeterFt * activeWallHeight * floorsCount;
 
   // External openings deduction (external windows and main door)
   const mainDoorOpening = (input.houseType === 'Rental Units' || input.houseType === 'Mixed Use')
@@ -292,9 +317,12 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
   const externalOpeningsArea = Math.min(grossExternalWallAreaSqFt * 0.4, totalWindowOpeningArea * 0.85 + mainDoorOpening);
   const netExternalWallAreaSqFt = Math.max(0, grossExternalWallAreaSqFt - externalOpeningsArea);
 
-  // Internal walls: sum of configured room wall envelopes
-  const grossInternalWallAreaSqFt = spacesList.reduce((sum, s) => sum + s.grossWallAreaSqFt, 0);
-  const netInternalWallAreaSqFt = spacesList.reduce((sum, s) => sum + s.netWallAreaSqFt, 0);
+  // Internal walls: sum of configured room wall envelopes with shared partition wall deduplication
+  // (In architectural floorplans, shared internal partition walls divide adjacent rooms.
+  // Applying 0.65 deduplication avoids double-counting shared wall faces for masonry and plaster).
+  const internalDeduplicationFactor = 0.65;
+  const grossInternalWallAreaSqFt = spacesList.reduce((sum, s) => sum + s.grossWallAreaSqFt, 0) * internalDeduplicationFactor;
+  const netInternalWallAreaSqFt = spacesList.reduce((sum, s) => sum + s.netWallAreaSqFt, 0) * internalDeduplicationFactor;
   const totalCeilingAreaSqFt = spacesList.reduce((sum, s) => sum + s.ceilingAreaSqFt, 0);
 
   // Paintable area per PDF Section 17 & Prompt Section 11:
@@ -311,13 +339,21 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
   const totalNetWallAreaSqFt = netExternalWallAreaSqFt + netInternalWallAreaSqFt;
   // Convert sq.ft to sq.m (1 sq.ft = 0.092903 sq.m) and multiply by material-specific thickness:
   const SQFT_TO_SQM = 0.092903;
-  const externalWallVolCuM = (netExternalWallAreaSqFt * SQFT_TO_SQM) * masonrySpec.externalWallThicknessM;
-  const internalWallVolCuM = (netInternalWallAreaSqFt * SQFT_TO_SQM) * masonrySpec.internalWallThicknessM;
+  const netExternalWallAreaSqM = netExternalWallAreaSqFt * SQFT_TO_SQM;
+  const netInternalWallAreaSqM = netInternalWallAreaSqFt * SQFT_TO_SQM;
+  const totalNetWallAreaSqM = totalNetWallAreaSqFt * SQFT_TO_SQM;
+
+  const externalWallVolCuM = netExternalWallAreaSqM * masonrySpec.externalWallThicknessM;
+  const internalWallVolCuM = netInternalWallAreaSqM * masonrySpec.internalWallThicknessM;
   const totalWallVolumeCuM = externalWallVolCuM + internalWallVolCuM;
 
-  const totalBlockCount = Math.ceil(
-    (totalWallVolumeCuM / masonrySpec.unitVolumeCuM) * (1 + masonrySpec.wastagePercentage / 100)
-  );
+  let totalBlockCount = 0;
+  if (masonrySpec.unitVolumeCuM > 0) {
+    totalBlockCount = Math.ceil((totalWallVolumeCuM / masonrySpec.unitVolumeCuM) * (1 + masonrySpec.wastagePercentage / 100));
+  } else if (masonrySpec.blockLengthM && masonrySpec.blockHeightM) {
+    const blockFaceAreaSqM = masonrySpec.blockLengthM * masonrySpec.blockHeightM;
+    totalBlockCount = Math.ceil((totalNetWallAreaSqM / blockFaceAreaSqM) * (1 + masonrySpec.wastagePercentage / 100));
+  }
 
   return {
     floors,

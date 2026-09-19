@@ -500,31 +500,31 @@ export const ROOM_SIZE_ASSUMPTIONS: Record<string, RoomDimensionAssumption> = {
   },
   bathroom: {
     spaceType: 'bathroom',
-    name: 'Ensuite / Attached Bathroom',
-    estimatedArea: 40, // 8 × 5 ft
-    estimatedLength: 8,
+    name: 'Standard Bathroom / Toilet',
+    estimatedArea: 30, // 6 × 5 ft standard (Sept 19 Meeting standard)
+    estimatedLength: 6,
     estimatedWidth: 5,
     doorRequirement: 1,
     windowRequirement: 1,
     windowAreaSqFt: 6, // 2×3 ft ventilator
     doorOpeningAreaSqFt: 17.5, // 2.5×7 ft door
-    source: 'Hutty Pilot Spec (Section 4)',
+    source: 'Minutes of Meeting (September 19, 2026)',
     effectiveDate: '2026-01-01',
-    requiresClientConfirmation: true,
+    requiresClientConfirmation: false,
   },
   commonToilet: {
     spaceType: 'commonToilet',
     name: 'Common Toilet / Powder Room',
-    estimatedArea: 35, // 7 × 5 ft
-    estimatedLength: 7,
-    estimatedWidth: 5,
+    estimatedArea: 20, // 5 × 4 ft standard
+    estimatedLength: 5,
+    estimatedWidth: 4,
     doorRequirement: 1,
     windowRequirement: 1,
     windowAreaSqFt: 6, // 2×3 ft ventilator
     doorOpeningAreaSqFt: 17.5,
-    source: 'Hutty Pilot Spec (Section 4)',
+    source: 'Minutes of Meeting (September 19, 2026)',
     effectiveDate: '2026-01-01',
-    requiresClientConfirmation: true,
+    requiresClientConfirmation: false,
   },
   kitchen: {
     spaceType: 'kitchen',

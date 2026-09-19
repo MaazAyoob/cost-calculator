@@ -419,7 +419,62 @@ export function generateCalculationTrace(
     result: quantities.totalDoorsCount,
   });
 
-  // 11. Effective Rate per Sq.Ft (Commercial Reconciliation)
+  // 11. Paint & Putty Takeoff (Hutty Spec Phase 6 & Phase 16)
+  const paintRatePerLitre = 420;
+  const paintAmount = Math.round(quantities.interiorPaintLitres * paintRatePerLitre);
+  steps.push({
+    ruleId: 'RULE-PAINT-01',
+    parameter: 'interiorPaintLitres',
+    category: 'FINISHES / PAINT',
+    tradeCategory: 'Painting & Waterproofing',
+    inputs: {
+      internalWallAreaSqFt: quantities.internalWallAreaSqFt,
+      ceilingAreaSqFt: quantities.ceilingAreaSqFt,
+      interiorPaintAreaSqFt: quantities.interiorPaintAreaSqFt,
+      puttyAreaSqFt: quantities.puttyAreaSqFt,
+      coverageSqFtPerLitre: 60, // 2 coats = 60 sq.ft / litre effective
+      wastageAllowance: '10% cutting, roller loss & touchup',
+    },
+    formula: '(Internal Wall Area + Ceiling Area − Deductions) ÷ Coverage × Coats + Wastage',
+    rawQuantity: quantities.interiorPaintAreaSqFt / 60,
+    adjustments: 'Includes 10% wastage allowance and 2 coats application',
+    finalQuantity: quantities.interiorPaintLitres,
+    unit: 'Litres',
+    unitRate: paintRatePerLitre,
+    amount: paintAmount,
+    assumption: 'Interior acrylic emulsion with 2 coats wall putty + 1 coat primer undercoat.',
+    explanation: `Interior wall area (${quantities.internalWallAreaSqFt} sq.ft) plus ceiling area (${quantities.ceilingAreaSqFt} sq.ft) yields ${quantities.interiorPaintAreaSqFt} sq.ft paintable surface, requiring ${quantities.interiorPaintLitres} litres premium emulsion and ${quantities.puttyKg} kg acrylic putty.`,
+    result: quantities.interiorPaintLitres,
+  });
+
+  // 12. Labour Breakdown (Hutty Spec Phase 2 & Phase 16)
+  const civilBenchmark = input.qualityTier === 'Luxury' ? 400 : input.qualityTier === 'Premium' ? 380 : 350;
+  const civilLabourAmt = Math.round(bua * civilBenchmark);
+  steps.push({
+    ruleId: 'RULE-LABOUR-01',
+    parameter: 'directLabourCost',
+    category: 'LABOUR / EXECUTION',
+    tradeCategory: 'Civil & Trade Labour',
+    inputs: {
+      totalBUASqFt: bua,
+      civilBenchmarkPerSqFt: civilBenchmark,
+      civilLabourAmount: civilLabourAmt,
+      finishingTradesLabourAmount: Math.max(0, budget.directLabourCost - civilLabourAmt),
+      model: 'Composite Civil (Earthwork, RCC frame, Masonry, Plaster) + Segregated Finishing Trades',
+    },
+    formula: 'BUA × Civil Benchmark (₹350/₹380/₹400 per sqft) + Finishing Trades Labour',
+    rawQuantity: bua,
+    adjustments: 'Anti-double counting: composite civil subsumes structural trade labour',
+    finalQuantity: budget.directLabourCost,
+    unit: '₹',
+    unitRate: civilBenchmark,
+    amount: budget.directLabourCost,
+    assumption: 'Bengaluru market benchmark planning rates for civil execution.',
+    explanation: `For ${bua.toLocaleString()} sq.ft BUA (${input.qualityTier || 'Premium'} specification), composite civil labour is ₹${civilLabourAmt.toLocaleString('en-IN')} (₹${civilBenchmark}/sq.ft), plus segregated finishing installation trades (electrical, plumbing, tile laying, painting, waterproofing), totaling ₹${budget.directLabourCost.toLocaleString('en-IN')}.`,
+    result: budget.directLabourCost,
+  });
+
+  // 13. Effective Rate per Sq.Ft (Commercial Reconciliation)
   steps.push({
     ruleId: 'RULE-COMMERCIAL-01',
     parameter: 'costPerSqFt',
@@ -429,6 +484,7 @@ export function generateCalculationTrace(
       totalProjectCost: budget.totalProjectCost,
       totalBUASqFt: bua,
       baseConstructionCost: budget.baseConstructionCost,
+      directConstructionBudget: budget.directConstructionBudget,
       commercialAdditions: budget.contractorMargin + budget.contingency + budget.professionalFees + budget.gstAmount,
     },
     formula: 'Total Project Cost ÷ Total Built-Up Area',

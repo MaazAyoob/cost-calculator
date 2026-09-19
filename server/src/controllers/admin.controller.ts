@@ -256,8 +256,18 @@ export async function setOverride(req: AuthenticatedRequest, res: Response) {
             reason,
           },
         });
-      } catch (dbErr) {
-        console.warn('[AdminController] DB sync note (using in-memory):', dbErr);
+      } catch (dbErr: any) {
+        console.error('[AdminController] Database persistence failure:', dbErr);
+        // Revert in-memory modification to maintain strict fail-closed contract
+        if (existing) {
+          inMemoryOverrides.set(key, existing);
+        } else {
+          inMemoryOverrides.delete(key);
+        }
+        return res.status(500).json({
+          error: 'Database persistence failed. Mutation was not saved to permanent storage.',
+          details: dbErr?.message,
+        });
       }
     }
 
@@ -329,8 +339,15 @@ export async function removeOverride(req: AuthenticatedRequest, res: Response) {
             reason: reason || 'Reset to Hutty Baseline default by admin',
           },
         });
-      } catch (dbErr) {
-        console.warn('[AdminController] DB delete note:', dbErr);
+      } catch (dbErr: any) {
+        console.error('[AdminController] Database delete failure:', dbErr);
+        if (existing) {
+          existing.isActive = true;
+        }
+        return res.status(500).json({
+          error: 'Database persistence failed. Override could not be removed from permanent storage.',
+          details: dbErr?.message,
+        });
       }
     }
 

@@ -54,6 +54,8 @@ export interface RateMasterItem {
   active: boolean;
   source: string;
   notes?: string;
+  taxTreatment?: 'tax_included' | 'tax_excluded' | 'not_applicable' | 'unknown';
+  transportIncluded?: boolean;
   effectiveDate: string;
   updatedDate: string;
 }

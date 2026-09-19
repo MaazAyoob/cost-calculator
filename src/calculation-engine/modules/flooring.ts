@@ -15,6 +15,8 @@ import {
   TERRACE_WATERPROOFING_FACTOR,
   SUMP_WATERPROOFING_SQFT,
 } from '../data/coefficients';
+import { configResolver } from '../config/configurationResolver';
+import { calculationMethodManager } from '../rules/methodRegistry';
 
 export function calculateFlooring(
   input: EngineInput,
@@ -49,11 +51,26 @@ export function calculateFlooring(
   }
 
   // 1. Flooring Area (PDF Section 15)
-  // Sum of all space floor areas with 7% cutting wastage
+  // Sum of all space floor areas plus circulation (passages, corridors, foyer) with cutting wastage
   const rawSpaceFloorArea = buildingModel.allSpaces.reduce((sum, s) => sum + s.flooringAreaSqFt, 0);
-  // Ensure base BUA minus walls is well-covered
-  const netLivableBUA = Math.max(rawSpaceFloorArea, Math.round(bua * 0.88));
-  const floorTilesSqFt = Math.round(netLivableBUA * (1 + FLOORING_WASTAGE_PERCENTAGE / 100));
+  const circulationPct = configResolver.resolveParameter('config.flooring.circulation_allowance_pct', undefined, 10);
+  const circulationArea = Math.round(bua * (circulationPct / 100));
+  const netLivableBUA = rawSpaceFloorArea + circulationArea;
+
+  const activeMethod = calculationMethodManager.getMethod('flooring')?.activeMethodId || 'flooring_circulation_pct';
+  const wastagePct = configResolver.resolveParameter(
+    'config.wastage.flooring',
+    undefined,
+    configResolver.resolveParameter('flooring.tile_wastage_percent', undefined, FLOORING_WASTAGE_PERCENTAGE)
+  );
+
+  let floorTilesSqFt = 0;
+  if (activeMethod === 'flooring_carpet_bua_ratio') {
+    const carpetRatio = configResolver.resolveParameter('config.flooring.carpet_to_bua_ratio', undefined, 0.75);
+    floorTilesSqFt = Math.round(bua * carpetRatio * (1 + wastagePct / 100));
+  } else {
+    floorTilesSqFt = Math.round(netLivableBUA * (1 + wastagePct / 100));
+  }
 
   // 2. Wall Cladding / Dado Tiles (PDF Section 16)
   const bathroomSpaces = buildingModel.allSpaces.filter((s) => s.type === 'bathrooms' || s.type === 'commonToilets');
@@ -70,16 +87,19 @@ export function calculateFlooring(
   const wallTilesSqFt = bathroomDadoTileSqFt + kitchenDadoTileSqFt;
 
   // 3. Granite Slabs for Staircase Flights (PDF Section 15)
+  const granitePerFlight = configResolver.resolveParameter('config.flooring.staircase_granite_sqft', undefined, 180);
   const staircaseFlights = Math.max(0, floors - 1);
-  const graniteSlabsSqFt = staircaseFlights * 180; // 180 sq.ft per flight
+  const graniteSlabsSqFt = staircaseFlights * granitePerFlight;
 
   // 4. Waterproofing (PDF Section 23)
   const bathroomWaterproofingSqFt = Math.round(
     bathroomSpaces.reduce((sum, s) => sum + s.waterproofingAreaSqFt, 0)
   );
 
-  const terraceWaterproofingSqFt = Math.round(area.terraceSqFt * TERRACE_WATERPROOFING_FACTOR);
-  const sumpWaterproofingSqFt = SUMP_WATERPROOFING_SQFT; // 120 sq.ft for underground sump
+  const terraceFactor = configResolver.resolveParameter('config.waterproofing.terrace_coverage_ratio', undefined, TERRACE_WATERPROOFING_FACTOR);
+  const sumpSqFt = configResolver.resolveParameter('config.waterproofing.sump_surface_sqft', undefined, SUMP_WATERPROOFING_SQFT);
+  const terraceWaterproofingSqFt = Math.round(area.terraceSqFt * terraceFactor);
+  const sumpWaterproofingSqFt = sumpSqFt;
 
   const balconyWP = buildingModel.allSpaces
     .filter((s) => s.type === 'balcony' || s.type === 'utility')

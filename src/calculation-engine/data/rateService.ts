@@ -125,7 +125,9 @@ export const CANONICAL_RATE_ALIASES: Record<string, string[]> = {
 export function normalizePackageTier(pkg?: string): PackageTierDimension {
   if (!pkg) return 'ALL';
   const p = pkg.trim().toUpperCase();
-  if (p === 'STANDARD' || p === 'PREMIUM' || p === 'LUXURY') return p;
+  if (p === 'STANDARD' || p === 'ESSENTIAL') return 'STANDARD';
+  if (p === 'PREMIUM') return 'PREMIUM';
+  if (p === 'LUXURY') return 'LUXURY';
   return 'ALL';
 }
 

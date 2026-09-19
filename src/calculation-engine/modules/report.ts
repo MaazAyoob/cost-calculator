@@ -43,7 +43,8 @@ export function assembleReport(
   doorSchedule: DoorScheduleItem[],
   windowSchedule: WindowScheduleItem[],
   procurement: ProcurementItem[],
-  trace: CalculationTraceStep[]
+  trace: CalculationTraceStep[],
+  labourSchedule?: any[]
 ): ReportData {
   const recommendations: string[] = [
     `Use ${input.materialBrands?.cement || 'UltraTech OPC 53'} grade cement throughout for consistent 28-day concrete strength.`,
@@ -66,7 +67,7 @@ export function assembleReport(
     projectId: `HUTTY-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`,
     generatedAt: new Date().toISOString(),
     clientName: 'Homeowner',
-    engineVersion: '1.0.0 (Pilot Spec Space Engine)',
+    engineVersion: '2.0.0 (Hutty Master QS Engine)',
     input,
     area,
     buildingModel,
@@ -76,6 +77,7 @@ export function assembleReport(
     sectionB_MaterialSchedule: materialSchedule,
     sectionC_FixtureSchedule: fixtureSchedule,
     sectionD_CostSummary: budget,
+    sectionE_LabourSchedule: labourSchedule || [],
     doorSchedule,
     windowSchedule,
     timeline,

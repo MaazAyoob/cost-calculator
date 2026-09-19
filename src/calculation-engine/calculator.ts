@@ -48,6 +48,7 @@ import { calculatePlumbing }         from './modules/plumbing';
 import { generateBOQ }               from './modules/boq';
 import { generateMaterialSchedule, generateProcurementList } from './modules/materials';
 import { generateFixtureSchedule }   from './modules/fixtures';
+import { calculateLabour }            from './modules/labour';
 import { calculateBudget }           from './modules/budget';
 import { calculateTimeline }         from './modules/timeline';
 import { calculatePaymentPlan, getPaymentPlanSummary } from './modules/payment';
@@ -56,6 +57,7 @@ import { assembleReport }            from './modules/report';
 import { runQAGate }                 from './modules/qaGate';
 import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from './data/engineeringAssumptions';
 import { rateService }               from './data/rateService';
+import { configResolver }            from './config';
 
 export function runCalculator(input: EngineInput): CalculationResult {
   // ── STEP 1: Built-Up Area & Setback Geometry ──────────────
@@ -252,8 +254,12 @@ export function runCalculator(input: EngineInput): CalculationResult {
   // ── STEP 7: SECTION C – Fixture Schedule (What We Install) ─
   const fixtureSchedule = generateFixtureSchedule(input, quantities, doorSchedule, windowSchedule);
 
+  // ── STEP 7.5: SECTION E – Labour Schedule (Labour Takeoff) ──
+  const labourResult = calculateLabour(input, area, quantities, buildingModel);
+  const labourSchedule = labourResult.items;
+
   // ── STEP 8: SECTION D – Budget (What It Costs) ────────────
-  const budget = calculateBudget(input, area, boq);
+  const budget = calculateBudget(input, area, boq, materialSchedule, fixtureSchedule, labourSchedule);
 
   // ── STEP 9: Timeline ──────────────────────────────────────
   const timeline = calculateTimeline(input, area);
@@ -283,7 +289,8 @@ export function runCalculator(input: EngineInput): CalculationResult {
     doorSchedule,
     windowSchedule,
     procurement,
-    trace
+    trace,
+    labourSchedule
   );
 
   const parameterTable: QSParameterItem[] = Object.values(CENTRALIZED_ENGINEERING_ASSUMPTIONS);
@@ -302,6 +309,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     boq,
     materialSchedule,
     fixtureSchedule,
+    labourSchedule,
     budget,
     timeline,
     paymentPlan,
@@ -312,6 +320,10 @@ export function runCalculator(input: EngineInput): CalculationResult {
     parameterTable,
     rateSourceMetadata,
     commercialReconciliation,
+    resolvedConfiguration: configResolver.getResolvedConfigurationSnapshot({
+      city: input.city,
+      packageTier: input.qualityTier,
+    }),
     calculatedAt,
   };
 

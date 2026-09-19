@@ -102,6 +102,7 @@ model CalculationResult {
   timelineMonths  Int
   budgetBreakdown Json
   quantitiesJson  Json
+  configSnapshot  Json?
   calculatedAt    DateTime @default(now())
 
   @@index([projectId])
@@ -256,6 +257,87 @@ model CalculatorConfig {
   updatedAt DateTime @updatedAt
 
   @@map("calculator_configs")
+}
+
+model CalculationConfigVersion {
+  id               String                       @id @default(uuid())
+  versionNumber    String                       @unique
+  status           String                       @default("DRAFT") // 'DRAFT' | 'VALIDATED' | 'REVIEW' | 'PUBLISHED' | 'ACTIVE' | 'ARCHIVED' | 'REJECTED'
+  description      String?
+  changeNote       String?
+  effectiveFrom    DateTime                     @default(now())
+  effectiveTo      DateTime?
+  validationStatus String                       @default("VALID")
+  parametersCount  Int                          @default(0)
+  createdBy        String
+  validatedBy      String?
+  validatedAt      DateTime?
+  publishedBy      String?
+  publishedAt      DateTime?
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+  parameters       CalculationConfigParameter[]
+  auditLogs        CalculationConfigAuditLog[]
+
+  @@index([status])
+  @@index([versionNumber])
+  @@index([effectiveFrom])
+  @@map("calculation_config_versions")
+}
+
+model CalculationConfigParameter {
+  id                String                   @id @default(uuid())
+  versionId         String
+  version           CalculationConfigVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  key               String
+  name              String
+  description       String?
+  category          String
+  valueJson         Json
+  unit              String
+  valueType         String                   @default("number")
+  minimum           Float?
+  maximum           Float?
+  location          String                   @default("Global")
+  specificationTier String                   @default("Global")
+  source            String?
+  sourceDate        String?
+  sourceReference   String?
+  isStatutory       Boolean                  @default(false)
+  status            String                   @default("ACTIVE")
+  createdBy         String
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+
+  @@unique([versionId, key, location, specificationTier], name: "config_param_unique")
+  @@index([key])
+  @@index([category])
+  @@index([location])
+  @@index([specificationTier])
+  @@index([versionId])
+  @@map("calculation_config_parameters")
+}
+
+model CalculationConfigAuditLog {
+  id           String                   @id @default(uuid())
+  versionId    String
+  version      CalculationConfigVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  parameterId  String?
+  parameterKey String?
+  action       String // 'CREATE_DRAFT' | 'EDIT_PARAMETER' | 'VALIDATE' | 'SIMULATE' | 'SUBMIT_REVIEW' | 'APPROVE_REVIEW' | 'PUBLISH' | 'ACTIVATE' | 'ARCHIVE' | 'REJECT' | 'ROLLBACK_PREPARE'
+  oldValue     Json?
+  newValue     Json?
+  reason       String?
+  adminEmail   String
+  ipAddress    String?
+  userAgent    String?
+  timestamp    DateTime                 @default(now())
+
+  @@index([versionId])
+  @@index([action])
+  @@index([adminEmail])
+  @@index([timestamp])
+  @@map("calculation_config_audit_logs")
 }
 
 model AnalyticsEvent {

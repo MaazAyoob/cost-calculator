@@ -48,6 +48,15 @@ import {
   Square,
   Eye,
   Info,
+  Cpu,
+  History,
+  Play,
+  Compass,
+  Wrench,
+  Hammer,
+  Paintbrush,
+  Home,
+  Percent,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -62,6 +71,12 @@ import {
   Cell,
 } from 'recharts';
 import { formatCurrency } from '../../utils/cn';
+import { ParametersTab } from './tabs/ParametersTab';
+import { SpaceRoomsTab } from './tabs/SpaceRoomsTab';
+import { TradeParametersTab } from './tabs/TradeParametersTab';
+import { CalculationRulesTab } from './tabs/CalculationRulesTab';
+import { SimulationImpactTab } from './tabs/SimulationImpactTab';
+import { VersionHistoryTab } from './tabs/VersionHistoryTab';
 
 export const AdminPage: React.FC = () => {
   const {
@@ -95,6 +110,14 @@ export const AdminPage: React.FC = () => {
     successMessage,
     authError,
     clearMessages,
+
+    // Configuration Engine State
+    configVersions,
+    activeConfigVersion,
+    draftParameters,
+    simulationReport,
+    configHealth,
+    fetchConfigVersions,
 
     // Auto Price Updates
     proposals,
@@ -182,7 +205,8 @@ export const AdminPage: React.FC = () => {
     fetchPriceUpdates();
     fetchAnalytics();
     fetchAccountDetails();
-  }, [fetchData, fetchPriceUpdates, fetchAnalytics, fetchAccountDetails]);
+    fetchConfigVersions();
+  }, [fetchData, fetchPriceUpdates, fetchAnalytics, fetchAccountDetails, fetchConfigVersions]);
 
   // Sync config form with state
   useEffect(() => {
@@ -481,44 +505,262 @@ export const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── NAVIGATION BAR (8 TABS) ── */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto text-xs font-bold">
-        {[
-          { id: 'overview', label: 'Overview', icon: <Building className="w-3.5 h-3.5" /> },
-          { id: 'rates', label: 'Rate Master', icon: <Database className="w-3.5 h-3.5" />, badge: overrides.length > 0 ? overrides.length : undefined },
-          { id: 'price-update', label: 'Auto Price Update', icon: <Sparkles className="w-3.5 h-3.5 text-amber-500" />, badge: proposals.filter((p) => p.status === 'PENDING' || p.status === 'NEEDS_REVIEW').length || undefined },
-          { id: 'config', label: 'Calculator Config', icon: <Sliders className="w-3.5 h-3.5" /> },
-          { id: 'packages', label: 'Package Standards', icon: <Layers className="w-3.5 h-3.5" /> },
-          { id: 'analytics', label: 'Analytics', icon: <TrendingUp className="w-3.5 h-3.5" /> },
-          { id: 'audit', label: 'Audit Trail', icon: <Activity className="w-3.5 h-3.5" /> },
-          { id: 'account', label: 'Account & Security', icon: <Shield className="w-3.5 h-3.5" /> },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id as AdminTab)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === tab.id
-                ? 'bg-[#1B3D34] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-            }`}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-            {tab.badge !== undefined && (
-              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
-              }`}>
-                {tab.badge}
-              </span>
-            )}
-          </button>
-        ))}
+      {/* ── GROUPED NAVIGATION & SECTION SELECTOR (26 SECTIONS) ── */}
+      <div className="space-y-2">
+        {/* Cluster Selector */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto text-xs font-bold">
+            {[
+              { id: 'CORE', label: 'Overview & Pricing', icon: <Building className="w-3.5 h-3.5" /> },
+              { id: 'CONSTRUCTION', label: 'Construction & Spaces', icon: <Layers className="w-3.5 h-3.5" /> },
+              { id: 'COMMERCIAL', label: 'Specs & Commercial', icon: <Sliders className="w-3.5 h-3.5" /> },
+              { id: 'ENGINE', label: 'Rules & Engine', icon: <Cpu className="w-3.5 h-3.5" /> },
+              { id: 'GOVERNANCE', label: 'Governance & Tools', icon: <Shield className="w-3.5 h-3.5" /> },
+            ].map((cluster) => {
+              const clusterTabs: Record<string, AdminTab[]> = {
+                CORE: ['overview', 'rates', 'price-update'],
+                CONSTRUCTION: ['parameters', 'space-rooms', 'structure-rcc', 'masonry', 'flooring', 'paint', 'waterproofing', 'doors-windows', 'plumbing', 'electrical', 'fixtures'],
+                COMMERCIAL: ['labour', 'specifications', 'packages', 'commercial', 'authority', 'recommendations'],
+                ENGINE: ['calculation-engine', 'calculation-rules', 'reports', 'config'],
+                GOVERNANCE: ['versions', 'simulation', 'audit', 'analytics', 'account'],
+              };
+              const isClusterActive = clusterTabs[cluster.id]?.includes(activeTab);
+
+              return (
+                <button
+                  key={cluster.id}
+                  type="button"
+                  onClick={() => {
+                    const firstTab = clusterTabs[cluster.id]?.[0];
+                    if (firstTab) setActiveTab(firstTab);
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+                    isClusterActive
+                      ? 'bg-[#1B3D34] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  }`}
+                >
+                  {cluster.icon}
+                  <span>{cluster.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick Jump 26-Section Dropdown */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[11px] font-bold text-slate-400 uppercase hidden md:inline">Jump To:</span>
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as AdminTab)}
+              className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+            >
+              <optgroup label="1. Core & Pricing">
+                <option value="overview">1. Overview</option>
+                <option value="rates">2. Rate Master</option>
+                <option value="price-update">Auto Price Update</option>
+              </optgroup>
+              <optgroup label="2. Construction & Spaces">
+                <option value="parameters">3. Construction Parameters</option>
+                <option value="space-rooms">4. Space & Rooms</option>
+                <option value="structure-rcc">5. Structure & RCC</option>
+                <option value="masonry">6. Masonry</option>
+                <option value="flooring">7. Flooring & Finishes</option>
+                <option value="paint">8. Paint</option>
+                <option value="waterproofing">9. Waterproofing</option>
+                <option value="doors-windows">10. Doors & Windows</option>
+                <option value="plumbing">11. Plumbing</option>
+                <option value="electrical">12. Electrical</option>
+                <option value="fixtures">13. Fixtures & Sanitary</option>
+              </optgroup>
+              <optgroup label="3. Specs & Commercial">
+                <option value="labour">14. Labour Benchmarks</option>
+                <option value="specifications">15. Specifications & Packages</option>
+                <option value="commercial">16. Commercial Margins</option>
+                <option value="authority">17. Authority & BUA</option>
+                <option value="recommendations">18. Recommendations</option>
+              </optgroup>
+              <optgroup label="4. Rules & Engine">
+                <option value="calculation-engine">19. Calculation Engine</option>
+                <option value="calculation-rules">20. Calculation Rules</option>
+                <option value="reports">21. Report Configuration</option>
+              </optgroup>
+              <optgroup label="5. Governance & System">
+                <option value="versions">22. Version History</option>
+                <option value="simulation">23. Simulation & Impact</option>
+                <option value="audit">24. Audit Trail</option>
+                <option value="analytics">25. Analytics</option>
+                <option value="account">26. Account & Security</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        {/* Sub-Tabs for Current Category */}
+        <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200 overflow-x-auto text-xs font-semibold">
+          {(() => {
+            let tabsToShow: Array<{ id: AdminTab; label: string; badge?: number }> = [];
+            if (['overview', 'rates', 'price-update'].includes(activeTab)) {
+              tabsToShow = [
+                { id: 'overview', label: '1. Overview' },
+                { id: 'rates', label: '2. Rate Master', badge: overrides.length || undefined },
+                { id: 'price-update', label: 'Auto Price Update', badge: proposals.filter((p) => p.status === 'PENDING' || p.status === 'NEEDS_REVIEW').length || undefined },
+              ];
+            } else if (['parameters', 'space-rooms', 'structure-rcc', 'masonry', 'flooring', 'paint', 'waterproofing', 'doors-windows', 'plumbing', 'electrical', 'fixtures'].includes(activeTab)) {
+              tabsToShow = [
+                { id: 'parameters', label: '3. Parameters' },
+                { id: 'space-rooms', label: '4. Space & Rooms' },
+                { id: 'structure-rcc', label: '5. Structure & RCC' },
+                { id: 'masonry', label: '6. Masonry' },
+                { id: 'flooring', label: '7. Flooring' },
+                { id: 'paint', label: '8. Paint' },
+                { id: 'waterproofing', label: '9. Waterproofing' },
+                { id: 'doors-windows', label: '10. Doors/Windows' },
+                { id: 'plumbing', label: '11. Plumbing' },
+                { id: 'electrical', label: '12. Electrical' },
+                { id: 'fixtures', label: '13. Fixtures' },
+              ];
+            } else if (['labour', 'specifications', 'packages', 'commercial', 'authority', 'recommendations'].includes(activeTab)) {
+              tabsToShow = [
+                { id: 'labour', label: '14. Labour' },
+                { id: 'specifications', label: '15. Specifications' },
+                { id: 'commercial', label: '16. Commercial' },
+                { id: 'authority', label: '17. Authority & BUA' },
+                { id: 'recommendations', label: '18. Recommendations' },
+              ];
+            } else if (['calculation-engine', 'calculation-rules', 'reports', 'config'].includes(activeTab)) {
+              tabsToShow = [
+                { id: 'calculation-engine', label: '19. Engine Overview' },
+                { id: 'calculation-rules', label: '20. Calculation Rules' },
+                { id: 'reports', label: '21. Report Config' },
+              ];
+            } else {
+              tabsToShow = [
+                { id: 'versions', label: '22. Version History' },
+                { id: 'simulation', label: '23. Simulation' },
+                { id: 'audit', label: '24. Audit Trail' },
+                { id: 'analytics', label: '25. Analytics' },
+                { id: 'account', label: '26. Account & Security' },
+              ];
+            }
+
+            return tabsToShow.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap cursor-pointer text-xs ${
+                  activeTab === tab.id
+                    ? 'bg-emerald-50 text-[#1B3D34] font-bold border border-emerald-300'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.badge !== undefined && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-emerald-100 text-emerald-800">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            ));
+          })()}
+        </div>
       </div>
 
-      {/* ── TAB 1: OVERVIEW ── */}
+      {/* ── TAB 1: OVERVIEW (UPGRADED PART 2) ── */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
+          {/* Active vs Draft Configuration Banner (Part 2) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Active Production Status */}
+            <div className="p-5 bg-gradient-to-br from-emerald-50 to-white border border-emerald-300 rounded-2xl shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-emerald-700 text-white uppercase">
+                  PRODUCTION / ACTIVE
+                </span>
+                <span className="text-xs font-mono font-bold text-emerald-900">
+                  {activeConfigVersion?.versionLabel || 'v2.0-ACTIVE-PROD'}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 font-heading">
+                  Active Production Calculation Engine
+                </h3>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Published By: <strong>{activeConfigVersion?.publishedBy || 'System Architect'}</strong> · 
+                  Status: <strong>Live Public Estimates</strong>
+                </p>
+              </div>
+              <div className="pt-2 border-t border-emerald-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>Database: Connected (PostgreSQL)</span>
+                <span>Rate Master: Authoritative</span>
+              </div>
+            </div>
+
+            {/* Draft Configuration Status */}
+            <div className="p-5 bg-gradient-to-br from-amber-50 to-white border border-amber-300 rounded-2xl shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-amber-600 text-white uppercase">
+                  DRAFT / NOT LIVE
+                </span>
+                <span className="text-xs font-mono font-bold text-amber-900">
+                  {Object.keys(draftParameters).length} Pending Changes
+                </span>
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 font-heading">
+                  Draft Configuration Workspace
+                </h3>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Changes made in admin tabs remain in isolated draft state until simulated and formally published.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-amber-100 flex items-center justify-between text-[11px]">
+                <span className="text-amber-800 font-medium">
+                  {Object.keys(draftParameters).length > 0 ? 'Simulation Recommended' : 'Clean / Up-to-date'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('simulation')}
+                  className="text-xs font-bold text-[#1B3D34] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  Open Simulation →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Configuration Conflicts Widget (Part 2 & 45) */}
+          {configHealth.conflicts.length > 0 && (
+            <div className="p-4 bg-white border border-amber-200 rounded-2xl shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-[#F28C28]" />
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-heading">
+                    Known Parameter Conflicts Awaiting Review ({configHealth.conflicts.length})
+                  </h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('parameters')}
+                  className="text-xs font-bold text-[#1B3D34] hover:underline cursor-pointer"
+                >
+                  Manage in Parameters →
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {configHealth.conflicts.map((c) => (
+                  <div key={c.key} className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-0.5">
+                    <span className="font-mono text-[10px] text-slate-400 block">{c.key}</span>
+                    <strong className="text-slate-800 text-[11px] block">{c.description}</strong>
+                    <span className="text-[10px] font-mono text-[#F28C28] block">{c.values}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Top Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
@@ -574,56 +816,56 @@ export const AdminPage: React.FC = () => {
           {/* Quick Action Panels */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
-              onClick={() => setActiveTab('price-update')}
-              className="p-6 bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-200 rounded-2xl cursor-pointer hover:border-amber-400 transition-all space-y-3"
+              onClick={() => setActiveTab('parameters')}
+              className="p-6 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-200 rounded-2xl cursor-pointer hover:border-emerald-400 transition-all space-y-3"
             >
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center">
-                <Sparkles className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-[#1B3D34] text-white flex items-center justify-center">
+                <Sliders className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Automatic Market Price Update</h3>
+                <h3 className="text-sm font-bold text-slate-900">Construction Parameters</h3>
                 <p className="text-xs text-slate-600 mt-1">
-                  Query Karnataka market data, vendor feeds, or AI-assisted research. Generate proposals and review before applying.
+                  Adjust wall heights, steel factors, paint spreading rates, and wastage allowances without developer code changes.
                 </p>
               </div>
-              <span className="text-xs font-bold text-amber-700 flex items-center gap-1">
-                Run Price Update →
+              <span className="text-xs font-bold text-[#1B3D34] flex items-center gap-1">
+                Configure Parameters →
               </span>
             </div>
 
             <div
-              onClick={() => setActiveTab('analytics')}
+              onClick={() => setActiveTab('space-rooms')}
+              className="p-6 bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-200 rounded-2xl cursor-pointer hover:border-amber-400 transition-all space-y-3"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#F28C28] text-white flex items-center justify-center">
+                <Building className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Space &amp; Room Archetypes</h3>
+                <p className="text-xs text-slate-600 mt-1">
+                  Control master bedroom, bathroom, kitchen templates, dado heights, and sanitary fixture counts.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-[#F28C28] flex items-center gap-1">
+                Manage Room Templates →
+              </span>
+            </div>
+
+            <div
+              onClick={() => setActiveTab('simulation')}
               className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-200 rounded-2xl cursor-pointer hover:border-blue-400 transition-all space-y-3"
             >
               <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
-                <TrendingUp className="w-5 h-5" />
+                <Activity className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">14-Step Calculator Funnel</h3>
+                <h3 className="text-sm font-bold text-slate-900">Pre-Publish Simulation</h3>
                 <p className="text-xs text-slate-600 mt-1">
-                  Monitor drop-off percentages, step timings, and package preference metrics across user planning sessions.
+                  Compare current production vs draft changes side-by-side with full BOQ and budget delta breakdown.
                 </p>
               </div>
               <span className="text-xs font-bold text-blue-700 flex items-center gap-1">
-                View Analytics Dashboard →
-              </span>
-            </div>
-
-            <div
-              onClick={() => setActiveTab('account')}
-              className="p-6 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-200 rounded-2xl cursor-pointer hover:border-emerald-400 transition-all space-y-3"
-            >
-              <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Admin Account &amp; Security</h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Manage bcrypt-hashed credentials, sign out other active sessions, and review administrative security logs.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
-                Manage Security →
+                Run Simulation Engine →
               </span>
             </div>
           </div>
@@ -1818,6 +2060,36 @@ export const AdminPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* ── NEW TAB: CONSTRUCTION PARAMETERS (Part 3 & 44) ── */}
+      {activeTab === 'parameters' && <ParametersTab />}
+
+      {/* ── NEW TAB: SPACE & ROOMS (Part 4 & 5) ── */}
+      {activeTab === 'space-rooms' && <SpaceRoomsTab />}
+
+      {/* ── NEW TABS: TRADE PARAMETERS & ASSUMPTIONS (Parts 6, 11-18, 21-24) ── */}
+      {(activeTab === 'structure-rcc' ||
+        activeTab === 'masonry' ||
+        activeTab === 'flooring' ||
+        activeTab === 'paint' ||
+        activeTab === 'waterproofing' ||
+        activeTab === 'doors-windows' ||
+        activeTab === 'plumbing' ||
+        activeTab === 'electrical' ||
+        activeTab === 'fixtures' ||
+        activeTab === 'labour' ||
+        activeTab === 'commercial' ||
+        activeTab === 'authority' ||
+        activeTab === 'recommendations') && <TradeParametersTab forcedTab={activeTab} />}
+
+      {/* ── NEW TABS: CALCULATION RULES & ENGINE (Parts 7-10) ── */}
+      {(activeTab === 'calculation-rules' || activeTab === 'calculation-engine') && <CalculationRulesTab />}
+
+      {/* ── NEW TAB: SIMULATION & IMPACT ANALYSIS (Parts 28 & 29) ── */}
+      {activeTab === 'simulation' && <SimulationImpactTab />}
+
+      {/* ── NEW TAB: VERSION HISTORY & HEALTH (Parts 27, 30, 39, 45) ── */}
+      {activeTab === 'versions' && <VersionHistoryTab />}
 
       {/* ── MODAL: EDIT RATE OVERRIDE ── */}
       {editingItem && (

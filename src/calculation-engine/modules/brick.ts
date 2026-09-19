@@ -23,6 +23,7 @@ import {
 import { getMasonrySpecification } from '../data/masonrySpecifications';
 import { getBrandRate } from '../data/brandDatabase';
 import { rateService } from '../data/rateService';
+import { configResolver } from '../config/configurationResolver';
 
 export function calculateMasonry(
   input: EngineInput,
@@ -73,10 +74,14 @@ export function calculateMasonry(
   }
 
   // 1. Direct Material Thumb Rules (PDF Section 9, 10, 11)
-  const mSandCuFt = Math.round(bua * M_SAND_CUFT_PER_SQFT); // 0.60 CFT/sqft
-  const pSandCuFt = Math.round(bua * P_SAND_CUFT_PER_SQFT); // 0.60 CFT/sqft
+  const mSandFactor = configResolver.resolveParameter('config.material.m_sand_cft_per_sqft', undefined, M_SAND_CUFT_PER_SQFT);
+  const pSandFactor = configResolver.resolveParameter('config.material.p_sand_cft_per_sqft', undefined, P_SAND_CUFT_PER_SQFT);
+  const aggregateFactor = configResolver.resolveParameter('config.material.coarse_aggregate_cft_per_sqft', undefined, COARSE_AGGREGATE_CUFT_PER_SQFT);
+
+  const mSandCuFt = Math.round(bua * mSandFactor);
+  const pSandCuFt = Math.round(bua * pSandFactor);
   const sandCuFt = mSandCuFt + pSandCuFt; // Total sand
-  const coarseAggregateCuFt = Math.round(bua * COARSE_AGGREGATE_CUFT_PER_SQFT); // 1.35 CFT/sqft
+  const coarseAggregateCuFt = Math.round(bua * aggregateFactor);
 
   // 2. Space Model Geometry for Masonry (PDF Section 12)
   const netWallAreaSqFt = parseFloat(buildingModel.totalNetWallAreaSqFt.toFixed(1));
@@ -87,8 +92,14 @@ export function calculateMasonry(
   // Rate and brand determination
   const brandName = input.materialBrands?.masonry || spec.brand;
   const defaultBrandRate = getBrandRate('masonry', brandName) || spec.unitRate;
+  let rateKey = 'masonry.aac_block_birla';
+  if (spec.type === 'Clay Bricks') {
+    rateKey = 'masonry.red_clay_brick';
+  } else if (spec.type === 'Concrete Blocks') {
+    rateKey = 'masonry.solid_concrete_block_6in';
+  }
   const brandRate = rateService.getEffectiveRate(
-    'masonry.aac_block_birla',
+    rateKey,
     { packageTier: input.qualityTier, location: input.city, brand: brandName },
     defaultBrandRate
   );

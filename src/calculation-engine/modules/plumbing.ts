@@ -19,6 +19,7 @@ import {
   DAILY_WATER_DEMAND_LPCD,
   WATER_STORAGE_DAYS,
 } from '../data/coefficients';
+import { configResolver } from '../config/configurationResolver';
 
 export function calculatePlumbing(
   input: EngineInput,
@@ -80,14 +81,22 @@ export function calculatePlumbing(
   const bathroomFixtureSets = (input.rooms.bathrooms || 0) + (input.rooms.commonToilets || 0);
 
   // 2. CPVC & SWR Pipe Lengths (PDF Section 20)
-  const verticalRiserM = floors * VERTICAL_RISER_ALLOWANCE_M;
-  const cpvcSupplyMetres = Math.round(totalWaterPoints * CPVC_M_PER_POINT + verticalRiserM * 1.5);
-  const swrDrainMetres = Math.round(totalDrainagePoints * SWR_M_PER_POINT + verticalRiserM);
+  const riserAllowance = configResolver.resolveParameter('config.plumbing.riser_m_per_floor', undefined, VERTICAL_RISER_ALLOWANCE_M);
+  const cpvcPerPoint = configResolver.resolveParameter('config.plumbing.cpvc_m_per_point', undefined, CPVC_M_PER_POINT);
+  const swrPerPoint = configResolver.resolveParameter('config.plumbing.swr_m_per_point', undefined, SWR_M_PER_POINT);
+
+  const verticalRiserM = floors * riserAllowance;
+  const cpvcSupplyMetres = Math.round(totalWaterPoints * cpvcPerPoint + verticalRiserM * 1.5);
+  const swrDrainMetres = Math.round(totalDrainagePoints * swrPerPoint + verticalRiserM);
 
   // 3. Tank Sizing (PDF Section 22)
+  const occupantsPerBed = configResolver.resolveParameter('config.plumbing.occupants_per_bedroom', undefined, OCCUPANTS_PER_BEDROOM);
+  const dailyDemand = configResolver.resolveParameter('config.plumbing.daily_water_demand_lpcd', undefined, DAILY_WATER_DEMAND_LPCD);
+  const storageDays = configResolver.resolveParameter('config.plumbing.water_storage_reserve_days', undefined, WATER_STORAGE_DAYS);
+
   const bedCount = Math.max(1, input.rooms.bedrooms || 1);
-  const occupants = bedCount * OCCUPANTS_PER_BEDROOM;
-  const rawTankCap = occupants * DAILY_WATER_DEMAND_LPCD * WATER_STORAGE_DAYS;
+  const occupants = bedCount * occupantsPerBed;
+  const rawTankCap = occupants * dailyDemand * storageDays;
   // Round up to standard commercial tank capacities (1000L, 1500L, 2000L, 3000L, etc.)
   const overheadTankLitres = Math.max(1000, Math.ceil(rawTankCap / 500) * 500);
 

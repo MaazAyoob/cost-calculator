@@ -10,6 +10,8 @@
 // ============================================================
 
 import { EngineInput, AreaResult, BuildingModel } from '../types';
+import { configResolver } from '../config/configurationResolver';
+import { calculationMethodManager } from '../rules/methodRegistry';
 
 export function calculatePaint(
   input: EngineInput,
@@ -58,13 +60,22 @@ export function calculatePaint(
   // Putty on internal walls + ceiling
   const puttyAreaSqFt = interiorPaintAreaSqFt;
 
-  // Material consumable quantities:
-  // 1 litre interior emulsion covers ~45 sqft (2 coats)
-  // 1 litre exterior weather guard covers ~60 sqft (2 coats)
-  // 1 kg acrylic putty covers ~1.8 sqft (0.55 kg/sqft for 2 coats)
-  const interiorPaintLitres = Math.ceil(interiorPaintAreaSqFt / 45);
-  const exteriorPaintLitres = Math.ceil(exteriorPaintAreaSqFt / 60);
-  const puttyKg = Math.round(puttyAreaSqFt * 0.55);
+  // Dynamic configuration resolution with method selection
+  const interiorCoverage = configResolver.resolveParameter('config.paint.interior_coverage_sqft_per_litre', undefined, 45);
+  const exteriorCoverage = configResolver.resolveParameter('config.paint.exterior_coverage_sqft_per_litre', undefined, 60);
+  const puttyKgPerSqFt = configResolver.resolveParameter('config.paint.putty_kg_per_sqft', undefined, 0.55);
+
+  const activeMethod = calculationMethodManager.getMethod('paint')?.activeMethodId || 'paint_surface_area';
+  let interiorPaintLitres = 0;
+  if (activeMethod === 'paint_thumb_rule_bua') {
+    const thumbRate = configResolver.resolveParameter('config.paint.litres_per_sqft_bua', undefined, 0.12);
+    interiorPaintLitres = Math.ceil(bua * thumbRate);
+  } else {
+    interiorPaintLitres = Math.ceil(interiorPaintAreaSqFt / interiorCoverage);
+  }
+
+  const exteriorPaintLitres = Math.ceil(exteriorPaintAreaSqFt / exteriorCoverage);
+  const puttyKg = Math.round(puttyAreaSqFt * puttyKgPerSqFt);
 
   return {
     internalWallAreaSqFt,

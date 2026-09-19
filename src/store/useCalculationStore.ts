@@ -41,6 +41,9 @@ function buildInput(): EngineInput {
     electrical:      s.electrical,
     bathroomFittings: s.bathroomFittings,
     painting:        s.painting,
+    contractorMode:  s.contractorMode || 'independent',
+    contractorMarginRate: s.contractorMarginRate,
+    applyContractorGST: s.applyContractorGST,
   };
   return input;
 }
@@ -93,6 +96,7 @@ export const useBudgetResult      = () => useCalculationStore((s) => s.result.bu
 export const useBOQ               = () => useCalculationStore((s) => s.result.boq);
 export const useMaterialSchedule  = () => useCalculationStore((s) => s.result.materialSchedule);
 export const useFixtureSchedule   = () => useCalculationStore((s) => s.result.fixtureSchedule);
+export const useLabourSchedule    = () => useCalculationStore((s) => s.result.labourSchedule);
 export const useDoorSchedule      = () => useCalculationStore((s) => s.result.doorSchedule);
 export const useWindowSchedule    = () => useCalculationStore((s) => s.result.windowSchedule);
 export const useTimeline          = () => useCalculationStore((s) => s.result.timeline);

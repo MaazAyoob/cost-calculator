@@ -60,7 +60,10 @@ export function generateBOQ(
     painting,
   } = input;
 
-  const m = MATERIAL_QUALITY_MULTIPLIER[qualityTier || 'Premium'];
+  const tierKey = (String(qualityTier || '').toLowerCase().includes('standard') || String(qualityTier || '').toLowerCase().includes('essential'))
+    ? 'Essential'
+    : (qualityTier || 'Premium');
+  const m = (MATERIAL_QUALITY_MULTIPLIER as any)[tierKey] || MATERIAL_QUALITY_MULTIPLIER.Premium;
   const r = UNIT_RATES_PREMIUM;
   const bua = area.totalBUASqFt;
 

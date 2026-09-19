@@ -15,6 +15,7 @@
 // ============================================================
 
 import { EngineInput, AreaResult, BuildingModel } from '../types';
+import { configResolver } from '../config/configurationResolver';
 
 export interface ElectricalEngineOutput {
   lightingPoints: number;
@@ -106,27 +107,27 @@ export function calculateElectrical(
     evPoints;
 
   // Modular switch plates & modules (approx 0.75 modular units per point + accessories)
-  const switchModules = Math.round(totalElectricalPoints * 0.75) + (input.liftRequired ? 4 : 0);
+  const switchModuleRatio = configResolver.resolveParameter('config.electrical.switch_module_ratio', undefined, 0.75);
+  const switchModules = Math.round(totalElectricalPoints * switchModuleRatio) + (input.liftRequired ? 4 : 0);
 
   // ────────────────────────────────────────────────────────────
   // 2. CONDUCTOR SIZING & LENGTHS (Metres of Single Core Wire)
   // ────────────────────────────────────────────────────────────
   // 1.5 sq.mm: Lighting & Fan points (Phase + Neutral + Earth loop)
-  // ~2.8m route run × 3 conductors = 8.4m -> 8.5m single-core wire per point
-  const wire1_5SqMmMetres = Math.round((lightingPoints + fanPoints) * 8.5);
+  const wire1_5Rate = configResolver.resolveParameter('config.electrical.wire_1_5_m_per_point', undefined, 8.5);
+  const wire1_5SqMmMetres = Math.round((lightingPoints + fanPoints) * wire1_5Rate);
 
   // 2.5 sq.mm: 6A/16A Power Sockets & TV/Data power outlets
-  // ~4.1m route run × 3 conductors = 12.3m -> 12.5m single-core wire per point
-  const wire2_5SqMmMetres = Math.round((socketPoints + tvDataPoints) * 12.5);
+  const wire2_5Rate = configResolver.resolveParameter('config.electrical.wire_2_5_m_per_point', undefined, 12.5);
+  const wire2_5SqMmMetres = Math.round((socketPoints + tvDataPoints) * wire2_5Rate);
 
   // 4.0 sq.mm: Dedicated Heavy Appliance Homerun Circuits (AC & Geyser)
-  // ~7.3m route run × 3 conductors = 22.0m single-core wire per heavy load point
-  const wire4SqMmMetres = Math.round((acPoints + geyserPoints) * 22.0);
+  const wire4_0Rate = configResolver.resolveParameter('config.electrical.wire_4_0_m_per_point', undefined, 22.0);
+  const wire4SqMmMetres = Math.round((acPoints + geyserPoints) * wire4_0Rate);
 
   // 6.0 sq.mm: Vertical Distribution Sub-Main Risers & EV Charging Run
-  // Main DB to each upper floor sub-DB (~11.6m shaft run × 3 conductors = ~35m per upper floor)
-  // Dedicated 32A EV Charger homerun (~11.6m route × 3 conductors = ~35m)
-  const riserWireMetres = Math.max(0, floors - 1) * 35;
+  const riserWireRate = configResolver.resolveParameter('config.electrical.riser_wire_m_per_floor', undefined, 35);
+  const riserWireMetres = Math.max(0, floors - 1) * riserWireRate;
   const evWireMetres = input.evCharging ? 35 : 0;
   const wire6SqMmMetres = riserWireMetres + evWireMetres;
 
@@ -140,13 +141,11 @@ export function calculateElectrical(
   // ────────────────────────────────────────────────────────────
   // 3. CONDUIT ROUTE CALCULATION (Heavy-Duty ISI PVC 25mm)
   // ────────────────────────────────────────────────────────────
-  // Conduit route length is physical piping embedded in slab & wall chases.
-  // Calculated from point density (~2.6m conduit route per draw point)
-  // + vertical riser shaft conduit (~15m per upper floor) + EV run (~12m)
+  const conduitRate = configResolver.resolveParameter('config.electrical.conduit_m_per_point', undefined, 2.6);
   const verticalConduitRisers = Math.max(0, floors - 1) * 15;
   const evConduit = input.evCharging ? 12 : 0;
   const conduitsMetres = Math.round(
-    totalElectricalPoints * 2.6 + verticalConduitRisers + evConduit
+    totalElectricalPoints * conduitRate + verticalConduitRisers + evConduit
   );
 
   return {

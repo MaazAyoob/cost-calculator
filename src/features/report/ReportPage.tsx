@@ -268,27 +268,48 @@ export const ReportPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 2. Project Geometry & Summary (Available to all) */}
+          {/* 2. Project Geometry & Summary (Direct Construction Budget & Breakup) */}
           <section className="space-y-3">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-              1. Project Geometry &amp; Parameters
-            </h2>
+            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                1. Project Geometry &amp; Direct Construction Budget
+              </h2>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[rgba(27,61,52,0.08)] text-[#1B3D34]">
+                {result.input?.contractorMode === 'contractor' ? 'Contractor Build' : 'Independent Self-Build'}
+              </span>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
               <div>
-                <span className="text-[#4B5563] block">Total Estimated Cost</span>
-                <span className="text-base font-extrabold text-[#1B3D34] font-heading">{formatCurrency(budget.totalProjectCost)}</span>
+                <span className="text-[#4B5563] block">Direct Construction Budget</span>
+                <span className="text-base font-extrabold text-[#1B3D34] font-heading">{formatCurrency(budget.directConstructionBudget || budget.totalProjectCost)}</span>
               </div>
               <div>
                 <span className="text-[#4B5563] block">Built-Up Area (BUA)</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
               </div>
               <div>
-                <span className="text-[#4B5563] block">Effective Rate</span>
-                <span className="text-base font-bold text-[#1B3D34] font-heading">₹{budget.costPerSqFt.toLocaleString()} / sq.ft</span>
+                <span className="text-[#4B5563] block">Direct Execution Rate</span>
+                <span className="text-base font-bold text-[#1B3D34] font-heading">₹{(budget.directCostPerSqFt || budget.costPerSqFt).toLocaleString()} / sq.ft</span>
               </div>
               <div>
                 <span className="text-[#4B5563] block">Estimated Timeline</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading">{timeline.totalMonths} Months</span>
+              </div>
+            </div>
+
+            {/* Direct Cost Components Breakup */}
+            <div className="grid grid-cols-3 gap-3 pt-2 text-xs">
+              <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
+                <span className="text-[#4B5563] block text-[11px]">1. Materials (What We Consume)</span>
+                <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(budget.directMaterialCost)}</span>
+              </div>
+              <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
+                <span className="text-[#4B5563] block text-[11px]">2. Fixtures (What We Install)</span>
+                <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(budget.directFixtureCost)}</span>
+              </div>
+              <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
+                <span className="text-[#4B5563] block text-[11px]">3. Labour (Civil &amp; Finishing)</span>
+                <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(budget.directLabourCost)}</span>
               </div>
             </div>
           </section>

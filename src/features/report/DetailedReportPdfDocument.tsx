@@ -401,16 +401,16 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
             Includes Works BOQ, Conductor Takeoff, MEP &amp; Fixture Schedules, and Milestone Disbursement Roadmap.
           </Text>
 
-          {/* KPI row */}
+          {/* KPI row: Core Direct Construction Budget */}
           <View style={styles.coverKpiRow}>
             <View style={styles.coverKpi}>
-              <Text style={styles.coverKpiLabel}>Total Estimated Cost</Text>
-              <Text style={styles.coverKpiValue}>{fmt(budget?.totalProjectCost)}</Text>
-              <Text style={styles.coverKpiSub}>All-inclusive (incl. margins &amp; GST)</Text>
+              <Text style={styles.coverKpiLabel}>Direct Construction Budget</Text>
+              <Text style={styles.coverKpiValue}>{fmt(budget?.directConstructionBudget || budget?.totalProjectCost)}</Text>
+              <Text style={styles.coverKpiSub}>Core Direct Execution (Zero Margin/GST)</Text>
             </View>
             <View style={styles.coverKpi}>
-              <Text style={styles.coverKpiLabel}>Effective Rate</Text>
-              <Text style={styles.coverKpiValue}>₹{num(budget?.costPerSqFt)} / sq.ft</Text>
+              <Text style={styles.coverKpiLabel}>Direct Rate</Text>
+              <Text style={styles.coverKpiValue}>₹{num(budget?.directCostPerSqFt || budget?.costPerSqFt)} / sq.ft</Text>
               <Text style={styles.coverKpiSub}>{specificationTier.toUpperCase()} specification tier</Text>
             </View>
             <View style={styles.coverKpi}>
@@ -420,17 +420,36 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
             </View>
           </View>
 
+          {/* Sub-KPI Row: Materials, Fixtures, Labour */}
+          <View style={[styles.coverKpiRow, { marginTop: -14, marginBottom: 20 }]}>
+            <View style={[styles.coverKpi, { backgroundColor: 'rgba(255,255,255,0.04)' }]}>
+              <Text style={styles.coverKpiLabel}>1. Physical Materials</Text>
+              <Text style={[styles.coverKpiValue, { fontSize: 11 }]}>{fmt(budget?.directMaterialCost)}</Text>
+              <Text style={styles.coverKpiSub}>What We Consume</Text>
+            </View>
+            <View style={[styles.coverKpi, { backgroundColor: 'rgba(255,255,255,0.04)' }]}>
+              <Text style={styles.coverKpiLabel}>2. Fixtures & Equipment</Text>
+              <Text style={[styles.coverKpiValue, { fontSize: 11 }]}>{fmt(budget?.directFixtureCost)}</Text>
+              <Text style={styles.coverKpiSub}>What We Install</Text>
+            </View>
+            <View style={[styles.coverKpi, { backgroundColor: 'rgba(255,255,255,0.04)' }]}>
+              <Text style={styles.coverKpiLabel}>3. Execution Labour</Text>
+              <Text style={[styles.coverKpiValue, { fontSize: 11 }]}>{fmt(budget?.directLabourCost)}</Text>
+              <Text style={styles.coverKpiSub}>Civil & Finishing Trades</Text>
+            </View>
+          </View>
+
           {/* Meta grid */}
           <View style={styles.coverMetaGrid}>
             {[
               ['Project Reference', refId],
               ['Prepared For', preparedFor],
               ['Date Issued', dateStr],
+              ['Execution Mode', input?.contractorMode === 'contractor' ? 'Contractor Mode' : 'Independent Self-Build'],
               ['Plot Dimensions', `${input?.plotLength || 0} × ${input?.plotWidth || 0} ft`],
               ['Rate Master Dataset', rateMeta?.datasetVersion || 'HUTTY-RM-2026.1'],
               ['Data Source', rateMeta?.isLive ? 'Live API' : '2026-Q1 Baseline'],
               ['Calculation Engine', rateMeta?.calculationEngineVersion || 'v2.6.0'],
-              ['Authority', input?.authority || 'BBMP/BDA'],
             ].map(([label, value], i) => (
               <View key={i} style={styles.coverMetaCell}>
                 <Text style={styles.coverMetaLabel}>{label}</Text>

@@ -101,6 +101,35 @@ export interface EngineInput {
   electrical: ElectricalSelection;
   bathroomFittings: BathroomFittingSelection;
   painting: PaintingSelection;
+  // Commercial & contractor mode options
+  contractorMode?: 'independent' | 'contractor';
+  contractorMarginRate?: number; // Configurable contractor margin (e.g. 0.08 to 0.15, default 0.10)
+  applyContractorGST?: boolean;
+}
+
+// ────────────────────────────────────────────────────────────
+// LABOUR SCHEDULE (Section 8 / Paid Package Spec)
+// ────────────────────────────────────────────────────────────
+
+export interface LabourScheduleItem {
+  slNo: number;
+  trade: string;
+  category:
+    | 'Civil & Structure'
+    | 'Electrical'
+    | 'Plumbing'
+    | 'Flooring & Tiling'
+    | 'Painting & Finishes'
+    | 'Waterproofing'
+    | 'Doors & Windows'
+    | 'Other';
+  scope: string;
+  basis: string; // e.g. "Total BUA", "Points", "Area (Sq Ft)", "Openings"
+  quantity: number;
+  unit: string;
+  unitRate: number; // ₹
+  amount: number;   // ₹ = quantity × unitRate
+  notes?: string;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -470,6 +499,13 @@ export interface BudgetResult {
   finishingCost: number;
   mepCost: number;
   baseConstructionCost: number;
+  // Core Direct Construction Budget (Materials + Fixtures + Labour)
+  directMaterialCost: number;
+  directFixtureCost: number;
+  directLabourCost: number;
+  directConstructionBudget: number;
+  directCostPerSqFt: number;
+  // Optional / Configurable Commercial Additions
   professionalFees: number;
   contractorMargin: number;
   contingency: number;
@@ -477,6 +513,7 @@ export interface BudgetResult {
   totalProjectCost: number;
   costPerSqFt: number;
   commercialReconciliation?: CommercialReconciliation;
+  labourSchedule?: LabourScheduleItem[];
 }
 
 // ────────────────────────────────────────────────────────────
@@ -586,11 +623,12 @@ export interface ReportData {
   buildingModel: BuildingModel;
   quantities: MaterialQuantities;
   budget: BudgetResult;
-  // The 4 Core Customer-Facing Sections
+  // The Core Customer-Facing Sections
   sectionA_WorksBOQ: BOQItem[];
   sectionB_MaterialSchedule: MaterialScheduleItem[];
   sectionC_FixtureSchedule: FixtureScheduleItem[];
   sectionD_CostSummary: BudgetResult;
+  sectionE_LabourSchedule?: LabourScheduleItem[];
   // Supporting Schedules
   doorSchedule: DoorScheduleItem[];
   windowSchedule: WindowScheduleItem[];
@@ -620,6 +658,7 @@ export interface CalculationResult {
   boq: BOQItem[]; // Section A
   materialSchedule: MaterialScheduleItem[]; // Section B
   fixtureSchedule: FixtureScheduleItem[]; // Section C
+  labourSchedule: LabourScheduleItem[]; // Labour Breakdown
   budget: BudgetResult; // Section D
   timeline: TimelineResult;
   paymentPlan: PaymentMilestone[];
@@ -631,5 +670,6 @@ export interface CalculationResult {
   rateSourceMetadata?: RateSourceMetadata;
   qaResult?: QAGateResult;
   commercialReconciliation?: CommercialReconciliation;
+  resolvedConfiguration?: any; // ResolvedCalculationConfiguration
   calculatedAt: string;
 }

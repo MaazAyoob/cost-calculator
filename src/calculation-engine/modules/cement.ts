@@ -9,6 +9,7 @@
 
 import { EngineInput, AreaResult } from '../types';
 import { CEMENT_BAGS_PER_SQFT } from '../data/coefficients';
+import { configResolver } from '../config/configurationResolver';
 
 export function calculateCement(input: EngineInput, area: AreaResult): {
   cementBags: number;
@@ -20,7 +21,11 @@ export function calculateCement(input: EngineInput, area: AreaResult): {
     return { cementBags: 0, bagsPerSqFt: 0 };
   }
 
-  const bagsPerSqFt = CEMENT_BAGS_PER_SQFT; // 0.40
+  const bagsPerSqFt = configResolver.resolveParameter(
+    'config.material.cement_bags_per_sqft',
+    undefined,
+    configResolver.resolveParameter('rcc.cement_factor_bags_sqft', undefined, CEMENT_BAGS_PER_SQFT)
+  );
   const cementBags = Math.round(bua * bagsPerSqFt);
 
   return { cementBags, bagsPerSqFt };

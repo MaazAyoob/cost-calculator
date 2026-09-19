@@ -27,6 +27,7 @@ import {
   getSecurityAuditLogs,
 } from '../controllers/account.controller';
 import { authenticateToken, requireAdmin } from '../middlewares/auth.middleware';
+import configRoutes from './config.routes';
 
 const router = Router();
 
@@ -79,5 +80,8 @@ router.post('/account/password', changePassword as any);
 router.post('/account/email', changeEmail as any);
 router.post('/account/revoke-sessions', revokeAllOtherSessions as any);
 router.get('/account/security-audit', getSecurityAuditLogs as any);
+
+// Configuration Versioning Lifecycle Endpoints
+router.use('/config', configRoutes);
 
 export default router;

@@ -135,7 +135,12 @@ export interface ConfiguratorState {
   setBathroomFittingSelection: (sanitaryTier: any, cpvcBrand: any) => void;
   setPaintingSelection: (internalPaint: any, externalPaint: any, brand: any) => void;
   setQualityTier: (tier: QualityTier) => void;
+  // Commercial / Contractor Execution Mode (Phase 1)
+  contractorMode: 'independent' | 'contractor';
+  contractorMarginRate: number;
+  applyContractorGST: boolean;
 
+  setContractorMode: (mode: 'independent' | 'contractor', marginRate?: number, applyGST?: boolean) => void;
   resetConfigurator: () => void;
 }
 
@@ -208,6 +213,11 @@ export function getFreshZeroState() {
     electrical: { ...pkg.specs.electrical },
     bathroomFittings: { ...pkg.specs.bathroomFittings },
     painting: { ...pkg.specs.painting },
+
+    // Commercial / Contractor Execution Mode
+    contractorMode: 'independent' as const,
+    contractorMarginRate: 0.10,
+    applyContractorGST: false,
 
     // Computed metrics: 0
     calculatedAreaSqFt: 0,
@@ -479,13 +489,21 @@ export const useWizardStore = create<ConfiguratorState>()(
         });
       },
 
-      setQualityTier: (qualityTier) => {
+      setQualityTier: (qualityTier: QualityTier) => {
         const packageMap: Record<QualityTier, ConstructionPackageId> = {
           Essential: 'STANDARD',
           Premium: 'PREMIUM',
           Luxury: 'LUXURY',
         };
         set({ qualityTier, selectedPackage: packageMap[qualityTier] || 'PREMIUM', hasStartedSelection: true });
+      },
+
+      setContractorMode: (mode, marginRate, applyGST) => {
+        set((state) => ({
+          contractorMode: mode,
+          contractorMarginRate: typeof marginRate === 'number' ? marginRate : state.contractorMarginRate,
+          applyContractorGST: typeof applyGST === 'boolean' ? applyGST : state.applyContractorGST,
+        }));
       },
 
       resetConfigurator: () => {
