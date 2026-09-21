@@ -402,6 +402,14 @@ export interface MaterialQuantities {
   kitchenSinkCount: number;
   bathroomFixtureSets: number;
   overheadTankLitres: number;
+  // Resolved calculation factors exposed from canonical modules (preserves zero UI recalculation)
+  cementFactorBagsPerSqFt?: number;
+  interiorPaintCoverageSqFtPerLitre?: number;
+  exteriorPaintCoverageSqFtPerLitre?: number;
+  puttyKgPerSqFt?: number;
+  flooringWastagePct?: number;
+  flooringRawAreaSqFt?: number;
+  flooringCirculationSqFt?: number;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -671,5 +679,62 @@ export interface CalculationResult {
   qaResult?: QAGateResult;
   commercialReconciliation?: CommercialReconciliation;
   resolvedConfiguration?: any; // ResolvedCalculationConfiguration
+  explanations?: Record<string, StepCalculationExplanation>;
   calculatedAt: string;
+}
+
+// ────────────────────────────────────────────────────────────
+// CALCULATION TRANSPARENCY / "HOW WE CALCULATED THIS" TYPES
+// ────────────────────────────────────────────────────
+
+export interface ExplanationInputMetric {
+  label: string;
+  value: string | number;
+  unit?: string;
+  description?: string;
+  affectsDownstream?: string[];
+}
+
+export interface ExplanationDerivedQuantity {
+  label: string;
+  quantity: number | string;
+  unit: string;
+  description?: string;
+}
+
+export interface ExplanationFormulaStep {
+  title: string;
+  formula: string;
+  substitutions?: string;
+  resultText: string;
+}
+
+export interface ExplanationRateItem {
+  item: string;
+  quantity: number | string;
+  unit: string;
+  rate: number;
+  rateUnit: string;
+  cost: number;
+  rateSource?: string;
+}
+
+export interface StepCalculationExplanation {
+  stepKey: string;
+  title: string;
+  stepTotal: number;
+  unitRateOrBenchmark?: string;
+  summaryMetrics: Array<{ label: string; value: string | number; unit?: string }>;
+  inputsUsed: ExplanationInputMetric[];
+  derivedQuantities: ExplanationDerivedQuantity[];
+  calculationLogic: ExplanationFormulaStep[];
+  rateBreakdown: ExplanationRateItem[];
+  costBreakdown: {
+    materials?: number;
+    fixtures?: number;
+    labour?: number;
+    total: number;
+  };
+  whatDoesThisAffect?: string[];
+  quantityVsPriceNote?: string;
 }

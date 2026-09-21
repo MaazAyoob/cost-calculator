@@ -9,6 +9,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step2SpaceRequirements: React.FC = () => {
   const { rooms, liftRequired, floors, updateRoomCount, setLiftRequired } = useWizardStore();
@@ -223,6 +224,9 @@ export const Step2SpaceRequirements: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: SPACE REQUIREMENTS ── */}
+      <HowWeCalculatedThis stepKey="space" className="mt-4" />
 
     </div>
   );

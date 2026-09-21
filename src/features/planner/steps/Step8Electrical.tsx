@@ -6,6 +6,7 @@ import { Check, ChevronDown, ChevronUp, Zap, Box, Layers, HelpCircle } from 'luc
 import { cn, formatCurrency } from '../../../utils/cn';
 import { getElectricalWireRate } from '../../../calculation-engine/data/brandDatabase';
 import { rateService } from '../../../calculation-engine/data/rateService';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step8Electrical: React.FC = () => {
   const { electrical, setElectricalSelection, rooms, floors } = useWizardStore();
@@ -280,38 +281,8 @@ export const Step8Electrical: React.FC = () => {
         </table>
       </div>
 
-      {/* ── 5. "HOW IS THIS CALCULATED?" TRANSPARENCY ACCORDION ── */}
-      <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] text-xs">
-        <button
-          type="button"
-          onClick={() => setShowHowCalculated(!showHowCalculated)}
-          className="w-full flex items-center justify-between font-bold text-[#1B3D34] hover:text-[#F28C28] transition-colors cursor-pointer"
-        >
-          <span className="flex items-center gap-1.5">
-            <HelpCircle className="w-3.5 h-3.5 text-[#F28C28]" />
-            How are electrical quantities calculated?
-          </span>
-          {showHowCalculated ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-
-        {showHowCalculated && (
-          <div className="mt-3 pt-3 border-t border-[#E5E7EB] space-y-2 text-[#4B5563] leading-relaxed">
-            <p>
-              <strong>1. Point Schedule:</strong> Derived directly from your configured rooms. Each bedroom allocates 3 lights, 1 fan, 4 sockets, 1 AC point, and 1 TV/data point. Bathrooms allocate 2 lights, 2 sockets, and 1 dedicated geyser point.
-            </p>
-            <p>
-              <strong>2. Conductor Sizing:</strong> Conductor lengths represent single-core copper wire (Phase, Neutral, and Earth loop):
-              <br />&bull; <strong>1.5 sq.mm:</strong> ~8.5m per light/fan point including switch loop.
-              <br />&bull; <strong>2.5 sq.mm:</strong> ~12.5m per power socket &amp; TV console run.
-              <br />&bull; <strong>4.0 sq.mm:</strong> ~22.0m dedicated home-run per AC and geyser.
-              <br />&bull; <strong>6.0 sq.mm:</strong> ~35m vertical riser per upper floor + 35m EV charger run.
-            </p>
-            <p>
-              <strong>3. Heavy-Duty Conduit:</strong> Calculated separately from wiring. Represents physical rigid 25mm PVC piping embedded in slab casting (~2.6m per draw point + 15m vertical shaft riser per floor).
-            </p>
-          </div>
-        )}
-      </div>
+      {/* ── 5. CALCULATION TRANSPARENCY: REFERENCE ELECTRICAL & MEP ── */}
+      <HowWeCalculatedThis stepKey="electrical" defaultExpanded={false} className="mt-4" />
 
     </div>
   );

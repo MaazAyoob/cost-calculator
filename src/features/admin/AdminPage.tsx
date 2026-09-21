@@ -57,6 +57,8 @@ import {
   Paintbrush,
   Home,
   Percent,
+  Zap,
+  Coins,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -77,9 +79,17 @@ import { TradeParametersTab } from './tabs/TradeParametersTab';
 import { CalculationRulesTab } from './tabs/CalculationRulesTab';
 import { SimulationImpactTab } from './tabs/SimulationImpactTab';
 import { VersionHistoryTab } from './tabs/VersionHistoryTab';
+import { AdminOverviewSection } from './sections/AdminOverviewSection';
+import { ProjectBuaSection } from './sections/ProjectBuaSection';
+import { RoomsSpacesSection } from './sections/RoomsSpacesSection';
+import { TradeSections } from './sections/TradeSections';
+import { CalculationMethodsSection } from './sections/CalculationMethodsSection';
+import { TestCalculatorSection } from './sections/TestCalculatorSection';
 
 export const AdminPage: React.FC = () => {
   const {
+    adminViewMode,
+    setAdminViewMode,
     isAuthenticated,
     token,
     adminUser,
@@ -505,375 +515,272 @@ export const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── GROUPED NAVIGATION & SECTION SELECTOR (26 SECTIONS) ── */}
-      <div className="space-y-2">
-        {/* Cluster Selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto text-xs font-bold">
-            {[
-              { id: 'CORE', label: 'Overview & Pricing', icon: <Building className="w-3.5 h-3.5" /> },
-              { id: 'CONSTRUCTION', label: 'Construction & Spaces', icon: <Layers className="w-3.5 h-3.5" /> },
-              { id: 'COMMERCIAL', label: 'Specs & Commercial', icon: <Sliders className="w-3.5 h-3.5" /> },
-              { id: 'ENGINE', label: 'Rules & Engine', icon: <Cpu className="w-3.5 h-3.5" /> },
-              { id: 'GOVERNANCE', label: 'Governance & Tools', icon: <Shield className="w-3.5 h-3.5" /> },
-            ].map((cluster) => {
-              const clusterTabs: Record<string, AdminTab[]> = {
-                CORE: ['overview', 'rates', 'price-update'],
-                CONSTRUCTION: ['parameters', 'space-rooms', 'structure-rcc', 'masonry', 'flooring', 'paint', 'waterproofing', 'doors-windows', 'plumbing', 'electrical', 'fixtures'],
-                COMMERCIAL: ['labour', 'specifications', 'packages', 'commercial', 'authority', 'recommendations'],
-                ENGINE: ['calculation-engine', 'calculation-rules', 'reports', 'config'],
-                GOVERNANCE: ['versions', 'simulation', 'audit', 'analytics', 'account'],
-              };
-              const isClusterActive = clusterTabs[cluster.id]?.includes(activeTab);
+      {/* ── PHASE 2E: 6 COLLAPSIBLE NAVIGATION GROUPS & GLOBAL SEARCH ── */}
+      {(() => {
+        // Search catalog
+        const searchCatalog = [
+          { label: 'Standard Wall Height', section: 'walls-masonry' as AdminTab, group: 'Construction' },
+          { label: 'Masonry Block Type (AAC / Brick)', section: 'walls-masonry' as AdminTab, group: 'Construction' },
+          { label: 'Ground Steel Factor (kg/sqft)', section: 'rcc-structure' as AdminTab, group: 'Construction' },
+          { label: 'Cement Consumption (bags/sqft)', section: 'rcc-structure' as AdminTab, group: 'Construction' },
+          { label: 'M-Sand & P-Sand Ratios', section: 'rcc-structure' as AdminTab, group: 'Construction' },
+          { label: 'Flooring Tile Wastage %', section: 'flooring-tiles' as AdminTab, group: 'Construction' },
+          { label: 'Bathroom Master & Dimensions', section: 'rooms-spaces' as AdminTab, group: 'Project' },
+          { label: 'Interior Paint Coverage (45 vs 60 sqft/L)', section: 'paint-finishes' as AdminTab, group: 'Construction' },
+          { label: 'Exterior Weatherproof Paint', section: 'paint-finishes' as AdminTab, group: 'Construction' },
+          { label: 'Doors & Windows Master', section: 'doors-windows' as AdminTab, group: 'Construction' },
+          { label: 'Electrical Wiring per Point', section: 'electrical' as AdminTab, group: 'Services' },
+          { label: 'Plumbing Supply & Drainage', section: 'plumbing' as AdminTab, group: 'Services' },
+          { label: 'Sanitaryware & Fixtures', section: 'fixtures-sanitary' as AdminTab, group: 'Services' },
+          { label: 'Labour Rates Master', section: 'labour' as AdminTab, group: 'Pricing' },
+          { label: 'Material Prices (Rate Master)', section: 'material-prices' as AdminTab, group: 'Pricing' },
+          { label: 'Quality & Specification Tiers', section: 'quality-spec' as AdminTab, group: 'Pricing' },
+          { label: 'Contractor Margin & GST Rate', section: 'commercial-tax' as AdminTab, group: 'Pricing' },
+          { label: 'Calculation Methods Switcher', section: 'calculation-methods' as AdminTab, group: 'Calculator' },
+          { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculator' },
+          { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Management' },
+        ];
 
-              return (
+        const searchResults = searchQuery.trim()
+          ? searchCatalog.filter((item) => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
+          : [];
+
+        // 6 Collapsible Navigation Groups
+        const navGroups: Array<{
+          id: string;
+          name: string;
+          icon: React.ReactNode;
+          sections: Array<{ id: AdminTab; label: string; badge?: number }>;
+        }> = [
+          {
+            id: 'PROJECT',
+            name: '1. Project',
+            icon: <Building className="w-3.5 h-3.5" />,
+            sections: [
+              { id: 'project-bua', label: 'Project & BUA' },
+              { id: 'rooms-spaces', label: 'Rooms & Spaces' },
+            ],
+          },
+          {
+            id: 'CONSTRUCTION',
+            name: '2. Construction',
+            icon: <Hammer className="w-3.5 h-3.5" />,
+            sections: [
+              { id: 'walls-masonry', label: 'Walls & Masonry' },
+              { id: 'rcc-structure', label: 'RCC & Structure' },
+              { id: 'flooring-tiles', label: 'Flooring & Tiles' },
+              { id: 'waterproofing', label: 'Waterproofing' },
+              { id: 'paint-finishes', label: 'Paint & Finishes' },
+              { id: 'doors-windows', label: 'Doors & Windows' },
+            ],
+          },
+          {
+            id: 'SERVICES',
+            name: '3. Services',
+            icon: <Zap className="w-3.5 h-3.5" />,
+            sections: [
+              { id: 'electrical', label: 'Electrical' },
+              { id: 'plumbing', label: 'Plumbing' },
+              { id: 'fixtures-sanitary', label: 'Fixtures & Sanitary' },
+            ],
+          },
+          {
+            id: 'PRICING',
+            name: '4. Pricing',
+            icon: <Coins className="w-3.5 h-3.5" />,
+            sections: [
+              { id: 'labour', label: 'Labour' },
+              { id: 'material-prices', label: 'Material Prices', badge: overrides.length || undefined },
+              { id: 'quality-spec', label: 'Quality / Specification' },
+              { id: 'commercial-tax', label: 'Commercial & Tax' },
+            ],
+          },
+          {
+            id: 'CALCULATOR',
+            name: '5. Calculator',
+            icon: <TrendingUp className="w-3.5 h-3.5" />,
+            sections: [
+              { id: 'calculation-methods', label: 'Calculation Methods' },
+              { id: 'recommendations', label: 'Recommendations' },
+              { id: 'test-calculator', label: 'Test Calculator' },
+            ],
+          },
+          {
+            id: 'REPORT_MGMT',
+            name: '6. Report & Management',
+            icon: <Shield className="w-3.5 h-3.5" />,
+            sections: [
+              { id: 'report-settings', label: 'Report Settings' },
+              { id: 'versions-history', label: 'Versions & History' },
+              { id: 'simulation', label: 'Simulation & Impact' },
+              { id: 'audit', label: 'Audit Trail' },
+              { id: 'analytics', label: 'Analytics' },
+              { id: 'account', label: 'Account & Security' },
+            ],
+          },
+        ];
+
+        // Find current active group
+        const currentGroup = navGroups.find((g) => g.sections.some((s) => s.id === activeTab)) || navGroups[0];
+
+        return (
+          <div className="space-y-3">
+            {/* Top Toolbar: Search + Basic/Advanced Toggle + Overview Button */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
+              <div className="flex items-center gap-2">
                 <button
-                  key={cluster.id}
                   type="button"
-                  onClick={() => {
-                    const firstTab = clusterTabs[cluster.id]?.[0];
-                    if (firstTab) setActiveTab(firstTab);
-                  }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
-                    isClusterActive
+                  onClick={() => setActiveTab('overview')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'overview'
                       ? 'bg-[#1B3D34] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
-                  {cluster.icon}
-                  <span>{cluster.label}</span>
+                  <Home className="w-3.5 h-3.5" />
+                  <span>Overview</span>
                 </button>
-              );
-            })}
-          </div>
 
-          {/* Quick Jump 26-Section Dropdown */}
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] font-bold text-slate-400 uppercase hidden md:inline">Jump To:</span>
-            <select
-              value={activeTab}
-              onChange={(e) => setActiveTab(e.target.value as AdminTab)}
-              className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
-            >
-              <optgroup label="1. Core & Pricing">
-                <option value="overview">1. Overview</option>
-                <option value="rates">2. Rate Master</option>
-                <option value="price-update">Auto Price Update</option>
-              </optgroup>
-              <optgroup label="2. Construction & Spaces">
-                <option value="parameters">3. Construction Parameters</option>
-                <option value="space-rooms">4. Space & Rooms</option>
-                <option value="structure-rcc">5. Structure & RCC</option>
-                <option value="masonry">6. Masonry</option>
-                <option value="flooring">7. Flooring & Finishes</option>
-                <option value="paint">8. Paint</option>
-                <option value="waterproofing">9. Waterproofing</option>
-                <option value="doors-windows">10. Doors & Windows</option>
-                <option value="plumbing">11. Plumbing</option>
-                <option value="electrical">12. Electrical</option>
-                <option value="fixtures">13. Fixtures & Sanitary</option>
-              </optgroup>
-              <optgroup label="3. Specs & Commercial">
-                <option value="labour">14. Labour Benchmarks</option>
-                <option value="specifications">15. Specifications & Packages</option>
-                <option value="commercial">16. Commercial Margins</option>
-                <option value="authority">17. Authority & BUA</option>
-                <option value="recommendations">18. Recommendations</option>
-              </optgroup>
-              <optgroup label="4. Rules & Engine">
-                <option value="calculation-engine">19. Calculation Engine</option>
-                <option value="calculation-rules">20. Calculation Rules</option>
-                <option value="reports">21. Report Configuration</option>
-              </optgroup>
-              <optgroup label="5. Governance & System">
-                <option value="versions">22. Version History</option>
-                <option value="simulation">23. Simulation & Impact</option>
-                <option value="audit">24. Audit Trail</option>
-                <option value="analytics">25. Analytics</option>
-                <option value="account">26. Account & Security</option>
-              </optgroup>
-            </select>
-          </div>
-        </div>
-
-        {/* Sub-Tabs for Current Category */}
-        <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200 overflow-x-auto text-xs font-semibold">
-          {(() => {
-            let tabsToShow: Array<{ id: AdminTab; label: string; badge?: number }> = [];
-            if (['overview', 'rates', 'price-update'].includes(activeTab)) {
-              tabsToShow = [
-                { id: 'overview', label: '1. Overview' },
-                { id: 'rates', label: '2. Rate Master', badge: overrides.length || undefined },
-                { id: 'price-update', label: 'Auto Price Update', badge: proposals.filter((p) => p.status === 'PENDING' || p.status === 'NEEDS_REVIEW').length || undefined },
-              ];
-            } else if (['parameters', 'space-rooms', 'structure-rcc', 'masonry', 'flooring', 'paint', 'waterproofing', 'doors-windows', 'plumbing', 'electrical', 'fixtures'].includes(activeTab)) {
-              tabsToShow = [
-                { id: 'parameters', label: '3. Parameters' },
-                { id: 'space-rooms', label: '4. Space & Rooms' },
-                { id: 'structure-rcc', label: '5. Structure & RCC' },
-                { id: 'masonry', label: '6. Masonry' },
-                { id: 'flooring', label: '7. Flooring' },
-                { id: 'paint', label: '8. Paint' },
-                { id: 'waterproofing', label: '9. Waterproofing' },
-                { id: 'doors-windows', label: '10. Doors/Windows' },
-                { id: 'plumbing', label: '11. Plumbing' },
-                { id: 'electrical', label: '12. Electrical' },
-                { id: 'fixtures', label: '13. Fixtures' },
-              ];
-            } else if (['labour', 'specifications', 'packages', 'commercial', 'authority', 'recommendations'].includes(activeTab)) {
-              tabsToShow = [
-                { id: 'labour', label: '14. Labour' },
-                { id: 'specifications', label: '15. Specifications' },
-                { id: 'commercial', label: '16. Commercial' },
-                { id: 'authority', label: '17. Authority & BUA' },
-                { id: 'recommendations', label: '18. Recommendations' },
-              ];
-            } else if (['calculation-engine', 'calculation-rules', 'reports', 'config'].includes(activeTab)) {
-              tabsToShow = [
-                { id: 'calculation-engine', label: '19. Engine Overview' },
-                { id: 'calculation-rules', label: '20. Calculation Rules' },
-                { id: 'reports', label: '21. Report Config' },
-              ];
-            } else {
-              tabsToShow = [
-                { id: 'versions', label: '22. Version History' },
-                { id: 'simulation', label: '23. Simulation' },
-                { id: 'audit', label: '24. Audit Trail' },
-                { id: 'analytics', label: '25. Analytics' },
-                { id: 'account', label: '26. Account & Security' },
-              ];
-            }
-
-            return tabsToShow.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all whitespace-nowrap cursor-pointer text-xs ${
-                  activeTab === tab.id
-                    ? 'bg-emerald-50 text-[#1B3D34] font-bold border border-emerald-300'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <span>{tab.label}</span>
-                {tab.badge !== undefined && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-emerald-100 text-emerald-800">
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            ));
-          })()}
-        </div>
-      </div>
-
-      {/* ── TAB 1: OVERVIEW (UPGRADED PART 2) ── */}
-      {activeTab === 'overview' && (
-        <div className="space-y-6">
-          {/* Active vs Draft Configuration Banner (Part 2) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Active Production Status */}
-            <div className="p-5 bg-gradient-to-br from-emerald-50 to-white border border-emerald-300 rounded-2xl shadow-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-emerald-700 text-white uppercase">
-                  PRODUCTION / ACTIVE
-                </span>
-                <span className="text-xs font-mono font-bold text-emerald-900">
-                  {activeConfigVersion?.versionLabel || 'v2.0-ACTIVE-PROD'}
-                </span>
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900 font-heading">
-                  Active Production Calculation Engine
-                </h3>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Published By: <strong>{activeConfigVersion?.publishedBy || 'System Architect'}</strong> · 
-                  Status: <strong>Live Public Estimates</strong>
-                </p>
-              </div>
-              <div className="pt-2 border-t border-emerald-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                <span>Database: Connected (PostgreSQL)</span>
-                <span>Rate Master: Authoritative</span>
-              </div>
-            </div>
-
-            {/* Draft Configuration Status */}
-            <div className="p-5 bg-gradient-to-br from-amber-50 to-white border border-amber-300 rounded-2xl shadow-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-amber-600 text-white uppercase">
-                  DRAFT / NOT LIVE
-                </span>
-                <span className="text-xs font-mono font-bold text-amber-900">
-                  {Object.keys(draftParameters).length} Pending Changes
-                </span>
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900 font-heading">
-                  Draft Configuration Workspace
-                </h3>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Changes made in admin tabs remain in isolated draft state until simulated and formally published.
-                </p>
-              </div>
-              <div className="pt-2 border-t border-amber-100 flex items-center justify-between text-[11px]">
-                <span className="text-amber-800 font-medium">
-                  {Object.keys(draftParameters).length > 0 ? 'Simulation Recommended' : 'Clean / Up-to-date'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('simulation')}
-                  className="text-xs font-bold text-[#1B3D34] hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  Open Simulation →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Configuration Conflicts Widget (Part 2 & 45) */}
-          {configHealth.conflicts.length > 0 && (
-            <div className="p-4 bg-white border border-amber-200 rounded-2xl shadow-xs space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-[#F28C28]" />
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-heading">
-                    Known Parameter Conflicts Awaiting Review ({configHealth.conflicts.length})
-                  </h4>
+                {/* Basic / Advanced Mode Switcher */}
+                <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setAdminViewMode('BASIC')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      adminViewMode === 'BASIC'
+                        ? 'bg-white text-[#1B3D34] shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Basic
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAdminViewMode('ADVANCED')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      adminViewMode === 'ADVANCED'
+                        ? 'bg-[#1B3D34] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Advanced
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('parameters')}
-                  className="text-xs font-bold text-[#1B3D34] hover:underline cursor-pointer"
-                >
-                  Manage in Parameters →
-                </button>
+                <span className="text-[11px] text-slate-400 hidden lg:inline">
+                  {adminViewMode === 'BASIC'
+                    ? 'Everyday builder settings'
+                    : 'Deep parameters & logic rules'}
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                {configHealth.conflicts.map((c) => (
-                  <div key={c.key} className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-0.5">
-                    <span className="font-mono text-[10px] text-slate-400 block">{c.key}</span>
-                    <strong className="text-slate-800 text-[11px] block">{c.description}</strong>
-                    <span className="text-[10px] font-mono text-[#F28C28] block">{c.values}</span>
+              {/* Fast Search with Instant Jump */}
+              <div className="relative w-full md:w-80">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Find parameter (e.g. Wall Height, Margin)..."
+                  className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
+                />
+                {searchResults.length > 0 && (
+                  <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
+                    {searchResults.map((r, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          setActiveTab(r.section);
+                          setSearchQuery('');
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-emerald-50/50 flex items-center justify-between group cursor-pointer"
+                      >
+                        <span className="font-semibold text-slate-800 group-hover:text-[#1B3D34]">{r.label}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">
+                          {r.group}
+                        </span>
+                      </button>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          )}
 
-          {/* Top Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Total Active Overrides</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-[#1B3D34] font-mono">{overrides.length}</span>
-                <span className="text-xs text-slate-500">of {rates.length} rates</span>
-              </div>
-              <span className="text-[11px] text-emerald-600 block">Authoritative Rate Resolver Active</span>
+            {/* 6 Collapsible Navigation Groups */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+              {navGroups.map((group) => {
+                const isGroupActive = group.sections.some((s) => s.id === activeTab);
+                return (
+                  <div
+                    key={group.id}
+                    onClick={() => {
+                      if (!isGroupActive) {
+                        setActiveTab(group.sections[0].id);
+                      }
+                    }}
+                    className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                      isGroupActive
+                        ? 'bg-emerald-50/60 border-emerald-300 ring-1 ring-emerald-400 shadow-xs'
+                        : 'bg-white border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className={isGroupActive ? 'text-[#1B3D34]' : 'text-slate-400'}>
+                        {group.icon}
+                      </span>
+                      <span className={`text-xs font-bold truncate ${isGroupActive ? 'text-[#1B3D34]' : 'text-slate-700'}`}>
+                        {group.name}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-medium truncate">
+                      {group.sections.length} sections
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Pending Price Proposals</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-amber-600 font-mono">
-                  {proposals.filter((p) => p.status === 'PENDING' || p.status === 'NEEDS_REVIEW').length}
+            {/* Active Sub-Sections Bar */}
+            {activeTab !== 'overview' && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 scrollbar-none">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider pl-1 pr-2 shrink-0">
+                  {currentGroup.name}:
                 </span>
-                <span className="text-xs text-slate-500">awaiting review</span>
+                {currentGroup.sections.map((sec) => {
+                  const isSecActive = activeTab === sec.id;
+                  return (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => setActiveTab(sec.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                        isSecActive
+                          ? 'bg-[#1B3D34] text-white shadow-xs'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{sec.label}</span>
+                      {sec.badge !== undefined && (
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                          isSecActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800 font-bold'
+                        }`}>
+                          {sec.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-              <button
-                onClick={() => setActiveTab('price-update')}
-                className="text-[11px] text-[#1B3D34] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-              >
-                Open Auto Price Update →
-              </button>
-            </div>
-
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Calculator Sessions</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-[#1B3D34] font-mono">{analytics?.totalSessions || 45}</span>
-                <span className="text-xs text-slate-500">{analytics?.completionRate || 68}% completion</span>
-              </div>
-              <button
-                onClick={() => setActiveTab('analytics')}
-                className="text-[11px] text-[#1B3D34] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-              >
-                Inspect Analytics Funnel →
-              </button>
-            </div>
-
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Average Project Cost</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-extrabold text-[#1B3D34] font-mono">
-                  {formatCurrency(analytics?.avgCost || 5850000)}
-                </span>
-              </div>
-              <span className="text-[11px] text-slate-500 block">~₹{analytics?.avgCostPerSqFt || 2450}/sq.ft effective</span>
-            </div>
+            )}
           </div>
+        );
+      })()}
 
-          {/* Quick Action Panels */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div
-              onClick={() => setActiveTab('parameters')}
-              className="p-6 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-200 rounded-2xl cursor-pointer hover:border-emerald-400 transition-all space-y-3"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#1B3D34] text-white flex items-center justify-center">
-                <Sliders className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Construction Parameters</h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Adjust wall heights, steel factors, paint spreading rates, and wastage allowances without developer code changes.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-[#1B3D34] flex items-center gap-1">
-                Configure Parameters →
-              </span>
-            </div>
+      {/* ── SECTION 0: OVERVIEW ── */}
+      {activeTab === 'overview' && <AdminOverviewSection onNavigate={setActiveTab} />}
 
-            <div
-              onClick={() => setActiveTab('space-rooms')}
-              className="p-6 bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-200 rounded-2xl cursor-pointer hover:border-amber-400 transition-all space-y-3"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#F28C28] text-white flex items-center justify-center">
-                <Building className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Space &amp; Room Archetypes</h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Control master bedroom, bathroom, kitchen templates, dado heights, and sanitary fixture counts.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-[#F28C28] flex items-center gap-1">
-                Manage Room Templates →
-              </span>
-            </div>
-
-            <div
-              onClick={() => setActiveTab('simulation')}
-              className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-200 rounded-2xl cursor-pointer hover:border-blue-400 transition-all space-y-3"
-            >
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
-                <Activity className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Pre-Publish Simulation</h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Compare current production vs draft changes side-by-side with full BOQ and budget delta breakdown.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-blue-700 flex items-center gap-1">
-                Run Simulation Engine →
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── TAB 2: RATE MASTER ── */}
-      {activeTab === 'rates' && (
+      {/* ── TAB 2: RATE MASTER (MATERIAL PRICES) ── */}
+      {(activeTab === 'rates' || activeTab === 'material-prices') && (
         <div className="space-y-6">
           {/* Header Action Strip */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
@@ -2061,35 +1968,41 @@ export const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── NEW TAB: CONSTRUCTION PARAMETERS (Part 3 & 44) ── */}
-      {activeTab === 'parameters' && <ParametersTab />}
+      {/* ── PHASE 2E SECTIONS ROUTER ── */}
+      {/* 1. Project */}
+      {(activeTab === 'project-bua' || activeTab === 'authority') && <ProjectBuaSection />}
+      {(activeTab === 'rooms-spaces' || activeTab === 'space-rooms') && <RoomsSpacesSection />}
 
-      {/* ── NEW TAB: SPACE & ROOMS (Part 4 & 5) ── */}
-      {activeTab === 'space-rooms' && <SpaceRoomsTab />}
+      {/* 2. Construction */}
+      {(activeTab === 'walls-masonry' || activeTab === 'masonry') && <TradeSections sectionId="walls-masonry" />}
+      {(activeTab === 'rcc-structure' || activeTab === 'structure-rcc') && <TradeSections sectionId="rcc-structure" />}
+      {(activeTab === 'flooring-tiles' || activeTab === 'flooring') && <TradeParametersTab forcedTab="flooring" />}
+      {activeTab === 'waterproofing' && <TradeParametersTab forcedTab="waterproofing" />}
+      {(activeTab === 'paint-finishes' || activeTab === 'paint') && <TradeSections sectionId="paint-finishes" />}
+      {activeTab === 'doors-windows' && <TradeParametersTab forcedTab="doors-windows" />}
 
-      {/* ── NEW TABS: TRADE PARAMETERS & ASSUMPTIONS (Parts 6, 11-18, 21-24) ── */}
-      {(activeTab === 'structure-rcc' ||
-        activeTab === 'masonry' ||
-        activeTab === 'flooring' ||
-        activeTab === 'paint' ||
-        activeTab === 'waterproofing' ||
-        activeTab === 'doors-windows' ||
-        activeTab === 'plumbing' ||
-        activeTab === 'electrical' ||
-        activeTab === 'fixtures' ||
-        activeTab === 'labour' ||
-        activeTab === 'commercial' ||
-        activeTab === 'authority' ||
-        activeTab === 'recommendations') && <TradeParametersTab forcedTab={activeTab} />}
+      {/* 3. Services */}
+      {activeTab === 'electrical' && <TradeParametersTab forcedTab="electrical" />}
+      {activeTab === 'plumbing' && <TradeParametersTab forcedTab="plumbing" />}
+      {(activeTab === 'fixtures-sanitary' || activeTab === 'fixtures') && <TradeParametersTab forcedTab="fixtures" />}
 
-      {/* ── NEW TABS: CALCULATION RULES & ENGINE (Parts 7-10) ── */}
-      {(activeTab === 'calculation-rules' || activeTab === 'calculation-engine') && <CalculationRulesTab />}
+      {/* 4. Pricing */}
+      {activeTab === 'labour' && <TradeParametersTab forcedTab="labour" />}
+      {activeTab === 'quality-spec' && <TradeParametersTab forcedTab="recommendations" />}
+      {(activeTab === 'commercial-tax' || activeTab === 'commercial') && <TradeSections sectionId="commercial-tax" />}
 
-      {/* ── NEW TAB: SIMULATION & IMPACT ANALYSIS (Parts 28 & 29) ── */}
+      {/* 5. Calculator */}
+      {(activeTab === 'calculation-methods' || activeTab === 'calculation-rules' || activeTab === 'calculation-engine') && <CalculationMethodsSection />}
+      {activeTab === 'recommendations' && <TradeParametersTab forcedTab="recommendations" />}
+      {activeTab === 'test-calculator' && <TestCalculatorSection />}
+
+      {/* 6. Report & Management */}
+      {activeTab === 'report-settings' && <TradeParametersTab forcedTab="recommendations" />}
+      {(activeTab === 'versions-history' || activeTab === 'versions') && <VersionHistoryTab />}
       {activeTab === 'simulation' && <SimulationImpactTab />}
 
-      {/* ── NEW TAB: VERSION HISTORY & HEALTH (Parts 27, 30, 39, 45) ── */}
-      {activeTab === 'versions' && <VersionHistoryTab />}
+      {/* Legacy fallbacks */}
+      {activeTab === 'parameters' && <ParametersTab />}
 
       {/* ── MODAL: EDIT RATE OVERRIDE ── */}
       {editingItem && (

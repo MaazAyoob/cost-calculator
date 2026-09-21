@@ -188,6 +188,272 @@ export const CANONICAL_CALCULATION_METHODS: CalculationMethodDefinition[] = [
       },
     ],
   },
+  // ── 4. Masonry Method Registry ──
+  {
+    id: 'method.masonry',
+    category: 'MASONRY',
+    name: 'Masonry & Blockwork Calculation',
+    description: 'Method for calculating blockwork volume and unit counts.',
+    activeMethodId: 'masonry_surface_thickness',
+    supportedMethods: [
+      {
+        methodId: 'masonry_surface_thickness',
+        displayName: 'Net Surface Area & Thickness (Current Production)',
+        description: 'Wall Area × Wall Thickness with Door/Window deductions and cutting wastage',
+        requiredParameters: [
+          'config.masonry.external_wall_thickness_m',
+          'config.masonry.internal_wall_thickness_m',
+          'config.wastage.masonry',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'totalWallArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.masonry.external_wall_thickness_m', fallbackValue: 0.15 },
+        },
+      },
+      {
+        methodId: 'masonry_block_count',
+        displayName: 'Unit Block Count Model',
+        description: 'Net Wall Volume divided by individual block unit volume plus mortar joints',
+        requiredParameters: ['config.masonry.aac_block_unit_volume_cum'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'DIVIDE',
+          left: { type: 'METRIC_REF', metricKey: 'wallVolumeCuM' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.masonry.aac_block_unit_volume_cum', fallbackValue: 0.018 },
+        },
+      },
+      {
+        methodId: 'masonry_bua_thumb_rule',
+        displayName: 'BUA Volume Ratio Model',
+        description: 'BUA × 0.042 cu.m per sqft of built-up area',
+        requiredParameters: ['config.masonry.cum_per_sqft_bua'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.masonry.cum_per_sqft_bua', fallbackValue: 0.042 },
+        },
+      },
+    ],
+  },
+
+  // ── 5. Electrical Method Registry ──
+  {
+    id: 'method.electrical',
+    category: 'ELECTRICAL',
+    name: 'Electrical Cabling & Conduit Calculation',
+    description: 'Method for calculating wiring lengths, conduits, and modular switch points.',
+    activeMethodId: 'electrical_point_wire',
+    supportedMethods: [
+      {
+        methodId: 'electrical_point_wire',
+        displayName: 'Point-wise Circuit Wiring (Current Production)',
+        description: 'Light/Fan points × 8.5m + Socket points × 12.5m + Power points × 22m',
+        requiredParameters: [
+          'config.electrical.wire_1_5_m_per_point',
+          'config.electrical.wire_2_5_m_per_point',
+          'config.electrical.wire_4_0_m_per_point',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'totalElectricalPoints' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.electrical.wire_1_5_m_per_point', fallbackValue: 8.5 },
+        },
+      },
+      {
+        methodId: 'electrical_room_allowance',
+        displayName: 'Room-wise Modular Allowance',
+        description: 'Fixed modular points allocated based on room category specifications',
+        requiredParameters: ['config.electrical.switch_module_ratio'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'totalRooms' },
+          right: { type: 'CONSTANT', value: 12 },
+        },
+      },
+      {
+        methodId: 'electrical_bua_ratio',
+        displayName: 'BUA Area Factor Model',
+        description: 'BUA × 0.08 electrical points per sqft',
+        requiredParameters: ['config.electrical.points_per_sqft'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.electrical.points_per_sqft', fallbackValue: 0.08 },
+        },
+      },
+    ],
+  },
+
+  // ── 6. Plumbing Method Registry ──
+  {
+    id: 'method.plumbing',
+    category: 'PLUMBING',
+    name: 'Water Supply & Drainage Calculation',
+    description: 'Method for calculating CPVC supply, SWR drainage lines, and fixtures.',
+    activeMethodId: 'plumbing_fixture_point',
+    supportedMethods: [
+      {
+        methodId: 'plumbing_fixture_point',
+        displayName: 'Fixture & Core Point Model (Current Production)',
+        description: 'Water points × 4.5m CPVC + Drainage points × 3.5m SWR + Shaft risers',
+        requiredParameters: [
+          'config.plumbing.cpvc_m_per_point',
+          'config.plumbing.swr_m_per_point',
+          'config.plumbing.riser_m_per_floor',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'totalPlumbingPoints' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.plumbing.cpvc_m_per_point', fallbackValue: 4.5 },
+        },
+      },
+      {
+        methodId: 'plumbing_bathroom_core',
+        displayName: 'Bathroom Core Module Allowance',
+        description: 'Flat CPVC and SWR allowance per configured bathroom/utility module',
+        requiredParameters: ['config.plumbing.cpvc_per_bathroom_m'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'bathrooms' },
+          right: { type: 'CONSTANT', value: 28 },
+        },
+      },
+      {
+        methodId: 'plumbing_bua_thumb_rule',
+        displayName: 'BUA Plumbing Benchmark',
+        description: 'BUA × 0.025 piping metres per sqft',
+        requiredParameters: ['config.plumbing.pipe_m_per_sqft'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.plumbing.pipe_m_per_sqft', fallbackValue: 0.025 },
+        },
+      },
+    ],
+  },
+
+  // ── 7. Labour Method Registry ──
+  {
+    id: 'method.labour',
+    category: 'LABOUR',
+    name: 'Civil & Trade Labour Calculation',
+    description: 'Method for calculating composite and trade-specific site labour costs.',
+    activeMethodId: 'labour_composite_sqft',
+    supportedMethods: [
+      {
+        methodId: 'labour_composite_sqft',
+        displayName: 'Composite Built-Up Area Rate (Current Production)',
+        description: 'Built-up Area × Composite Civil Labour Rate (₹380/sqft)',
+        requiredParameters: ['rate.labour.civil_composite'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'rate.labour.civil_composite', fallbackValue: 380 },
+        },
+      },
+      {
+        methodId: 'labour_trade_quantity',
+        displayName: 'Trade-wise Quantity Take-off Model',
+        description: 'Discrete labour rates applied directly to concrete, masonry, tile, and paint quantities',
+        requiredParameters: [
+          'rate.labour.flooring_tiling',
+          'rate.labour.painting_finishes',
+          'rate.labour.waterproofing_app',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'flooringArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'rate.labour.flooring_tiling', fallbackValue: 38 },
+        },
+      },
+      {
+        methodId: 'labour_day_work',
+        displayName: 'Standard Crew-day Allowance',
+        description: 'Estimated mason and helper work days calculated per 1000 sqft',
+        requiredParameters: ['config.labour.mandays_per_1000_sqft'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: {
+            type: 'BINARY_OP',
+            operation: 'DIVIDE',
+            left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+            right: { type: 'CONSTANT', value: 1000 },
+          },
+          right: { type: 'CONSTANT', value: 240 },
+        },
+      },
+    ],
+  },
+
+  // ── 8. Waterproofing Method Registry ──
+  {
+    id: 'method.waterproofing',
+    category: 'WATERPROOFING',
+    name: 'Wet-Area Waterproofing Calculation',
+    description: 'Method for calculating bathroom, terrace, and sump waterproofing area.',
+    activeMethodId: 'waterproofing_floor_upturn',
+    supportedMethods: [
+      {
+        methodId: 'waterproofing_floor_upturn',
+        displayName: 'Floor Slab + 1ft Upturn Flashing (Current Production)',
+        description: 'Bathroom Floor Area + (Perimeter × 1.0 ft Upturn Height) + Terrace Area',
+        requiredParameters: [
+          'config.waterproofing.bathroom_upturn_ft',
+          'config.waterproofing.terrace_coverage_ratio',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'ADD',
+          left: { type: 'METRIC_REF', metricKey: 'bathroomFloorArea' },
+          right: {
+            type: 'BINARY_OP',
+            operation: 'MULTIPLY',
+            left: { type: 'METRIC_REF', metricKey: 'bathroomPerimeter' },
+            right: { type: 'PARAMETER_REF', parameterKey: 'config.waterproofing.bathroom_upturn_ft', fallbackValue: 1.0 },
+          },
+        },
+      },
+      {
+        methodId: 'waterproofing_floor_only',
+        displayName: 'Horizontal Floor Slab Only',
+        description: 'Horizontal floor membrane application without vertical upturn',
+        requiredParameters: ['config.waterproofing.terrace_coverage_ratio'],
+        rule: {
+          type: 'METRIC_REF',
+          metricKey: 'bathroomFloorArea',
+        },
+      },
+      {
+        methodId: 'waterproofing_full_height',
+        displayName: 'Full Wet-Area Encapsulation (Floor + Full Wall)',
+        description: 'Complete floor and vertical wall damp-proofing up to ceiling level',
+        requiredParameters: ['config.structure.wall_height_ft'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'ADD',
+          left: { type: 'METRIC_REF', metricKey: 'bathroomFloorArea' },
+          right: {
+            type: 'BINARY_OP',
+            operation: 'MULTIPLY',
+            left: { type: 'METRIC_REF', metricKey: 'bathroomPerimeter' },
+            right: { type: 'PARAMETER_REF', parameterKey: 'config.structure.wall_height_ft', fallbackValue: 10.0 },
+          },
+        },
+      },
+    ],
+  },
 ];
 
 class CalculationMethodManager {

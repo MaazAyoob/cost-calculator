@@ -3,6 +3,7 @@ import { useWizardStore } from '../../../store/useWizardStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step5WallCladding: React.FC = () => {
   const { wallCladding, setWallCladding } = useWizardStore();
@@ -113,6 +114,9 @@ export const Step5WallCladding: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: WATERPROOFING & DADO ── */}
+      <HowWeCalculatedThis stepKey="waterproofing" className="mt-4" />
 
     </div>
   );

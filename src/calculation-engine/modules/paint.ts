@@ -27,6 +27,9 @@ export function calculatePaint(
   interiorPaintLitres: number;
   exteriorPaintLitres: number;
   puttyKg: number;
+  interiorCoverageSqFtPerLitre: number;
+  exteriorCoverageSqFtPerLitre: number;
+  puttyKgPerSqFt: number;
 } {
   const bua = area.totalBUASqFt || 0;
 
@@ -41,6 +44,9 @@ export function calculatePaint(
       interiorPaintLitres: 0,
       exteriorPaintLitres: 0,
       puttyKg: 0,
+      interiorCoverageSqFtPerLitre: 45,
+      exteriorCoverageSqFtPerLitre: 60,
+      puttyKgPerSqFt: 0.55,
     };
   }
 
@@ -87,5 +93,8 @@ export function calculatePaint(
     interiorPaintLitres,
     exteriorPaintLitres,
     puttyKg,
+    interiorCoverageSqFtPerLitre: interiorCoverage,
+    exteriorCoverageSqFtPerLitre: exteriorCoverage,
+    puttyKgPerSqFt,
   };
 }

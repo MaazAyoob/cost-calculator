@@ -4,6 +4,7 @@ import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step3CoreMaterials: React.FC = () => {
   const { materialBrands, setCoreMaterials } = useWizardStore();
@@ -282,6 +283,12 @@ export const Step3CoreMaterials: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: RCC & STRUCTURE ── */}
+      <HowWeCalculatedThis stepKey="structure" className="mt-4" />
+
+      {/* ── CALCULATION TRANSPARENCY: WALLS & MASONRY ── */}
+      <HowWeCalculatedThis stepKey="masonry" className="mt-2" />
 
     </div>
   );

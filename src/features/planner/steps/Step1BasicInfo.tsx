@@ -16,6 +16,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step1BasicInfo: React.FC = () => {
   const {
@@ -860,6 +861,9 @@ export const Step1BasicInfo: React.FC = () => {
             )}
           </div>
         )}
+
+        {/* ── CALCULATION TRANSPARENCY: BUA & SETBACKS ── */}
+        <HowWeCalculatedThis stepKey="bua" className="mt-4" />
 
       </div>
 

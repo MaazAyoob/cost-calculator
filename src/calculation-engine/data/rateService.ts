@@ -36,6 +36,7 @@ import {
   HUTTY_BASELINE_CONFIG,
 } from './rateMasterDefaults';
 import { getApiUrl } from '../../config/api';
+import { configResolver } from '../config/configurationResolver';
 
 export interface RateSourceMetadata {
   sourceId?: string;
@@ -154,6 +155,8 @@ class RateService {
   private config: CalculatorConfigSettings = { ...HUTTY_BASELINE_CONFIG };
   private listeners: Array<() => void> = [];
   private isSyncing = false;
+  // Tracks where the active calculation configuration was resolved from
+  private activeConfigSource: 'POSTGRESQL' | 'STATIC_EMBEDDED_BASELINE' | 'OFFLINE_FALLBACK' = 'OFFLINE_FALLBACK';
 
   constructor() {
     this.defaultProvider = new DefaultQSRateProvider();
@@ -206,8 +209,27 @@ class RateService {
   }
 
   /**
-   * Synchronizes active rate overrides and calculator configuration with the backend server.
-   * Caches successful responses in localStorage and notifies all listeners (e.g. useCalculationStore).
+   * Returns where the active calculation configuration was most recently resolved from.
+   * 'POSTGRESQL'              — backend confirmed an ACTIVE version from the database.
+   * 'STATIC_EMBEDDED_BASELINE' — backend responded but no DB version found; uses in-memory baseline.
+   * 'OFFLINE_FALLBACK'        — backend was unreachable; using static TypeScript baseline only.
+   */
+  public getActiveConfigSource(): 'POSTGRESQL' | 'STATIC_EMBEDDED_BASELINE' | 'OFFLINE_FALLBACK' {
+    return this.activeConfigSource;
+  }
+
+  /**
+   * Synchronizes active rate overrides, legacy calculator config, and the versioned
+   * ACTIVE calculation configuration from the backend server.
+   *
+   * Resolution order:
+   * 1. GET /api/v1/config/active  → versioned ACTIVE config (PostgreSQL or server in-memory)
+   *    → configResolver.syncActiveConfiguration()  [THE FIX]
+   * 2. GET /api/v1/admin/rates/overrides  → material/labour rate overrides
+   * 3. GET /api/v1/admin/config           → legacy flat config (GST, margins, etc.)
+   *
+   * Caches successful rate overrides in localStorage and notifies all listeners
+   * (useCalculationStore recalculates immediately).
    */
   public async syncWithServer(customBaseUrl?: string): Promise<boolean> {
     if (typeof window === 'undefined') return false;
@@ -215,44 +237,96 @@ class RateService {
     this.isSyncing = true;
 
     try {
-      const overridesUrl = customBaseUrl
-        ? `${customBaseUrl.replace(/\/+$/, '')}/api/v1/admin/rates/overrides`
-        : getApiUrl('/api/v1/admin/rates/overrides');
-      const configUrl = customBaseUrl
-        ? `${customBaseUrl.replace(/\/+$/, '')}/api/v1/admin/config`
-        : getApiUrl('/api/v1/admin/config');
+      const base = customBaseUrl ? customBaseUrl.replace(/\/+$/, '') : null;
+      const overridesUrl = base ? `${base}/api/v1/admin/rates/overrides` : getApiUrl('/api/v1/admin/rates/overrides');
+      const legacyConfigUrl = base ? `${base}/api/v1/admin/config`        : getApiUrl('/api/v1/admin/config');
+      const activeConfigUrl = base ? `${base}/api/v1/config/active`       : getApiUrl('/api/v1/config/active');
 
-      const [ratesRes, configRes] = await Promise.allSettled([
+      const [ratesRes, legacyConfigRes, activeConfigRes] = await Promise.allSettled([
         fetch(overridesUrl),
-        fetch(configUrl),
+        fetch(legacyConfigUrl),
+        fetch(activeConfigUrl),
       ]);
 
       let hasUpdates = false;
 
+      // ── 1. VERSIONED ACTIVE CONFIGURATION (THE PRIMARY FIX) ────────────────
+      // This is the authoritative path for all Admin-controlled calculation parameters.
+      // It reads from PostgreSQL ACTIVE version (or in-memory baseline on the server).
+      if (activeConfigRes.status === 'fulfilled' && activeConfigRes.value.ok) {
+        try {
+          const d = await activeConfigRes.value.json();
+          if (d.success && d.data && d.data.parameters && typeof d.data.parameters === 'object') {
+            const serverSource = d.data.source as string;
+            const resolverSource: 'POSTGRESQL' | 'STATIC_APPROVED_BASELINE' =
+              serverSource === 'POSTGRESQL' ? 'POSTGRESQL' : 'STATIC_APPROVED_BASELINE';
+
+            configResolver.syncActiveConfiguration({
+              versionNumber: d.data.versionNumber || 'server-active',
+              versionId: d.data.versionId,
+              parameters: d.data.parameters,
+              source: resolverSource,
+              effectiveFrom: d.data.effectiveFrom ? String(d.data.effectiveFrom) : undefined,
+            });
+
+            this.activeConfigSource = serverSource === 'POSTGRESQL'
+              ? 'POSTGRESQL'
+              : 'STATIC_EMBEDDED_BASELINE';
+            hasUpdates = true;
+          } else {
+            console.warn('[RateService] /api/v1/config/active returned unexpected shape — keeping baseline:', d);
+            this.activeConfigSource = 'OFFLINE_FALLBACK';
+          }
+        } catch (parseErr) {
+          console.warn('[RateService] Failed to parse /api/v1/config/active response:', parseErr);
+          this.activeConfigSource = 'OFFLINE_FALLBACK';
+        }
+      } else {
+        // Backend unreachable or returned non-OK: keep static baseline
+        this.activeConfigSource = 'OFFLINE_FALLBACK';
+        if (activeConfigRes.status === 'rejected') {
+          console.warn('[RateService] /api/v1/config/active unreachable — using static baseline. Customer will see approved baseline values.');
+        } else {
+          console.warn('[RateService] /api/v1/config/active returned', (activeConfigRes as any).value?.status, '— using static baseline.');
+        }
+      }
+
+      // ── 2. MATERIAL/LABOUR RATE OVERRIDES ──────────────────────────────────
       if (ratesRes.status === 'fulfilled' && ratesRes.value.ok) {
-        const d = await ratesRes.value.json();
-        const serverOverrides = d.overrides || d.data || [];
-        if (Array.isArray(serverOverrides)) {
-          this.setOverrides(serverOverrides);
-          hasUpdates = true;
+        try {
+          const d = await ratesRes.value.json();
+          const serverOverrides = d.overrides || d.data || [];
+          if (Array.isArray(serverOverrides)) {
+            this.setOverrides(serverOverrides);
+            hasUpdates = true;
+          }
+        } catch (parseErr) {
+          console.warn('[RateService] Failed to parse rate overrides response:', parseErr);
         }
       }
 
-      if (configRes.status === 'fulfilled' && configRes.value.ok) {
-        const d = await configRes.value.json();
-        const serverConfig = d.config || d.data;
-        if (serverConfig && typeof serverConfig === 'object') {
-          this.setConfig(serverConfig);
-          hasUpdates = true;
+      // ── 3. LEGACY FLAT CONFIG (GST, margins, wastage percentages) ──────────
+      if (legacyConfigRes.status === 'fulfilled' && legacyConfigRes.value.ok) {
+        try {
+          const d = await legacyConfigRes.value.json();
+          const serverConfig = d.config || d.data;
+          if (serverConfig && typeof serverConfig === 'object') {
+            this.setConfig(serverConfig);
+            hasUpdates = true;
+          }
+        } catch (parseErr) {
+          console.warn('[RateService] Failed to parse legacy config response:', parseErr);
         }
       }
 
+      // Notify all subscribers (useCalculationStore → recalculate()) once
       if (hasUpdates) {
         this.notify();
       }
       return true;
     } catch (e) {
-      console.warn('[RateService] syncWithServer network error, continuing with cached rates:', e);
+      console.warn('[RateService] syncWithServer network error — continuing with cached rates:', e);
+      this.activeConfigSource = 'OFFLINE_FALLBACK';
       return false;
     } finally {
       this.isSyncing = false;

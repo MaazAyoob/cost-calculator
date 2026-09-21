@@ -4,6 +4,7 @@ import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step9BathroomFittings: React.FC = () => {
   const { bathroomFittings, setBathroomFittingSelection } = useWizardStore();
@@ -161,6 +162,9 @@ export const Step9BathroomFittings: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: SANITARY & PLUMBING FIXTURES ── */}
+      <HowWeCalculatedThis stepKey="fixtures" className="mt-4" />
 
     </div>
   );

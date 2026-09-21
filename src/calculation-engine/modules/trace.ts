@@ -149,8 +149,8 @@ export function generateCalculationTrace(
     category: 'FINISHES & CLADDING',
     tradeCategory: 'Flooring & Cladding',
     inputs: {
-      bathroomCount: (input.rooms.bathrooms || 0) + (input.rooms.commonToilets || 0),
-      kitchenCount: input.rooms.kitchen || 0,
+      bathroomCount: (input.rooms?.bathrooms || 0) + (input.rooms?.commonToilets || 0),
+      kitchenCount: input.rooms?.kitchen || 0,
       bathroomTileHeight: input.wallCladding?.bathroomTileHeight || '7 ft (Lintel)',
       kitchenDadoHeight: input.wallCladding?.kitchenDadoHeight || '2 ft',
       deductions: 'Door frames and ventilator openings within tile band deducted',

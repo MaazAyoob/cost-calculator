@@ -105,3 +105,5 @@ export const useProcurement       = () => useCalculationStore((s) => s.result.pr
 export const useReportData        = () => useCalculationStore((s) => s.result.report);
 export const useCalculationTrace  = () => useCalculationStore((s) => s.result.trace);
 export const useParameterTable    = () => useCalculationStore((s) => s.result.parameterTable);
+export const useExplanations      = () => useCalculationStore((s) => s.result.explanations);
+export const useStepExplanation   = (stepKey: string) => useCalculationStore((s) => s.result.explanations?.[stepKey]);

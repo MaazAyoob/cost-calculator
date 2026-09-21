@@ -4,6 +4,7 @@ import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step10Painting: React.FC = () => {
   const { painting, setPaintingSelection } = useWizardStore();
@@ -199,6 +200,9 @@ export const Step10Painting: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: PAINTING & COATINGS ── */}
+      <HowWeCalculatedThis stepKey="paint" className="mt-4" />
 
     </div>
   );

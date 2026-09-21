@@ -3,6 +3,7 @@ import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { cn, formatCurrency } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step6Doors: React.FC = () => {
   const { doors, setDoorSelection } = useWizardStore();
@@ -170,6 +171,9 @@ export const Step6Doors: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: DOORS & JOINERY ── */}
+      <HowWeCalculatedThis stepKey="doors" className="mt-4" />
 
     </div>
   );

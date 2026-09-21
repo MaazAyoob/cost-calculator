@@ -4,6 +4,7 @@ import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step7Windows: React.FC = () => {
   const { windows, setWindowSelection } = useWizardStore();
@@ -147,6 +148,9 @@ export const Step7Windows: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: WINDOWS & GLAZING ── */}
+      <HowWeCalculatedThis stepKey="windows" className="mt-4" />
 
     </div>
   );

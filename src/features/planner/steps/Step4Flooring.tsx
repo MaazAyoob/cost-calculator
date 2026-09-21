@@ -4,6 +4,7 @@ import { useArea } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
 import { Check } from 'lucide-react';
 import { cn, formatCurrency } from '../../../utils/cn';
+import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step4Flooring: React.FC = () => {
   const { flooringZones, setFlooringZone } = useWizardStore();
@@ -183,6 +184,9 @@ export const Step4Flooring: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── CALCULATION TRANSPARENCY: FLOORING & TILES ── */}
+      <HowWeCalculatedThis stepKey="flooring" className="mt-4" />
 
     </div>
   );

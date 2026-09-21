@@ -35,6 +35,8 @@ import {
 import { calculationMethodManager } from '../calculation-engine/rules/methodRegistry';
 import { configResolver } from '../calculation-engine/config/configurationResolver';
 import { getActiveConflicts } from '../calculation-engine/config/conflictRegistry';
+import { runCalculator } from '../calculation-engine/calculator';
+import type { CalculationResult, EngineInput } from '../calculation-engine/types';
 
 export type AdminTab =
   | 'overview'
@@ -65,9 +67,101 @@ export type AdminTab =
   | 'simulation'
   | 'audit'
   | 'analytics'
-  | 'account';
+  | 'account'
+  // Phase 2E Section aliases:
+  | 'project-bua'
+  | 'rooms-spaces'
+  | 'walls-masonry'
+  | 'rcc-structure'
+  | 'flooring-tiles'
+  | 'paint-finishes'
+  | 'fixtures-sanitary'
+  | 'material-prices'
+  | 'quality-spec'
+  | 'calculation-methods'
+  | 'commercial-tax'
+  | 'report-settings'
+  | 'test-calculator'
+  | 'versions-history';
 
 interface AdminStoreState {
+  // Phase 2E Mode Toggle
+  adminViewMode: 'BASIC' | 'ADVANCED';
+  setAdminViewMode: (mode: 'BASIC' | 'ADVANCED') => void;
+
+  // Custom Rooms (Phase 2E)
+  customRooms: Array<{
+    id: string;
+    name: string;
+    lengthFt: number;
+    widthFt: number;
+    heightFt: number;
+    flooring: string;
+    wallFinish: string;
+    electricalPoints: number;
+    plumbingPoints: number;
+    doors: number;
+    windows: number;
+  }>;
+  addCustomRoom: (room: {
+    id?: string;
+    name: string;
+    lengthFt: number;
+    widthFt: number;
+    heightFt: number;
+    flooring: string;
+    wallFinish: string;
+    electricalPoints: number;
+    plumbingPoints: number;
+    doors: number;
+    windows: number;
+  }) => void;
+  removeCustomRoom: (id: string) => void;
+
+  // In-Admin Test Calculator (Phase 2E)
+  testInputs: {
+    bua: number;
+    floors: number;
+    bedrooms: number;
+    bathrooms: number;
+    tier: 'Essential' | 'Premium' | 'Luxury';
+    city: string;
+  };
+  setTestInputs: (inputs: Partial<{
+    bua: number;
+    floors: number;
+    bedrooms: number;
+    bathrooms: number;
+    tier: 'Essential' | 'Premium' | 'Luxury';
+    city: string;
+  }>) => void;
+  testCalculationActive: CalculationResult | null;
+  testCalculationDraft: CalculationResult | null;
+  isCalculatingTest: boolean;
+  runTestCalculator: () => Promise<void>;
+
+  // Visual Rule Builder (Phase 2E)
+  customRules: Array<{
+    id: string;
+    whenField: string;
+    condition: string;
+    value: any;
+    thenTarget: string;
+    action: string;
+    targetValue: any;
+    isActive: boolean;
+  }>;
+  addCustomRule: (rule: {
+    whenField: string;
+    condition: string;
+    value: any;
+    thenTarget: string;
+    action: string;
+    targetValue: any;
+  }) => void;
+  toggleCustomRule: (id: string) => void;
+  deleteCustomRule: (id: string) => void;
+
   // Authentication
   token: string | null;
   adminUser: { id: string; email: string; role: string; name?: string } | null;
@@ -252,6 +346,42 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
   },
   isSimulating: false,
   isPublishingConfig: false,
+  // Phase 2E Mode & Test Calculator State
+  adminViewMode: 'BASIC',
+  customRooms: [],
+  testInputs: {
+    bua: 2160,
+    floors: 2,
+    bedrooms: 3,
+    bathrooms: 3,
+    tier: 'Premium',
+    city: 'Bangalore',
+  },
+  testCalculationActive: null,
+  testCalculationDraft: null,
+  isCalculatingTest: false,
+  customRules: [
+    {
+      id: 'rule-bath-wp',
+      whenField: 'bathrooms',
+      condition: 'GREATER_THAN',
+      value: 3,
+      thenTarget: 'config.waterproofing.bathroom_upturn_ft',
+      action: 'SET_TO',
+      targetValue: 1.10,
+      isActive: true,
+    },
+    {
+      id: 'rule-spec-paint',
+      whenField: 'qualityTier',
+      condition: 'EQUALS',
+      value: 'Luxury',
+      thenTarget: 'config.paint.interior_coats',
+      action: 'SET_TO',
+      targetValue: 3,
+      isActive: false,
+    },
+  ],
 
   isLoading: false,
   error: null,
@@ -1179,69 +1309,90 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
     }
 
     set({ isPublishingConfig: true, error: null });
+
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const versionLabel = `v2.${(get().configVersions?.length || 1) + 1}-PROD`;
+    const payload = {
+      label: versionLabel,
+      changeSummary: changeSummary || 'Administrative parameter and rule update',
+      parameters: Object.entries(draftParameters).map(([key, value]) => ({
+        key,
+        value,
+        name: key.replace(/\./g, ' ').toUpperCase(),
+        category: key.split('.')[0].toUpperCase(),
+        valueType: typeof value === 'number' ? 'NUMBER' : 'STRING',
+        status: 'ACTIVE'
+      }))
+    };
+
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const payload = {
-        label: `v2.${(get().configVersions?.length || 1) + 1}-PROD`,
-        changeSummary: changeSummary || 'Administrative parameter and rule update',
-        parameters: Object.entries(draftParameters).map(([key, value]) => ({
-          key,
-          value,
-          name: key.replace(/\./g, ' ').toUpperCase(),
-          category: key.split('.')[0].toUpperCase(),
-          valueType: typeof value === 'number' ? 'NUMBER' : 'STRING',
-          status: 'ACTIVE'
-        }))
-      };
-
-      const res = await fetch(getApiUrl('/api/v1/admin/config/versions'), {
+      // Step 1: Create draft on backend
+      const createRes = await fetch(getApiUrl('/api/v1/admin/config/versions'), {
         method: 'POST',
         headers,
         body: JSON.stringify(payload)
       });
 
-      if (res.ok) {
-        const d = await res.json();
-        const draftId = d.data?.id;
-        if (draftId) {
-          await fetch(getApiUrl(`/api/v1/admin/config/versions/${draftId}/publish`), {
-            method: 'POST',
-            headers
-          });
-        }
+      if (!createRes.ok) {
+        const errBody = await createRes.json().catch(() => ({}));
+        set({
+          isPublishingConfig: false,
+          error: `Failed to create configuration draft on server (${createRes.status}). ${errBody?.error || ''}. Changes were NOT published.`
+        });
+        return false;
       }
 
-      configResolver.syncActiveConfiguration({
-        versionNumber: `v2.${(get().configVersions?.length || 1) + 1}-PROD`,
-        parameters: draftParameters,
-        source: 'POSTGRESQL'
-      });
+      const createData = await createRes.json();
+      const draftId = createData.data?.id;
 
+      // Step 2: Publish the draft on backend
+      let publishOk = false;
+      if (draftId) {
+        const publishRes = await fetch(getApiUrl(`/api/v1/admin/config/versions/${draftId}/publish`), {
+          method: 'POST',
+          headers
+        });
+        publishOk = publishRes.ok;
+        if (!publishOk) {
+          const errBody = await publishRes.json().catch(() => ({}));
+          set({
+            isPublishingConfig: false,
+            error: `Draft created but publish failed on server (${publishRes.status}). ${errBody?.error || ''}. Configuration is in DRAFT state, not yet ACTIVE.`
+          });
+          return false;
+        }
+      } else {
+        set({
+          isPublishingConfig: false,
+          error: 'Server did not return a draft ID. Configuration was NOT published.'
+        });
+        return false;
+      }
+
+      // Step 3: Re-sync from server to verify ACTIVE config now reflects the published version.
+      // This also calls configResolver.syncActiveConfiguration() via the fixed syncWithServer().
+      await rateService.syncWithServer();
+
+      // Step 4: Update admin store state — only after confirmed backend success
       set({
         isPublishingConfig: false,
         draftParameters: {},
         simulationReport: null,
-        successMessage: `Configuration successfully published as v2.${(get().configVersions?.length || 1) + 1}-PROD. Production calculation engine is now active with updated rules.`
+        successMessage: `Configuration published as ${versionLabel}. Production engine is now active with updated rules.`
       });
 
       get().fetchConfigVersions();
       return true;
-    } catch {
-      configResolver.syncActiveConfiguration({
-        versionNumber: `v2.${(get().configVersions?.length || 1) + 1}-LOCAL-ACTIVE`,
-        parameters: draftParameters,
-        source: 'STATIC_APPROVED_BASELINE'
-      });
-
+    } catch (networkErr: any) {
+      // Network error: backend unreachable — do NOT pretend publish succeeded
       set({
         isPublishingConfig: false,
-        draftParameters: {},
-        simulationReport: null,
-        successMessage: 'Configuration saved and activated locally.'
+        error: `Could not reach the server to publish configuration: ${networkErr?.message || 'Network error'}. ` +
+          `Changes remain as unsaved drafts. The production calculator has NOT been updated.`
       });
-      return true;
+      return false;
     }
   },
 
@@ -1259,15 +1410,21 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       });
 
       if (res.ok) {
-        set({ isLoading: false, successMessage: `Successfully rolled back configuration to version #${versionNumber}.` });
+        // Re-sync from server so configResolver picks up the rolled-back ACTIVE config.
+        // The next customer calculator fetch of /api/v1/config/active will also get the rolled-back version.
+        await rateService.syncWithServer();
+        set({ isLoading: false, successMessage: `Successfully rolled back configuration to version #${versionNumber}. Production engine now uses the previous configuration.` });
         get().fetchConfigVersions();
         return true;
       }
-      set({ isLoading: false, error: 'Rollback failed on server.' });
+
+      const errBody = await res.json().catch(() => ({}));
+      set({ isLoading: false, error: `Rollback failed: ${errBody?.error || `Server returned ${res.status}`}` });
       return false;
-    } catch {
-      set({ isLoading: false, successMessage: `Configuration rolled back to version #${versionNumber} (offline mode).` });
-      return true;
+    } catch (networkErr: any) {
+      // Backend unreachable: do NOT pretend rollback succeeded
+      set({ isLoading: false, error: `Could not reach the server to rollback: ${networkErr?.message || 'Network error'}. The active configuration was NOT changed.` });
+      return false;
     }
   },
 
@@ -1276,6 +1433,119 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
     set((state) => ({
       activeMethods: { ...state.activeMethods, [category]: methodId },
       successMessage: `Calculation method for ${category} updated to ${methodId}.`
+    }));
+  },
+
+  // Phase 2E Actions
+  setAdminViewMode: (mode) => set({ adminViewMode: mode }),
+
+  addCustomRoom: (room) => {
+    const id = room.id || `custom-room-${Date.now()}`;
+    set((state) => ({
+      customRooms: [...state.customRooms, { ...room, id }],
+      successMessage: `Custom room "${room.name}" added successfully.`
+    }));
+  },
+
+  removeCustomRoom: (id) => {
+    set((state) => ({
+      customRooms: state.customRooms.filter((r) => r.id !== id),
+      successMessage: 'Custom room removed.'
+    }));
+  },
+
+  setTestInputs: (inputs) => {
+    set((state) => ({
+      testInputs: { ...state.testInputs, ...inputs }
+    }));
+  },
+
+  runTestCalculator: async () => {
+    const { testInputs, draftParameters } = get();
+    set({ isCalculatingTest: true, error: null });
+    try {
+      const baseInput = getStandardSimulationSampleInput();
+      const bua = Number(testInputs.bua) || 2160;
+      const floors = Math.max(1, Number(testInputs.floors) || 2);
+      const buaPerFloor = Math.round(bua / floors);
+
+      const input: EngineInput = {
+        ...baseInput,
+        city: (testInputs.city || 'Bangalore') as any,
+        floors,
+        userSelectedBUA: bua,
+        builtUpAreaPerFloor: buaPerFloor,
+        rooms: {
+          ...baseInput.rooms,
+          bedrooms: Number(testInputs.bedrooms) || 3,
+          bathrooms: Number(testInputs.bathrooms) || 3,
+        },
+        qualityTier: testInputs.tier || 'Premium',
+      };
+
+      // 1. Calculate Active using production engine
+      const activeResult = runCalculator(input);
+
+      // 2. Temporarily load draft parameters to calculate Draft safely
+      const hasDrafts = Object.keys(draftParameters).length > 0;
+      let draftResult = activeResult;
+
+      if (hasDrafts) {
+        const normalizedParams: Record<string, any> = {};
+        for (const [k, v] of Object.entries(draftParameters)) {
+          normalizedParams[k] = v;
+          if (k.startsWith('config.')) {
+            normalizedParams[k.replace(/^config\./, '')] = v;
+          } else {
+            normalizedParams[`config.${k}`] = v;
+          }
+        }
+
+        configResolver.syncActiveConfiguration({
+          versionNumber: 'DRAFT-TEST-CALCULATOR',
+          parameters: normalizedParams,
+          source: 'STATIC_APPROVED_BASELINE'
+        });
+
+        try {
+          draftResult = runCalculator(input);
+        } finally {
+          configResolver.resetToBaseline();
+        }
+      }
+
+      set({
+        testCalculationActive: activeResult,
+        testCalculationDraft: draftResult,
+        isCalculatingTest: false,
+        successMessage: 'Test calculation completed using canonical calculation engine.'
+      });
+    } catch (err: any) {
+      set({
+        isCalculatingTest: false,
+        error: `Test calculation failed: ${err?.message || 'Unknown error'}`
+      });
+    }
+  },
+
+  addCustomRule: (rule) => {
+    const id = `rule-${Date.now()}`;
+    set((state) => ({
+      customRules: [...state.customRules, { ...rule, id, isActive: true }],
+      successMessage: 'Advanced calculation rule added.'
+    }));
+  },
+
+  toggleCustomRule: (id) => {
+    set((state) => ({
+      customRules: state.customRules.map((r) => r.id === id ? { ...r, isActive: !r.isActive } : r)
+    }));
+  },
+
+  deleteCustomRule: (id) => {
+    set((state) => ({
+      customRules: state.customRules.filter((r) => r.id !== id),
+      successMessage: 'Rule deleted.'
     }));
   },
 

@@ -54,6 +54,7 @@ import { calculateTimeline }         from './modules/timeline';
 import { calculatePaymentPlan, getPaymentPlanSummary } from './modules/payment';
 import { generateCalculationTrace }  from './modules/trace';
 import { assembleReport }            from './modules/report';
+import { generateStepExplanations }  from './modules/explanations';
 import { runQAGate }                 from './modules/qaGate';
 import { CENTRALIZED_ENGINEERING_ASSUMPTIONS } from './data/engineeringAssumptions';
 import { rateService }               from './data/rateService';
@@ -85,7 +86,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
 
   // ── STEP 4: Physical Material Quantities ──────────────────
   const { steelTonnes, steelKg, steelFactorKgPerSqFt } = calculateSteel(input, area);
-  const { cementBags } = calculateCement(input, area);
+  const { cementBags, bagsPerSqFt: cementFactorBagsPerSqFt } = calculateCement(input, area);
   const {
     masonryMaterial,
     masonryBrand,
@@ -116,6 +117,9 @@ export function runCalculator(input: EngineInput): CalculationResult {
     terraceWaterproofingSqFt,
     sumpWaterproofingSqFt,
     waterproofingAreaSqFt,
+    flooringRawAreaSqFt,
+    flooringCirculationSqFt,
+    flooringWastagePct,
   } = calculateFlooring(input, area, buildingModel);
 
   const {
@@ -128,6 +132,9 @@ export function runCalculator(input: EngineInput): CalculationResult {
     interiorPaintLitres,
     exteriorPaintLitres,
     puttyKg,
+    interiorCoverageSqFtPerLitre: interiorPaintCoverageSqFtPerLitre,
+    exteriorCoverageSqFtPerLitre: exteriorPaintCoverageSqFtPerLitre,
+    puttyKgPerSqFt,
   } = calculatePaint(input, area, buildingModel);
 
   const {
@@ -243,6 +250,13 @@ export function runCalculator(input: EngineInput): CalculationResult {
     kitchenSinkCount,
     bathroomFixtureSets,
     overheadTankLitres,
+    cementFactorBagsPerSqFt,
+    interiorPaintCoverageSqFtPerLitre,
+    exteriorPaintCoverageSqFtPerLitre,
+    puttyKgPerSqFt,
+    flooringWastagePct,
+    flooringRawAreaSqFt,
+    flooringCirculationSqFt,
   };
 
   // ── STEP 5: SECTION A – Works BOQ (What We Build) ─────────
@@ -334,6 +348,9 @@ export function runCalculator(input: EngineInput): CalculationResult {
   partialResult.report.commercialReconciliation = commercialReconciliation;
   partialResult.report.paymentSummary = paymentSummary;
   partialResult.report.rateSourceMetadata = rateSourceMetadata;
+
+  // ── STEP 15: Transparent Calculation Explanations (Pure Formatter) ──
+  partialResult.explanations = generateStepExplanations(partialResult);
 
   return partialResult;
 }

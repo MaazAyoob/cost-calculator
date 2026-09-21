@@ -15,6 +15,7 @@ import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } f
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { formatCurrency } from '../../utils/cn';
 import { SEO } from '../../components/common/SEO';
+import { HowWeCalculatedThis } from '../../components/common/HowWeCalculatedThis';
 import {
   ChevronLeft,
   FileText,
@@ -444,6 +445,14 @@ export const DashboardPage: React.FC = () => {
               ))}
             </div>
           </section>
+        )}
+
+        {/* ── CALCULATION TRANSPARENCY: SUMMARY & LABOUR RECONCILIATION ── */}
+        {hasProject && (
+          <div className="space-y-4">
+            <HowWeCalculatedThis stepKey="summary" defaultExpanded={false} />
+            <HowWeCalculatedThis stepKey="labour" defaultExpanded={false} />
+          </div>
         )}
 
       </div>

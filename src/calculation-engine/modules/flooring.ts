@@ -32,6 +32,9 @@ export function calculateFlooring(
   terraceWaterproofingSqFt: number;
   sumpWaterproofingSqFt: number;
   waterproofingAreaSqFt: number;
+  flooringRawAreaSqFt: number;
+  flooringCirculationSqFt: number;
+  flooringWastagePct: number;
 } {
   const bua = area.totalBUASqFt || 0;
   const floors = Math.max(0, input.floors || 0);
@@ -47,6 +50,9 @@ export function calculateFlooring(
       terraceWaterproofingSqFt: 0,
       sumpWaterproofingSqFt: 0,
       waterproofingAreaSqFt: 0,
+      flooringRawAreaSqFt: 0,
+      flooringCirculationSqFt: 0,
+      flooringWastagePct: 8,
     };
   }
 
@@ -117,5 +123,8 @@ export function calculateFlooring(
     terraceWaterproofingSqFt,
     sumpWaterproofingSqFt,
     waterproofingAreaSqFt,
+    flooringRawAreaSqFt: rawSpaceFloorArea,
+    flooringCirculationSqFt: circulationArea,
+    flooringWastagePct: wastagePct,
   };
 }
