@@ -6,6 +6,7 @@ import { useCatalogStore } from '../../../store/useCatalogStore';
 import { MaterialProduct } from '../../../types/catalog';
 import { ProductVisualCard } from '../../../components/common/ProductVisualCard';
 import { ProductImageViewerModal } from '../../../components/common/ProductImageViewerModal';
+import { Search, X } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
@@ -17,6 +18,7 @@ export const Step4Flooring: React.FC = () => {
 
   const [activeZoneKey, setActiveZoneKey] = useState<keyof typeof flooringZones>('living');
   const [modalProduct, setModalProduct] = useState<MaterialProduct | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const totalBua = area.totalBUASqFt || 2400;
 
@@ -334,23 +336,48 @@ export const Step4Flooring: React.FC = () => {
 
       {/* ── ACTIVE ZONE SPECIFICATION CARDS ── */}
       <div className="space-y-3">
-        <div className="flex justify-between items-center text-xs">
+        <div className="flex flex-wrap justify-between items-center gap-2">
           <div>
-            <label className="font-bold text-[#1B3D34] uppercase tracking-wider block">
-              {currentZone.label} Finishes
+            <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
+              {currentZone.label} — Select Finish
             </label>
             <span className="text-[10px] text-[#6B7280]">
-              Visual tile & slab selection for {currentZone.label.toLowerCase()}
+              ~{currentZone.approxAreaSqFt} sq.ft computed area
             </span>
           </div>
-          <span className="font-mono font-extrabold text-[#1B3D34]">
-            ~{currentZone.approxAreaSqFt} sq.ft computed
-          </span>
+          {/* Compact search filter */}
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9CA3AF] pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search finishes…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-7 pr-7 py-1.5 text-[12px] border border-[#E5E7EB] rounded-lg bg-white text-[#374151] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:border-[#1B3D34] w-40 sm:w-48"
+              aria-label="Search floor finishes"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#374151]"
+                aria-label="Clear search"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Responsive Grid: 1 col on mobile, 2 on tablet, 3 on desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-          {currentZone.options.map((opt) => {
+        {/* Single-column list layout: clean architectural rows */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {currentZone.options
+            .filter((opt) =>
+              !searchQuery ||
+              opt.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              opt.desc.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((opt) => {
             const isSelected = selectedOptionLabel === opt.label;
             const isRecommended = opt.label === recommendation.recommendedValue;
 

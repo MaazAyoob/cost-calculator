@@ -84,7 +84,7 @@ export const Step3CoreMaterials: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {steelProducts.map((product) => {
             const brandKey = resolveSteelBrandKey(product);
             const brandEntity = getBrandById(product.brandId);
@@ -134,7 +134,7 @@ export const Step3CoreMaterials: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {cementProducts.map((product) => {
             const brandKey = resolveCementBrandKey(product);
             const brandEntity = getBrandById(product.brandId);
@@ -186,7 +186,7 @@ export const Step3CoreMaterials: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {masonryProducts.map((product) => {
             const masonryKey = resolveMasonryKey(product);
             const brandEntity = getBrandById(product.brandId);
