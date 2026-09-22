@@ -157,7 +157,7 @@ export const PlannerPage: React.FC = () => {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="h-[100dvh] max-h-[100dvh] flex flex-col bg-[#F8F8F6] text-[#1B3D34] font-sans select-none overflow-hidden"
+      className="h-full max-h-screen w-full flex flex-col bg-[#F8F8F6] text-[#1B3D34] font-sans overflow-hidden"
     >
       <SEO
         title={
@@ -411,56 +411,61 @@ export const PlannerPage: React.FC = () => {
       )}
 
       {/* ── MAIN WORKSPACE (Desktop 45% Left Form / 55% Right Live Preview) ── */}
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col">
         {currentStep === 0 && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scrollbar-thin">
+          <div className="h-full w-full overflow-y-auto p-4 sm:p-6 lg:p-8 scrollbar-thin">
             <Step0Onboarding />
           </div>
         )}
 
         {currentStep === 11 && (
-          <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+          <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
             <Step10LoadingExperience />
           </div>
         )}
 
         {currentStep >= 1 && currentStep <= 10 && (
-          <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden pb-16 lg:pb-0">
+          <div className="h-full w-full flex flex-col lg:flex-row min-h-0 overflow-hidden pb-16 lg:pb-0">
             
             {/* ── LEFT PANEL (45% Desktop): FOCUSED INPUT CONFIGURATION ── */}
             <div
-              className={`w-full lg:w-[45%] xl:w-[44%] 2xl:w-[42%] flex flex-col h-full bg-white border-r border-[#E5E7EB] overflow-hidden shrink-0 ${
+              className={`w-full lg:w-[45%] xl:w-[44%] 2xl:w-[42%] h-full flex flex-col min-h-0 bg-white border-r border-[#E5E7EB] overflow-hidden shrink-0 ${
                 mobileActiveTab === 'form' ? 'flex' : 'hidden lg:flex'
               }`}
             >
               
-              {/* Scrollable Configuration Panel */}
-              <div className="flex-1 overflow-y-auto p-5 sm:p-6 lg:p-7 xl:p-8 pb-28 sm:pb-24 lg:pb-8 space-y-6 scrollbar-thin">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                    className="max-w-xl mx-auto w-full"
-                  >
-                    {currentStep === 1 && <Step1BasicInfo />}
-                    {currentStep === 2 && <Step2SpaceRequirements />}
-                    {currentStep === 3 && <Step3CoreMaterials />}
-                    {currentStep === 4 && <Step4Flooring />}
-                    {currentStep === 5 && <Step5WallCladding />}
-                    {currentStep === 6 && <Step6Doors />}
-                    {currentStep === 7 && <Step7Windows />}
-                    {currentStep === 8 && <Step8Electrical />}
-                    {currentStep === 9 && <Step9BathroomFittings />}
-                    {currentStep === 10 && <Step10Painting />}
-                  </motion.div>
-                </AnimatePresence>
+              {/* 1. SCROLLABLE STEP CONTENT (Primary Vertical Scroll Container) */}
+              <div
+                id="step-content-scroll-container"
+                className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 lg:p-7 xl:p-8 pb-24 lg:pb-8 space-y-6 scrollbar-thin"
+              >
+                <div className="max-w-xl mx-auto w-full space-y-6 pb-4">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentStep}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                      className="w-full space-y-6"
+                    >
+                      {currentStep === 1 && <Step1BasicInfo />}
+                      {currentStep === 2 && <Step2SpaceRequirements />}
+                      {currentStep === 3 && <Step3CoreMaterials />}
+                      {currentStep === 4 && <Step4Flooring />}
+                      {currentStep === 5 && <Step5WallCladding />}
+                      {currentStep === 6 && <Step6Doors />}
+                      {currentStep === 7 && <Step7Windows />}
+                      {currentStep === 8 && <Step8Electrical />}
+                      {currentStep === 9 && <Step9BathroomFittings />}
+                      {currentStep === 10 && <Step10Painting />}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
 
-              {/* Desktop Docked Navigation Bar */}
-              <div className="hidden lg:flex p-4 bg-white border-t border-[#E5E7EB] items-center justify-between gap-4 shrink-0 z-10">
+              {/* 2. DEDICATED BOTTOM NAVIGATION REGION (OUTSIDE SCROLLING CONTENT, INSIDE LEFT PANEL) */}
+              <div className="hidden lg:flex shrink-0 min-h-[64px] py-3.5 px-6 bg-white border-t border-[#E5E7EB] items-center justify-between gap-4 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
                 <button
                   type="button"
                   onClick={() => {
@@ -470,18 +475,19 @@ export const PlannerPage: React.FC = () => {
                       prevStep();
                     }
                   }}
-                  className="hutty-btn-secondary text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
+                  className="hutty-btn-secondary text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer hover:bg-gray-100 transition-colors shrink-0"
+                  id="step-nav-prev-btn"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>{currentStep === 1 ? 'Package Standards' : 'Back'}</span>
                 </button>
 
                 {/* Compact Step Progress Indicator */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <span className="text-[11px] font-mono font-bold text-[#4B5563]">
                     {currentStep} / 10
                   </span>
-                  <div className="w-24 h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                  <div className="w-20 sm:w-24 h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-[#1B3D34] rounded-full transition-all duration-300"
                       style={{ width: `${progressPct}%` }}
@@ -492,9 +498,16 @@ export const PlannerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="hutty-btn-primary text-xs font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer shadow-xs"
+                  className="hutty-btn-primary text-xs font-bold px-5 sm:px-6 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer shadow-xs hover:shadow-md transition-all shrink-0"
+                  id="step-nav-next-btn"
                 >
-                  <span>{currentStep === 10 ? 'Generate Full Dossier' : 'Continue'}</span>
+                  <span>
+                    {currentStep === 1
+                      ? 'Next: Space Planning'
+                      : currentStep === 10
+                      ? 'Generate Full Dossier'
+                      : `Next: ${STEPS[currentStep]?.shortTitle || 'Continue'}`}
+                  </span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
                 </button>
               </div>
@@ -503,8 +516,8 @@ export const PlannerPage: React.FC = () => {
 
             {/* ── RIGHT PANEL (55% Desktop): LIVE PREVIEW & ARCHITECTURAL 3D ── */}
             <div
-              className={`w-full lg:w-[55%] xl:w-[56%] 2xl:w-[58%] flex-col h-full bg-[#F8F8F6] overflow-y-auto p-4 sm:p-5 lg:p-6 pb-28 lg:pb-6 scrollbar-thin ${
-                mobileActiveTab === 'preview' ? 'flex' : 'hidden lg:flex'
+              className={`w-full lg:w-[55%] xl:w-[56%] 2xl:w-[58%] h-full min-h-0 overflow-y-auto p-4 sm:p-5 lg:p-6 pb-20 lg:pb-8 scrollbar-thin ${
+                mobileActiveTab === 'preview' ? 'flex flex-col' : 'hidden lg:block'
               }`}
             >
               <LivePreviewPanel onOpenPackageComparison={() => setShowCompareModal(true)} />

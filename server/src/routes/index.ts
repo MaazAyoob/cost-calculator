@@ -4,6 +4,7 @@ import downloadRoutes from './download.routes';
 import adminRoutes from './admin.routes';
 import ratesRoutes from './rates.routes';
 import configRoutes from './config.routes';
+import { catalogPublicRouter } from './catalog.routes';
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use('/download', downloadRoutes);
 router.use('/admin', adminRoutes);
 router.use('/rates', ratesRoutes);
 router.use('/config', configRoutes);
+router.use('/catalog', catalogPublicRouter);
 
 
 // Health check

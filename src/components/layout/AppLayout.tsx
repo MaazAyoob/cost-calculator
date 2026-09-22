@@ -26,8 +26,8 @@ export const AppLayout: React.FC = () => {
   // Calculator wizard manages its own minimalist top bar & sticky bottom bar
   if (isCalculatorRoute) {
     return (
-      <div className="min-h-screen bg-[#F7F7F5] flex flex-col font-sans antialiased text-[#172033]">
-        <main className="flex-1 w-full min-w-0">
+      <div className="h-screen max-h-screen overflow-hidden bg-[#F7F7F5] flex flex-col font-sans antialiased text-[#172033]">
+        <main className="flex-1 min-h-0 w-full min-w-0 flex flex-col overflow-hidden">
           <Outlet />
         </main>
         <ToastContainer />

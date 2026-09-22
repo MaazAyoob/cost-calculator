@@ -121,6 +121,35 @@ export const CANONICAL_RATE_ALIASES: Record<string, string[]> = {
   'doors.internal_flush': ['doors.flush_door'],
   'doors.teak_wood': ['doors.main_teak_african'],
   'doors.main_teak_african': ['doors.teak_wood'],
+
+  // ── Visual Catalog Brand & Material Product Canonical Aliases ──
+  'st-tata': ['steel.tata_tiscon', 'steel.fe550d_tmt'],
+  'steel.tata_tiscon': ['st-tata', 'steel.fe550d_tmt'],
+  'st-jsw': ['steel.jsw_neosteel', 'steel.fe550d_tmt'],
+  'steel.jsw_neosteel': ['st-jsw', 'steel.fe550d_tmt'],
+  'st-indus': ['steel.indus_fe500d', 'steel.fe550d_tmt'],
+  'steel.indus_fe500d': ['st-indus', 'steel.fe550d_tmt'],
+
+  'cm-ultratech': ['cement.ultratech_opc53', 'cement.opc53_grade'],
+  'cement.ultratech_opc53': ['cm-ultratech', 'cement.opc53_grade'],
+  'cm-acc': ['cement.acc_concrete_plus', 'cement.opc53_grade'],
+  'cement.acc_concrete_plus': ['cm-acc', 'cement.opc53_grade'],
+  'cm-dalmia': ['cement.dalmia_bharat', 'cement.opc53_grade'],
+  'cement.dalmia_bharat': ['cm-dalmia', 'cement.opc53_grade'],
+
+  'ms-birla-aac': ['masonry.aac_block_6in'],
+  'masonry.aac_block_6in': ['ms-birla-aac'],
+  'ms-wirecut-clay': ['masonry.clay_brick'],
+  'masonry.clay_brick': ['ms-wirecut-clay'],
+  'ms-solid-concrete': ['masonry.solid_concrete_block'],
+  'masonry.solid_concrete_block': ['ms-solid-concrete'],
+
+  'fl-vitrified': ['flooring.vitrified_living', 'flooring.vitrified_800'],
+  'flooring.vitrified_living': ['fl-vitrified'],
+  'fl-granite': ['flooring.granite'],
+  'flooring.granite': ['fl-granite'],
+  'fl-italian-marble': ['flooring.italian_marble'],
+  'flooring.italian_marble': ['fl-italian-marble'],
 };
 
 export function normalizePackageTier(pkg?: string): PackageTierDimension {

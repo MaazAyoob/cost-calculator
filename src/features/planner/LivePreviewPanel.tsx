@@ -111,7 +111,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
   const isZeroState = buaSqFt === 0 || totalCost === 0;
 
   return (
-    <aside className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-5 lg:p-6 shadow-xs flex flex-col justify-between space-y-4 text-left select-none relative">
+    <aside className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-5 lg:p-6 shadow-xs flex flex-col justify-between space-y-4 text-left relative">
       
       {/* ── 1. PROMINENT ESTIMATE HERO AREA ── */}
       <div className="space-y-3 pb-3 border-b border-[#E5E7EB]">

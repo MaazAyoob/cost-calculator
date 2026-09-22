@@ -25,6 +25,8 @@ import {
 } from '../calculation-engine/data/rateMasterDefaults';
 import { rateService } from '../calculation-engine/data/rateService';
 import { useCalculationStore } from './useCalculationStore';
+import { useCatalogStore } from './useCatalogStore';
+import { Brand, MaterialProduct } from '../types/catalog';
 import { getApiUrl } from '../config/api';
 import {
   simulateConfigurationComparison,
@@ -82,7 +84,8 @@ export type AdminTab =
   | 'commercial-tax'
   | 'report-settings'
   | 'test-calculator'
-  | 'versions-history';
+  | 'versions-history'
+  | 'catalog';
 
 interface AdminStoreState {
   // Phase 2E Mode Toggle
@@ -263,6 +266,18 @@ interface AdminStoreState {
   rollbackConfigVersion: (versionNumber: number) => Promise<boolean>;
   setActiveMethod: (category: string, methodId: string) => void;
 
+  // Visual Material & Brand Catalog State (Phase 2F)
+  catalogBrands: Brand[];
+  catalogProducts: MaterialProduct[];
+  isLoadingCatalog: boolean;
+  catalogError: string | null;
+  fetchCatalog: () => Promise<void>;
+  saveBrand: (data: Partial<Brand>) => Promise<boolean>;
+  deleteBrand: (id: string) => Promise<boolean>;
+  saveProduct: (data: Partial<MaterialProduct>) => Promise<boolean>;
+  deleteProduct: (id: string) => Promise<boolean>;
+  uploadCatalogImage: (base64OrDataUrl: string, filename?: string) => Promise<string | null>;
+
   // UI Setters
   setActiveTab: (tab: AdminTab) => void;
   setSearchQuery: (query: string) => void;
@@ -348,6 +363,12 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
   isPublishingConfig: false,
   // Phase 2E Mode & Test Calculator State
   adminViewMode: 'BASIC',
+
+  // Visual Material & Brand Catalog Initial State
+  catalogBrands: [],
+  catalogProducts: [],
+  isLoadingCatalog: false,
+  catalogError: null,
   customRooms: [],
   testInputs: {
     bua: 2160,
@@ -523,6 +544,9 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
         config: loadedConfig,
         auditLogs: loadedAudit,
       });
+
+      // Synchronize visual material & brand catalog
+      get().fetchCatalog();
     } catch {
       set({
         isLoading: false,
@@ -1547,6 +1571,196 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       customRules: state.customRules.filter((r) => r.id !== id),
       successMessage: 'Rule deleted.'
     }));
+  },
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // VISUAL CATALOG MANAGEMENT ACTIONS (Phase 2F)
+  // ═════════════════════════════════════════════════════════════════════════
+
+  fetchCatalog: async () => {
+    const { token } = get();
+    set({ isLoadingCatalog: true, catalogError: null });
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const [brandsRes, prodsRes] = await Promise.allSettled([
+        fetch(getApiUrl('/api/v1/admin/catalog/brands'), { headers }),
+        fetch(getApiUrl('/api/v1/admin/catalog/products'), { headers }),
+      ]);
+
+      let brands: Brand[] = [];
+      let prods: MaterialProduct[] = [];
+
+      if (brandsRes.status === 'fulfilled' && brandsRes.value.ok) {
+        const json = await brandsRes.value.json();
+        brands = json.data || [];
+      }
+      if (prodsRes.status === 'fulfilled' && prodsRes.value.ok) {
+        const json = await prodsRes.value.json();
+        prods = json.data || [];
+      }
+
+      set({
+        catalogBrands: brands.length > 0 ? brands : useCatalogStore.getState().brands,
+        catalogProducts: prods.length > 0 ? prods : useCatalogStore.getState().products,
+        isLoadingCatalog: false,
+      });
+    } catch (err: any) {
+      set({
+        catalogBrands: useCatalogStore.getState().brands,
+        catalogProducts: useCatalogStore.getState().products,
+        isLoadingCatalog: false,
+        catalogError: err.message || 'Failed to fetch catalog from server',
+      });
+    }
+  },
+
+  saveBrand: async (data: Partial<Brand>) => {
+    const { token } = get();
+    set({ isLoadingCatalog: true, catalogError: null, successMessage: null });
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const isUpdate = Boolean(data.id && get().catalogBrands.some((b) => b.id === data.id));
+      const url = isUpdate
+        ? getApiUrl(`/api/v1/admin/catalog/brands/${data.id}`)
+        : getApiUrl('/api/v1/admin/catalog/brands');
+      const method = isUpdate ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to save brand');
+      }
+
+      await get().fetchCatalog();
+      useCatalogStore.getState().fetchCatalog();
+      set({ isLoadingCatalog: false, successMessage: `Brand "${data.name}" saved successfully.` });
+      return true;
+    } catch (err: any) {
+      set({ isLoadingCatalog: false, catalogError: err.message || 'Failed to save brand.' });
+      return false;
+    }
+  },
+
+  deleteBrand: async (id: string) => {
+    const { token } = get();
+    set({ isLoadingCatalog: true, catalogError: null, successMessage: null });
+    try {
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(getApiUrl(`/api/v1/admin/catalog/brands/${id}`), {
+        method: 'DELETE',
+        headers,
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to delete brand');
+      }
+
+      await get().fetchCatalog();
+      useCatalogStore.getState().fetchCatalog();
+      set({ isLoadingCatalog: false, successMessage: 'Brand deleted or deactivated successfully.' });
+      return true;
+    } catch (err: any) {
+      set({ isLoadingCatalog: false, catalogError: err.message || 'Failed to delete brand.' });
+      return false;
+    }
+  },
+
+  saveProduct: async (data: Partial<MaterialProduct>) => {
+    const { token } = get();
+    set({ isLoadingCatalog: true, catalogError: null, successMessage: null });
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const isUpdate = Boolean(data.id && get().catalogProducts.some((p) => p.id === data.id));
+      const url = isUpdate
+        ? getApiUrl(`/api/v1/admin/catalog/products/${data.id}`)
+        : getApiUrl('/api/v1/admin/catalog/products');
+      const method = isUpdate ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to save product');
+      }
+
+      await get().fetchCatalog();
+      useCatalogStore.getState().fetchCatalog();
+      set({ isLoadingCatalog: false, successMessage: `Product "${data.name}" saved successfully.` });
+      return true;
+    } catch (err: any) {
+      set({ isLoadingCatalog: false, catalogError: err.message || 'Failed to save product.' });
+      return false;
+    }
+  },
+
+  deleteProduct: async (id: string) => {
+    const { token } = get();
+    set({ isLoadingCatalog: true, catalogError: null, successMessage: null });
+    try {
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(getApiUrl(`/api/v1/admin/catalog/products/${id}`), {
+        method: 'DELETE',
+        headers,
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to delete product');
+      }
+
+      await get().fetchCatalog();
+      useCatalogStore.getState().fetchCatalog();
+      set({ isLoadingCatalog: false, successMessage: 'Product removed or deactivated successfully.' });
+      return true;
+    } catch (err: any) {
+      set({ isLoadingCatalog: false, catalogError: err.message || 'Failed to delete product.' });
+      return false;
+    }
+  },
+
+  uploadCatalogImage: async (base64OrDataUrl: string, filename?: string) => {
+    const { token } = get();
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(getApiUrl('/api/v1/admin/catalog/upload'), {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ image: base64OrDataUrl, filename }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Image upload failed');
+      }
+
+      const json = await res.json();
+      return json.data?.url || null;
+    } catch (err: any) {
+      set({ catalogError: err.message || 'Upload failed' });
+      return null;
+    }
   },
 
   // UI Setters

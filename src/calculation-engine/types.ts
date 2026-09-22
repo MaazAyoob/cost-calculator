@@ -650,6 +650,18 @@ export interface ReportData {
   rateSourceMetadata?: RateSourceMetadata;
   qaResult?: QAGateResult;
   commercialReconciliation?: CommercialReconciliation;
+  catalogSnapshot?: Record<string, CatalogReportSnapshotItem>;
+}
+
+export interface CatalogReportSnapshotItem {
+  category: string;
+  brandName: string;
+  brandLogoUrl?: string | null;
+  productName: string;
+  productImageUrl?: string | null;
+  specification?: string | null;
+  unit?: string;
+  rate?: number;
 }
 
 // ────────────────────────────────────────────────────────────

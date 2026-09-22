@@ -38,8 +38,8 @@ export interface RoomCounts {
 }
 
 export interface MaterialBrandSelection {
-  steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT';
-  cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat';
+  steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT' | string;
+  cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat' | string;
   masonry?: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string;
   doors: string;
   windows: string;
@@ -122,8 +122,8 @@ export interface ConfiguratorState {
   setRoomCount: (room: keyof RoomCounts, count: number) => void;
   setLiftRequired: (required: boolean) => void;
   setCoreMaterials: (
-    steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT',
-    cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat',
+    steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT' | string,
+    cement: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat' | string,
     masonry?: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string
   ) => void;
   setMasonryMaterial: (masonry: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string) => void;

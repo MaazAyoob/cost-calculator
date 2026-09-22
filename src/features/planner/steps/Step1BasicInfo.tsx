@@ -220,7 +220,7 @@ export const Step1BasicInfo: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 text-left select-none pb-4">
+    <div className="space-y-6 text-left pb-4">
       
       {/* ── STEP HEADER ── */}
       <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">

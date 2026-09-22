@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useQuantities } from '../../../store/useCalculationStore';
 import { useRecommendations } from '../../../hooks/useRecommendations';
-import { Check } from 'lucide-react';
-import { cn, formatCurrency } from '../../../utils/cn';
+import { useCatalogStore } from '../../../store/useCatalogStore';
+import { MaterialProduct } from '../../../types/catalog';
+import { ProductVisualCard } from '../../../components/common/ProductVisualCard';
+import { ProductImageViewerModal } from '../../../components/common/ProductImageViewerModal';
 import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step3CoreMaterials: React.FC = () => {
@@ -12,57 +14,42 @@ export const Step3CoreMaterials: React.FC = () => {
   const { getCoreMaterialsRecommendation } = useRecommendations();
   const recommendedCore = getCoreMaterialsRecommendation();
 
+  const { getProductsByCategory, getBrandById, getEffectiveProductRate } = useCatalogStore();
+  const [modalProduct, setModalProduct] = useState<MaterialProduct | null>(null);
+
   const steelTonnes = quantities.steelTonnes || 0;
   const cementBags = quantities.cementBags || 0;
 
-  const steelOptions: { brand: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT'; grade: string; ratePerKg: number; desc: string }[] = [
-    { brand: 'Tata Tiscon', grade: 'Fe 550D Super Ductile', ratePerKg: 78, desc: 'Primary structural steel with superior earthquake ductility.' },
-    { brand: 'JSW Neosteel', grade: 'Fe 550D High Strength', ratePerKg: 74, desc: 'High-yield thermo-mechanically treated primary rebars.' },
-    { brand: 'Indus TMT', grade: 'Fe 500D Premium', ratePerKg: 68, desc: 'Cost-effective high-durability ribbed TMT bars.' },
-  ];
+  const steelProducts = getProductsByCategory('steel');
+  const cementProducts = getProductsByCategory('cement');
+  const masonryProducts = getProductsByCategory('masonry');
 
-  const cementOptions: { brand: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat'; grade: string; ratePerBag: number; desc: string }[] = [
-    { brand: 'UltraTech', grade: 'Super / Weather Plus (OPC 53)', ratePerBag: 420, desc: "India's #1 structural cement with water-repellent micro-particles." },
-    { brand: 'ACC Cement', grade: 'Gold Water Shield / Concrete Plus', ratePerBag: 395, desc: 'High initial compressive strength for slab casting.' },
-    { brand: 'Dalmia Bharat', grade: 'DSP / PPC Heavy Structure', ratePerBag: 375, desc: 'High slump retention for heavy reinforced concrete.' },
-  ];
+  // Fallback map helper if custom product selected
+  const resolveSteelBrandKey = (product: MaterialProduct): string => {
+    if (product.brand && product.brand.trim()) return product.brand;
+    const name = (product.name || '').toLowerCase();
+    if (name.includes('jsw')) return 'JSW Neosteel';
+    if (name.includes('indus')) return 'Indus TMT';
+    return 'Tata Tiscon';
+  };
 
-  const masonryOptions = [
-    {
-      type: 'AAC Blocks',
-      name: 'AAC Blocks (Birla Aerocon / Godrej)',
-      size: '600 × 200 × 150 mm',
-      vol: '0.018 m³',
-      wastage: '5%',
-      rate: 85,
-      unit: 'Block',
-      desc: 'IS 2185 Part 3 lightweight thermal insulating blocks with polymer jointing.',
-    },
-    {
-      type: 'Clay Bricks',
-      name: 'Wirecut Red Clay Bricks',
-      size: '190 × 90 × 90 mm',
-      vol: '0.00154 m³',
-      wastage: '7%',
-      rate: 12,
-      unit: 'Brick',
-      desc: 'IS 1077 high compressive strength modular kiln-burnt red clay bricks.',
-    },
-    {
-      type: 'Concrete Blocks',
-      name: 'Solid Concrete / Cement Blocks',
-      size: '400 × 200 × 150 mm',
-      vol: '0.012 m³',
-      wastage: '5%',
-      rate: 52,
-      unit: 'Block',
-      desc: 'IS 2185 Part 1 heavy-duty hydraulic pressed solid concrete blocks.',
-    },
-  ];
+  const resolveCementBrandKey = (product: MaterialProduct): string => {
+    if (product.brand && product.brand.trim()) return product.brand;
+    const name = (product.name || '').toLowerCase();
+    if (name.includes('acc')) return 'ACC Cement';
+    if (name.includes('dalmia')) return 'Dalmia Bharat';
+    return 'UltraTech';
+  };
+
+  const resolveMasonryKey = (product: MaterialProduct): string => {
+    const name = (product.name + ' ' + (product.specification || '')).toLowerCase();
+    if (name.includes('clay') || name.includes('brick')) return 'Clay Bricks';
+    if (name.includes('concrete')) return 'Concrete Blocks';
+    return 'AAC Blocks';
+  };
 
   return (
-    <div className="space-y-6 text-left select-none">
-      
+    <div className="space-y-6 text-left">
       {/* ── STEP HEADER ── */}
       <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
         <div className="flex items-center justify-between">
@@ -77,138 +64,112 @@ export const Step3CoreMaterials: React.FC = () => {
           CORE STRUCTURAL MATERIALS
         </h1>
         <p className="text-xs sm:text-sm text-[#4B5563]">
-          Select structural TMT steel and Portland cement brands. Physical quantities remain invariant while unit rates reflect manufacturer grade.
+          Select structural TMT steel, Portland cement, and masonry block systems. Unit rates reflect manufacturer grade and specifications.
         </p>
       </div>
 
       {/* ── 1. STRUCTURAL STEEL ── */}
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         <div className="flex justify-between items-center text-xs">
-          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
-            TMT Rebar Steel
-          </label>
+          <div>
+            <label className="font-bold text-[#1B3D34] uppercase tracking-wider block">
+              TMT Rebar Steel
+            </label>
+            <span className="text-[10px] text-[#6B7280]">
+              IS 1786 primary structural reinforcement
+            </span>
+          </div>
           <span className="font-mono font-extrabold text-[#1B3D34]">
             {steelTonnes > 0 ? `${steelTonnes} Tonnes Required` : '0 T'}
           </span>
         </div>
 
-        <div className="space-y-2">
-          {steelOptions.map((item) => {
-            const isSelected = (!materialBrands.steel && item.brand === recommendedCore.steel) || materialBrands.steel === item.brand;
-            const isRecommended = item.brand === recommendedCore.steel;
-            const itemCost = Math.round(steelTonnes * 1000 * item.ratePerKg);
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {steelProducts.map((product) => {
+            const brandKey = resolveSteelBrandKey(product);
+            const brandEntity = getBrandById(product.brandId);
+            const isSelected = (!materialBrands.steel && brandKey === recommendedCore.steel) || materialBrands.steel === brandKey;
+            const isRecommended = brandKey === recommendedCore.steel;
+            const { rate } = getEffectiveProductRate(product);
+            const totalItemCost = Math.round(steelTonnes * 1000 * rate);
 
             return (
-              <div
-                key={item.brand}
-                onClick={() => setCoreMaterials(item.brand, (materialBrands.cement || recommendedCore.cement) as any, materialBrands.masonry as any)}
-                className={cn(
-                  'hutty-tactile-card flex items-center justify-between',
-                  isSelected && 'hutty-tactile-card-selected'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
-                    )}
-                  >
-                    {isSelected && <Check className="w-3.5 h-3.5" />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.brand}</h4>
-                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
-                        {item.grade}
-                      </span>
-                      {isRecommended && (
-                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
-                          Recommended for your plan
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-[#4B5563] mt-0.5">{item.desc}</p>
-                  </div>
-                </div>
-
-                <div className="text-right shrink-0 pl-3">
-                  <span className="text-xs font-black text-[#1B3D34] block font-mono">
-                    {steelTonnes > 0 ? formatCurrency(itemCost) : `₹${item.ratePerKg}/kg`}
-                  </span>
-                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerKg}/kg</span>
-                </div>
-              </div>
+              <ProductVisualCard
+                key={product.id}
+                product={product}
+                brand={brandEntity}
+                isSelected={isSelected}
+                displayMode="compact"
+                onSelect={() => {
+                  setCoreMaterials(
+                    brandKey,
+                    (materialBrands.cement || recommendedCore.cement) as any,
+                    materialBrands.masonry as any
+                  );
+                }}
+                onPreview={(p) => setModalProduct(p)}
+                isRecommended={isRecommended}
+                recommendedReason="Recommended for optimal seismic structural performance"
+                effectiveRate={rate}
+                totalComputedCost={steelTonnes > 0 ? totalItemCost : undefined}
+              />
             );
           })}
         </div>
       </div>
 
       {/* ── 2. PORTLAND CEMENT ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-3 pt-3 border-t border-[#E5E7EB]">
         <div className="flex justify-between items-center text-xs">
-          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
-            Portland Cement (50 kg Bag)
-          </label>
+          <div>
+            <label className="font-bold text-[#1B3D34] uppercase tracking-wider block">
+              Portland Cement (50 kg Bag)
+            </label>
+            <span className="text-[10px] text-[#6B7280]">
+              OPC 53 / PPC certified high early compressive strength
+            </span>
+          </div>
           <span className="font-mono font-extrabold text-[#1B3D34]">
             {cementBags > 0 ? `${cementBags.toLocaleString()} Bags Required` : '0 Bags'}
           </span>
         </div>
 
-        <div className="space-y-2">
-          {cementOptions.map((item) => {
-            const isSelected = (!materialBrands.cement && item.brand === recommendedCore.cement) || materialBrands.cement === item.brand;
-            const isRecommended = item.brand === recommendedCore.cement;
-            const itemCost = Math.round(cementBags * item.ratePerBag);
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {cementProducts.map((product) => {
+            const brandKey = resolveCementBrandKey(product);
+            const brandEntity = getBrandById(product.brandId);
+            const isSelected = (!materialBrands.cement && brandKey === recommendedCore.cement) || materialBrands.cement === brandKey;
+            const isRecommended = brandKey === recommendedCore.cement;
+            const { rate } = getEffectiveProductRate(product);
+            const totalItemCost = Math.round(cementBags * rate);
 
             return (
-              <div
-                key={item.brand}
-                onClick={() => setCoreMaterials((materialBrands.steel || recommendedCore.steel) as any, item.brand, materialBrands.masonry as any)}
-                className={cn(
-                  'hutty-tactile-card flex items-center justify-between',
-                  isSelected && 'hutty-tactile-card-selected'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
-                    )}
-                  >
-                    {isSelected && <Check className="w-3.5 h-3.5" />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.brand}</h4>
-                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
-                        {item.grade}
-                      </span>
-                      {isRecommended && (
-                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
-                          Recommended for your plan
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-[#4B5563] mt-0.5">{item.desc}</p>
-                  </div>
-                </div>
-
-                <div className="text-right shrink-0 pl-3">
-                  <span className="text-xs font-black text-[#1B3D34] block font-mono">
-                    {cementBags > 0 ? formatCurrency(itemCost) : `₹${item.ratePerBag}/bag`}
-                  </span>
-                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerBag} / 50kg bag</span>
-                </div>
-              </div>
+              <ProductVisualCard
+                key={product.id}
+                product={product}
+                brand={brandEntity}
+                isSelected={isSelected}
+                displayMode="compact"
+                onSelect={() => {
+                  setCoreMaterials(
+                    (materialBrands.steel || recommendedCore.steel) as any,
+                    brandKey,
+                    materialBrands.masonry as any
+                  );
+                }}
+                onPreview={(p) => setModalProduct(p)}
+                isRecommended={isRecommended}
+                recommendedReason="Engineered for water-shield slab casting"
+                effectiveRate={rate}
+                totalComputedCost={cementBags > 0 ? totalItemCost : undefined}
+              />
             );
           })}
         </div>
       </div>
 
       {/* ── 3. WALL / MASONRY MATERIAL ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-3 pt-3 border-t border-[#E5E7EB]">
         <div className="flex justify-between items-center text-xs">
           <div>
             <label className="font-bold text-[#1B3D34] uppercase tracking-wider block">
@@ -221,75 +182,68 @@ export const Step3CoreMaterials: React.FC = () => {
             )}
           </div>
           <span className="font-mono font-extrabold text-[#1B3D34]">
-            {quantities.masonryUnitsCount > 0 ? `${quantities.masonryUnitsCount.toLocaleString()} ${quantities.masonryUnit || 'Nos'} Required` : '0 Nos'}
+            {quantities.masonryUnitsCount > 0 ? `${quantities.masonryUnitsCount.toLocaleString()} ${quantities.masonryUnit || 'Units'} Required` : '0 Units'}
           </span>
         </div>
 
-        <div className="space-y-2">
-          {masonryOptions.map((item) => {
-            const isSelected = (!materialBrands.masonry && item.name.includes(recommendedCore.masonry.split(' ')[0])) || materialBrands.masonry === item.type;
-            const isRecommended = item.name.includes(recommendedCore.masonry.split(' ')[0]) || (recommendedCore.masonry.includes('Concrete') && item.type === 'Concrete Blocks');
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {masonryProducts.map((product) => {
+            const masonryKey = resolveMasonryKey(product);
+            const brandEntity = getBrandById(product.brandId);
+            const isSelected = (!materialBrands.masonry && product.name.toLowerCase().includes(recommendedCore.masonry.split(' ')[0].toLowerCase())) || materialBrands.masonry === masonryKey;
+            const isRecommended = product.name.toLowerCase().includes(recommendedCore.masonry.split(' ')[0].toLowerCase());
+            const { rate } = getEffectiveProductRate(product);
             const count = isSelected ? quantities.masonryUnitsCount : 0;
-            const itemCost = Math.round(count * item.rate);
+            const totalItemCost = Math.round(count * rate);
 
             return (
-              <div
-                key={item.type}
-                onClick={() => {
+              <ProductVisualCard
+                key={product.id}
+                product={product}
+                brand={brandEntity}
+                isSelected={isSelected}
+                displayMode="compact"
+                onSelect={() => {
                   setCoreMaterials(
                     (materialBrands.steel || recommendedCore.steel) as any,
                     (materialBrands.cement || recommendedCore.cement) as any,
-                    item.type
+                    masonryKey
                   );
                 }}
-                className={cn(
-                  'hutty-tactile-card flex items-center justify-between',
-                  isSelected && 'hutty-tactile-card-selected'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
-                    )}
-                  >
-                    {isSelected && <Check className="w-3.5 h-3.5" />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.name}</h4>
-                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
-                        Size: {item.size}
-                      </span>
-                      {isRecommended && (
-                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
-                          Recommended for your plan
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-[#4B5563] mt-0.5">{item.desc}</p>
-                  </div>
-                </div>
-
-                <div className="text-right shrink-0 pl-3">
-                  <span className="text-xs font-black text-[#1B3D34] block font-mono">
-                    {count > 0 ? formatCurrency(itemCost) : `₹${item.rate}/${item.unit}`}
-                  </span>
-                  <span className="text-[10px] text-[#4B5563]">₹{item.rate} / {item.unit}</span>
-                </div>
-              </div>
+                onPreview={(p) => setModalProduct(p)}
+                isRecommended={isRecommended}
+                recommendedReason="Thermal insulation & lightweight load distribution"
+                effectiveRate={rate}
+                totalComputedCost={count > 0 ? totalItemCost : undefined}
+              />
             );
           })}
         </div>
       </div>
+
+      {/* ── IMAGE LIGHTBOX MODAL ── */}
+      {modalProduct && (
+        <ProductImageViewerModal
+          product={modalProduct}
+          brand={getBrandById(modalProduct.brandId)}
+          onClose={() => setModalProduct(null)}
+          onSelect={() => {
+            if (modalProduct.category === 'steel') {
+              setCoreMaterials(resolveSteelBrandKey(modalProduct), (materialBrands.cement || recommendedCore.cement) as any, materialBrands.masonry as any);
+            } else if (modalProduct.category === 'cement') {
+              setCoreMaterials((materialBrands.steel || recommendedCore.steel) as any, resolveCementBrandKey(modalProduct), materialBrands.masonry as any);
+            } else if (modalProduct.category === 'masonry') {
+              setCoreMaterials((materialBrands.steel || recommendedCore.steel) as any, (materialBrands.cement || recommendedCore.cement) as any, resolveMasonryKey(modalProduct));
+            }
+          }}
+        />
+      )}
 
       {/* ── CALCULATION TRANSPARENCY: RCC & STRUCTURE ── */}
       <HowWeCalculatedThis stepKey="structure" className="mt-4" />
 
       {/* ── CALCULATION TRANSPARENCY: WALLS & MASONRY ── */}
       <HowWeCalculatedThis stepKey="masonry" className="mt-2" />
-
     </div>
   );
 };

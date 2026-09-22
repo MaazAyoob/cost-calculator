@@ -84,4 +84,8 @@ router.get('/account/security-audit', getSecurityAuditLogs as any);
 // Configuration Versioning Lifecycle Endpoints
 router.use('/config', configRoutes);
 
+// Visual Material & Brand Catalog Endpoints
+import { catalogAdminRouter } from './catalog.routes';
+router.use('/catalog', catalogAdminRouter);
+
 export default router;

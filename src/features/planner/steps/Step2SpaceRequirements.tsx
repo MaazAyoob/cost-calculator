@@ -51,7 +51,7 @@ export const Step2SpaceRequirements: React.FC = () => {
     (rooms.pooja || 0) + (rooms.utility || 0) + (rooms.office || 0) + (rooms.storeRoom || 0);
 
   return (
-    <div className="space-y-6 text-left select-none pb-4">
+    <div className="space-y-6 text-left pb-4">
       
       {/* ── STEP HEADER ── */}
       <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">

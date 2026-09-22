@@ -63,6 +63,40 @@ export function assembleReport(
 
   const parameterTable: QSParameterItem[] = Object.values(CENTRALIZED_ENGINEERING_ASSUMPTIONS);
 
+  const steelScheduleItem = materialSchedule.find((m) => m.category === 'Rebar' || m.material.toLowerCase().includes('steel'));
+  const cementScheduleItem = materialSchedule.find((m) => m.category === 'Cement' || m.material.toLowerCase().includes('cement'));
+
+  // Snapshot visual material catalog display metadata to guarantee historical immutability
+  const catalogSnapshot: Record<string, any> = {
+    steel: {
+      category: 'steel',
+      brandName: input.materialBrands?.steel || steelScheduleItem?.brand || 'Tata Tiscon',
+      productName: `${input.materialBrands?.steel || 'Tata Tiscon'} Fe 550D TMT Rebar`,
+      unit: steelScheduleItem?.unit || 'Tonne',
+      rate: steelScheduleItem?.unitRate || 74000,
+    },
+    cement: {
+      category: 'cement',
+      brandName: input.materialBrands?.cement || cementScheduleItem?.brand || 'UltraTech',
+      productName: `${input.materialBrands?.cement || 'UltraTech'} OPC 53 Grade`,
+      unit: cementScheduleItem?.unit || 'Bag',
+      rate: cementScheduleItem?.unitRate || 420,
+    },
+    masonry: {
+      category: 'masonry',
+      brandName: quantities?.masonryBrand || (typeof input.materialBrands?.masonry === 'string' ? input.materialBrands.masonry : 'AAC Blocks'),
+      productName: quantities?.masonryMaterial || 'AAC Blocks',
+      unit: quantities?.masonryUnit || 'Block',
+      rate: quantities?.masonryUnitRate || 85,
+    },
+    flooring: {
+      category: 'flooring',
+      brandName: 'Kajaria / Somany',
+      productName: typeof input.flooringZones?.living === 'string' ? input.flooringZones.living : 'Vitrified Tiles',
+      unit: 'sq.ft',
+    },
+  };
+
   return {
     projectId: `HUTTY-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000) + 1000}`,
     generatedAt: new Date().toISOString(),
@@ -86,5 +120,6 @@ export function assembleReport(
     recommendations,
     trace,
     parameterTable,
+    catalogSnapshot,
   };
 }

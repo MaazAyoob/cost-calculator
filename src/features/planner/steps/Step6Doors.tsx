@@ -40,7 +40,7 @@ export const Step6Doors: React.FC = () => {
   const selectedBathDoor = doors.bathroomDoor || recBath.recommendedValue;
 
   return (
-    <div className="space-y-6 text-left select-none">
+    <div className="space-y-6 text-left">
       
       {/* ── STEP HEADER ── */}
       <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">

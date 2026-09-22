@@ -160,6 +160,23 @@ model ProcurementList {
   @@index([projectId])
 }
 
+model Brand {
+  id           String            @id @default(uuid())
+  name         String            @unique
+  logoUrl      String?
+  description  String?
+  website      String?
+  active       Boolean           @default(true)
+  displayOrder Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  products     MaterialProduct[]
+
+  @@index([active])
+  @@index([displayOrder])
+  @@map("catalog_brands")
+}
+
 model MaterialCategory {
   id       String            @id @default(uuid())
   name     String            @unique
@@ -182,17 +199,34 @@ model MaterialBrand {
 }
 
 model MaterialProduct {
-  id          String           @id @default(uuid())
-  categoryId  String
-  category    MaterialCategory @relation(fields: [categoryId], references: [id])
-  name        String
-  brand       String
-  unit        String
-  rate        Float
-  description String?
-  isAvailable Boolean          @default(true)
+  id            String            @id @default(uuid())
+  brandId       String?
+  brandRel      Brand?            @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  categoryId    String?
+  categoryRel   MaterialCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category      String            @default("general")
+  name          String
+  brand         String            @default("")
+  imageUrl      String?
+  description   String?
+  specification String?
+  unit          String
+  rate          Float             @default(0)
+  rateUnit      String?
+  rateId        String?
+  productCode   String?
+  active        Boolean           @default(true)
+  displayOrder  Int               @default(0)
+  metadataJson  Json?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
+  @@index([brandId])
   @@index([categoryId])
+  @@index([category])
+  @@index([active])
+  @@index([rateId])
+  @@map("catalog_products")
 }
 
 model AuditLog {
