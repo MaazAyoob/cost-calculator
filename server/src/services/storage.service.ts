@@ -68,7 +68,7 @@ export function verifyImageMagicBytes(buffer: Buffer, reportedMime: string): boo
 /**
  * Strict SVG Sanitizer and Security Validator
  */
-export function sanitizeSvgContent(buffer: Buffer): Buffer {
+export function sanitizeSvgContent(buffer: Buffer): Buffer<ArrayBuffer> {
   const svgText = buffer.toString('utf8');
 
   // Reject executable or malicious patterns in SVG
