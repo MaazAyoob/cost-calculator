@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { catalogService } from '../services/catalog.service';
-import { storageService } from '../services/storage.service';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -198,29 +197,3 @@ export async function deleteProduct(req: AuthenticatedRequest, res: Response): P
   }
 }
 
-export async function uploadImage(req: AuthenticatedRequest, res: Response): Promise<void> {
-  try {
-    const { image, filename } = req.body;
-    if (!image) {
-      res.status(400).json({
-        success: false,
-        error: 'Missing required image payload (base64 or data URI)',
-      });
-      return;
-    }
-
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const result = await storageService.saveBase64Image(image, filename, baseUrl);
-
-    res.status(201).json({
-      success: true,
-      message: 'Image uploaded successfully',
-      data: result,
-    });
-  } catch (err: any) {
-    res.status(400).json({
-      success: false,
-      error: err.message || 'Image upload failed',
-    });
-  }
-}

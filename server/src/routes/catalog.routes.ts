@@ -10,7 +10,6 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-  uploadImage,
 } from '../controllers/catalog.controller';
 import { authenticateToken, requireAdmin } from '../middlewares/auth.middleware';
 
@@ -37,8 +36,5 @@ catalogAdminRouter.get('/products', getAllProducts as any);
 catalogAdminRouter.post('/products', createProduct as any);
 catalogAdminRouter.put('/products/:id', updateProduct as any);
 catalogAdminRouter.delete('/products/:id', deleteProduct as any);
-
-// Image Upload Endpoint (Dedicated 6MB limit for 5MB max binary upload)
-catalogAdminRouter.post('/upload', express.json({ limit: '6mb' }), uploadImage as any);
 
 export default catalogPublicRouter;

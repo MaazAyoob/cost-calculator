@@ -7,10 +7,7 @@
 import { create } from 'zustand';
 import { Brand, MaterialProduct } from '../types/catalog';
 import { getApiUrl } from '../config/api';
-import { resolveImageUrl } from '../utils/imageUrl';
 import { rateService } from '../calculation-engine/data/rateService';
-
-export { resolveImageUrl };
 
 // Initial fallback baseline brands (offline / instant initial load)
 const FALLBACK_BRANDS: Brand[] = [

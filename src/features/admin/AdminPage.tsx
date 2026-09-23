@@ -85,7 +85,6 @@ import { RoomsSpacesSection } from './sections/RoomsSpacesSection';
 import { TradeSections } from './sections/TradeSections';
 import { CalculationMethodsSection } from './sections/CalculationMethodsSection';
 import { TestCalculatorSection } from './sections/TestCalculatorSection';
-import { CatalogManagementTab } from './tabs/CatalogManagementTab';
 
 export const AdminPage: React.FC = () => {
   const {
@@ -138,7 +137,6 @@ export const AdminPage: React.FC = () => {
     selectedPriceCategory,
     setSelectedPriceCategory,
     selectedProviderId,
-    catalogProducts,
     setSelectedProviderId,
     fetchPriceUpdates,
     runPriceUpdate,
@@ -541,8 +539,6 @@ export const AdminPage: React.FC = () => {
           { label: 'Calculation Methods Switcher', section: 'calculation-methods' as AdminTab, group: 'Calculator' },
           { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculator' },
           { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Management' },
-          { label: 'Visual Material & Brand Catalog', section: 'catalog' as AdminTab, group: 'Pricing' },
-          { label: 'Manufacturer Logos & Tile Images', section: 'catalog' as AdminTab, group: 'Pricing' },
         ];
 
         const searchResults = searchQuery.trim()
@@ -590,10 +586,9 @@ export const AdminPage: React.FC = () => {
           },
           {
             id: 'PRICING',
-            name: '4. Pricing & Catalog',
+            name: '4. Pricing',
             icon: <Coins className="w-3.5 h-3.5" />,
             sections: [
-              { id: 'catalog', label: 'Visual Catalog & Brands', badge: catalogProducts.length || undefined },
               { id: 'labour', label: 'Labour' },
               { id: 'material-prices', label: 'Material Prices', badge: overrides.length || undefined },
               { id: 'quality-spec', label: 'Quality / Specification' },
@@ -2005,9 +2000,6 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'report-settings' && <TradeParametersTab forcedTab="recommendations" />}
       {(activeTab === 'versions-history' || activeTab === 'versions') && <VersionHistoryTab />}
       {activeTab === 'simulation' && <SimulationImpactTab />}
-
-      {/* Visual Material & Brand Catalog (Phase 2F) */}
-      {activeTab === 'catalog' && <CatalogManagementTab />}
 
       {/* Legacy fallbacks */}
       {activeTab === 'parameters' && <ParametersTab />}
