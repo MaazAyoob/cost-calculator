@@ -239,6 +239,10 @@ export function generateStepExplanations(
     stepTotal: structureTotal,
     unitRateOrBenchmark: bua > 0 ? `₹${formatNumber(structureTotal / bua)}/sq.ft BUA` : '₹0/sq.ft',
     summaryMetrics: [
+      { label: 'Footing Concrete', value: formatNumber(quantities?.footingConcreteCuM, 2), unit: 'm³' },
+      { label: 'Column Concrete', value: formatNumber(quantities?.columnConcreteCuM, 2), unit: 'm³' },
+      { label: 'Slab Concrete', value: formatNumber(quantities?.slabConcreteCuM, 2), unit: 'm³' },
+      { label: 'Total RCC Concrete', value: formatNumber(quantities?.rccConcreteTotalCuM, 2), unit: 'm³' },
       { label: 'Rebar Steel', value: formatNumber(quantities?.steelTonnes, 2), unit: 'Tonnes' },
       { label: 'Cement', value: formatNumber(quantities?.cementBags), unit: 'Bags' },
       { label: 'M-Sand / P-Sand', value: formatNumber(quantities?.sandCuFt), unit: 'CFT' },
@@ -249,14 +253,43 @@ export function generateStepExplanations(
       { label: 'Number of Floors', value: floors },
       { label: 'Steel Factor', value: `${quantities?.steelFactorKgPerSqFt || 3.0} kg/sq.ft`, description: 'Canonical structural requirement factor' },
       { label: 'Cement Thumb Rule', value: `${quantities?.cementFactorBagsPerSqFt || 0.40} bags/sq.ft`, description: 'Approved benchmark coefficient' },
+      { label: 'Framing Concrete Index', value: '0.052 m³/sq.ft BUA', description: 'IS 456 monolithic structural framing thumb rule' },
     ],
     derivedQuantities: [
+      { label: 'Footing Concrete', quantity: formatNumber(quantities?.footingConcreteCuM, 2), unit: 'm³', description: 'Isolated & combined column footing concrete pads' },
+      { label: 'Column Concrete', quantity: formatNumber(quantities?.columnConcreteCuM, 2), unit: 'm³', description: 'Vertical load-bearing structural columns (ground to top)' },
+      { label: 'Slab Concrete', quantity: formatNumber(quantities?.slabConcreteCuM, 2), unit: 'm³', description: 'Monolithic floor/roof slabs and structural beams' },
+      { label: 'Total RCC Concrete', quantity: formatNumber(quantities?.rccConcreteTotalCuM, 2), unit: 'm³', description: 'Reconciled structural RCC total (Footing + Column + Slab)' },
       { label: 'Total Steel Weight', quantity: formatNumber(quantities?.steelKg), unit: 'kg', description: `${formatNumber(quantities?.steelTonnes, 2)} Tonnes Fe-550D TMT` },
       { label: 'Total Cement Requirement', quantity: formatNumber(quantities?.cementBags), unit: 'Bags', description: '50 kg bags for structural RCC & masonry' },
       { label: 'Total Sand Quantity', quantity: formatNumber(quantities?.sandCuFt), unit: 'CFT', description: 'M-Sand for concrete + P-Sand for plaster' },
       { label: 'Coarse Aggregate (20mm)', quantity: formatNumber(quantities?.coarseAggregateCuFt), unit: 'CFT', description: 'Granite aggregate for RCC members' },
     ],
     calculationLogic: [
+      {
+        title: 'Footing Concrete',
+        formula: 'Structural Framing Concrete Volume × Footing Share (22%)',
+        substitutions: `${formatNumber(quantities?.approxConcreteCuM, 1)} m³ × 0.22 [min 5.00 m³]`,
+        resultText: `${formatNumber(quantities?.footingConcreteCuM, 2)} m³`,
+      },
+      {
+        title: 'Column Concrete',
+        formula: 'Structural Framing Concrete Volume × Column Share (18%)',
+        substitutions: `${formatNumber(quantities?.approxConcreteCuM, 1)} m³ × 0.18 [min 3.00 m³]`,
+        resultText: `${formatNumber(quantities?.columnConcreteCuM, 2)} m³`,
+      },
+      {
+        title: 'Slab Concrete',
+        formula: 'Structural Framing Concrete Volume × Slab & Beam Share (52%)',
+        substitutions: `${formatNumber(quantities?.approxConcreteCuM, 1)} m³ × 0.52 [min 8.00 m³]`,
+        resultText: `${formatNumber(quantities?.slabConcreteCuM, 2)} m³`,
+      },
+      {
+        title: 'Total RCC Concrete',
+        formula: 'Footing Concrete + Column Concrete + Slab Concrete',
+        substitutions: `${formatNumber(quantities?.footingConcreteCuM, 2)} m³ + ${formatNumber(quantities?.columnConcreteCuM, 2)} m³ + ${formatNumber(quantities?.slabConcreteCuM, 2)} m³`,
+        resultText: `${formatNumber(quantities?.rccConcreteTotalCuM, 2)} m³`,
+      },
       {
         title: 'Steel Reinforcement Quantity',
         formula: 'Total BUA × Resolved Steel Factor (kg/sq.ft)',
@@ -292,7 +325,7 @@ export function generateStepExplanations(
       'Structural load capacity for multi-floor vertical expansion',
       'Procurement logistics, staging area, and delivery schedules',
     ],
-    quantityVsPriceNote: 'Changing material brands (e.g., Tata Tiscon to JSW, or UltraTech to ACC) updates unit rates and cost totals, but physical steel tonnage and cement bags remain 100% invariant.',
+    quantityVsPriceNote: 'Changing material brands (e.g., Tata Tiscon to JSW, or UltraTech to ACC) updates unit rates and cost totals, but physical steel tonnage, cement bags, and RCC concrete volumes remain 100% invariant.',
   };
 
   // ============================================================
@@ -301,40 +334,55 @@ export function generateStepExplanations(
   const masonryBOQ = findBOQItems((i) => i.category === 'Masonry & Plastering' || i.description.toLowerCase().includes('masonry') || i.description.toLowerCase().includes('block') || i.description.toLowerCase().includes('brick'));
   const masonryTotal = sumCost(masonryBOQ);
 
+  const grossWallArea = quantities?.grossWallAreaSqFt || parseFloat(((buildingModel?.grossExternalWallAreaSqFt || 0) + (buildingModel?.grossInternalWallAreaSqFt || 0)).toFixed(1));
+  const baseBlocks = quantities?.baseBlockCount || Math.round((quantities?.masonryUnitsCount || 0) / (1 + (quantities?.masonryWastagePct || 5) / 100));
+  const finalBlocks = quantities?.finalBlocksRequired || quantities?.masonryUnitsCount || 0;
+
   explanations['masonry'] = {
     stepKey: 'masonry',
     title: 'Walls & Masonry Enclosure',
     stepTotal: masonryTotal,
     unitRateOrBenchmark: bua > 0 ? `₹${formatNumber(masonryTotal / bua)}/sq.ft BUA` : '₹0/sq.ft',
     summaryMetrics: [
-      { label: 'Masonry Material', value: quantities?.masonryMaterial || 'AAC Blocks' },
-      { label: 'Units Required', value: formatNumber(quantities?.masonryUnitsCount), unit: quantities?.masonryUnit || 'Blocks' },
       { label: 'Net Wall Area', value: formatNumber(quantities?.netWallAreaSqFt), unit: 'sq.ft' },
-      { label: 'Masonry Volume', value: formatNumber(quantities?.masonryVolumeCuM, 1), unit: 'Cu.M' },
+      { label: 'Block Wall Coverage', value: formatNumber(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt), unit: 'sq.ft' },
+      { label: 'Blocks Required', value: formatNumber(finalBlocks), unit: quantities?.masonryUnit || 'Nos' },
+      { label: 'Units Required', value: formatNumber(finalBlocks), unit: quantities?.masonryUnit || 'Nos' },
+      { label: 'Block Consumption', value: formatNumber(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt), unit: 'sq.ft' },
+      { label: 'Masonry Volume', value: formatNumber(quantities?.masonryVolumeCuM, 2), unit: 'm³' },
     ],
     inputsUsed: [
-      { label: 'Gross External Wall Area', value: `${formatNumber(buildingModel?.grossExternalWallAreaSqFt)} sq.ft` },
-      { label: 'Gross Internal Wall Area', value: `${formatNumber(buildingModel?.grossInternalWallAreaSqFt)} sq.ft` },
-      { label: 'Deductions (Openings)', value: `${formatNumber((buildingModel?.totalDoorOpeningAreaSqFt || 0) + (buildingModel?.totalWindowOpeningAreaSqFt || 0))} sq.ft` },
-      { label: 'Wastage Allowance', value: `${quantities?.masonryWastagePct || 5}%` },
+      { label: 'Wall Area', value: `${formatNumber(grossWallArea)} sq.ft`, description: 'Gross external & internal wall envelope' },
+      { label: 'Wall Thickness', value: `${quantities?.wallThicknessMm || 150} mm`, description: 'Wall thickness' },
+      { label: 'Block Size', value: `${quantities?.masonrySizeLabel || '600 × 200 × 150 mm'}`, description: 'Manufactured unit dimension' },
+      { label: 'Wastage', value: `${quantities?.masonryWastagePct || 5}%`, description: 'Cutting & handling buffer' },
+      { label: 'Deductions (Openings)', value: `${formatNumber((buildingModel?.totalDoorOpeningAreaSqFt || 0) + (buildingModel?.totalWindowOpeningAreaSqFt || 0))} sq.ft`, description: 'Doors and windows subtracted' },
     ],
     derivedQuantities: [
-      { label: 'Net Masonry Wall Area', quantity: formatNumber(quantities?.netWallAreaSqFt), unit: 'sq.ft', description: 'Wall surface minus doors and windows' },
-      { label: 'Masonry Volume', quantity: formatNumber(quantities?.masonryVolumeCuM, 2), unit: 'Cu.M', description: 'Net area × wall thickness (0.15m / 0.20m)' },
-      { label: 'Block Count (with wastage)', quantity: formatNumber(quantities?.masonryUnitsCount), unit: quantities?.masonryUnit || 'Blocks' },
+      { label: 'Block Wall Area', quantity: formatNumber(quantities?.netWallAreaSqFt), unit: 'sq.ft', description: 'Wall surface minus doors and windows' },
+      { label: 'Block Wall Coverage', quantity: formatNumber(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt), unit: 'sq.ft', description: 'Net wall surface covered by block masonry' },
+      { label: 'Block Quantity', quantity: formatNumber(baseBlocks), unit: 'Nos', description: 'Base block count before cutting wastage' },
+      { label: 'Final Blocks Required', quantity: formatNumber(finalBlocks), unit: 'Nos', description: `Approved total including ${quantities?.masonryWastagePct || 5}% wastage allowance` },
+      { label: 'Masonry Volume', quantity: formatNumber(quantities?.masonryVolumeCuM, 2), unit: 'm³', description: 'Net Block Wall Area × Wall Thickness' },
     ],
     calculationLogic: [
       {
-        title: 'Net Masonry Wall Area',
-        formula: '(Gross External + Gross Internal Walls) - Openings',
-        substitutions: `(${formatNumber(buildingModel?.grossExternalWallAreaSqFt)} + ${formatNumber(buildingModel?.grossInternalWallAreaSqFt)}) - ${formatNumber((buildingModel?.totalDoorOpeningAreaSqFt || 0) + (buildingModel?.totalWindowOpeningAreaSqFt || 0))}`,
+        title: 'Net Block Wall Area',
+        formula: 'Wall Area (Gross) − Openings (Doors + Windows)',
+        substitutions: `${formatNumber(grossWallArea)} sq.ft − ${formatNumber((buildingModel?.totalDoorOpeningAreaSqFt || 0) + (buildingModel?.totalWindowOpeningAreaSqFt || 0))} sq.ft`,
         resultText: `${formatNumber(quantities?.netWallAreaSqFt)} sq.ft`,
       },
       {
-        title: 'Masonry Units Calculation',
-        formula: '(Masonry Volume ÷ Unit Block Volume) × (1 + Wastage%)',
-        substitutions: `${formatNumber(quantities?.masonryVolumeCuM, 2)} Cu.M with ${quantities?.masonryWastagePct || 5}% cutting allowance`,
-        resultText: `${formatNumber(quantities?.masonryUnitsCount)} ${quantities?.masonryUnit || 'Blocks'}`,
+        title: 'Block Quantity',
+        formula: 'Masonry Volume (m³) ÷ Unit Block Volume (m³)',
+        substitutions: `${formatNumber(quantities?.masonryVolumeCuM, 2)} m³ ÷ ${quantities?.masonryMaterial === 'Clay Bricks' ? '0.001539' : quantities?.masonryMaterial === 'Concrete Blocks' ? '0.012' : '0.018'} m³`,
+        resultText: `${formatNumber(baseBlocks)} Nos`,
+      },
+      {
+        title: 'Final Blocks Required',
+        formula: 'Block Quantity × (1 + Wastage %)',
+        substitutions: `${formatNumber(baseBlocks)} Nos × (1 + ${(quantities?.masonryWastagePct || 5) / 100})`,
+        resultText: `${formatNumber(finalBlocks)} Nos`,
       },
     ],
     rateBreakdown: masonryBOQ,

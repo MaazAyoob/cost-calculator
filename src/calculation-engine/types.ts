@@ -316,12 +316,32 @@ export interface AreaResult {
 // PHYSICAL MATERIAL TAKEOFF (SECTION B QUANTITIES)
 // ────────────────────────────────────────────────────────────
 
+export interface RCCQuantities {
+  approxConcreteCuM: number;
+  footingConcreteCuM: number;
+  columnConcreteCuM: number;
+  slabConcreteCuM: number;
+  plinthConcreteCuM: number;
+  staircaseConcreteCuM: number;
+  rccConcreteTotalCuM: number;
+  totalStructuralConcreteCuM: number;
+}
+
 export interface MaterialQuantities {
   // Structure & Rebar
   steelKg: number;
   steelTonnes: number;
   steelFactorKgPerSqFt: number;
   cementBags: number;
+  // RCC & Structural Concrete (Canonical Engine Intermediate Quantities)
+  approxConcreteCuM: number;
+  footingConcreteCuM: number;
+  columnConcreteCuM: number;
+  slabConcreteCuM: number;
+  plinthConcreteCuM: number;
+  staircaseConcreteCuM: number;
+  rccConcreteTotalCuM: number;
+  totalStructuralConcreteCuM: number;
   // Sand & Aggregates (Direct Thumb Rules)
   mSandCuFt: number;
   pSandCuFt: number;
@@ -329,6 +349,11 @@ export interface MaterialQuantities {
   coarseAggregateCuFt: number;
   // Masonry (Geometry & Specification-Driven)
   netWallAreaSqFt: number;
+  grossWallAreaSqFt: number;
+  wallThicknessMm: number;
+  blockWallCoverageSqFt: number;
+  baseBlockCount: number;
+  finalBlocksRequired: number;
   wallVolumeCuM: number;
   masonryMaterial: string;
   masonryBrand: string;
@@ -685,6 +710,7 @@ export interface CalculationResult {
   paymentSummary?: PaymentPlanSummary;
   procurement: ProcurementItem[];
   report: ReportData;
+  rcc?: RCCQuantities;
   trace: CalculationTraceStep[];
   parameterTable: QSParameterItem[];
   rateSourceMetadata?: RateSourceMetadata;

@@ -42,6 +42,11 @@ export function calculateMasonry(
   aacBlocksCuM: number;
   aacBlocksPieces: number;
   netWallAreaSqFt: number;
+  grossWallAreaSqFt: number;
+  wallThicknessMm: number;
+  blockWallCoverageSqFt: number;
+  baseBlockCount: number;
+  finalBlocksRequired: number;
   wallVolumeCuM: number;
   mSandCuFt: number;
   pSandCuFt: number;
@@ -65,6 +70,11 @@ export function calculateMasonry(
       aacBlocksCuM: 0,
       aacBlocksPieces: 0,
       netWallAreaSqFt: 0,
+      grossWallAreaSqFt: 0,
+      wallThicknessMm: Math.round(spec.externalWallThicknessM * 1000),
+      blockWallCoverageSqFt: 0,
+      baseBlockCount: 0,
+      finalBlocksRequired: 0,
       wallVolumeCuM: 0,
       mSandCuFt: 0,
       pSandCuFt: 0,
@@ -85,8 +95,15 @@ export function calculateMasonry(
 
   // 2. Space Model Geometry for Masonry (PDF Section 12)
   const netWallAreaSqFt = parseFloat(buildingModel.totalNetWallAreaSqFt.toFixed(1));
+  const grossWallAreaSqFt = parseFloat((buildingModel.grossExternalWallAreaSqFt + buildingModel.grossInternalWallAreaSqFt).toFixed(1));
+  const wallThicknessMm = Math.round(spec.externalWallThicknessM * 1000);
+  const blockWallCoverageSqFt = netWallAreaSqFt;
   const wallVolumeCuM = parseFloat(buildingModel.totalWallVolumeCuM.toFixed(2));
   const masonryUnitsCount = buildingModel.totalBlockCount;
+  const baseBlockCount = spec.unitVolumeCuM > 0
+    ? Math.ceil(wallVolumeCuM / spec.unitVolumeCuM)
+    : Math.round(masonryUnitsCount / (1 + spec.wastagePercentage / 100));
+  const finalBlocksRequired = masonryUnitsCount;
   const masonryVolumeCuM = wallVolumeCuM;
 
   // Rate and brand determination
@@ -118,6 +135,11 @@ export function calculateMasonry(
     aacBlocksCuM: masonryVolumeCuM,
     aacBlocksPieces: masonryUnitsCount,
     netWallAreaSqFt,
+    grossWallAreaSqFt,
+    wallThicknessMm,
+    blockWallCoverageSqFt,
+    baseBlockCount,
+    finalBlocksRequired,
     wallVolumeCuM,
     mSandCuFt,
     pSandCuFt,

@@ -490,17 +490,31 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         {/* Key structural quantities */}
-        <Text style={[styles.sectionTitle, { marginTop: 8 }]}>2. Key Structural Quantities (Derived)</Text>
+        <Text style={[styles.sectionTitle, { marginTop: 8 }]}>2. Key Structural &amp; Concrete Quantities (Derived)</Text>
         <View style={styles.kpiRow}>
           {[
             ['Structural Steel', `${quantities?.steelTonnes || 0} MT`, `${quantities?.steelKg?.toLocaleString()||0} kg`],
             ['Portland Cement', `${quantities?.cementBags?.toLocaleString()||0} bags`, '50 kg / bag'],
-            ['Masonry Units', `${num(quantities?.masonryUnitsCount)} nos`, quantities?.masonryMaterial || 'AAC Blocks'],
-            ['Sand &amp; Agg.', `${num((quantities?.mSandCuFt||0)+(quantities?.pSandCuFt||0)+(quantities?.coarseAggregateCuFt||0))} CFT`, 'All aggregate types'],
+            ['Total RCC Concrete', `${quantities?.rccConcreteTotalCuM || 0} m³`, 'Footing + Col + Slab'],
+            ['Block Wall Area', `${num(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt)} sq.ft`, `${num(quantities?.masonryUnitsCount)} nos`],
           ].map(([lbl, val, sub], i) => (
             <View key={i} style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>{lbl}</Text>
               <Text style={styles.kpiValue}>{val}</Text>
+              <Text style={styles.kpiSub}>{sub}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={[styles.kpiRow, { marginTop: -14, marginBottom: 8 }]}>
+          {[
+            ['Footing Concrete', `${quantities?.footingConcreteCuM || 0} m³`, 'Pads / Mats'],
+            ['Column Concrete', `${quantities?.columnConcreteCuM || 0} m³`, 'Structural Columns'],
+            ['Slab Concrete', `${quantities?.slabConcreteCuM || 0} m³`, 'Slabs & Beams'],
+            ['Block Consumption', `${num(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt)} sq.ft`, `${quantities?.masonryMaterial || 'AAC'} coverage`],
+          ].map(([lbl, val, sub], i) => (
+            <View key={i} style={[styles.kpiCard, { backgroundColor: 'rgba(27,61,52,0.03)' }]}>
+              <Text style={[styles.kpiLabel, { color: C.grey }]}>{lbl}</Text>
+              <Text style={[styles.kpiValue, { fontSize: 8.5, color: C.green }]}>{val}</Text>
               <Text style={styles.kpiSub}>{sub}</Text>
             </View>
           ))}

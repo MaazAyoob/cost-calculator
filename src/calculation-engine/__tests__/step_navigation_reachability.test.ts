@@ -80,4 +80,59 @@ describe('Calculator Step Navigation & Reachability Regression Suite', () => {
     store.prevStep();
     expect(useWizardStore.getState().currentStep).toBe(0); // Clamped at 0
   });
+
+  it('Step 3 Core Materials displays RCC & block consumption without breaking navigation', () => {
+    const store = useWizardStore.getState();
+    store.setCity('Bangalore');
+    store.setPlotDimensions(40, 30);
+    store.setHouseConfig('Independent House', 2);
+    store.setRoomCount('bedrooms', 3);
+    store.setRoomCount('bathrooms', 2);
+    store.setRoomCount('living', 1);
+    store.setRoomCount('kitchen', 1);
+    store.setStep(3);
+
+    expect(useWizardStore.getState().currentStep).toBe(3);
+
+    const state = useWizardStore.getState();
+    const result = runCalculator({
+      city: state.city,
+      plotLength: state.plotLength,
+      plotWidth: state.plotWidth,
+      builtUpAreaPerFloor: 720,
+      houseType: state.houseType,
+      floors: state.floors,
+      parkingType: state.parkingType,
+      carCount: state.carCount,
+      bikeCount: state.bikeCount,
+      evCharging: state.evCharging,
+      liftRequired: state.liftRequired,
+      rooms: state.rooms,
+      qualityTier: state.qualityTier,
+      materialBrands: state.materialBrands,
+      flooringZones: state.flooringZones,
+      wallCladding: state.wallCladding,
+      doors: state.doors,
+      windows: state.windows,
+    });
+
+    // Check all newly exposed quantities in Step 3
+    expect(result.quantities.footingConcreteCuM).toBeGreaterThan(0);
+    expect(result.quantities.columnConcreteCuM).toBeGreaterThan(0);
+    expect(result.quantities.slabConcreteCuM).toBeGreaterThan(0);
+    expect(result.quantities.rccConcreteTotalCuM).toBeGreaterThan(0);
+    expect(result.quantities.netWallAreaSqFt).toBeGreaterThan(0);
+    expect(result.quantities.blockWallCoverageSqFt).toBeGreaterThan(0);
+    expect(result.quantities.masonryUnitsCount).toBeGreaterThan(0);
+
+    // Verify navigation can proceed to Step 4 and back to Step 2
+    store.nextStep();
+    expect(useWizardStore.getState().currentStep).toBe(4);
+
+    store.prevStep();
+    expect(useWizardStore.getState().currentStep).toBe(3);
+
+    store.prevStep();
+    expect(useWizardStore.getState().currentStep).toBe(2);
+  });
 });

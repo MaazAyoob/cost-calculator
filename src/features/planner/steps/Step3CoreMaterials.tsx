@@ -225,6 +225,35 @@ export const Step3CoreMaterials: React.FC = () => {
           </span>
         </div>
 
+        {/* ── BLOCK CONSUMPTION ── */}
+        {quantities.netWallAreaSqFt > 0 && (
+          <div className="p-3.5 bg-[#FAFBF9] rounded-xl border border-[#E5E7EB] space-y-2">
+            <span className="text-[11px] font-bold text-[#1B3D34] uppercase tracking-wider block">
+              Block Consumption
+            </span>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#4B5563] block font-medium">Net Wall Area</span>
+                <span className="font-mono font-bold text-[#1B3D34] text-xs sm:text-sm">
+                  {quantities.netWallAreaSqFt.toLocaleString('en-IN')} sq.ft
+                </span>
+              </div>
+              <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#4B5563] block font-medium">Block Wall Coverage</span>
+                <span className="font-mono font-bold text-[#1B3D34] text-xs sm:text-sm">
+                  {(quantities.blockWallCoverageSqFt || quantities.netWallAreaSqFt).toLocaleString('en-IN')} sq.ft
+                </span>
+              </div>
+              <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
+                <span className="text-[10px] text-[#4B5563] block font-medium">Blocks Required</span>
+                <span className="font-mono font-bold text-[#1B3D34] text-xs sm:text-sm">
+                  {quantities.masonryUnitsCount.toLocaleString('en-IN')} Nos
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           {masonryOptions.map((item) => {
             const isSelected = (!materialBrands.masonry && item.name.includes(recommendedCore.masonry.split(' ')[0])) || materialBrands.masonry === item.type;
@@ -283,6 +312,47 @@ export const Step3CoreMaterials: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* ── RCC CONCRETE QUANTITY RECONCILIATION ── */}
+      {quantities.rccConcreteTotalCuM > 0 && (
+        <div className="p-4 bg-[#FAFBF9] rounded-2xl border border-[#E5E7EB] space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
+              RCC &amp; Structure Concrete
+            </label>
+            <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-full border border-[#E5E7EB]">
+              IS 456 M25 Design Mix
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div className="p-2.5 bg-white rounded-xl border border-[#E5E7EB]">
+              <span className="text-[10px] text-[#4B5563] block font-medium">Footing Concrete</span>
+              <span className="font-mono font-bold text-[#1B3D34] text-sm">
+                {quantities.footingConcreteCuM} m³
+              </span>
+            </div>
+            <div className="p-2.5 bg-white rounded-xl border border-[#E5E7EB]">
+              <span className="text-[10px] text-[#4B5563] block font-medium">Column Concrete</span>
+              <span className="font-mono font-bold text-[#1B3D34] text-sm">
+                {quantities.columnConcreteCuM} m³
+              </span>
+            </div>
+            <div className="p-2.5 bg-white rounded-xl border border-[#E5E7EB]">
+              <span className="text-[10px] text-[#4B5563] block font-medium">Slab Concrete</span>
+              <span className="font-mono font-bold text-[#1B3D34] text-sm">
+                {quantities.slabConcreteCuM} m³
+              </span>
+            </div>
+            <div className="p-2.5 bg-[#1B3D34]/5 rounded-xl border border-[#1B3D34]/20">
+              <span className="text-[10px] font-bold text-[#1B3D34] block">Total RCC Concrete</span>
+              <span className="font-mono font-extrabold text-[#1B3D34] text-sm">
+                {quantities.rccConcreteTotalCuM} m³
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── CALCULATION TRANSPARENCY: RCC & STRUCTURE ── */}
       <HowWeCalculatedThis stepKey="structure" className="mt-4" />

@@ -40,6 +40,7 @@ import { calculateDoors }            from './modules/doors';
 import { calculateWindows }          from './modules/windows';
 import { calculateSteel }            from './modules/steel';
 import { calculateCement }           from './modules/cement';
+import { calculateRCC }              from './modules/rcc';
 import { calculateMasonry }          from './modules/brick';
 import { calculateFlooring }         from './modules/flooring';
 import { calculatePaint }            from './modules/paint';
@@ -87,6 +88,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
   // ── STEP 4: Physical Material Quantities ──────────────────
   const { steelTonnes, steelKg, steelFactorKgPerSqFt } = calculateSteel(input, area);
   const { cementBags, bagsPerSqFt: cementFactorBagsPerSqFt } = calculateCement(input, area);
+  const rcc = calculateRCC(input, area);
   const {
     masonryMaterial,
     masonryBrand,
@@ -100,6 +102,11 @@ export function runCalculator(input: EngineInput): CalculationResult {
     aacBlocksCuM,
     aacBlocksPieces,
     netWallAreaSqFt,
+    grossWallAreaSqFt,
+    wallThicknessMm,
+    blockWallCoverageSqFt,
+    baseBlockCount,
+    finalBlocksRequired,
     wallVolumeCuM,
     mSandCuFt,
     pSandCuFt,
@@ -178,11 +185,25 @@ export function runCalculator(input: EngineInput): CalculationResult {
     steelTonnes,
     steelFactorKgPerSqFt,
     cementBags,
+    // RCC & Structural Concrete (Canonical Engine Intermediate Quantities)
+    approxConcreteCuM: rcc.approxConcreteCuM,
+    footingConcreteCuM: rcc.footingConcreteCuM,
+    columnConcreteCuM: rcc.columnConcreteCuM,
+    slabConcreteCuM: rcc.slabConcreteCuM,
+    plinthConcreteCuM: rcc.plinthConcreteCuM,
+    staircaseConcreteCuM: rcc.staircaseConcreteCuM,
+    rccConcreteTotalCuM: rcc.rccConcreteTotalCuM,
+    totalStructuralConcreteCuM: rcc.totalStructuralConcreteCuM,
     mSandCuFt,
     pSandCuFt,
     sandCuFt,
     coarseAggregateCuFt,
     netWallAreaSqFt,
+    grossWallAreaSqFt,
+    wallThicknessMm,
+    blockWallCoverageSqFt,
+    baseBlockCount,
+    finalBlocksRequired,
     wallVolumeCuM,
     masonryMaterial,
     masonryBrand,
@@ -330,6 +351,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     paymentSummary,
     procurement,
     report,
+    rcc,
     trace,
     parameterTable,
     rateSourceMetadata,

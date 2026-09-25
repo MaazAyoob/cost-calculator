@@ -153,7 +153,12 @@ export function generateBOQ(
   const cementLabel  = materialBrands?.cement  || 'OPC 53 Grade Cement';
 
   // Derived concrete estimate for structural framing (0.05 Cu.M per sq.ft BUA)
-  const approxConcreteCuM = parseFloat((bua * 0.052).toFixed(1));
+  const approxConcreteCuM = qty.approxConcreteCuM !== undefined ? qty.approxConcreteCuM : parseFloat((bua * 0.052).toFixed(1));
+  const footingConcreteCuM = qty.footingConcreteCuM !== undefined ? qty.footingConcreteCuM : Math.max(5, approxConcreteCuM * 0.22);
+  const plinthConcreteCuM = qty.plinthConcreteCuM !== undefined ? qty.plinthConcreteCuM : Math.max(2, approxConcreteCuM * 0.08);
+  const columnConcreteCuM = qty.columnConcreteCuM !== undefined ? qty.columnConcreteCuM : Math.max(3, approxConcreteCuM * 0.18);
+  const slabConcreteCuM = qty.slabConcreteCuM !== undefined ? qty.slabConcreteCuM : Math.max(8, approxConcreteCuM * 0.52);
+  const staircaseConcreteCuM = qty.staircaseConcreteCuM !== undefined ? qty.staircaseConcreteCuM : Math.max(1, approxConcreteCuM * 0.06);
 
   // Resolved Site & Ground Rates
   const sitePrepRate = rateService.getEffectiveRate('site.topsoil_clearing', ctx) || rate(r.sitePreparationPerSqFt, m.structural);
@@ -171,19 +176,19 @@ export function generateBOQ(
 
   // ── 2. Foundation ──
   add('Foundation', 'FD', 'PCC M10 Levelling Bed below Column Footings', 'Cu M', Math.max(2, approxConcreteCuM * 0.08), pccRate, cementLabel, '100mm thickness (1:3:6)', 'PCC Volume × Rate');
-  add('Foundation', 'FD', 'Isolated / Combined Column Footing RCC M25', 'Cu M', Math.max(5, approxConcreteCuM * 0.22), concreteRate, 'UltraTech / ACC RMC', '50mm clear cover to rebar', 'Footing Concrete × Rate');
+  add('Foundation', 'FD', 'Isolated / Combined Column Footing RCC M25', 'Cu M', footingConcreteCuM, concreteRate, 'UltraTech / ACC RMC', '50mm clear cover to rebar', 'Footing Concrete × Rate');
   add('Foundation', 'FD', 'Footing Reinforcement TMT Fe 550D Bar Bending', 'Tonne', Math.max(0.2, qty.steelTonnes * 0.20), steelRate, steelLabel, 'IS 13920 seismic foundation cage', 'Footing Rebar × Rate');
 
   // ── 3. Plinth ──
-  add('Plinth', 'PL', 'Plinth Tie Beam RCC M25 Casting', 'Cu M', Math.max(2, approxConcreteCuM * 0.08), concreteRate, 'UltraTech / ACC RMC', 'Continuous ring plinth beam', 'Plinth Concrete × Rate');
+  add('Plinth', 'PL', 'Plinth Tie Beam RCC M25 Casting', 'Cu M', plinthConcreteCuM, concreteRate, 'UltraTech / ACC RMC', 'Continuous ring plinth beam', 'Plinth Concrete × Rate');
   add('Plinth', 'PL', 'Plinth Tie Beam TMT Reinforcement Fe 550D', 'Tonne', Math.max(0.1, qty.steelTonnes * 0.08), steelRate, steelLabel, 'continuous tie beam rebar', 'Plinth Rebar × Rate');
   add('Plinth', 'PL', 'Granular Earth Backfilling & Plate Compaction', 'Cu M', Math.max(5, area.buildableAreaSqFt * 0.5 / 35.31), rate(r.earthworkPerCuM * 0.8, 1), 'Quarry Dust + Red Earth', '150mm watered compacted layers', 'Backfill Volume × Rate');
   add('Plinth', 'PL', 'Damp Proof Course (DPC) M20 with Waterproofing', 'Sq Ft', area.buildableAreaSqFt, dpcRate, 'Dr. Fixit Pidiproof LW+', '50mm thick waterproof DPC layer', 'Plinth Area × Rate');
 
   // ── 4. RCC Superstructure ──
-  add('RCC Structure', 'RC', 'RCC Columns M25 Casting (Ground to Top Floor)', 'Cu M', Math.max(3, approxConcreteCuM * 0.18), concreteRate, 'UltraTech / ACC RMC', 'pump placed with needle vibrator', 'Column Volume × Rate');
-  add('RCC Structure', 'RC', 'RCC Beams & Roof/Floor Slabs M25 Monolithic Pour', 'Cu M', Math.max(8, approxConcreteCuM * 0.52), concreteRate, 'UltraTech / ACC RMC', '125-150mm slab + 200×450mm beams', 'Slab Volume × Rate');
-  add('RCC Structure', 'RC', 'RCC Staircase Waist Slab & Folded Steps', 'Cu M', Math.max(1, approxConcreteCuM * 0.06), concreteRate, 'UltraTech / ACC RMC', '150mm waist slab with risers', 'Stair Concrete × Rate');
+  add('RCC Structure', 'RC', 'RCC Columns M25 Casting (Ground to Top Floor)', 'Cu M', columnConcreteCuM, concreteRate, 'UltraTech / ACC RMC', 'pump placed with needle vibrator', 'Column Volume × Rate');
+  add('RCC Structure', 'RC', 'RCC Beams & Roof/Floor Slabs M25 Monolithic Pour', 'Cu M', slabConcreteCuM, concreteRate, 'UltraTech / ACC RMC', '125-150mm slab + 200×450mm beams', 'Slab Volume × Rate');
+  add('RCC Structure', 'RC', 'RCC Staircase Waist Slab & Folded Steps', 'Cu M', staircaseConcreteCuM, concreteRate, 'UltraTech / ACC RMC', '150mm waist slab with risers', 'Stair Concrete × Rate');
   add('RCC Structure', 'RC', 'Column TMT Reinforcement Fe 550D Caging', 'Tonne', Math.max(0.3, qty.steelTonnes * 0.30), steelRate, steelLabel, 'main vertical bars + ties @100mm', 'Column Rebar × Rate');
   add('RCC Structure', 'RC', 'Floor Slab & Beam TMT Reinforcement Fe 550D', 'Tonne', Math.max(0.4, qty.steelTonnes * 0.42), steelRate, steelLabel, 'top/bottom mesh + cranked bars', 'Slab Rebar × Rate');
   add('RCC Structure', 'RC', 'Scaffolding & Film-Faced Plywood Formwork System', 'Sq Ft', bua * 0.90, formworkRate, 'Cuplock Staging System', 'waterproof shuttering ply with oiling', 'Formwork Area × Rate');
