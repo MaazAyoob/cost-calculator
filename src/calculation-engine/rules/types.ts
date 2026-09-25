@@ -113,7 +113,20 @@ export interface CalculationRule {
 
 export interface CalculationMethodDefinition {
   id: string;
-  category: 'STEEL' | 'MASONRY' | 'FLOORING' | 'PAINT' | 'WATERPROOFING' | 'PLUMBING' | 'ELECTRICAL' | 'LABOUR' | 'COMMERCIAL';
+  category:
+    | 'RCC'
+    | 'STEEL'
+    | 'CEMENT'
+    | 'MASONRY'
+    | 'FLOORING'
+    | 'WATERPROOFING'
+    | 'PAINT'
+    | 'DOORS_WINDOWS'
+    | 'ELECTRICAL'
+    | 'PLUMBING'
+    | 'FIXTURES'
+    | 'LABOUR'
+    | 'COMMERCIAL';
   name: string;
   description: string;
   supportedMethods: Array<{

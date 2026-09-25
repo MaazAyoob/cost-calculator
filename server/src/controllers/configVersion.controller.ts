@@ -46,6 +46,7 @@ export async function listVersions(req: AuthenticatedRequest, res: Response) {
       success: true,
       count: versions.length,
       versions,
+      data: versions,
     });
   } catch (err: any) {
     return res.status(500).json({ success: false, error: err.message });
@@ -64,6 +65,7 @@ export async function getVersion(req: AuthenticatedRequest, res: Response) {
     return res.json({
       success: true,
       version,
+      data: version,
     });
   } catch (err: any) {
     return res.status(500).json({ success: false, error: err.message });
@@ -73,7 +75,7 @@ export async function getVersion(req: AuthenticatedRequest, res: Response) {
 // ── 4. ADMIN: CREATE NEW DRAFT VERSION ──
 export async function createDraft(req: AuthenticatedRequest, res: Response) {
   try {
-    const { baseVersionId, versionNumber, description, changeNote } = req.body;
+    const { baseVersionId, versionNumber, description, changeNote, parameters } = req.body;
     const adminEmail = req.user?.email || 'admin@costcalculator.app';
     const ipAddress = req.ip;
     const userAgent = req.get('user-agent');
@@ -83,6 +85,7 @@ export async function createDraft(req: AuthenticatedRequest, res: Response) {
       versionNumber,
       description,
       changeNote,
+      parameters,
       adminEmail,
       ipAddress,
       userAgent,
@@ -92,6 +95,7 @@ export async function createDraft(req: AuthenticatedRequest, res: Response) {
       success: true,
       message: `Draft version '${draft.versionNumber}' created successfully.`,
       draft,
+      data: draft,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -121,6 +125,7 @@ export async function updateDraft(req: AuthenticatedRequest, res: Response) {
       success: true,
       message: 'Draft configuration updated successfully.',
       result,
+      data: result,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -138,6 +143,7 @@ export async function validateVersion(req: AuthenticatedRequest, res: Response) 
     return res.json({
       success: report.schemaValid,
       report,
+      data: report,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -156,6 +162,7 @@ export async function submitReview(req: AuthenticatedRequest, res: Response) {
       success: true,
       message: `Version submitted for review.`,
       result,
+      data: result,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -173,6 +180,7 @@ export async function simulateVersion(req: AuthenticatedRequest, res: Response) 
     return res.json({
       success: true,
       simulation,
+      data: simulation,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -203,6 +211,7 @@ export async function publishVersion(req: AuthenticatedRequest, res: Response) {
       success: true,
       message: `Configuration version ${result.versionNumber} published and activated.`,
       result,
+      data: result,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -222,6 +231,7 @@ export async function archiveVersion(req: AuthenticatedRequest, res: Response) {
       success: true,
       message: 'Version archived successfully.',
       result,
+      data: result,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -239,6 +249,7 @@ export async function getVersionAudit(req: AuthenticatedRequest, res: Response) 
       versionId: id,
       count: logs.length,
       auditLogs: logs,
+      data: logs,
     });
   } catch (err: any) {
     return res.status(500).json({ success: false, error: err.message });
@@ -254,6 +265,7 @@ export async function compareVersions(req: AuthenticatedRequest, res: Response) 
     return res.json({
       success: true,
       comparison,
+      data: comparison,
     });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
@@ -264,13 +276,35 @@ export async function compareVersions(req: AuthenticatedRequest, res: Response) 
 export async function rollbackVersion(req: AuthenticatedRequest, res: Response) {
   try {
     const { id } = req.params;
-    const { newVersionNumber, reason } = req.body;
+    const { targetVersionId, targetVersionNumber, newVersionNumber, reason } = req.body;
     const adminEmail = req.user?.email || 'admin@costcalculator.app';
     const ipAddress = req.ip;
     const userAgent = req.get('user-agent');
 
+    // Resolve target version ID if not provided directly
+    let resolvedTargetId = id || targetVersionId;
+    if (!resolvedTargetId && targetVersionNumber !== undefined) {
+      const allVers = await configVersionService.getVersions();
+      const match = allVers.find(
+        (v) =>
+          String(v.versionNumber) === String(targetVersionNumber) ||
+          v.id === String(targetVersionNumber) ||
+          (v.versionNumber && v.versionNumber.toLowerCase() === String(targetVersionNumber).toLowerCase())
+      );
+      if (match) {
+        resolvedTargetId = match.id;
+      }
+    }
+
+    if (!resolvedTargetId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Target version ID or targetVersionNumber is required for rollback.',
+      });
+    }
+
     const result = await configVersionService.rollbackToVersion({
-      targetVersionId: id,
+      targetVersionId: resolvedTargetId,
       newVersionNumber,
       adminEmail,
       reason,
@@ -278,7 +312,11 @@ export async function rollbackVersion(req: AuthenticatedRequest, res: Response) 
       userAgent,
     });
 
-    return res.status(201).json(result);
+    return res.status(200).json({
+      success: true,
+      ...result,
+      data: result,
+    });
   } catch (err: any) {
     return res.status(400).json({ success: false, error: err.message });
   }

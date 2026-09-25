@@ -47,6 +47,7 @@ router.post('/versions/:id/archive', archiveVersion as any);
 // Audit, comparison & rollback
 router.get('/versions/:id/audit', getVersionAudit as any);
 router.get('/compare/:a/:b', compareVersions as any);
+router.post('/rollback', rollbackVersion as any);
 router.post('/rollback/:id', rollbackVersion as any);
 
 export default router;

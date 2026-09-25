@@ -9,6 +9,8 @@ import { RateSourceMetadata } from './data/rateService';
 
 export type { QSParameterItem } from './data/engineeringAssumptions';
 export type { RateSourceMetadata } from './data/rateService';
+export type { QuantityUnit, ConstructionDomain } from './data/units';
+export { DOMAIN_UNITS, formatUnitLabel } from './data/units';
 
 // ────────────────────────────────────────────────────────────
 // INPUT MODEL

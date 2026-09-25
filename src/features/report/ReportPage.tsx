@@ -338,12 +338,31 @@ export const ReportPage: React.FC = () => {
                 <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.cementBags?.toLocaleString()} Bags</span>
               </div>
               <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-                <span className="text-[#4B5563] block">Sand &amp; Aggregates</span>
-                <span className="text-sm font-bold text-[#1B3D34] font-mono">{((quantities.mSandCuFt || 0) + (quantities.pSandCuFt || 0) + (quantities.coarseAggregateCuFt || 0))?.toLocaleString()} CFT</span>
+                <span className="text-[#4B5563] block">Total RCC Concrete</span>
+                <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.rccConcreteTotalCuM || 0} m³</span>
               </div>
               <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-                <span className="text-[#4B5563] block">Masonry Units</span>
-                <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.masonryUnitsCount?.toLocaleString()} Units</span>
+                <span className="text-[#4B5563] block">Block Wall Coverage</span>
+                <span className="text-sm font-bold text-[#1B3D34] font-mono">{(quantities.blockWallCoverageSqFt || quantities.netWallAreaSqFt)?.toLocaleString()} sq.ft</span>
+                <span className="text-[10px] text-[#4B5563] block">{quantities.masonryUnitsCount?.toLocaleString()} Nos</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+                <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Footing Concrete</span>
+                <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.footingConcreteCuM || 0} m³</span>
+              </div>
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+                <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Column Concrete</span>
+                <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.columnConcreteCuM || 0} m³</span>
+              </div>
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+                <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Slab Concrete</span>
+                <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.slabConcreteCuM || 0} m³</span>
+              </div>
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+                <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Sand &amp; Aggregates</span>
+                <span className="text-xs font-bold text-[#1B3D34] font-mono">{((quantities.mSandCuFt || 0) + (quantities.pSandCuFt || 0) + (quantities.coarseAggregateCuFt || 0))?.toLocaleString()} CFT</span>
               </div>
             </div>
           </section>

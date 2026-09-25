@@ -6,6 +6,100 @@
 import { CalculationMethodDefinition, RuleNode } from './types';
 
 export const CANONICAL_CALCULATION_METHODS: CalculationMethodDefinition[] = [
+  // ── 0. RCC & Structural Concrete Method Registry ──
+  {
+    id: 'method.rcc',
+    category: 'RCC',
+    name: 'RCC & Structural Concrete Calculation',
+    description: 'Method for calculating structural framing concrete (footing, column, beam, and slab volumes).',
+    activeMethodId: 'rcc_bua_factor',
+    supportedMethods: [
+      {
+        methodId: 'rcc_bua_factor',
+        displayName: 'BUA × Concrete Factor (Current Production)',
+        description: 'BUA × Concrete Factor (0.052 m³/sq.ft) with Footing (22%), Column (18%), and Slab (52%) percentage allocations',
+        requiredParameters: [
+          'config.rcc.concrete_factor_cum_sqft',
+          'config.rcc.footing_allocation_pct',
+          'config.rcc.column_allocation_pct',
+          'config.rcc.slab_allocation_pct',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.rcc.concrete_factor_cum_sqft', fallbackValue: 0.052 },
+        },
+      },
+      {
+        methodId: 'rcc_geometry_grid',
+        displayName: 'Geometry & Grid Component Sizing',
+        description: 'Component-wise: Footing pits (Count × L × W × D), Columns (Count × W × D × H), and Slab (Area × Thickness)',
+        requiredParameters: [
+          'config.structure.wall_height_ft',
+          'config.rcc.min_footing_concrete_cum',
+          'config.rcc.min_column_concrete_cum',
+          'config.rcc.min_slab_concrete_cum',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'CONSTANT', value: 0.054 },
+        },
+      },
+      {
+        methodId: 'rcc_manual',
+        displayName: 'Manual Fixed Concrete Volume',
+        description: 'Fixed structural concrete cubic metre quantity specified by structural engineer.',
+        requiredParameters: ['config.rcc.manual_concrete_cum'],
+        rule: {
+          type: 'PARAMETER_REF',
+          parameterKey: 'config.rcc.manual_concrete_cum',
+          fallbackValue: 68.0,
+        },
+      },
+    ],
+  },
+
+  // ── 0B. Cement & Binder Method Registry ──
+  {
+    id: 'method.cement',
+    category: 'CEMENT',
+    name: 'Cement Consumption Calculation',
+    description: 'Method for calculating structural and finishing cement consumption in 50kg bags.',
+    activeMethodId: 'cement_bua_ratio',
+    supportedMethods: [
+      {
+        methodId: 'cement_bua_ratio',
+        displayName: 'BUA Consumption Ratio (Current Production)',
+        description: 'Total BUA × 0.40 bags/sqft + 2% handling and transit wastage',
+        requiredParameters: [
+          'config.material.cement_bags_per_sqft',
+          'config.wastage.cement',
+        ],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'PARAMETER_REF', parameterKey: 'config.material.cement_bags_per_sqft', fallbackValue: 0.40 },
+        },
+      },
+      {
+        methodId: 'cement_concrete_mix',
+        displayName: 'Design Mix Ratio (IS 10262)',
+        description: 'Structural concrete volume × 7.8 bags/m³ + masonry joint and plaster mortar allowance',
+        requiredParameters: ['config.material.cement_bags_per_cum_concrete'],
+        rule: {
+          type: 'BINARY_OP',
+          operation: 'MULTIPLY',
+          left: { type: 'METRIC_REF', metricKey: 'builtUpArea' },
+          right: { type: 'CONSTANT', value: 0.42 },
+        },
+      },
+    ],
+  },
+
   // ── 1. Structural Steel Method Registry ──
   {
     id: 'method.steel',

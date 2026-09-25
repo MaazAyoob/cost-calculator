@@ -327,11 +327,20 @@ class ConfigVersionService {
     versionNumber?: string;
     description?: string;
     changeNote?: string;
+    parameters?: Array<{
+      key: string;
+      value: any;
+      name?: string;
+      category?: string;
+      unit?: string;
+      location?: string;
+      specificationTier?: string;
+    }>;
     adminEmail: string;
     ipAddress?: string;
     userAgent?: string;
   }): Promise<any> {
-    const { baseVersionId, description, changeNote, adminEmail, ipAddress, userAgent } = params;
+    const { baseVersionId, description, changeNote, parameters: initialParams, adminEmail, ipAddress, userAgent } = params;
 
     // Determine base parameters to copy
     let sourceParams: CanonicalConfigParam[] = [];
@@ -385,6 +394,36 @@ class ConfigVersionService {
         status: 'DRAFT',
       });
     });
+
+    // Merge any explicit initial parameter overrides into the draft
+    if (initialParams && initialParams.length > 0) {
+      for (const ip of initialParams) {
+        const loc = ip.location || 'Global';
+        const tier = ip.specificationTier || 'Global';
+        const compKey = `${ip.key}:${loc}:${tier}`;
+        const existing = paramsMap.get(compKey);
+        if (existing) {
+          existing.value = ip.value;
+        } else {
+          paramsMap.set(compKey, {
+            id: `param-${newId}-${paramsMap.size + 1}`,
+            versionId: newId,
+            key: ip.key,
+            name: ip.name || ip.key,
+            description: null,
+            category: ip.category || 'CUSTOM',
+            value: ip.value,
+            unit: ip.unit || 'scalar',
+            valueType: typeof ip.value === 'number' ? 'number' : 'string',
+            location: loc,
+            specificationTier: tier,
+            source: 'Initial Draft Param',
+            status: 'DRAFT',
+            createdBy: adminEmail,
+          });
+        }
+      }
+    }
 
     const newVersionRecord: InMemoryVersionRecord = {
       id: newId,
@@ -1332,10 +1371,20 @@ class ConfigVersionService {
       userAgent,
     });
 
+    // Atomically validate, publish, and activate the rollback version
+    const publishResult = await this.publishVersion({
+      id: draft.id,
+      adminEmail,
+      acceptConflicts: true,
+      conflictAcceptanceReason: `Rollback restoration to parameters of historical version ${targetVer.versionNumber}`,
+      ipAddress,
+      userAgent,
+    });
+
     await this.recordAudit({
       versionId: draft.id,
       action: 'ROLLBACK_PREPARE',
-      reason: `Rollback prepared from historical version ${targetVer.versionNumber}: ${reason || 'Admin initiated'}`,
+      reason: `Rollback executed and activated from historical version ${targetVer.versionNumber}: ${reason || 'Admin initiated'}`,
       adminEmail,
       ipAddress,
       userAgent,
@@ -1343,7 +1392,8 @@ class ConfigVersionService {
 
     return {
       success: true,
-      message: `Rollback draft '${computedNumber}' created from historical version '${targetVer.versionNumber}'. Historical versions remain immutable.`,
+      message: `Rollback successful. Version '${computedNumber}' activated with parameters restored from '${targetVer.versionNumber}'.`,
+      activeVersion: publishResult,
       newDraftVersion: draft,
     };
   }

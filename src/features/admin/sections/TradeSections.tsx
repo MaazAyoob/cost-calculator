@@ -217,9 +217,20 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
   }
 
   // ────────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────────
   // 2. RCC & STRUCTURE (Section 10)
   // ────────────────────────────────────────────────────────────
   if (sectionId === 'rcc-structure' || sectionId === 'structure-rcc') {
+    const concreteMethod = draftParameters['config.rcc.concrete_calculation_method'] ?? 'BUA_FACTOR';
+    const concreteFactor = draftParameters['config.rcc.concrete_factor_cum_sqft'] ?? 0.052;
+    const footingMethod = draftParameters['config.rcc.footing_method'] ?? 'PERCENTAGE';
+    const footingAlloc = draftParameters['config.rcc.footing_allocation_pct'] ?? 22.0;
+    const columnAlloc = draftParameters['config.rcc.column_allocation_pct'] ?? 18.0;
+    const slabAlloc = draftParameters['config.rcc.slab_allocation_pct'] ?? 52.0;
+    const minFooting = draftParameters['config.rcc.min_footing_concrete_cum'] ?? 5.0;
+    const minColumn = draftParameters['config.rcc.min_column_concrete_cum'] ?? 3.0;
+    const minSlab = draftParameters['config.rcc.min_slab_concrete_cum'] ?? 8.0;
+
     const steelBase = draftParameters['config.rcc.steel_base_factor_kg_sqft'] ?? 2.80;
     const steelFloorIncr = draftParameters['config.rcc.steel_additional_floor_factor'] ?? 0.20;
     const cementFactor = draftParameters['config.material.cement_bags_per_sqft'] ?? 0.40;
@@ -240,29 +251,357 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
               RCC & Structural Frame Parameters
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Reinforcement steel factors, structural cement consumption, concrete sand, and aggregates.
+              Concrete volume calculation methodology, component allocations (footing, column, slab), and rebar parameters.
             </p>
           </div>
           <span className="text-xs font-bold text-blue-800 bg-blue-100 px-3 py-1.5 rounded-xl">
-            Base Steel: {steelBase} kg/sq.ft
+            Concrete Factor: {concreteFactor} m³/sq.ft
           </span>
         </div>
 
-        {/* What Does This Affect? */}
+        {/* Rate vs Calculation Method Visual Distinction (Section 16) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-purple-200 text-purple-900 font-mono font-bold text-[10px]">
+                CALCULATION METHOD
+              </span>
+              <span className="text-purple-950 font-semibold">Drives Physical Quantities (m³, kg, bags)</span>
+            </div>
+            <span className="text-[11px] text-purple-700 font-medium">Configurable below</span>
+          </div>
+
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-mono font-bold text-[10px]">
+                PRICE / RATE
+              </span>
+              <span className="text-slate-800 font-semibold">Drives ₹ Costs (Unit Rates Only)</span>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium">Managed in Material Prices</span>
+          </div>
+        </div>
+
+        {/* What Does This Affect? (Section 9) */}
         <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-4 text-xs">
           <div className="flex items-center gap-2 font-bold text-blue-900 mb-1.5">
             <Info className="w-4 h-4 text-blue-700 shrink-0" />
-            <span>What do structural parameters affect?</span>
+            <span>WHAT DOES THIS AFFECT?</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-700">
-            <p>
-              <strong className="text-blue-800 font-semibold">✓ Affects:</strong> Total TMT reinforcement steel tonnage, cement bag count for RCC slabs/columns, fine sand volume, and coarse aggregates.
-            </p>
-            <p>
-              <strong className="text-slate-600 font-semibold">✗ Does not affect:</strong> Paint coverage, tile wastage, or bathroom waterproofing membrane area.
-            </p>
+            <div>
+              <p className="font-semibold text-blue-900 mb-1">✓ AFFECTED:</p>
+              <ul className="space-y-0.5 text-blue-950 pl-2">
+                <li>• Footing concrete, column concrete, and slab/beam concrete (m³)</li>
+                <li>• RCC Concrete Total and structural envelope volume</li>
+                <li>• Reinforcement steel rebar tonnes and shuttering formwork</li>
+                <li>• Foundation, Plinth, and RCC Structure BOQ items</li>
+                <li>• Concrete material costs, labour costs, and total project budget</li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-600 mb-1">○ NOT AFFECTED:</p>
+              <ul className="space-y-0.5 text-slate-500 pl-2">
+                <li>• Built-up area (BUA) and setback geometry</li>
+                <li>• Wall area and AAC block counts</li>
+                <li>• Flooring tiles, interior paint, or plumbing fixtures</li>
+              </ul>
+            </div>
           </div>
         </div>
+
+        {/* ── CONCRETE CALCULATION METHODOLOGY (Section 3: BASIC MODE) ── */}
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 font-heading">
+                Structural Concrete Methodology & Component Allocations
+              </h3>
+              <p className="text-xs text-slate-500">
+                Configure how total RCC concrete is sized and apportioned between footings, columns, and slabs.
+              </p>
+            </div>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+              BASIC CONTROLS
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {/* Concrete Calculation Method */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Concrete Calculation Method
+              </label>
+              <select
+                value={concreteMethod}
+                onChange={(e) => updateDraftParameter('config.rcc.concrete_calculation_method', e.target.value)}
+                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100"
+              >
+                <option value="BUA_FACTOR">BUA × Factor (Standard Production)</option>
+                <option value="GEOMETRY_GRID">Structural Grid & Geometry Based</option>
+                <option value="MANUAL">Manual Quantity Specified</option>
+              </select>
+            </div>
+
+            {/* Concrete Factor */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Concrete Factor
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="0.002"
+                  min="0.03"
+                  max="0.10"
+                  value={concreteFactor}
+                  onChange={(e) => updateDraftParameter('config.rcc.concrete_factor_cum_sqft', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500 whitespace-nowrap">m³/sq.ft</span>
+              </div>
+            </div>
+
+            {/* Footing Method */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Footing Method
+              </label>
+              <select
+                value={footingMethod}
+                onChange={(e) => updateDraftParameter('config.rcc.footing_method', e.target.value)}
+                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100"
+              >
+                <option value="PERCENTAGE">Percentage of structural concrete</option>
+                <option value="GEOMETRY">Grid geometry (Footing pits L×W×D)</option>
+              </select>
+            </div>
+
+            {/* Footing Allocation % */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Footing Allocation
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="1"
+                  min="5"
+                  max="45"
+                  value={footingAlloc}
+                  onChange={(e) => updateDraftParameter('config.rcc.footing_allocation_pct', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500">%</span>
+              </div>
+            </div>
+
+            {/* Column Allocation % */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Column Allocation
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="1"
+                  min="5"
+                  max="40"
+                  value={columnAlloc}
+                  onChange={(e) => updateDraftParameter('config.rcc.column_allocation_pct', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500">%</span>
+              </div>
+            </div>
+
+            {/* Slab & Beam Allocation % */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Slab & Beam Allocation
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="1"
+                  min="25"
+                  max="75"
+                  value={slabAlloc}
+                  onChange={(e) => updateDraftParameter('config.rcc.slab_allocation_pct', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500">%</span>
+              </div>
+            </div>
+
+            {/* Minimum Footing Concrete */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Minimum Footing Concrete
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="50"
+                  value={minFooting}
+                  onChange={(e) => updateDraftParameter('config.rcc.min_footing_concrete_cum', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500">m³</span>
+              </div>
+            </div>
+
+            {/* Minimum Column Concrete */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Minimum Column Concrete
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="50"
+                  value={minColumn}
+                  onChange={(e) => updateDraftParameter('config.rcc.min_column_concrete_cum', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500">m³</span>
+              </div>
+            </div>
+
+            {/* Minimum Slab Concrete */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Minimum Slab Concrete
+              </label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={minSlab}
+                  onChange={(e) => updateDraftParameter('config.rcc.min_slab_concrete_cum', Number(e.target.value))}
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                />
+                <span className="text-xs text-slate-500">m³</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── ADVANCED MODE VISUAL FORMULAS (Section 4: ADVANCED MODE) ── */}
+        {adminViewMode === 'ADVANCED' && (
+          <div className="bg-slate-900 p-5 rounded-2xl text-white space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400">
+                  ADVANCED MODE
+                </span>
+                <h3 className="text-sm font-bold text-white mt-0.5">
+                  Calculation Formula Flow (Visual AST)
+                </h3>
+              </div>
+              <span className="text-xs text-slate-400">
+                Controlled AST Engine • Zero arbitrary code execution
+              </span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              {/* Formula 1: Structural Concrete */}
+              <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 space-y-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">
+                  STRUCTURAL CONCRETE
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded bg-blue-900 text-blue-200 font-mono font-bold">
+                    [ BUA ]
+                  </span>
+                  <span className="text-slate-400 font-bold">×</span>
+                  <span className="px-2.5 py-1 rounded bg-amber-900 text-amber-200 font-mono font-bold">
+                    [ Concrete Factor ({concreteFactor}) ]
+                  </span>
+                  <span className="text-slate-400 font-bold">=</span>
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Structural Concrete (m³) ]
+                  </span>
+                </div>
+              </div>
+
+              {/* Formula 2: Footing */}
+              <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 space-y-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">
+                  FOOTING CONCRETE
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Structural Concrete ]
+                  </span>
+                  <span className="text-slate-400 font-bold">×</span>
+                  <span className="px-2.5 py-1 rounded bg-amber-900 text-amber-200 font-mono font-bold">
+                    [ Footing Allocation ({footingAlloc}%) ]
+                  </span>
+                  <span className="text-slate-400 font-medium text-[11px] px-1">
+                    with minimum: [ {minFooting} m³ ]
+                  </span>
+                  <span className="text-slate-400 font-bold">=</span>
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Footing Concrete (m³) ]
+                  </span>
+                </div>
+              </div>
+
+              {/* Formula 3: Column */}
+              <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 space-y-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">
+                  COLUMN CONCRETE
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Structural Concrete ]
+                  </span>
+                  <span className="text-slate-400 font-bold">×</span>
+                  <span className="px-2.5 py-1 rounded bg-amber-900 text-amber-200 font-mono font-bold">
+                    [ Column Allocation ({columnAlloc}%) ]
+                  </span>
+                  <span className="text-slate-400 font-medium text-[11px] px-1">
+                    with minimum: [ {minColumn} m³ ]
+                  </span>
+                  <span className="text-slate-400 font-bold">=</span>
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Column Concrete (m³) ]
+                  </span>
+                </div>
+              </div>
+
+              {/* Formula 4: Slab */}
+              <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 space-y-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">
+                  SLAB & BEAM CONCRETE
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Structural Concrete ]
+                  </span>
+                  <span className="text-slate-400 font-bold">×</span>
+                  <span className="px-2.5 py-1 rounded bg-amber-900 text-amber-200 font-mono font-bold">
+                    [ Slab Allocation ({slabAlloc}%) ]
+                  </span>
+                  <span className="text-slate-400 font-medium text-[11px] px-1">
+                    with minimum: [ {minSlab} m³ ]
+                  </span>
+                  <span className="text-slate-400 font-bold">=</span>
+                  <span className="px-2.5 py-1 rounded bg-emerald-900 text-emerald-200 font-mono font-bold">
+                    [ Slab Concrete (m³) ]
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Basic Primary Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

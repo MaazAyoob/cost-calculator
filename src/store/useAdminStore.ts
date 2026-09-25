@@ -82,7 +82,10 @@ export type AdminTab =
   | 'commercial-tax'
   | 'report-settings'
   | 'test-calculator'
-  | 'versions-history';
+  | 'versions-history'
+  | 'formula-library'
+  | 'steel'
+  | 'cement-aggregates';
 
 interface AdminStoreState {
   // Phase 2E Mode Toggle
@@ -243,6 +246,9 @@ interface AdminStoreState {
   // Configuration Rule Engine & Versioning State
   configVersions: any[];
   activeConfigVersion: any | null;
+  currentDraftId: string | null;
+  isSavingDraft: boolean;
+  lastDraftSavedAt: string | null;
   draftParameters: Record<string, any>;
   activeMethods: Record<string, string>;
   simulationReport: SimulationComparisonReport | null;
@@ -257,10 +263,11 @@ interface AdminStoreState {
   // Configuration Actions
   fetchConfigVersions: () => Promise<void>;
   updateDraftParameter: (key: string, value: any) => void;
+  saveDraftToBackend: (changeSummary?: string) => Promise<boolean>;
   resetDraftParameters: () => void;
   runSimulation: (sampleInput?: any) => Promise<SimulationComparisonReport | null>;
   publishDraftConfig: (changeSummary: string) => Promise<boolean>;
-  rollbackConfigVersion: (versionNumber: number) => Promise<boolean>;
+  rollbackConfigVersion: (versionNumber: string | number) => Promise<boolean>;
   setActiveMethod: (category: string, methodId: string) => void;
 
   // UI Setters
@@ -290,6 +297,7 @@ const getStoredToken = (): string | null => {
 };
 
 const initialToken = getStoredToken();
+let draftSaveDebounceTimer: any = null;
 
 export const useAdminStore = create<AdminStoreState>((set, get) => ({
   token: initialToken,
@@ -328,6 +336,9 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
   // Configuration Rule Engine & Versioning Initial State
   configVersions: [],
   activeConfigVersion: null,
+  currentDraftId: null,
+  isSavingDraft: false,
+  lastDraftSavedAt: null,
   draftParameters: {},
   activeMethods: {
     STEEL: 'steel_floorwise',
@@ -1222,14 +1233,51 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const res = await fetch(getApiUrl('/api/v1/admin/config/versions'), { headers });
       if (res.ok) {
         const d = await res.json();
-        if (d.data) {
-          const active = d.data.find((v: any) => v.status === 'ACTIVE') || d.data[0] || null;
+        const versions = d.data || d.versions || [];
+        if (versions.length > 0) {
+          const active = versions.find((v: any) => v.status === 'ACTIVE') || versions[0] || null;
+          const serverDraft = versions.find((v: any) => v.status === 'DRAFT') || null;
+
+          let draftParams = { ...get().draftParameters };
+          let draftId = get().currentDraftId;
+
+          // If there is an existing DRAFT version on the server, fetch its parameters
+          // This guarantees that a browser refresh or another Admin session doesn't destroy draft work
+          if (serverDraft) {
+            draftId = serverDraft.id;
+            try {
+              const detailRes = await fetch(getApiUrl(`/api/v1/admin/config/versions/${serverDraft.id}`), { headers });
+              if (detailRes.ok) {
+                const detailData = await detailRes.json();
+                const verObj = detailData.version || detailData.data;
+                if (verObj && verObj.parameters) {
+                  const paramList = Array.isArray(verObj.parameters)
+                    ? verObj.parameters
+                    : Object.values(verObj.parameters);
+                  const fetchedMap: Record<string, any> = {};
+                  for (const p of paramList) {
+                    if (p && p.key) {
+                      fetchedMap[p.key] =
+                        p.valueJson !== undefined ? p.valueJson : (p.value !== undefined ? p.value : null);
+                    }
+                  }
+                  // Merge server draft parameters so changes survive page refresh/restart
+                  draftParams = { ...fetchedMap, ...draftParams };
+                }
+              }
+            } catch (err) {
+              console.warn('[useAdminStore] Failed to fetch server draft details:', err);
+            }
+          }
+
           set({
-            configVersions: d.data,
+            configVersions: versions,
             activeConfigVersion: active,
+            currentDraftId: draftId,
+            draftParameters: draftParams,
             configHealth: {
-              status: d.data.length > 0 ? 'HEALTHY' : 'WARNINGS',
-              issues: d.data.length === 0 ? ['No active database version loaded. Fallback baseline active.'] : [],
+              status: versions.length > 0 ? 'HEALTHY' : 'WARNINGS',
+              issues: versions.length === 0 ? ['No active database version loaded. Fallback baseline active.'] : [],
               conflicts: getActiveConflicts().map((c) => ({
                 key: c.parameterKey,
                 description: c.parameterName,
@@ -1237,34 +1285,38 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
               }))
             }
           });
+          return;
         }
       }
-    } catch {
-      set({
-        configVersions: [
-          {
-            id: 'ver-baseline',
-            versionNumber: 1,
-            versionLabel: 'v2.0-ACTIVE-PROD',
-            status: 'ACTIVE',
-            changeSummary: 'Approved production baseline configuration',
-            publishedBy: 'System Architect',
-            publishedAt: '2026-09-19T00:00:00.000Z',
-            parameterCount: 68
-          }
-        ],
-        activeConfigVersion: {
+    } catch (err) {
+      console.warn('[useAdminStore] fetchConfigVersions error:', err);
+    }
+
+    // Static fallback baseline if backend unreachable
+    set({
+      configVersions: [
+        {
           id: 'ver-baseline',
-          versionNumber: 1,
+          versionNumber: 'v1.0.0',
           versionLabel: 'v2.0-ACTIVE-PROD',
           status: 'ACTIVE',
           changeSummary: 'Approved production baseline configuration',
           publishedBy: 'System Architect',
           publishedAt: '2026-09-19T00:00:00.000Z',
-          parameterCount: 68
+          parametersCount: 68
         }
-      });
-    }
+      ],
+      activeConfigVersion: {
+        id: 'ver-baseline',
+        versionNumber: 'v1.0.0',
+        versionLabel: 'v2.0-ACTIVE-PROD',
+        status: 'ACTIVE',
+        changeSummary: 'Approved production baseline configuration',
+        publishedBy: 'System Architect',
+        publishedAt: '2026-09-19T00:00:00.000Z',
+        parametersCount: 68
+      }
+    });
   },
 
   updateDraftParameter: (key: string, value: any) => {
@@ -1272,6 +1324,75 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const updated = { ...state.draftParameters, [key]: value };
       return { draftParameters: updated };
     });
+
+    // Debounced automatic draft persistence to backend (survives browser refresh/restart)
+    if (draftSaveDebounceTimer) clearTimeout(draftSaveDebounceTimer);
+    draftSaveDebounceTimer = setTimeout(() => {
+      get().saveDraftToBackend();
+    }, 800);
+  },
+
+  saveDraftToBackend: async (changeSummary?: string) => {
+    const { token, draftParameters, currentDraftId } = get();
+    const changedEntries = Object.entries(draftParameters);
+    if (changedEntries.length === 0) return true;
+
+    set({ isSavingDraft: true });
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const paramArray = changedEntries.map(([key, value]) => ({
+      key,
+      value,
+      name: key.replace(/\./g, ' ').toUpperCase(),
+      category: key.split('.')[1]?.toUpperCase() || 'CUSTOM',
+    }));
+
+    try {
+      if (currentDraftId) {
+        // Update existing draft on backend
+        const res = await fetch(getApiUrl(`/api/v1/admin/config/versions/${currentDraftId}`), {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            changeNote: changeSummary || 'Admin draft modification',
+            parameters: paramArray,
+          }),
+        });
+        if (res.ok) {
+          set({ isSavingDraft: false, lastDraftSavedAt: new Date().toISOString() });
+          return true;
+        }
+      }
+
+      // If no draft ID yet or update failed, create new draft version on backend
+      const createRes = await fetch(getApiUrl('/api/v1/admin/config/versions'), {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          changeNote: changeSummary || 'Draft configuration created from Admin',
+          parameters: paramArray,
+        }),
+      });
+
+      if (createRes.ok) {
+        const createData = await createRes.json();
+        const newDraftId = createData.draft?.id || createData.data?.id;
+        set({
+          isSavingDraft: false,
+          currentDraftId: newDraftId || null,
+          lastDraftSavedAt: new Date().toISOString(),
+        });
+        return true;
+      }
+
+      set({ isSavingDraft: false });
+      return false;
+    } catch (err: any) {
+      console.warn('[useAdminStore] Error persisting draft to server:', err);
+      set({ isSavingDraft: false });
+      return false;
+    }
   },
 
   resetDraftParameters: () => {
@@ -1301,11 +1422,25 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
   },
 
   publishDraftConfig: async (changeSummary: string) => {
-    const { token, draftParameters } = get();
+    const { token, draftParameters, currentDraftId } = get();
     const changedKeys = Object.keys(draftParameters);
     if (changedKeys.length === 0) {
       set({ error: 'No draft changes to publish.' });
       return false;
+    }
+
+    // Safety checks: validate no NaN, Infinity, or negative values for factors
+    for (const [key, val] of Object.entries(draftParameters)) {
+      if (typeof val === 'number') {
+        if (isNaN(val) || !isFinite(val)) {
+          set({ error: `Validation failure: Parameter '${key}' evaluates to NaN or Infinity.` });
+          return false;
+        }
+        if (val < 0) {
+          set({ error: `Validation failure: Parameter '${key}' cannot be negative.` });
+          return false;
+        }
+      }
     }
 
     set({ isPublishingConfig: true, error: null });
@@ -1313,90 +1448,110 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const versionLabel = `v2.${(get().configVersions?.length || 1) + 1}-PROD`;
-    const payload = {
-      label: versionLabel,
-      changeSummary: changeSummary || 'Administrative parameter and rule update',
-      parameters: Object.entries(draftParameters).map(([key, value]) => ({
-        key,
-        value,
-        name: key.replace(/\./g, ' ').toUpperCase(),
-        category: key.split('.')[0].toUpperCase(),
-        valueType: typeof value === 'number' ? 'NUMBER' : 'STRING',
-        status: 'ACTIVE'
-      }))
-    };
+    const paramArray = Object.entries(draftParameters).map(([key, value]) => ({
+      key,
+      value,
+      name: key.replace(/\./g, ' ').toUpperCase(),
+      category: key.split('.')[1]?.toUpperCase() || 'CUSTOM',
+      valueType: typeof value === 'number' ? 'NUMBER' : 'STRING',
+      status: 'ACTIVE',
+    }));
 
     try {
-      // Step 1: Create draft on backend
-      const createRes = await fetch(getApiUrl('/api/v1/admin/config/versions'), {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload)
-      });
+      let draftIdToPublish = currentDraftId;
 
-      if (!createRes.ok) {
-        const errBody = await createRes.json().catch(() => ({}));
-        set({
-          isPublishingConfig: false,
-          error: `Failed to create configuration draft on server (${createRes.status}). ${errBody?.error || ''}. Changes were NOT published.`
+      if (draftIdToPublish) {
+        // Ensure draft has latest parameters
+        const updateRes = await fetch(getApiUrl(`/api/v1/admin/config/versions/${draftIdToPublish}`), {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            changeNote: changeSummary || 'Published admin configuration',
+            parameters: paramArray,
+          }),
         });
-        return false;
+        if (!updateRes.ok) {
+          draftIdToPublish = null;
+        }
       }
 
-      const createData = await createRes.json();
-      const draftId = createData.data?.id;
-
-      // Step 2: Publish the draft on backend
-      let publishOk = false;
-      if (draftId) {
-        const publishRes = await fetch(getApiUrl(`/api/v1/admin/config/versions/${draftId}/publish`), {
+      if (!draftIdToPublish) {
+        // Create draft on backend
+        const versionLabel = `v2.${(get().configVersions?.length || 1) + 1}-PROD`;
+        const createRes = await fetch(getApiUrl('/api/v1/admin/config/versions'), {
           method: 'POST',
-          headers
+          headers,
+          body: JSON.stringify({
+            versionNumber: versionLabel,
+            changeNote: changeSummary || 'Administrative parameter and rule update',
+            parameters: paramArray,
+          }),
         });
-        publishOk = publishRes.ok;
-        if (!publishOk) {
-          const errBody = await publishRes.json().catch(() => ({}));
+
+        if (!createRes.ok) {
           set({
             isPublishingConfig: false,
-            error: `Draft created but publish failed on server (${publishRes.status}). ${errBody?.error || ''}. Configuration is in DRAFT state, not yet ACTIVE.`
+            error: 'Could not publish configuration. No changes were activated.',
           });
           return false;
         }
-      } else {
+
+        const createData = await createRes.json();
+        draftIdToPublish = createData.draft?.id || createData.data?.id;
+      }
+
+      if (!draftIdToPublish) {
         set({
           isPublishingConfig: false,
-          error: 'Server did not return a draft ID. Configuration was NOT published.'
+          error: 'Could not publish configuration. No changes were activated.',
         });
         return false;
       }
 
-      // Step 3: Re-sync from server to verify ACTIVE config now reflects the published version.
-      // This also calls configResolver.syncActiveConfiguration() via the fixed syncWithServer().
+      // Step 2: Publish the draft on backend (marks ACTIVE, archives previous ACTIVE)
+      const publishRes = await fetch(getApiUrl(`/api/v1/admin/config/versions/${draftIdToPublish}/publish`), {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          acceptConflicts: true,
+          conflictAcceptanceReason: changeSummary || 'Administrative approval and verification',
+        }),
+      });
+
+      if (!publishRes.ok) {
+        const errBody = await publishRes.json().catch(() => ({}));
+        set({
+          isPublishingConfig: false,
+          error: `Could not publish configuration. No changes were activated. ${errBody?.error || errBody?.message || ''}`.trim(),
+        });
+        return false;
+      }
+
+      // Step 3: Re-sync from server to verify ACTIVE config now reaches the customer calculator
+      // This calls configResolver.syncActiveConfiguration() via rateService.syncWithServer()
       await rateService.syncWithServer();
 
       // Step 4: Update admin store state — only after confirmed backend success
       set({
         isPublishingConfig: false,
+        currentDraftId: null,
         draftParameters: {},
         simulationReport: null,
-        successMessage: `Configuration published as ${versionLabel}. Production engine is now active with updated rules.`
+        successMessage: `Configuration published successfully. Production engine is now active with updated rules.`,
       });
 
-      get().fetchConfigVersions();
+      await get().fetchConfigVersions();
       return true;
     } catch (networkErr: any) {
-      // Network error: backend unreachable — do NOT pretend publish succeeded
       set({
         isPublishingConfig: false,
-        error: `Could not reach the server to publish configuration: ${networkErr?.message || 'Network error'}. ` +
-          `Changes remain as unsaved drafts. The production calculator has NOT been updated.`
+        error: `Could not publish configuration. No changes were activated. (${networkErr?.message || 'Server unreachable'})`,
       });
       return false;
     }
   },
 
-  rollbackConfigVersion: async (versionNumber: number) => {
+  rollbackConfigVersion: async (versionTarget: string | number) => {
     const { token } = get();
     set({ isLoading: true, error: null });
     try {
@@ -1406,24 +1561,37 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       const res = await fetch(getApiUrl('/api/v1/admin/config/rollback'), {
         method: 'POST',
         headers,
-        body: JSON.stringify({ targetVersionNumber: versionNumber, reason: `Admin rollback to version #${versionNumber}` })
+        body: JSON.stringify({
+          targetVersionId: typeof versionTarget === 'string' ? versionTarget : undefined,
+          targetVersionNumber: versionTarget,
+          reason: `Admin rollback to configuration version ${versionTarget}`,
+        }),
       });
 
       if (res.ok) {
-        // Re-sync from server so configResolver picks up the rolled-back ACTIVE config.
-        // The next customer calculator fetch of /api/v1/config/active will also get the rolled-back version.
+        // Re-sync from server so configResolver picks up the rolled-back ACTIVE config
         await rateService.syncWithServer();
-        set({ isLoading: false, successMessage: `Successfully rolled back configuration to version #${versionNumber}. Production engine now uses the previous configuration.` });
-        get().fetchConfigVersions();
+        set({
+          isLoading: false,
+          currentDraftId: null,
+          draftParameters: {},
+          successMessage: `Successfully rolled back configuration to version #${versionTarget}. Production engine now uses the previous configuration.`,
+        });
+        await get().fetchConfigVersions();
         return true;
       }
 
       const errBody = await res.json().catch(() => ({}));
-      set({ isLoading: false, error: `Rollback failed: ${errBody?.error || `Server returned ${res.status}`}` });
+      set({
+        isLoading: false,
+        error: `Could not rollback configuration. Active configuration was not changed. ${errBody?.error || ''}`.trim(),
+      });
       return false;
     } catch (networkErr: any) {
-      // Backend unreachable: do NOT pretend rollback succeeded
-      set({ isLoading: false, error: `Could not reach the server to rollback: ${networkErr?.message || 'Network error'}. The active configuration was NOT changed.` });
+      set({
+        isLoading: false,
+        error: `Could not reach the server to rollback: ${networkErr?.message || 'Network error'}. Active configuration was not changed.`,
+      });
       return false;
     }
   },

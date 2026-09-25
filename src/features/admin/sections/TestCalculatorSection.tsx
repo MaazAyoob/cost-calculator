@@ -55,6 +55,18 @@ export const TestCalculatorSection: React.FC = () => {
   const activeQty = testCalculationActive?.quantities;
   const draftQty = testCalculationDraft?.quantities;
 
+  const activeFooting = activeQty?.footingConcreteCuM || 0;
+  const draftFooting = draftQty?.footingConcreteCuM || 0;
+
+  const activeColumn = activeQty?.columnConcreteCuM || 0;
+  const draftColumn = draftQty?.columnConcreteCuM || 0;
+
+  const activeSlab = activeQty?.slabConcreteCuM || 0;
+  const draftSlab = draftQty?.slabConcreteCuM || 0;
+
+  const activeRccTotal = activeQty?.rccConcreteTotalCuM || (activeFooting + activeColumn + activeSlab);
+  const draftRccTotal = draftQty?.rccConcreteTotalCuM || (draftFooting + draftColumn + draftSlab);
+
   const activeSteel = activeQty?.steelTonnes || 0;
   const draftSteel = draftQty?.steelTonnes || 0;
 
@@ -304,6 +316,96 @@ export const TestCalculatorSection: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
+              {/* Footing Concrete */}
+              <tr className={draftFooting !== activeFooting ? 'bg-amber-50/50' : ''}>
+                <td className="py-3 px-4 font-bold text-slate-900">Footing Concrete (M25)</td>
+                <td className="py-3 px-4 text-right font-mono">{activeFooting.toFixed(2)} m³</td>
+                <td className={`py-3 px-4 text-right font-mono ${draftFooting !== activeFooting ? 'font-bold text-amber-900 bg-amber-100/60 rounded' : ''}`}>
+                  {draftFooting.toFixed(2)} m³
+                </td>
+                <td className="py-3 px-4 text-center">
+                  {draftFooting !== activeFooting ? (
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">
+                      Changed ({(draftFooting - activeFooting > 0 ? '+' : '') + (draftFooting - activeFooting).toFixed(2)} m³)
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">No Change</span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeFooting * 5800)}</td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftFooting * 5800)}</td>
+                <td className={`py-3 px-4 text-right font-mono font-bold ${draftFooting !== activeFooting ? 'text-amber-800' : 'text-slate-900'}`}>
+                  {formatCurrency((draftFooting - activeFooting) * 5800)}
+                </td>
+              </tr>
+
+              {/* Column Concrete */}
+              <tr className={draftColumn !== activeColumn ? 'bg-amber-50/50' : ''}>
+                <td className="py-3 px-4 font-bold text-slate-900">Column Concrete (M25)</td>
+                <td className="py-3 px-4 text-right font-mono">{activeColumn.toFixed(2)} m³</td>
+                <td className={`py-3 px-4 text-right font-mono ${draftColumn !== activeColumn ? 'font-bold text-amber-900 bg-amber-100/60 rounded' : ''}`}>
+                  {draftColumn.toFixed(2)} m³
+                </td>
+                <td className="py-3 px-4 text-center">
+                  {draftColumn !== activeColumn ? (
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">
+                      Changed ({(draftColumn - activeColumn > 0 ? '+' : '') + (draftColumn - activeColumn).toFixed(2)} m³)
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">No Change</span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeColumn * 5800)}</td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftColumn * 5800)}</td>
+                <td className={`py-3 px-4 text-right font-mono font-bold ${draftColumn !== activeColumn ? 'text-amber-800' : 'text-slate-900'}`}>
+                  {formatCurrency((draftColumn - activeColumn) * 5800)}
+                </td>
+              </tr>
+
+              {/* Slab Concrete */}
+              <tr className={draftSlab !== activeSlab ? 'bg-amber-50/50' : ''}>
+                <td className="py-3 px-4 font-bold text-slate-900">Slab & Beam Concrete (M25)</td>
+                <td className="py-3 px-4 text-right font-mono">{activeSlab.toFixed(2)} m³</td>
+                <td className={`py-3 px-4 text-right font-mono ${draftSlab !== activeSlab ? 'font-bold text-amber-900 bg-amber-100/60 rounded' : ''}`}>
+                  {draftSlab.toFixed(2)} m³
+                </td>
+                <td className="py-3 px-4 text-center">
+                  {draftSlab !== activeSlab ? (
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">
+                      Changed ({(draftSlab - activeSlab > 0 ? '+' : '') + (draftSlab - activeSlab).toFixed(2)} m³)
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">No Change</span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeSlab * 5800)}</td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftSlab * 5800)}</td>
+                <td className={`py-3 px-4 text-right font-mono font-bold ${draftSlab !== activeSlab ? 'text-amber-800' : 'text-slate-900'}`}>
+                  {formatCurrency((draftSlab - activeSlab) * 5800)}
+                </td>
+              </tr>
+
+              {/* RCC Concrete Total */}
+              <tr className={`border-b-2 border-slate-300 font-bold ${draftRccTotal !== activeRccTotal ? 'bg-amber-100/40' : 'bg-slate-50/60'}`}>
+                <td className="py-3 px-4 text-[#1B3D34]">Total RCC Concrete (Footing+Col+Slab)</td>
+                <td className="py-3 px-4 text-right font-mono">{activeRccTotal.toFixed(2)} m³</td>
+                <td className="py-3 px-4 text-right font-mono">{draftRccTotal.toFixed(2)} m³</td>
+                <td className="py-3 px-4 text-center">
+                  {draftRccTotal !== activeRccTotal ? (
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-200 text-amber-900">
+                      Net Delta: {(draftRccTotal - activeRccTotal > 0 ? '+' : '') + (draftRccTotal - activeRccTotal).toFixed(2)} m³
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">Matched</span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeRccTotal * 5800)}</td>
+                <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftRccTotal * 5800)}</td>
+                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                  {formatCurrency((draftRccTotal - activeRccTotal) * 5800)}
+                </td>
+              </tr>
+
               {/* Steel */}
               <tr>
                 <td className="py-3 px-4 font-bold text-slate-900">TMT Steel (Fe 550D)</td>

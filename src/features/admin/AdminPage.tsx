@@ -85,6 +85,7 @@ import { RoomsSpacesSection } from './sections/RoomsSpacesSection';
 import { TradeSections } from './sections/TradeSections';
 import { CalculationMethodsSection } from './sections/CalculationMethodsSection';
 import { TestCalculatorSection } from './sections/TestCalculatorSection';
+import { FormulaLibrarySection } from './sections/FormulaLibrarySection';
 
 export const AdminPage: React.FC = () => {
   const {
@@ -124,10 +125,17 @@ export const AdminPage: React.FC = () => {
     // Configuration Engine State
     configVersions,
     activeConfigVersion,
+    currentDraftId,
+    isSavingDraft,
+    lastDraftSavedAt,
     draftParameters,
     simulationReport,
     configHealth,
     fetchConfigVersions,
+    saveDraftToBackend,
+    publishDraftConfig,
+    resetDraftParameters,
+    isPublishingConfig,
 
     // Auto Price Updates
     proposals,
@@ -536,9 +544,10 @@ export const AdminPage: React.FC = () => {
           { label: 'Material Prices (Rate Master)', section: 'material-prices' as AdminTab, group: 'Pricing' },
           { label: 'Quality & Specification Tiers', section: 'quality-spec' as AdminTab, group: 'Pricing' },
           { label: 'Contractor Margin & GST Rate', section: 'commercial-tax' as AdminTab, group: 'Pricing' },
-          { label: 'Calculation Methods Switcher', section: 'calculation-methods' as AdminTab, group: 'Calculator' },
-          { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculator' },
-          { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Management' },
+          { label: 'Calculation Methods Switcher', section: 'calculation-methods' as AdminTab, group: 'Calculation' },
+          { label: 'Formula Library & Visual Builder', section: 'formula-library' as AdminTab, group: 'Calculation' },
+          { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculation' },
+          { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Calculation' },
         ];
 
         const searchResults = searchQuery.trim()
@@ -566,9 +575,11 @@ export const AdminPage: React.FC = () => {
             name: '2. Construction',
             icon: <Hammer className="w-3.5 h-3.5" />,
             sections: [
-              { id: 'walls-masonry', label: 'Walls & Masonry' },
               { id: 'rcc-structure', label: 'RCC & Structure' },
-              { id: 'flooring-tiles', label: 'Flooring & Tiles' },
+              { id: 'steel', label: 'Steel' },
+              { id: 'walls-masonry', label: 'Masonry' },
+              { id: 'cement-aggregates', label: 'Cement & Aggregates' },
+              { id: 'flooring-tiles', label: 'Flooring' },
               { id: 'waterproofing', label: 'Waterproofing' },
               { id: 'paint-finishes', label: 'Paint & Finishes' },
               { id: 'doors-windows', label: 'Doors & Windows' },
@@ -591,28 +602,27 @@ export const AdminPage: React.FC = () => {
             sections: [
               { id: 'labour', label: 'Labour' },
               { id: 'material-prices', label: 'Material Prices', badge: overrides.length || undefined },
-              { id: 'quality-spec', label: 'Quality / Specification' },
               { id: 'commercial-tax', label: 'Commercial & Tax' },
             ],
           },
           {
-            id: 'CALCULATOR',
-            name: '5. Calculator',
+            id: 'CALCULATION',
+            name: '5. Calculation',
             icon: <TrendingUp className="w-3.5 h-3.5" />,
             sections: [
               { id: 'calculation-methods', label: 'Calculation Methods' },
-              { id: 'recommendations', label: 'Recommendations' },
+              { id: 'formula-library', label: 'Formula Library' },
               { id: 'test-calculator', label: 'Test Calculator' },
+              { id: 'versions-history', label: 'Version History' },
+              { id: 'simulation', label: 'Simulation / Impact' },
             ],
           },
           {
             id: 'REPORT_MGMT',
-            name: '6. Report & Management',
+            name: '6. Report & System',
             icon: <Shield className="w-3.5 h-3.5" />,
             sections: [
               { id: 'report-settings', label: 'Report Settings' },
-              { id: 'versions-history', label: 'Versions & History' },
-              { id: 'simulation', label: 'Simulation & Impact' },
               { id: 'audit', label: 'Audit Trail' },
               { id: 'analytics', label: 'Analytics' },
               { id: 'account', label: 'Account & Security' },
@@ -775,6 +785,69 @@ export const AdminPage: React.FC = () => {
           </div>
         );
       })()}
+
+      {/* ── PERSISTENT SERVER DRAFT STATUS & PUBLISH BAR ── */}
+      {Object.keys(draftParameters).length > 0 && (
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-amber-900 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+            <div>
+              <div className="text-sm font-bold flex items-center gap-2">
+                <span>Unpublished Draft: {Object.keys(draftParameters).length} parameter(s) modified</span>
+                {currentDraftId && (
+                  <span className="text-[10px] bg-amber-200/70 text-amber-800 px-2 py-0.5 rounded font-mono">
+                    Backend Draft ID: {currentDraftId.slice(0, 14)}...
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-amber-700 mt-0.5">
+                {lastDraftSavedAt
+                  ? `Persisted to server at ${new Date(lastDraftSavedAt).toLocaleTimeString()} (survives page refresh & multi-session)`
+                  : 'Changes are currently in draft. Run Test Calculator or Publish to activate for customers.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={() => saveDraftToBackend()}
+              disabled={isSavingDraft}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              {isSavingDraft ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : null}
+              <span>{isSavingDraft ? 'Saving Draft...' : 'Save Draft'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('test-calculator')}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer"
+            >
+              Test Calculator
+            </button>
+
+            <button
+              type="button"
+              onClick={() => publishDraftConfig('Admin published configuration update')}
+              disabled={isPublishingConfig}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1B3D34] text-white hover:bg-[#153029] shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              {isPublishingConfig ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : null}
+              <span>{isPublishingConfig ? 'Publishing...' : 'Publish to Production'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => resetDraftParameters()}
+              title="Discard draft changes"
+              className="px-2.5 py-1.5 rounded-xl text-xs text-amber-700 hover:bg-amber-200/50 transition-colors cursor-pointer"
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── SECTION 0: OVERVIEW ── */}
       {activeTab === 'overview' && <AdminOverviewSection onNavigate={setActiveTab} />}
@@ -1974,8 +2047,10 @@ export const AdminPage: React.FC = () => {
       {(activeTab === 'rooms-spaces' || activeTab === 'space-rooms') && <RoomsSpacesSection />}
 
       {/* 2. Construction */}
+      {(activeTab === 'rcc-structure' || activeTab === 'structure-rcc' || activeTab === 'steel' || activeTab === 'cement-aggregates') && (
+        <TradeSections sectionId="rcc-structure" />
+      )}
       {(activeTab === 'walls-masonry' || activeTab === 'masonry') && <TradeSections sectionId="walls-masonry" />}
-      {(activeTab === 'rcc-structure' || activeTab === 'structure-rcc') && <TradeSections sectionId="rcc-structure" />}
       {(activeTab === 'flooring-tiles' || activeTab === 'flooring') && <TradeParametersTab forcedTab="flooring" />}
       {activeTab === 'waterproofing' && <TradeParametersTab forcedTab="waterproofing" />}
       {(activeTab === 'paint-finishes' || activeTab === 'paint') && <TradeSections sectionId="paint-finishes" />}
@@ -1991,15 +2066,16 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'quality-spec' && <TradeParametersTab forcedTab="recommendations" />}
       {(activeTab === 'commercial-tax' || activeTab === 'commercial') && <TradeSections sectionId="commercial-tax" />}
 
-      {/* 5. Calculator */}
+      {/* 5. Calculation */}
       {(activeTab === 'calculation-methods' || activeTab === 'calculation-rules' || activeTab === 'calculation-engine') && <CalculationMethodsSection />}
+      {activeTab === 'formula-library' && <FormulaLibrarySection />}
       {activeTab === 'recommendations' && <TradeParametersTab forcedTab="recommendations" />}
       {activeTab === 'test-calculator' && <TestCalculatorSection />}
-
-      {/* 6. Report & Management */}
-      {activeTab === 'report-settings' && <TradeParametersTab forcedTab="recommendations" />}
       {(activeTab === 'versions-history' || activeTab === 'versions') && <VersionHistoryTab />}
       {activeTab === 'simulation' && <SimulationImpactTab />}
+
+      {/* 6. Report & System */}
+      {activeTab === 'report-settings' && <TradeParametersTab forcedTab="recommendations" />}
 
       {/* Legacy fallbacks */}
       {activeTab === 'parameters' && <ParametersTab />}

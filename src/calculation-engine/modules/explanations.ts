@@ -346,10 +346,9 @@ export function generateStepExplanations(
     summaryMetrics: [
       { label: 'Net Wall Area', value: formatNumber(quantities?.netWallAreaSqFt), unit: 'sq.ft' },
       { label: 'Block Wall Coverage', value: formatNumber(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt), unit: 'sq.ft' },
-      { label: 'Blocks Required', value: formatNumber(finalBlocks), unit: quantities?.masonryUnit || 'Nos' },
-      { label: 'Units Required', value: formatNumber(finalBlocks), unit: quantities?.masonryUnit || 'Nos' },
+      { label: 'Blocks Required', value: formatNumber(finalBlocks), unit: 'Nos' },
+      { label: 'Units Required', value: formatNumber(finalBlocks), unit: 'Nos' },
       { label: 'Block Consumption', value: formatNumber(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt), unit: 'sq.ft' },
-      { label: 'Masonry Volume', value: formatNumber(quantities?.masonryVolumeCuM, 2), unit: 'm³' },
     ],
     inputsUsed: [
       { label: 'Wall Area', value: `${formatNumber(grossWallArea)} sq.ft`, description: 'Gross external & internal wall envelope' },
@@ -359,11 +358,10 @@ export function generateStepExplanations(
       { label: 'Deductions (Openings)', value: `${formatNumber((buildingModel?.totalDoorOpeningAreaSqFt || 0) + (buildingModel?.totalWindowOpeningAreaSqFt || 0))} sq.ft`, description: 'Doors and windows subtracted' },
     ],
     derivedQuantities: [
-      { label: 'Block Wall Area', quantity: formatNumber(quantities?.netWallAreaSqFt), unit: 'sq.ft', description: 'Wall surface minus doors and windows' },
+      { label: 'Net Wall Area', quantity: formatNumber(quantities?.netWallAreaSqFt), unit: 'sq.ft', description: 'Wall surface minus doors and windows' },
       { label: 'Block Wall Coverage', quantity: formatNumber(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt), unit: 'sq.ft', description: 'Net wall surface covered by block masonry' },
-      { label: 'Block Quantity', quantity: formatNumber(baseBlocks), unit: 'Nos', description: 'Base block count before cutting wastage' },
+      { label: 'Base Blocks Required', quantity: formatNumber(baseBlocks), unit: 'Nos', description: 'Base block count before cutting wastage' },
       { label: 'Final Blocks Required', quantity: formatNumber(finalBlocks), unit: 'Nos', description: `Approved total including ${quantities?.masonryWastagePct || 5}% wastage allowance` },
-      { label: 'Masonry Volume', quantity: formatNumber(quantities?.masonryVolumeCuM, 2), unit: 'm³', description: 'Net Block Wall Area × Wall Thickness' },
     ],
     calculationLogic: [
       {
