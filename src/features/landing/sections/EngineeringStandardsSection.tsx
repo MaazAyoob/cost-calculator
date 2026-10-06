@@ -40,9 +40,11 @@ export const EngineeringStandardsSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#F28C28] bg-white/10 px-3 py-1.5 rounded-md inline-block">
-            ENGINEERING REFERENCES &amp; ASSUMPTIONS
-          </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white">
+            <span className="text-[#F28C28] font-bold">Civil Standards</span>
+            <span>&bull;</span>
+            <span>Engineering Codes &amp; Calculations</span>
+          </div>
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12]">
             Formula-driven construction estimation.
           </h2>
@@ -51,16 +53,16 @@ export const EngineeringStandardsSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Engineering Flow Diagram (INPUT → ASSUMPTION → QUANTITY → RATE → BOQ → ESTIMATE) */}
+        {/* Calculation Flow Diagram (INPUT → ASSUMPTION → QUANTITY → RATE → BOQ → ESTIMATE) */}
         <div className="bg-white/5 border border-white/15 rounded-2xl p-6 sm:p-8 backdrop-blur-xs text-left space-y-4">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] block">
-            TECHNICAL DERIVATION FLOW
+          <span className="text-xs font-bold uppercase tracking-wider text-[#F28C28] block">
+            Calculation Flow
           </span>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             {pipelineSteps.map((step, idx) => (
               <React.Fragment key={step}>
-                <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-xs sm:text-sm font-bold font-mono tracking-wider text-white">
+                <div className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-xs sm:text-sm font-semibold tracking-wide text-white">
                   {step}
                 </div>
                 {idx < pipelineSteps.length - 1 && (
@@ -76,7 +78,7 @@ export const EngineeringStandardsSection: React.FC = () => {
           {references.map((item) => (
             <div key={item.code} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
               <div className="md:col-span-3">
-                <span className="text-xs sm:text-sm font-mono font-bold text-[#F28C28] tracking-wider block">
+                <span className="text-sm font-bold text-[#F28C28] block">
                   {item.code}
                 </span>
               </div>

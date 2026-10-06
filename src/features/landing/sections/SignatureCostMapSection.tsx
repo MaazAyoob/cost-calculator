@@ -83,10 +83,10 @@ export const SignatureCostMapSection: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E5E7EB] pb-6 text-left">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 arch-spec-pill text-[#1B3D34]">
-              <span className="text-[#F28C28] font-bold">06 // THE COST MAP</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+              <span className="text-[#F28C28] font-bold">Budget Breakdown</span>
               <span>&bull;</span>
-              <span>WHERE YOUR MONEY GOES</span>
+              <span>Where Your Capital Goes</span>
             </div>
 
             <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
@@ -95,20 +95,20 @@ export const SignatureCostMapSection: React.FC = () => {
           </div>
 
           <div className="space-y-1 text-left lg:text-right">
-            <span className="font-mono text-sm font-extrabold text-[#1B3D34] block">
-              TOTAL ESTIMATE: {formatCurrency(totalCost)}
+            <span className="text-base font-extrabold text-[#1B3D34] block tabular-nums">
+              Total Estimate: {formatCurrency(totalCost)}
             </span>
-            <span className="font-mono text-[10px] text-[#4B5563] block">
-              EFFECTIVE RATE: ₹1,867 / SQ.FT (2,400 SQ.FT BUA)
+            <span className="text-xs text-[#4B5563] block">
+              ~₹1,867 / sq.ft on 2,400 sq.ft BUA
             </span>
           </div>
         </div>
 
         {/* Master Proportional Horizontal Allocation Bar */}
         <div className="space-y-3 text-left">
-          <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-[#4B5563] uppercase">PROPORTIONAL TRADE ALLOCATION</span>
-            <span className="text-[#1B3D34] font-bold">100% OF CONSTRUCTION BUDGET RECONCILED</span>
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-[#4B5563]">Trade Budget Distribution</span>
+            <span className="text-[#1B3D34] font-medium">100% of construction budget itemized</span>
           </div>
 
           <div className="h-10 sm:h-12 w-full rounded-2xl overflow-hidden flex border border-[#E5E7EB] shadow-xs p-1 bg-white">
@@ -123,7 +123,7 @@ export const SignatureCostMapSection: React.FC = () => {
                 }`}
                 title={`${head.category}: ${head.percentage}%`}
               >
-                <div className="hidden sm:flex items-center justify-center h-full text-white text-[10px] font-mono font-bold tracking-tight px-1">
+                <div className="hidden sm:flex items-center justify-center h-full text-white text-xs font-bold tracking-tight px-1">
                   {head.percentage}%
                 </div>
               </button>
@@ -145,7 +145,7 @@ export const SignatureCostMapSection: React.FC = () => {
               >
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: head.color }} />
-                  <span className="font-mono text-[10px] font-bold text-[#1B3D34]">
+                  <span className="text-xs font-bold text-[#1B3D34]">
                     {head.percentage}%
                   </span>
                 </div>
@@ -158,12 +158,12 @@ export const SignatureCostMapSection: React.FC = () => {
         </div>
 
         {/* Selected Category Deep Dive Panel */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs text-left grid grid-cols-1 lg:grid-cols-12 gap-8 items-center arch-bracketed">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs text-left grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left Summary Metric (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
-              SELECTED TRADE BREAKDOWN
+            <span className="text-xs font-bold uppercase tracking-wider text-[#F28C28]">
+              Selected Trade Category
             </span>
 
             <h3 className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading">
@@ -174,15 +174,15 @@ export const SignatureCostMapSection: React.FC = () => {
               <div className="text-3xl sm:text-4xl font-black text-[#1B3D34] font-heading tabular-nums">
                 {formatCurrency(activeHead.amount)}
               </div>
-              <div className="font-mono text-xs text-[#4B5563]">
-                Effective: <strong>₹{activeHead.ratePerSqFt}</strong> per sq.ft of BUA ({activeHead.percentage}% of project)
+              <div className="text-xs text-[#4B5563]">
+                Effective: <strong>₹{activeHead.ratePerSqFt}</strong> per sq.ft ({activeHead.percentage}% of project)
               </div>
             </div>
 
             {/* Material vs Labour Split */}
-            <div className="pt-4 border-t border-[#E5E7EB] space-y-2 font-mono text-xs">
+            <div className="pt-4 border-t border-[#E5E7EB] space-y-2 text-xs">
               <span className="text-[#4B5563] block uppercase text-[10px] font-bold">
-                MATERIAL VS LABOUR COMPOSITION
+                Material vs Labour Split
               </span>
               <div className="flex items-center gap-3">
                 <div className="flex-1 space-y-1">
@@ -201,23 +201,23 @@ export const SignatureCostMapSection: React.FC = () => {
 
           {/* Right Included Deliverables Schedule (7 cols) */}
           <div className="lg:col-span-7 bg-[#F8F8F6] p-6 rounded-2xl border border-[#E5E7EB] space-y-4">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1B3D34] block border-b border-[#E5E7EB] pb-2">
-              ITEMIZED INCLUSIONS IN THIS TRADE HEAD
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] block border-b border-[#E5E7EB] pb-2">
+              Itemized Scope in This Category
             </span>
 
             <div className="space-y-2.5">
               {activeHead.includedTrades.map((trade, i) => (
                 <div key={i} className="flex items-center gap-3 text-xs sm:text-sm text-[#1B3D34] font-medium">
-                  <span className="font-mono text-[10px] text-[#F28C28] font-bold shrink-0">
-                    0{i + 1} //
+                  <span className="text-xs text-[#F28C28] font-bold shrink-0">
+                    {i + 1}.
                   </span>
                   <span>{trade}</span>
                 </div>
               ))}
             </div>
 
-            <div className="pt-3 border-t border-[#E5E7EB] text-[11px] font-mono text-[#4B5563]">
-              &bull; Reconciled in Hutty 22-Section Detailed BOQ Dossier
+            <div className="pt-3 border-t border-[#E5E7EB] text-xs text-[#4B5563]">
+              &bull; Itemized in Hutty 22-Section Detailed BOQ Dossier
             </div>
           </div>
 

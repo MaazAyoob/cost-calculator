@@ -49,10 +49,10 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 arch-spec-pill text-[#1B3D34]">
-            <span className="text-[#F28C28] font-bold">07 // THE HOMEOWNER ROADMAP</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+            <span className="text-[#F28C28] font-bold">Project Roadmap</span>
             <span>&bull;</span>
-            <span>FROM CONCEPT TO GROUNDBREAKING</span>
+            <span>From Concept to Groundbreaking</span>
           </div>
 
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
@@ -70,14 +70,14 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
           {TIMELINE_STAGES.map((stg, idx) => (
             <div
               key={stg.step}
-              className="p-6 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-6 text-left tactile-card arch-bracketed"
+              className="p-6 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-6 text-left"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                  <span className="font-mono text-xs font-bold text-[#F28C28]">
-                    {stg.step} //
+                  <span className="text-xs font-bold text-[#F28C28]">
+                    Step {idx + 1}
                   </span>
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1B3D34] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#1B3D34] bg-white px-2 py-0.5 rounded-lg border border-[#E5E7EB]">
                     {stg.phase}
                   </span>
                 </div>
@@ -92,8 +92,8 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
               </div>
 
               <div className="pt-3 border-t border-[#E5E7EB] space-y-1">
-                <span className="font-mono text-[9px] uppercase tracking-wider text-[#4B5563] block">
-                  DELIVERABLE:
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+                  Deliverable:
                 </span>
                 <span className="text-xs font-bold text-[#1B3D34] block font-heading">
                   {stg.deliverable}
@@ -112,7 +112,7 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
             <span>Begin Phase 01: Free Plan</span>
             <ArrowRight className="w-4 h-4 text-[#F28C28]" />
           </button>
-          <span className="text-xs font-mono text-[#4B5563]">
+          <span className="text-xs text-[#4B5563]">
             No credit card or builder contact required. Instant calculation.
           </span>
         </div>

@@ -13,10 +13,10 @@ export const SignaturePricingSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 arch-spec-pill text-[#1B3D34]">
-            <span className="text-[#F28C28] font-bold">09 // COMMERCIAL PLANS</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+            <span className="text-[#F28C28] font-bold">Plans &amp; Pricing</span>
             <span>&bull;</span>
-            <span>TRANSPARENT VALUE TIERS</span>
+            <span>Transparent Value Tiers</span>
           </div>
 
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
@@ -35,13 +35,13 @@ export const SignaturePricingSection: React.FC = () => {
           <div className="lg:col-span-5 flex flex-col justify-between gap-6">
             
             {/* Free Tier Card */}
-            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all text-left space-y-4 tactile-card arch-bracketed">
+            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all text-left space-y-4">
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
-                  EXPLORE YOUR PROJECT
+                <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                  Explore Your Project
                 </span>
-                <span className="font-mono text-xs font-bold text-[#1B3D34] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
-                  ₹0 FREE
+                <span className="text-xs font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E5E7EB]">
+                  ₹0 Free
                 </span>
               </div>
 
@@ -81,13 +81,13 @@ export const SignaturePricingSection: React.FC = () => {
             </div>
 
             {/* ₹99 Verified Estimate Tier Card */}
-            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all text-left space-y-4 tactile-card arch-bracketed">
+            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all text-left space-y-4">
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
-                  START PLANNING SERIOUSLY
+                <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                  Save &amp; Customize
                 </span>
-                <span className="font-mono text-xs font-bold text-[#1B3D34] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
-                  ₹99 ONE-TIME
+                <span className="text-xs font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E5E7EB]">
+                  ₹99 One-time
                 </span>
               </div>
 
@@ -126,10 +126,10 @@ export const SignaturePricingSection: React.FC = () => {
           </div>
 
           {/* RIGHT: Featured ₹499 Detailed BOQ Dossier Centerpiece (7 cols) */}
-          <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border-2 border-[#1B3D34] shadow-md flex flex-col justify-between space-y-6 text-left relative overflow-hidden arch-bracketed">
-            <div className="absolute top-0 right-0 bg-[#1B3D34] text-white text-[10px] font-mono font-bold px-4 py-1 rounded-bl-xl uppercase tracking-wider flex items-center gap-1.5">
+          <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border-2 border-[#1B3D34] shadow-md flex flex-col justify-between space-y-6 text-left relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-[#1B3D34] text-white text-[11px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
-              <span>MOST POPULAR HOMEOWNER DELIVERABLE</span>
+              <span>Most Popular Homeowner Plan</span>
             </div>
 
             <div className="space-y-4 pt-2">
@@ -138,11 +138,11 @@ export const SignaturePricingSection: React.FC = () => {
                   ₹499
                 </span>
                 <div>
-                  <span className="font-mono text-xs font-bold text-[#F28C28] uppercase tracking-wider block">
-                    COMPLETE CONSTRUCTION PICTURE
+                  <span className="text-xs font-bold text-[#F28C28] uppercase tracking-wider block">
+                    Complete Construction Picture
                   </span>
                   <span className="text-xs text-[#4B5563] block">
-                    One-time payment • Lifetime PDF access
+                    One-time payment &bull; Lifetime PDF access
                   </span>
                 </div>
               </div>
@@ -159,20 +159,20 @@ export const SignaturePricingSection: React.FC = () => {
               {/* Dossier Feature Matrix */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-[#E5E7EB] text-xs text-[#1B3D34]">
                 <div className="flex items-start gap-2.5">
-                  <span className="font-mono font-bold text-[#F28C28] shrink-0">&check;</span>
-                  <span><strong>Full Physical Material Schedules:</strong> Steel, cement, sand, aggregate, blocks, and tiles.</span>
+                  <Check className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
+                  <span><strong>Full Material Schedules:</strong> Steel, cement, sand, aggregate, blocks, and tiles.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <span className="font-mono font-bold text-[#F28C28] shrink-0">&check;</span>
+                  <Check className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
                   <span><strong>13 Trade Heads BOQ:</strong> Itemized labour and material allocation per IS-456 standards.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <span className="font-mono font-bold text-[#F28C28] shrink-0">&check;</span>
-                  <span><strong>Cashflow Payment Milestones:</strong> 8-stage disbursement schedule tied to slab casting milestones.</span>
+                  <Check className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
+                  <span><strong>Disbursement Roadmap:</strong> Milestone schedule tied to slab casting stages.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <span className="font-mono font-bold text-[#F28C28] shrink-0">&check;</span>
-                  <span><strong>Bank-Ready PDF Download:</strong> Officially formatted for SBI, HDFC, ICICI home loan sanction.</span>
+                  <Check className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
+                  <span><strong>Bank-Ready PDF Download:</strong> Formatted for SBI, HDFC, ICICI home loan sanction.</span>
                 </div>
               </div>
             </div>
@@ -186,11 +186,11 @@ export const SignaturePricingSection: React.FC = () => {
                 <ArrowRight className="w-4 h-4 text-[#F28C28]" />
               </button>
 
-              <div className="flex items-center justify-between text-[11px] font-mono text-[#4B5563]">
-                <span className="flex items-center gap-1">
+              <div className="flex items-center justify-between text-xs text-[#4B5563]">
+                <span className="flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34]" /> 100% Secure Razorpay Checkout
                 </span>
-                <span>Immediate PDF Generation</span>
+                <span>Instant PDF Generation</span>
               </div>
             </div>
 

@@ -63,10 +63,10 @@ export const SignatureConstructionBreakdownSection: React.FC = () => {
         {/* Section Header with Scale Contrast */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E5E7EB] pb-6 text-left">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 arch-spec-pill text-[#1B3D34]">
-              <span className="text-[#F28C28] font-bold">05 // WHAT YOUR HOME CONSUMES</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+              <span className="text-[#F28C28] font-bold">Material Quantities</span>
               <span>&bull;</span>
-              <span>PHYSICAL BILL OF QUANTITIES</span>
+              <span>Bill of Materials</span>
             </div>
 
             <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
@@ -76,27 +76,27 @@ export const SignatureConstructionBreakdownSection: React.FC = () => {
           </div>
 
           <div className="space-y-1 text-left lg:text-right">
-            <span className="font-mono text-xs font-bold text-[#1B3D34] block">
-              SAMPLE: 2,400 SQ.FT G+2 DUPLEX
+            <span className="text-xs font-bold text-[#1B3D34] block">
+              Sample Benchmark: 2,400 sq.ft G+2 Duplex
             </span>
-            <span className="font-mono text-[10px] text-[#4B5563] block">
-              DERIVED FROM IS-456 DETERMINISTIC QUANTITY SURVEYING
+            <span className="text-[11px] text-[#4B5563] block">
+              Calculated from physical structural requirements
             </span>
           </div>
         </div>
 
-        {/* Editorial Big Number Panels (6 items) */}
+        {/* Big Number Panels (6 items) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {MATERIAL_CONSUMPTION.map((item, idx) => (
             <div
               key={idx}
-              className="p-6 sm:p-8 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all space-y-4 text-left tactile-card arch-bracketed"
+              className="p-6 sm:p-8 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all space-y-4 text-left"
             >
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-[#4B5563]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
                   {item.category}
                 </span>
-                <span className="font-mono text-[9px] font-bold text-[#1B3D34] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
+                <span className="text-xs font-semibold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E5E7EB]">
                   {item.unit}
                 </span>
               </div>
@@ -124,8 +124,8 @@ export const SignatureConstructionBreakdownSection: React.FC = () => {
         {/* Bottom Editorial Callout */}
         <div className="p-6 sm:p-8 bg-[#112821] rounded-3xl text-white flex flex-col md:flex-row md:items-center justify-between gap-6 arch-bracketed text-left">
           <div className="space-y-1">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#F28C28] font-bold block">
-              ACCURATE TAKEOFF FOR YOUR EXACT PLOT
+            <span className="text-xs font-semibold tracking-wide text-[#F28C28] block">
+              Accurate Takeoff For Your Exact Plot
             </span>
             <h3 className="text-xl sm:text-2xl font-bold font-heading text-white">
               Want to see what your specific plot and room layout will consume?

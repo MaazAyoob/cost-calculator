@@ -63,10 +63,10 @@ export const VisualStorytellingSection: React.FC = () => {
         
         {/* Editorial Section Statement */}
         <div className="max-w-3xl space-y-4 text-left">
-          <div className="inline-flex items-center gap-2 arch-spec-pill text-[#1B3D34]">
-            <span className="text-[#F28C28] font-bold">03 // HUTTY'S ARCHITECTURE</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+            <span className="text-[#F28C28] font-bold">How It Works</span>
             <span>&bull;</span>
-            <span>THE 7-STAGE PROGRESSION</span>
+            <span>From Plot to Complete Plan</span>
           </div>
 
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
@@ -74,34 +74,34 @@ export const VisualStorytellingSection: React.FC = () => {
           </h2>
 
           <p className="body-lg text-[#4B5563] leading-relaxed">
-            Hutty breaks construction down into physical engineering realities. Here is how your building flows from raw plot coordinates into an itemized, bank-grade financial plan.
+            Hutty breaks construction down into physical realities. Here is how your building flows from raw plot boundaries into an itemized, bank-ready financial plan.
           </p>
         </div>
 
-        {/* Visual Architectural Sequence System (Not 7 ordinary cards) */}
+        {/* Visual Architectural Sequence System */}
         <div className="relative">
           
-          {/* Subtle Vertical Technical Axis Line (Desktop) */}
+          {/* Subtle Vertical Axis Line (Desktop) */}
           <div className="hidden lg:block absolute left-8 top-6 bottom-6 w-0.5 bg-[#E5E7EB]" />
 
           <div className="space-y-6 lg:space-y-4">
             {FLOW_NODES.map((node, idx) => (
               <div
                 key={node.step}
-                className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all lg:ml-16 tactile-card"
+                className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all lg:ml-16"
               >
                 {/* Desktop Anchor Node on the Axis Line */}
-                <div className="hidden lg:flex absolute -left-16 w-8 h-8 rounded-full bg-[#1B3D34] text-white font-mono text-xs font-bold items-center justify-center -translate-x-1/2 border-4 border-white shadow-xs">
-                  {node.step}
+                <div className="hidden lg:flex absolute -left-16 w-8 h-8 rounded-full bg-[#1B3D34] text-white text-xs font-bold items-center justify-center -translate-x-1/2 border-4 border-white shadow-xs">
+                  {idx + 1}
                 </div>
 
                 {/* Left: Step label, title, and detail */}
                 <div className="space-y-1 max-w-2xl text-left">
                   <div className="flex items-center gap-2">
-                    <span className="lg:hidden font-mono text-xs font-bold text-[#F28C28]">
-                      {node.step} //
+                    <span className="lg:hidden text-xs font-bold text-[#F28C28]">
+                      Stage {idx + 1} &bull;
                     </span>
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
                       {node.label}
                     </span>
                   </div>
@@ -113,9 +113,9 @@ export const VisualStorytellingSection: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Right: Technical Calculated Metric Tag */}
+                {/* Right: Calculated Metric Tag */}
                 <div className="shrink-0 flex items-center justify-between lg:justify-end gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 border-[#E5E7EB]">
-                  <span className="font-mono text-xs sm:text-sm font-bold text-[#1B3D34] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-2xs">
+                  <span className="text-xs sm:text-sm font-semibold text-[#1B3D34] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-2xs">
                     {node.metric}
                   </span>
                   {idx < FLOW_NODES.length - 1 ? (

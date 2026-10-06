@@ -33,9 +33,9 @@ export const FaqSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-md inline-block">
-            FREQUENTLY ASKED QUESTIONS
-          </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+            Frequently Asked Questions
+          </div>
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
             Everything you need to know.
           </h2>

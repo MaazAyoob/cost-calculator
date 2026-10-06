@@ -59,15 +59,15 @@ export const LiveMaterialPricesSection: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-3 max-w-2xl text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/15 text-[#1B3D34] text-xs font-bold tracking-wide">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
               <Database className="w-3.5 h-3.5 text-[#F28C28]" />
-              <span>HUTTY PRICING INTELLIGENCE</span>
+              <span>Current Market Rates</span>
             </div>
             <h2 className="heading-lg text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1B3D34] tracking-tight font-heading">
               Latest Material Prices
             </h2>
             <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-              Updated from Hutty&apos;s current pricing database. These authoritative unit rates feed directly into our engineering takeoff and cost calculation engine.
+              Current regional retail benchmarks for materials and trade labor in Karnataka. These rates feed directly into your cost estimate.
             </p>
           </div>
 
@@ -146,7 +146,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
             </span>
           ) : (
             <span className="text-[#1B3D34] font-medium hidden sm:inline">
-              Authoritative Single Source of Truth
+              Verified Market Benchmarks
             </span>
           )}
         </div>
@@ -172,7 +172,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
                     </span>
                   ) : (
                     <span className="text-[9px] font-semibold text-[#4B5563]/70">
-                      Hutty Baseline
+                      Standard
                     </span>
                   )}
                 </div>
@@ -207,7 +207,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
                 100% Price Consistency Across Hutty
               </h4>
               <p className="text-[11px] text-[#4B5563] leading-relaxed">
-                When our quantity surveyors update material rates in the Admin Rate Master, all cost calculations, Bill of Quantities, and public rates update instantly.
+                When market rates update, all cost calculations, Bill of Quantities schedules, and public rates update automatically.
               </p>
             </div>
           </div>

@@ -30,8 +30,8 @@ export const FinalCtaSection: React.FC = () => {
               strokeLinejoin="round"
             />
           </svg>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#F28C28] bg-white/10 px-3.5 py-1 rounded-md inline-block">
-            START PRE-CONSTRUCTION PLANNING
+          <span className="text-xs font-semibold text-[#F28C28] bg-white/10 px-3.5 py-1 rounded-full inline-block">
+            Pre-Construction Planning
           </span>
         </div>
 
