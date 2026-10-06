@@ -45,16 +45,16 @@ import { PackageComparisonModal } from '../../components/modals/PackageCompariso
 import { analytics } from '../../utils/analytics';
 
 const STEPS = [
-  { num: '01', key: 'Plot', title: 'Plot Dimensions & Site', shortTitle: 'Plot' },
-  { num: '02', key: 'Space', title: 'Rooms & Layout', shortTitle: 'Space' },
-  { num: '03', key: 'Structure', title: 'Structural Materials', shortTitle: 'Structure' },
-  { num: '04', key: 'Flooring', title: 'Flooring & Finishes', shortTitle: 'Flooring' },
-  { num: '05', key: 'Walls', title: 'Wall Cladding & Dado', shortTitle: 'Cladding' },
-  { num: '06', key: 'Doors', title: 'Doors & Joinery', shortTitle: 'Doors' },
-  { num: '07', key: 'Windows', title: 'Windows & Glazing', shortTitle: 'Windows' },
-  { num: '08', key: 'Electrical', title: 'Electrical & MEP', shortTitle: 'Electrical' },
-  { num: '09', key: 'Bathroom', title: 'Bathroom Fixtures', shortTitle: 'Sanitary' },
-  { num: '10', key: 'Paint', title: 'Painting & Surfaces', shortTitle: 'Painting' },
+  { num: '01', key: 'Plot', title: 'Plot Dimensions & Site', shortTitle: 'Plot', phase: 'PROJECT' },
+  { num: '02', key: 'Space', title: 'Rooms & Layout', shortTitle: 'Space', phase: 'SPACE' },
+  { num: '03', key: 'Structure', title: 'Structural Materials', shortTitle: 'Structure', phase: 'STRUCTURE' },
+  { num: '04', key: 'Flooring', title: 'Flooring & Finishes', shortTitle: 'Flooring', phase: 'FINISHES' },
+  { num: '05', key: 'Walls', title: 'Wall Cladding & Dado', shortTitle: 'Cladding', phase: 'FINISHES' },
+  { num: '06', key: 'Doors', title: 'Doors & Joinery', shortTitle: 'Doors', phase: 'OPENINGS' },
+  { num: '07', key: 'Windows', title: 'Windows & Glazing', shortTitle: 'Windows', phase: 'OPENINGS' },
+  { num: '08', key: 'Electrical', title: 'Electrical & MEP', shortTitle: 'Electrical', phase: 'SERVICES' },
+  { num: '09', key: 'Bathroom', title: 'Bathroom Fixtures', shortTitle: 'Sanitary', phase: 'SERVICES' },
+  { num: '10', key: 'Paint', title: 'Painting & Surfaces', shortTitle: 'Painting', phase: 'SURFACES' },
 ];
 
 export const PlannerPage: React.FC = () => {
@@ -235,16 +235,21 @@ export const PlannerPage: React.FC = () => {
                             {isCompleted ? '✓' : stepNum}
                           </span>
                           
-                          {/* Only show title for the ACTIVE step to avoid horizontal crowding */}
+                          {/* Only show phase & title for the ACTIVE step */}
                           {isCurrent && (
-                            <motion.span
+                            <motion.div
                               initial={{ opacity: 0, width: 0 }}
                               animate={{ opacity: 1, width: 'auto' }}
                               exit={{ opacity: 0, width: 0 }}
-                              className="text-xs font-bold text-[#1B3D34] whitespace-nowrap overflow-hidden pr-0.5"
+                              className="flex items-center gap-1 overflow-hidden pr-0.5 whitespace-nowrap"
                             >
-                              {s.shortTitle}
-                            </motion.span>
+                              <span className="font-mono text-[9px] uppercase tracking-wider text-[#F28C28] font-bold">
+                                {s.phase} &bull;
+                              </span>
+                              <span className="text-xs font-bold text-[#1B3D34]">
+                                {s.shortTitle}
+                              </span>
+                            </motion.div>
                           )}
                         </div>
                       </button>
@@ -264,7 +269,7 @@ export const PlannerPage: React.FC = () => {
               {/* Tablet Step Title */}
               <div className="hidden sm:flex lg:hidden items-center gap-2 text-xs">
                 <span className="font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.06)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
-                  Step {currentStep} of 10
+                  {currentStepDef.phase} &bull; Step {currentStep} of 10
                 </span>
                 <span className="font-semibold text-[#4B5563] truncate">
                   • {currentStepDef.title}

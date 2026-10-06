@@ -40,6 +40,7 @@ export const DashboardPage: React.FC = () => {
   const budget = useBudgetResult();
   const area = useArea();
   const { result } = useCalculationStore();
+  const quantities = result.quantities;
   const { city, plotLength, plotWidth, houseType, specificationTier, selectedPackage } = useWizardStore();
   const { hasDetailedReportAccess } = useEntitlementStore();
   const { preparedFor } = useReportStore();
@@ -164,70 +165,133 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Page Header */}
-        <div className="space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] block">
-            HUTTY DASHBOARD
-          </span>
-          <h1 className="heading-sm text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight">
-            Project Overview &amp; Products
-          </h1>
-        </div>
-
-        {/* ── 1. PROJECT METRICS HERO ── */}
-        <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#4B5563]">
-              ACTIVE PROJECT ESTIMATE
-            </span>
+        {/* ── HOME COMMAND CENTER HERO ── */}
+        <section className="bg-white border border-[#E5E7EB] rounded-3xl p-6 sm:p-9 shadow-xs space-y-6 arch-bracketed text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
+            <div className="space-y-1">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">
+                YOUR HOME &bull; PRE-CONSTRUCTION COMMAND CENTER
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading">
+                {houseType || 'Residential'} Active Residence
+              </h1>
+            </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
+              <span className="font-mono text-xs font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-3 py-1 rounded-full border border-[#1B3D34]/15">
                 PACKAGE: {(selectedPackage || 'PREMIUM').toUpperCase()}
               </span>
-              <button
-                type="button"
-                onClick={() => setShowCompareModal(true)}
-                className="text-[10px] font-bold text-[#F28C28] hover:underline cursor-pointer"
-              >
-                Compare 3 Standards &rarr;
-              </button>
             </div>
           </div>
 
           {hasProject ? (
-            <div className="space-y-4">
-              <div className="text-4xl sm:text-5xl font-black text-[#1B3D34] tracking-tight font-heading">
-                {totalCost > 0 ? formatCurrency(totalCost) : '₹0'}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                <div className="md:col-span-2 space-y-1">
+                  <span className="font-mono text-xs text-[#4B5563] block uppercase tracking-wider">
+                    ESTIMATED TOTAL CONSTRUCTION BUDGET
+                  </span>
+                  <div className="arch-stat-hero text-[#1B3D34]">
+                    {totalCost > 0 ? formatCurrency(totalCost) : '₹0'}
+                  </div>
+                  <p className="text-xs text-[#4B5563]">
+                    Includes civil frame, materials, MEP conduit, and contractor execution schedules.
+                  </p>
+                </div>
+
+                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                    GROSS BUILT-UP AREA
+                  </span>
+                  <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                    {buaSqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+                  </span>
+                  <span className="text-[11px] font-mono text-[#1B3D34]">
+                    Effective: ₹{ratePerSqFt.toLocaleString()} / sq.ft
+                  </span>
+                </div>
+
+                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                    SITE COORDINATES
+                  </span>
+                  <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                    {plotLength}' × {plotWidth}'
+                  </span>
+                  <span className="text-[11px] font-mono text-[#F28C28] font-bold">
+                    {city || 'Bangalore'} &bull; Zone II
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#E5E7EB]">
-                <div>
-                  <span className="text-[10px] font-bold text-[#4B5563] uppercase block">BUILT-UP AREA</span>
-                  <span className="text-base font-bold text-[#1B3D34] font-heading">{buaSqFt.toLocaleString()} sq.ft</span>
+              {/* Physical Material Consumption Takeoff Strip */}
+              <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[#4B5563] uppercase font-bold text-[10px]">
+                    PHYSICAL MATERIAL CONSUMPTION TAKEOFF
+                  </span>
+                  <span className="text-[#1B3D34] font-bold text-[10px]">
+                    IS-456 DETERMINISTIC QUANTITIES
+                  </span>
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#4B5563] uppercase block">EFFECTIVE RATE</span>
-                  <span className="text-base font-bold text-[#1B3D34] font-heading">₹{ratePerSqFt.toLocaleString()} / sq.ft</span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#4B5563] text-[10px] block">Fe550D Steel:</span>
+                    <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.steelTonnes || 8.64} Tonnes</span>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#4B5563] text-[10px] block">Grade 53 Cement:</span>
+                    <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.cementBags?.toLocaleString() || 1080} Bags</span>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#4B5563] text-[10px] block">RCC Concrete:</span>
+                    <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.rccConcreteTotalCuM || 48} m³</span>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#4B5563] text-[10px] block">Masonry Blocks:</span>
+                    <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.masonryUnitsCount?.toLocaleString() || 10752} Nos</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#4B5563] uppercase block">SPECIFICATION</span>
-                  <span className="text-base font-bold text-[#1B3D34] font-heading capitalize">{selectedPackage || 'Premium'}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#4B5563] uppercase block">PLOT &amp; LOCATION</span>
-                  <span className="text-base font-bold text-[#1B3D34] font-heading">{city || 'Bangalore'} &bull; {plotLength}×{plotWidth}</span>
-                </div>
+              </div>
+
+              {/* Command Center Action Bar */}
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigate('/calculator')}
+                  className="hutty-btn-primary text-xs font-bold px-5 py-3 rounded-xl cursor-pointer shadow-xs"
+                >
+                  <span>Modify Configuration in Calculator</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/report')}
+                  className="hutty-btn-secondary text-xs font-semibold px-4 py-3 rounded-xl cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#1B3D34]" />
+                  <span>View 22-Section BOQ</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/consult')}
+                  className="hutty-btn-secondary text-xs font-semibold px-4 py-3 rounded-xl cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <span>Book Expert Review (₹1,499)</span>
+                </button>
               </div>
             </div>
           ) : (
-            <div className="text-center py-6 space-y-3">
-              <p className="text-sm text-[#4B5563]">No active project configuration yet.</p>
+            <div className="text-center py-8 space-y-4">
+              <p className="text-sm text-[#4B5563]">No active project configuration yet in this session.</p>
               <button
                 type="button"
                 onClick={() => navigate('/calculator')}
-                className="hutty-btn-primary text-xs font-bold px-4 py-2 rounded-lg"
+                className="hutty-btn-primary text-xs font-bold px-6 py-3 rounded-xl cursor-pointer"
               >
-                Configure in Calculator
+                Launch Architectural Calculator
               </button>
             </div>
           )}
@@ -275,7 +339,7 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 2. Detailed Report (₹4,999) */}
+            {/* 2. Detailed Report (₹499) */}
             <div className={`p-5 bg-white rounded-2xl border shadow-xs space-y-3 flex flex-col justify-between transition-all ${
               isReportUnlocked ? 'border-[#1B3D34] ring-1 ring-[#1B3D34]' : 'border-[#E5E7EB]'
             }`}>
@@ -293,7 +357,7 @@ export const DashboardPage: React.FC = () => {
                     </span>
                   ) : (
                     <span className="text-[10px] font-mono font-bold text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-2 py-0.5 rounded border border-[#F28C28]/20">
-                      ₹4,999
+                      ₹499
                     </span>
                   )}
                 </div>
@@ -356,7 +420,7 @@ export const DashboardPage: React.FC = () => {
                       className="hutty-btn-primary px-3.5 py-1.5 text-xs rounded-lg font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                     >
                       <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                      <span>Unlock Detailed Report &bull; ₹4,999</span>
+                      <span>Unlock Detailed Report &bull; ₹499</span>
                     </button>
                   </div>
                 )}

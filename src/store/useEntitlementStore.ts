@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { usePricingStore } from './usePricingStore';
 
 export interface ReportEntitlement {
   projectId: string;
@@ -26,6 +27,10 @@ export const useEntitlementStore = create<EntitlementState>()(
       isCurrentProjectUnlocked: false,
 
       hasDetailedReportAccess: (projectId?: string) => {
+        // Check centralized pricing store first
+        if (usePricingStore.getState().canAccessFeature('FULL_PDF_REPORT', projectId)) {
+          return true;
+        }
         const state = get();
         if (state.isCurrentProjectUnlocked) return true;
         if (!projectId) return false;
@@ -38,8 +43,16 @@ export const useEntitlementStore = create<EntitlementState>()(
           isUnlocked: true,
           unlockedAt: new Date().toISOString(),
           orderId: orderId || `ORD-HUTTY-${Date.now().toString(36).toUpperCase()}`,
-          amountPaidINR: 4999,
+          amountPaidINR: 499, // Authoritative ₹499 Detailed Construction Dossier
         };
+
+        // Also grant in centralized pricing store
+        usePricingStore.getState().grantEntitlementsDirectly(
+          'DETAILED_ESTIMATE_499',
+          projectId,
+          undefined,
+          entitlement.orderId
+        );
 
         set((state) => ({
           isCurrentProjectUnlocked: true,
@@ -62,7 +75,7 @@ export const useEntitlementStore = create<EntitlementState>()(
       },
     }),
     {
-      name: 'hutty_report_entitlements_v1',
+      name: 'cost_calculator_report_entitlements_v2',
       storage: createJSONStorage(() => localStorage),
     }
   )

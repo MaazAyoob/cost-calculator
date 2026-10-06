@@ -3,19 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowRight,
-  Check,
   Layers,
-  ShieldCheck,
+  Sparkles,
+  Maximize2,
+  Compass,
+  CheckCircle2,
 } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
-import { useArea, useQuantities } from '../../../store/useCalculationStore';
+import { useArea, useQuantities, useBudgetResult } from '../../../store/useCalculationStore';
 import { Architectural3DViewer } from '../../../components/3d/Architectural3DViewer';
+import { formatCurrency } from '../../../utils/cn';
 
 const PRESET_PLOTS = [
-  { label: "30' × 40'", length: 40, width: 30, desc: '1,200 sq.ft' },
-  { label: "30' × 50'", length: 50, width: 30, desc: '1,500 sq.ft' },
-  { label: "40' × 60'", length: 60, width: 40, desc: '2,400 sq.ft' },
-  { label: "50' × 80'", length: 80, width: 50, desc: '4,000 sq.ft' },
+  { label: "30' × 40'", length: 40, width: 30, desc: '1,200 sq.ft Plot', baseBua: 1920 },
+  { label: "30' × 50'", length: 50, width: 30, desc: '1,500 sq.ft Plot', baseBua: 2400 },
+  { label: "40' × 60'", length: 60, width: 40, desc: '2,400 sq.ft Plot', baseBua: 3840 },
+  { label: "50' × 80'", length: 80, width: 50, desc: '4,000 sq.ft Plot', baseBua: 6400 },
 ];
 
 export const HeroSection: React.FC = () => {
@@ -24,10 +27,14 @@ export const HeroSection: React.FC = () => {
   const { plotLength, plotWidth, floors, houseType, setPlotDimensions, setHouseConfig, setSelectedPackage } = store;
   const area = useArea();
   const quantities = useQuantities();
+  const budget = useBudgetResult();
 
-  const [activePlotIdx, setActivePlotIdx] = useState(0);
-  const [selectedFloorCount, setSelectedFloorCount] = useState(floors || 2);
-  const buaSqFt = area.totalBUASqFt || 1440;
+  const [activePlotIdx, setActivePlotIdx] = useState(1); // default 30x50
+  const [selectedFloorCount, setSelectedFloorCount] = useState(floors || 3); // G+2
+  const buaSqFt = area.totalBUASqFt || PRESET_PLOTS[activePlotIdx].baseBua;
+  const steelTonnes = quantities.steelTonnes || Number(((buaSqFt * 3.6) / 1000).toFixed(2));
+  const cementBags = quantities.cementBags || Math.round(buaSqFt * 0.45);
+  const totalCost = budget.totalProjectCost || Math.round(buaSqFt * 1867);
 
   // Scroll parallax for hero 3D viewer
   const { scrollY } = useScroll();
@@ -51,68 +58,69 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative bg-[#F8F8F6] min-h-[92vh] flex items-center pt-8 pb-16 lg:pt-14 lg:pb-24 overflow-hidden border-b border-[#E5E7EB]">
+    <section className="relative bg-[#F8F8F6] min-h-[92vh] flex items-center pt-8 pb-16 lg:pt-14 lg:pb-20 overflow-hidden border-b border-[#E5E7EB]">
       {/* Subtle Architectural Blueprint Grid Background */}
-      <div className="absolute inset-0 pointer-events-none arch-grid-bg opacity-45" />
+      <div className="absolute inset-0 pointer-events-none arch-grid-bg opacity-40" />
 
       {/* Subtle Construction Technical Coordinates */}
-      <div className="absolute inset-0 pointer-events-none max-w-7xl mx-auto px-4 hidden lg:block opacity-35">
-        <div className="absolute top-10 left-6 text-[9px] font-mono font-bold text-[#1B3D34]">
-          COORD: 12.9716° N, 77.5946° E &bull; BBMP ZONE II
+      <div className="absolute inset-0 pointer-events-none max-w-7xl mx-auto px-6 hidden lg:block opacity-35 select-none">
+        <div className="absolute top-6 left-6 font-mono text-[9px] font-bold text-[#1B3D34] tracking-widest">
+          SYS.CAD // 12.9716° N, 77.5946° E • BANGALORE ZONE II
         </div>
-        <div className="absolute top-10 right-6 text-[9px] font-mono font-bold text-[#1B3D34]">
-          IS 456:2000 &bull; IS 1786 Fe 550D
+        <div className="absolute top-6 right-6 font-mono text-[9px] font-bold text-[#1B3D34] tracking-widest">
+          IS-456:2000 • IS-1786 Fe550D • NBC 2016
         </div>
-        <div className="absolute bottom-8 left-6 text-[9px] font-mono font-bold text-[#1B3D34]">
-          DATUM 0.000 &bull; PLINTH BEAM +0.60m
+        <div className="absolute bottom-6 left-6 font-mono text-[9px] font-bold text-[#1B3D34] tracking-widest">
+          DATUM ±0.000 • PLINTH BEAM +0.60m • SETBACKS IS-875
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* ── LEFT (col-span-12 lg:col-span-5): Headline & Hero Copy ── */}
+          {/* ── LEFT (col-span-12 lg:col-span-5): Editorial Architectural Statement ── */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 space-y-6 text-left"
           >
-            {/* Eyebrow badge */}
-            <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-[#1B3D34] bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/20 px-3.5 py-1.5 rounded-full shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#F28C28] animate-pulse" />
-              <span>DIGITAL QUANTITY SURVEYOR &bull; BANGALORE</span>
+            {/* Architectural Eyebrow Badge */}
+            <div className="inline-flex items-center gap-2 arch-spec-pill">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28] animate-pulse" />
+              <span>DETERMINISTIC QUANTITY SURVEYING &bull; BANGALORE</span>
             </div>
 
-            {/* Headline */}
-            <div className="space-y-3">
-              <h1 className="heading-display text-4xl sm:text-5xl lg:text-[3.35rem] leading-[1.06] text-[#1B3D34] font-black tracking-tight">
-                Build your home <br />
-                with total clarity.
+            {/* Editorial Heading with Scale Contrast */}
+            <div className="space-y-4">
+              <h1 className="heading-display text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.03] text-[#1B3D34] font-black tracking-tight">
+                Build with <br />
+                <span className="text-[#1B3D34] underline decoration-[#F28C28] decoration-4 underline-offset-8">mathematical</span> <br />
+                clarity.
               </h1>
-              <p className="text-sm sm:text-base text-[#4B5563] font-normal leading-relaxed max-w-md">
-                Plan your plot, spaces, construction standards and exact itemized bill of quantities before you break ground. Quantity-first, formula-driven, bank-ready.
+              <p className="body-lg text-[#4B5563] font-normal leading-relaxed max-w-md">
+                From raw plot dimensions to <strong className="text-[#1B3D34] font-bold">8.64 tonnes of Fe550D steel</strong> and a bank-ready 13-stage BOQ. Calculate your home before you pour the first foundation footing.
               </p>
             </div>
 
-            {/* Quick Interactive Plot Dimension Selectors */}
-            <div className="p-3.5 bg-white rounded-2xl border border-[#E5E7EB] shadow-2xs space-y-3">
+            {/* Interactive Dimensional Controller */}
+            <div className="p-4 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3.5 arch-bracketed">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
-                  Select Plot Size:
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
+                  SELECT PLOT SIZE
                 </span>
-                <span className="text-[10px] font-mono font-bold text-[#F28C28]">
+                <span className="font-mono text-[10px] font-bold text-[#F28C28]">
                   {PRESET_PLOTS[activePlotIdx].desc}
                 </span>
               </div>
 
-              <div className="grid grid-cols-4 gap-1.5">
+              <div className="grid grid-cols-4 gap-2">
                 {PRESET_PLOTS.map((plot, i) => (
                   <button
                     key={plot.label}
                     type="button"
                     onClick={() => handleSelectPlot(i)}
-                    className={`py-1.5 px-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                    className={`py-2 px-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer text-center ${
                       activePlotIdx === i
                         ? 'bg-[#1B3D34] text-white shadow-xs'
                         : 'bg-[#F8F8F6] text-[#4B5563] border border-[#E5E7EB] hover:bg-[#E5E7EB]'
@@ -123,19 +131,19 @@ export const HeroSection: React.FC = () => {
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
-                  Floors:
+              <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
+                  FLOOR CONFIGURATION
                 </span>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {[1, 2, 3, 4].map((fl) => (
                     <button
                       key={fl}
                       type="button"
                       onClick={() => handleSelectFloor(fl)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         selectedFloorCount === fl
-                          ? 'bg-[#F28C28] text-[#1B3D34] shadow-xs'
+                          ? 'bg-[#1B3D34] text-white shadow-xs'
                           : 'bg-[#F8F8F6] text-[#4B5563] hover:bg-[#E5E7EB]'
                       }`}
                     >
@@ -146,47 +154,42 @@ export const HeroSection: React.FC = () => {
               </div>
             </div>
 
-            {/* CTAs */}
+            {/* Primary & Secondary Actions */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
                 type="button"
                 onClick={() => handleStartEstimate('PREMIUM')}
-                className="hutty-btn-primary text-xs sm:text-sm font-bold px-7 py-3.5 rounded-xl shadow-xs cursor-pointer"
+                className="hutty-btn-primary text-sm font-bold px-7 py-3.5 rounded-xl shadow-xs cursor-pointer min-h-[48px]"
               >
-                <span>Choose Package &amp; Start</span>
+                <span>Launch Architectural Calculator</span>
                 <ArrowRight className="w-4 h-4 text-[#F28C28]" />
               </button>
 
               <button
                 type="button"
-                onClick={() => {
-                  document.querySelector('#packages')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="hutty-btn-secondary text-xs sm:text-sm font-semibold px-5 py-3.5 rounded-xl cursor-pointer"
+                onClick={() => navigate('/consult')}
+                className="hutty-btn-secondary text-sm font-semibold px-5 py-3.5 rounded-xl cursor-pointer min-h-[48px]"
               >
-                <Layers className="w-3.5 h-3.5 text-[#1B3D34]" />
-                <span>Explore 3 Standards</span>
+                <Compass className="w-4 h-4 text-[#1B3D34]" />
+                <span>Consult an Expert (₹1,499)</span>
               </button>
             </div>
 
-            {/* Proof Points */}
-            <div className="pt-3 border-t border-[#E5E7EB] grid grid-cols-3 gap-2 text-left">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
-                <span className="text-[11px] font-semibold text-[#4B5563]">BBMP Compliant</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
-                <span className="text-[11px] font-semibold text-[#4B5563]">Steel &amp; Cement BOQ</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
-                <span className="text-[11px] font-semibold text-[#4B5563]">Zero Multipliers</span>
-              </div>
+            {/* Technical Verification Strip */}
+            <div className="pt-4 border-t border-[#E5E7EB] flex items-center justify-between text-[11px] text-[#4B5563] font-mono">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#F28C28]" /> 100% Deterministic Physics
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#F28C28]" /> Zero Arbitrary Multipliers
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#F28C28]" /> Bank-Ready BOQ
+              </span>
             </div>
           </motion.div>
 
-          {/* ── RIGHT (col-span-12 lg:col-span-7): INTERACTIVE 3D MODEL & TAKEOFF ANNOTATIONS ── */}
+          {/* ── RIGHT (col-span-12 lg:col-span-7): Architectural Visualization & Data HUD ── */}
           <motion.div
             style={{ scale: heroScale, opacity: heroOpacity }}
             initial={{ opacity: 0, scale: 0.97 }}
@@ -194,62 +197,108 @@ export const HeroSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 relative"
           >
-            <div className="relative bg-white rounded-2xl border border-[#E5E7EB] p-3.5 sm:p-4 shadow-sm tactile-card">
+            <div className="relative bg-white rounded-3xl border border-[#E5E7EB] p-4 sm:p-5 shadow-sm tactile-card arch-bracketed">
               
-              {/* Architectural Technical Bar */}
-              <div className="px-3 py-2 flex items-center justify-between border-b border-[#E5E7EB] mb-2 text-left">
+              {/* CAD Technical Title Bar */}
+              <div className="px-3 py-2.5 flex items-center justify-between border-b border-[#E5E7EB] mb-3 text-left">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#1B3D34] animate-pulse" />
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1B3D34]">
-                    LIVE CANONICAL 3D RECONSTRUCTION
+                    CANONICAL 3D MASSING &bull; {plotWidth || 30}' × {plotLength || 50}'
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono font-bold text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
-                    {plotWidth || 30}' × {plotLength || 40}' PLOT
+                    {selectedFloorCount === 1 ? 'GROUND' : `G+${selectedFloorCount - 1} DUPLEX`}
                   </span>
-                  <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded border border-[#1B3D34]/15">
-                    {selectedFloorCount === 1 ? 'GROUND' : `G+${selectedFloorCount - 1}`}
+                  <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded border border-[#1B3D34]/15">
+                    BUA: {buaSqFt.toLocaleString()} SQ.FT
                   </span>
                 </div>
               </div>
 
-              {/* 3D Model Viewport Area */}
-              <div className="relative w-full h-80 sm:h-96 lg:h-[420px] xl:h-[460px] rounded-xl overflow-hidden bg-[#112821]">
+              {/* 3D Model Viewport Area with Blueprint Lines */}
+              <div className="relative w-full h-80 sm:h-96 lg:h-[440px] rounded-2xl overflow-hidden bg-[#112821] border border-[#1B3D34]/20 shadow-inner">
                 <Architectural3DViewer
-                  plotLength={plotLength || 40}
+                  plotLength={plotLength || 50}
                   plotWidth={plotWidth || 30}
-                  floors={selectedFloorCount || 2}
+                  floors={selectedFloorCount || 3}
                   className="w-full h-full"
                 />
-              </div>
 
-              {/* Bottom Quick Metrics Strip */}
-              <div className="mt-3 grid grid-cols-3 gap-2 px-1 pb-1">
-                <div className="bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E5E7EB] text-left">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
-                    TOTAL BUA
+                {/* Floating Architectural Data HUD in 3D canvas */}
+                <div className="absolute top-3 left-3 pointer-events-none bg-[#112821]/85 backdrop-blur-md border border-white/15 px-3 py-2 rounded-xl text-left text-white shadow-lg">
+                  <span className="font-mono text-[9px] uppercase tracking-wider text-[#F28C28] font-bold block">
+                    ESTIMATED COST PICTURE
                   </span>
-                  <span className="text-sm font-extrabold text-[#1B3D34] block font-heading tabular-nums">
-                    {buaSqFt.toLocaleString()} sq.ft
+                  <span className="font-heading text-lg sm:text-xl font-extrabold text-white block tabular-nums">
+                    {formatCurrency(totalCost)}
+                  </span>
+                  <span className="font-mono text-[9px] text-white/60 block">
+                    Effective: ~₹{Math.round(totalCost / buaSqFt)}/sqft
                   </span>
                 </div>
 
-                <div className="bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E5E7EB] text-left">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
+                <div className="absolute bottom-3 right-3 pointer-events-none bg-[#112821]/85 backdrop-blur-md border border-white/15 px-3 py-2 rounded-xl text-right text-white shadow-lg">
+                  <span className="font-mono text-[9px] uppercase tracking-wider text-white/60 font-bold block">
                     STRUCTURAL STEEL
                   </span>
-                  <span className="text-sm font-extrabold text-[#1B3D34] block font-heading tabular-nums">
-                    {quantities.steelTonnes || 4.32} Tonnes
+                  <span className="font-mono text-base font-bold text-white block tabular-nums">
+                    {steelTonnes} TONNES
+                  </span>
+                  <span className="font-mono text-[9px] text-[#F28C28] block">
+                    Fe550D TMT Primary
+                  </span>
+                </div>
+              </div>
+
+              {/* Bottom Architectural Specification Data Strip */}
+              <div className="mt-3.5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#4B5563] block">
+                    01 // BUA
+                  </span>
+                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                    {buaSqFt.toLocaleString()} sq.ft
+                  </span>
+                  <span className="text-[10px] text-[#4B5563] block font-mono">
+                    Super Built-Up
                   </span>
                 </div>
 
-                <div className="bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E5E7EB] text-left">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#4B5563] block">
-                    BOQ HEADS
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#4B5563] block">
+                    02 // STEEL
                   </span>
-                  <span className="text-sm font-extrabold text-[#1B3D34] block font-heading">
+                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                    {steelTonnes} T
+                  </span>
+                  <span className="text-[10px] text-[#4B5563] block font-mono">
+                    IS-1786 Fe550D
+                  </span>
+                </div>
+
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#4B5563] block">
+                    03 // CEMENT
+                  </span>
+                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                    {cementBags.toLocaleString()} Bags
+                  </span>
+                  <span className="text-[10px] text-[#4B5563] block font-mono">
+                    Grade 53 OPC/PPC
+                  </span>
+                </div>
+
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#4B5563] block">
+                    04 // BOQ
+                  </span>
+                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
                     13 Trade Heads
+                  </span>
+                  <span className="text-[10px] text-[#4B5563] block font-mono">
+                    Bank-Appraisal Ready
                   </span>
                 </div>
               </div>

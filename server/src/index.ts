@@ -20,31 +20,46 @@ app.use(
       // Allow requests with no origin (curl, mobile apps, server-to-server)
       if (!origin) return callback(null, true);
 
-      // Wildcard enabled
-      if (configuredOrigins.includes('*')) return callback(null, true);
+      // In non-production, allow wildcard if configured
+      if (ENV.NODE_ENV !== 'production' && configuredOrigins.includes('*')) {
+        return callback(null, true);
+      }
 
-      // Explicitly allow Hutty production Vercel frontend and any Vercel preview branch
-      if (
+      // Explicitly allow Hutty production domains, Vercel frontend, and configured origins
+      const isAllowedDomain =
+        origin === 'https://hutty.in' ||
+        origin === 'https://www.hutty.in' ||
         origin === 'https://cost-calculator-ten-kappa.vercel.app' ||
         origin.endsWith('.vercel.app') ||
-        configuredOrigins.includes(origin)
-      ) {
+        configuredOrigins.includes(origin);
+
+      if (isAllowedDomain) {
         return callback(null, true);
       }
 
       // Local development origins
-      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      if (
+        ENV.NODE_ENV !== 'production' &&
+        (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))
+      ) {
         return callback(null, true);
       }
 
-      return callback(null, false);
+      return callback(new Error(`CORS origin not allowed: ${origin}`), false);
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Razorpay-Signature', 'X-Idempotency-Key'],
   })
 );
-app.use(express.json({ limit: '2mb' }));
+app.use(
+  express.json({
+    limit: '2mb',
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf.toString();
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(morgan('dev'));
 

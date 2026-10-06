@@ -85,7 +85,11 @@ export type AdminTab =
   | 'versions-history'
   | 'formula-library'
   | 'steel'
-  | 'cement-aggregates';
+  | 'cement-aggregates'
+  | 'admin-consultants'
+  | 'admin-consultation-requests'
+  | 'pricing-tiers'
+  | 'pricing-purchases';
 
 interface AdminStoreState {
   // Phase 2E Mode Toggle

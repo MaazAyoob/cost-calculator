@@ -247,53 +247,113 @@ export const ReportPage: React.FC = () => {
           </div>
         )}
 
+        {/* ── GRAND ARCHITECTURAL HERO BANNER ── */}
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs space-y-6 arch-bracketed print:hidden text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
+            <div className="space-y-1">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">
+                YOUR HOME &bull; ESTIMATED CONSTRUCTION PICTURE
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading">
+                {result.input?.houseType || 'Residential'} Pre-Construction Dossier
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-3 py-1 rounded-full border border-[#1B3D34]/15">
+                PROJECT: {projectId}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+            <div className="md:col-span-2 space-y-1">
+              <span className="font-mono text-xs text-[#4B5563] block uppercase tracking-wider">
+                TOTAL ESTIMATED CONSTRUCTION BUDGET
+              </span>
+              <div className="arch-stat-hero text-[#1B3D34]">
+                {formatCurrency(budget.totalProjectCost || budget.directConstructionBudget)}
+              </div>
+              <p className="text-xs text-[#4B5563]">
+                Includes civil structural frame, material finishes, MEP services, and verified statutory margins.
+              </p>
+            </div>
+
+            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                GROSS BUILT-UP AREA
+              </span>
+              <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                {area.totalBUASqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+              </span>
+              <span className="text-[11px] font-mono text-[#1B3D34]">
+                Effective: ₹{(budget.costPerSqFt || budget.directCostPerSqFt).toLocaleString()} / sq.ft
+              </span>
+            </div>
+
+            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                ESTIMATED TIMELINE
+              </span>
+              <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                {timeline.totalMonths} <span className="text-xs font-normal text-[#4B5563]">Months</span>
+              </span>
+              <span className="text-[11px] font-mono text-[#F28C28] font-bold">
+                {specificationTier?.toUpperCase() || 'PREMIUM'} STANDARDS
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Document Sheet */}
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 sm:p-12 shadow-xs space-y-8 print:border-none print:shadow-none print:p-0">
+        <div className="bg-white border border-[#E5E7EB] rounded-3xl p-8 sm:p-12 shadow-xs space-y-10 print:border-none print:shadow-none print:p-0 arch-bracketed">
 
           {/* 1. Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b-2 border-[#1B3D34]">
             <div className="space-y-1">
               <HuttyLogo variant="full" width={140} />
-              <p className="text-xs text-[#4B5563] mt-1">
+              <p className="text-xs text-[#4B5563] mt-1 font-mono">
                 {isUnlocked ? 'Authoritative Construction Dossier & BOQ' : 'High-Level Construction Cost Estimate'}
               </p>
             </div>
 
-            <div className="text-xs text-left sm:text-right space-y-0.5 text-[#4B5563]">
+            <div className="text-xs text-left sm:text-right space-y-0.5 text-[#4B5563] font-mono">
               <p><strong className="text-[#1B3D34]">Project ID:</strong> {projectId}</p>
               <p><strong className="text-[#1B3D34]">Date:</strong> {currentDate}</p>
               <p><strong className="text-[#1B3D34]">Specification:</strong> {(specificationTier || 'Premium').toUpperCase()}</p>
               <p><strong className="text-[#1B3D34]">Prepared For:</strong> {preparedFor || 'Residential Client'}</p>
-              <p><strong className="text-[#1B3D34]">Rate Master:</strong> {report?.rateSourceMetadata?.datasetVersion || result.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'} ({report?.rateSourceMetadata?.isLive ? 'Live API' : '2026-Q1 Fallback'})</p>
+              <p><strong className="text-[#1B3D34]">Rate Master:</strong> {report?.rateSourceMetadata?.datasetVersion || result.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'}</p>
             </div>
           </div>
 
-          {/* 2. Project Geometry & Summary (Direct Construction Budget & Breakup) */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
-                1. Project Geometry &amp; Direct Construction Budget
-              </h2>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[rgba(27,61,52,0.08)] text-[#1B3D34]">
+          {/* 01. WHAT WE BUILD: Project Geometry & Summary */}
+          <section className="space-y-4 text-left">
+            <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xl font-black text-[#F28C28]">01</span>
+                <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                  WHAT WE BUILD &bull; PROJECT GEOMETRY &amp; SCOPE
+                </h2>
+              </div>
+              <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded bg-[rgba(27,61,52,0.08)] text-[#1B3D34]">
                 {result.input?.contractorMode === 'contractor' ? 'Contractor Build' : 'Independent Self-Build'}
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-              <div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                 <span className="text-[#4B5563] block">Direct Construction Budget</span>
-                <span className="text-base font-extrabold text-[#1B3D34] font-heading">{formatCurrency(budget.directConstructionBudget || budget.totalProjectCost)}</span>
+                <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">{formatCurrency(budget.directConstructionBudget || budget.totalProjectCost)}</span>
               </div>
-              <div>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                 <span className="text-[#4B5563] block">Built-Up Area (BUA)</span>
-                <span className="text-base font-bold text-[#1B3D34] font-heading">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
+                <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
               </div>
-              <div>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                 <span className="text-[#4B5563] block">Direct Execution Rate</span>
-                <span className="text-base font-bold text-[#1B3D34] font-heading">₹{(budget.directCostPerSqFt || budget.costPerSqFt).toLocaleString()} / sq.ft</span>
+                <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">₹{(budget.directCostPerSqFt || budget.costPerSqFt).toLocaleString()} / sq.ft</span>
               </div>
-              <div>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                 <span className="text-[#4B5563] block">Estimated Timeline</span>
-                <span className="text-base font-bold text-[#1B3D34] font-heading">{timeline.totalMonths} Months</span>
+                <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">{timeline.totalMonths} Months</span>
               </div>
             </div>
 
@@ -367,37 +427,40 @@ export const ReportPage: React.FC = () => {
             </div>
           </section>
 
-          {/* ── SECTION A: WHAT WE BUILD (Works BOQ) ── */}
+          {/* ── SECTION 01: WHAT WE BUILD (Works BOQ) ── */}
           {Array.isArray(boq) && boq.length > 0 && (
-            <section className="space-y-3">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
-                  SECTION A — WHAT WE BUILD (Construction Works BOQ)
-                </h2>
-                <span className="text-[10px] text-[#4B5563] font-mono">{boq.length} line items</span>
+            <section className="space-y-4">
+              <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xl font-black text-[#F28C28]">01</span>
+                  <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                    WHAT WE BUILD &bull; CONSTRUCTION WORKS BOQ
+                  </h2>
+                </div>
+                <span className="text-xs text-[#4B5563] font-mono font-bold">{boq.length} Line Items</span>
               </div>
               
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                    <th className="py-2 font-bold uppercase w-10">Sl</th>
-                    <th className="py-2 font-bold uppercase">Activity / Work Description</th>
-                    <th className="py-2 font-bold uppercase text-right">Quantity</th>
-                    <th className="py-2 font-bold uppercase text-right">Rate</th>
-                    <th className="py-2 font-bold uppercase text-right">Amount</th>
+                  <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                    <th className="py-2.5 font-bold uppercase w-10">Sl</th>
+                    <th className="py-2.5 font-bold uppercase">Activity / Work Description</th>
+                    <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
+                    <th className="py-2.5 font-bold uppercase text-right">Rate</th>
+                    <th className="py-2.5 font-bold uppercase text-right">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E7EB]">
                   {(isUnlocked ? boq : boq.slice(0, 4)).map((item) => (
                     <tr key={item.code || item.slNo}>
-                      <td className="py-2 font-mono text-[#4B5563]">{item.slNo}</td>
-                      <td className="py-2 text-[#1B3D34] font-medium">
+                      <td className="py-2.5 font-mono text-[#4B5563]">{item.slNo}</td>
+                      <td className="py-2.5 text-[#1B3D34] font-medium">
                         {item.description}
                         <span className="block text-[10px] text-[#4B5563] font-normal">{item.brand} &bull; {item.remarks}</span>
                       </td>
-                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">{item.quantity} {item.unit}</td>
-                      <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{item.unitRate.toLocaleString()}</td>
-                      <td className="py-2 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(item.amount)}</td>
+                      <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">{item.quantity} {item.unit}</td>
+                      <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{item.unitRate.toLocaleString()}</td>
+                      <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(item.amount)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -405,7 +468,7 @@ export const ReportPage: React.FC = () => {
 
               {/* Free Teaser for Remaining Items */}
               {!isUnlocked && boq.length > 4 && (
-                <div className="py-3 px-4 bg-[#F8F8F6] border border-dashed border-[#1B3D34]/30 rounded-xl flex items-center justify-between text-xs">
+                <div className="py-3.5 px-4 bg-[#F8F8F6] border border-dashed border-[#1B3D34]/30 rounded-2xl flex items-center justify-between text-xs">
                   <span className="text-[#4B5563] font-medium">
                     + {boq.length - 4} additional detailed work line items locked in free estimate preview
                   </span>
@@ -424,36 +487,39 @@ export const ReportPage: React.FC = () => {
           {/* ── PAID REPORT SECTIONS (LOCKED OR UNLOCKED) ── */}
           {isUnlocked ? (
             <>
-              {/* SECTION B: WHAT WE CONSUME */}
+              {/* SECTION 02: WHAT WE CONSUME */}
               {Array.isArray(materialSchedule) && materialSchedule.length > 0 && (
-                <section className="space-y-3">
-                  <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
-                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
-                      SECTION B — WHAT WE CONSUME (Material Schedule)
-                    </h2>
-                    <span className="text-[10px] text-[#4B5563] font-mono">{materialSchedule.length} physical materials</span>
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xl font-black text-[#F28C28]">02</span>
+                      <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                        WHAT WE CONSUME &bull; MATERIAL TAKEOFF SCHEDULE
+                      </h2>
+                    </div>
+                    <span className="text-xs text-[#4B5563] font-mono font-bold">{materialSchedule.length} Physical Materials</span>
                   </div>
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                        <th className="py-2 font-bold uppercase w-10">Sl</th>
-                        <th className="py-2 font-bold uppercase">Physical Material &amp; Brand</th>
-                        <th className="py-2 font-bold uppercase text-right">Quantity</th>
-                        <th className="py-2 font-bold uppercase text-right">Unit Rate</th>
-                        <th className="py-2 font-bold uppercase text-right">Total</th>
+                      <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                        <th className="py-2.5 font-bold uppercase w-10">Sl</th>
+                        <th className="py-2.5 font-bold uppercase">Physical Material &amp; Brand</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Unit Rate</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Total</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E5E7EB]">
                       {materialSchedule.map((mat) => (
                         <tr key={mat.slNo}>
-                          <td className="py-2 font-mono text-[#4B5563]">{mat.slNo}</td>
-                          <td className="py-2 text-[#1B3D34] font-medium">
+                          <td className="py-2.5 font-mono text-[#4B5563]">{mat.slNo}</td>
+                          <td className="py-2.5 text-[#1B3D34] font-medium">
                             {mat.material}
                             <span className="block text-[10px] text-[#4B5563] font-normal">{mat.brand} &bull; {mat.specification}</span>
                           </td>
-                          <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">{mat.quantity.toLocaleString()} {mat.unit}</td>
-                          <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{mat.unitRate.toLocaleString()}</td>
-                          <td className="py-2 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(mat.amount)}</td>
+                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">{mat.quantity.toLocaleString()} {mat.unit}</td>
+                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{mat.unitRate.toLocaleString()}</td>
+                          <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(mat.amount)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -461,38 +527,41 @@ export const ReportPage: React.FC = () => {
                 </section>
               )}
 
-              {/* SECTION C: WHAT WE INSTALL */}
+              {/* SECTION 03: WHAT WE INSTALL */}
               {Array.isArray(fixtureSchedule) && fixtureSchedule.length > 0 && (
-                <section className="space-y-3">
-                  <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
-                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
-                      SECTION C — WHAT WE INSTALL (Fixtures &amp; Fittings Schedule)
-                    </h2>
-                    <span className="text-[10px] text-[#4B5563] font-mono">{fixtureSchedule.length} installed units</span>
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xl font-black text-[#F28C28]">03</span>
+                      <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                        WHAT WE INSTALL &bull; FIXTURES &amp; FITTINGS SCHEDULE
+                      </h2>
+                    </div>
+                    <span className="text-xs text-[#4B5563] font-mono font-bold">{fixtureSchedule.length} Installed Units</span>
                   </div>
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                        <th className="py-2 font-bold uppercase w-10">Sl</th>
-                        <th className="py-2 font-bold uppercase">Installed Fixture / Equipment</th>
-                        <th className="py-2 font-bold uppercase">Location</th>
-                        <th className="py-2 font-bold uppercase text-right">Quantity</th>
-                        <th className="py-2 font-bold uppercase text-right">Rate</th>
-                        <th className="py-2 font-bold uppercase text-right">Amount</th>
+                      <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                        <th className="py-2.5 font-bold uppercase w-10">Sl</th>
+                        <th className="py-2.5 font-bold uppercase">Installed Fixture / Equipment</th>
+                        <th className="py-2.5 font-bold uppercase">Location</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Rate</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Amount</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E5E7EB]">
                       {fixtureSchedule.map((fix) => (
                         <tr key={fix.slNo}>
-                          <td className="py-2 font-mono text-[#4B5563]">{fix.slNo}</td>
-                          <td className="py-2 text-[#1B3D34] font-medium">
+                          <td className="py-2.5 font-mono text-[#4B5563]">{fix.slNo}</td>
+                          <td className="py-2.5 text-[#1B3D34] font-medium">
                             {fix.item}
                             <span className="block text-[10px] text-[#4B5563] font-normal">{fix.brand} &bull; {fix.specification}</span>
                           </td>
-                          <td className="py-2 text-[#4B5563] text-[11px]">{fix.location}</td>
-                          <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">{fix.quantity} {fix.unit}</td>
-                          <td className="py-2 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{fix.unitRate.toLocaleString()}</td>
-                          <td className="py-2 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(fix.amount)}</td>
+                          <td className="py-2.5 text-[#4B5563] text-[11px]">{fix.location}</td>
+                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">{fix.quantity} {fix.unit}</td>
+                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{fix.unitRate.toLocaleString()}</td>
+                          <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(fix.amount)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -500,26 +569,53 @@ export const ReportPage: React.FC = () => {
                 </section>
               )}
 
-              {/* SECTION D: WHAT IT COSTS */}
-              <section className="space-y-3">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
-                  SECTION D — WHAT IT COSTS (Trade Breakdown &amp; Commercial Additions)
-                </h2>
+              {/* SECTION 04: WHAT IT COSTS */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xl font-black text-[#F28C28]">04</span>
+                    <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                      WHAT IT COSTS &bull; TRADE ALLOCATION &amp; COMMERCIAL BUDGET
+                    </h2>
+                  </div>
+                  <span className="text-xs text-[#4B5563] font-mono font-bold">100% RECONCILED</span>
+                </div>
+
+                {/* Proportional Trade Allocation Horizontal Bar */}
+                <div className="space-y-2 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+                    WHERE YOUR MONEY GOES (PROPORTIONAL DISTRIBUTION)
+                  </span>
+                  <div className="h-6 w-full rounded-xl overflow-hidden flex border border-[#E5E7EB] bg-white p-0.5">
+                    {budget.heads.map((head, idx) => (
+                      <div
+                        key={head.id}
+                        style={{
+                          width: `${Math.max(4, head.percentage)}%`,
+                          backgroundColor: idx % 2 === 0 ? '#1B3D34' : '#F28C28',
+                        }}
+                        className="h-full first:rounded-l-lg last:rounded-r-lg opacity-90 transition-all hover:opacity-100"
+                        title={`${head.name}: ${head.percentage}%`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
-                        <th className="py-2 font-bold uppercase">Trade Category</th>
-                        <th className="py-2 font-bold uppercase text-right">Amount (INR)</th>
-                        <th className="py-2 font-bold uppercase text-right">% of Total</th>
+                      <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                        <th className="py-2.5 font-bold uppercase">Trade Category</th>
+                        <th className="py-2.5 font-bold uppercase text-right">Amount (INR)</th>
+                        <th className="py-2.5 font-bold uppercase text-right">% of Total</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E5E7EB]">
                       {budget.heads.map((head) => (
                         <tr key={head.id}>
-                          <td className="py-2 font-medium text-[#1B3D34]">{head.name}</td>
-                          <td className="py-2 text-right font-bold text-[#1B3D34] font-mono">{formatCurrency(head.allocatedAmount)}</td>
-                          <td className="py-2 text-right text-[#4B5563] font-mono">{head.percentage}%</td>
+                          <td className="py-2.5 font-medium text-[#1B3D34]">{head.name}</td>
+                          <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono">{formatCurrency(head.allocatedAmount)}</td>
+                          <td className="py-2.5 text-right font-mono text-[#4B5563]">{head.percentage}%</td>
                         </tr>
                       ))}
                     </tbody>
@@ -539,7 +635,7 @@ export const ReportPage: React.FC = () => {
             <div className="p-8 bg-[#F8F8F6] rounded-2xl border-2 border-dashed border-[#1B3D34]/30 space-y-6 text-center">
               <div className="space-y-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] bg-white px-3 py-1 rounded-md border border-[#E5E7EB] inline-block">
-                  WHAT AM I PAYING FOR? &bull; ₹4,999
+                  WHAT AM I PAYING FOR? &bull; ₹499
                 </span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading">
                   Want to know exactly where the money goes?
@@ -581,7 +677,7 @@ export const ReportPage: React.FC = () => {
                   className="hutty-btn-primary px-8 py-3.5 rounded-xl text-xs sm:text-sm font-bold shadow-xs cursor-pointer inline-flex items-center gap-2"
                 >
                   <Lock className="w-4 h-4 text-[#F28C28]" />
-                  <span>Unlock Detailed Report — ₹4,999</span>
+                  <span>Unlock Detailed Report — ₹499</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 

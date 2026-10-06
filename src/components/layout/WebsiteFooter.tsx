@@ -53,7 +53,15 @@ export const WebsiteFooter: React.FC = () => {
                     onClick={handleStartEstimate}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    1. What should it cost? (Free) <ArrowUpRight className="w-3 h-3 text-[#F28C28]" />
+                    1. Instant Estimate (Free) <ArrowUpRight className="w-3 h-3 text-[#F28C28]" />
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
+                  >
+                    2. Quick Estimate (₹99)
                   </button>
                 </li>
                 <li>
@@ -61,23 +69,15 @@ export const WebsiteFooter: React.FC = () => {
                     onClick={() => navigate('/report')}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    2. What am I paying for? (₹4,999)
+                    3. Detailed Estimate & BOQ (₹499)
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => setShowQuoteModal(true)}
+                    onClick={() => navigate('/consult')}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    3. Should I sign this? (₹8,999)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => setShowTrackModal(true)}
-                    className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
-                  >
-                    4. Where is my money going? (Sub)
+                    4. Expert Consultation (₹1,499)
                   </button>
                 </li>
               </ul>
@@ -91,26 +91,35 @@ export const WebsiteFooter: React.FC = () => {
               <ul className="space-y-2 text-xs text-white/70">
                 <li>
                   <button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={handleStartEstimate}
                     className="hover:text-white transition-colors cursor-pointer text-left"
                   >
-                    Project Dashboard
+                    Calculate Cost
                   </button>
                 </li>
                 <li>
-                  <a href="#how-it-works" className="hover:text-white transition-colors">
-                    Construction Pipeline
-                  </a>
+                  <button
+                    onClick={() => navigate('/consult')}
+                    className="hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    Book Consultant
+                  </button>
                 </li>
                 <li>
-                  <a href="#standards" className="hover:text-white transition-colors">
-                    Engineering Standards
-                  </a>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    Pricing &amp; Plans
+                  </button>
                 </li>
                 <li>
-                  <a href="#packages" className="hover:text-white transition-colors">
-                    Specification Matrix
-                  </a>
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    My Project Dashboard
+                  </button>
                 </li>
               </ul>
             </div>

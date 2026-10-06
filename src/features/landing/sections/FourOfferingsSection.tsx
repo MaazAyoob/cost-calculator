@@ -28,7 +28,7 @@ export const FourOfferingsSection: React.FC = () => {
     {
       num: '02',
       question: 'What am I paying for?',
-      price: '₹4,999',
+      price: '₹499',
       purpose: 'Detailed cost + BOQ report',
       bestFor: 'Understanding actual construction costs',
       cta: 'SHOW ME',

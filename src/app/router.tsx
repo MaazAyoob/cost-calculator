@@ -22,6 +22,15 @@ const SettingsPage = lazy(() =>
 const AdminPage = lazy(() =>
   import('../features/admin/AdminPage').then((m) => ({ default: m.AdminPage }))
 );
+const ConsultationPage = lazy(() =>
+  import('../features/consultation/ConsultationPage').then((m) => ({ default: m.ConsultationPage }))
+);
+const ConsultantProfilePage = lazy(() =>
+  import('../features/consultation/ConsultantProfilePage').then((m) => ({ default: m.ConsultantProfilePage }))
+);
+const PricingPage = lazy(() =>
+  import('../features/pricing/PricingPage').then((m) => ({ default: m.PricingPage }))
+);
 const NotFoundPage = lazy(() =>
   import('../features/error/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
@@ -114,6 +123,36 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
               <AdminPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'consult',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <ConsultationPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'consult/:slug',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <ConsultantProfilePage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'pricing',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <PricingPage />
             </Suspense>
           </ErrorBoundary>
         ),

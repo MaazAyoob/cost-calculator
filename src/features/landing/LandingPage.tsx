@@ -1,17 +1,16 @@
 import React from 'react';
 import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
-import { FourOfferingsSection } from './sections/FourOfferingsSection';
-import { TrustStatsSection } from './sections/TrustStatsSection';
-import { LiveMaterialPricesSection } from './sections/LiveMaterialPricesSection';
-import { WhyPlanningSection } from './sections/WhyPlanningSection';
-import { CalculatorSolutionsSection } from './sections/CalculatorSolutionsSection';
-import { InteractiveDemoSection } from './sections/InteractiveDemoSection';
-import { FeatureShowcaseSection } from './sections/FeatureShowcaseSection';
+import { CostAmbiguityTrapSection } from './sections/CostAmbiguityTrapSection';
+import { VisualStorytellingSection } from './sections/VisualStorytellingSection';
+import { SignatureMeasurementSection } from './sections/SignatureMeasurementSection';
+import { SignatureConstructionBreakdownSection } from './sections/SignatureConstructionBreakdownSection';
+import { SignatureCostMapSection } from './sections/SignatureCostMapSection';
+import { SignaturePlanningTimelineSection } from './sections/SignaturePlanningTimelineSection';
+import { SignatureExpertSection } from './sections/SignatureExpertSection';
+import { SignaturePricingSection } from './sections/SignaturePricingSection';
 import { EngineeringStandardsSection } from './sections/EngineeringStandardsSection';
-import { PackagesSection } from './sections/PackagesSection';
-import { ProjectGallerySection } from './sections/ProjectGallerySection';
-import { TestimonialsSection } from './sections/TestimonialsSection';
+import { LiveMaterialPricesSection } from './sections/LiveMaterialPricesSection';
 import { FaqSection } from './sections/FaqSection';
 import { FinalCtaSection } from './sections/FinalCtaSection';
 
@@ -23,46 +22,43 @@ export const LandingPage: React.FC = () => {
         description="Plan your plot, spaces, materials and construction cost before you build with Hutty. Deterministic, quantity-based estimates and bank-ready BOQ."
       />
 
-      {/* 01. Hero */}
+      {/* 01. Hero — Architectural Split Statement + Interactive 3D Massing HUD */}
       <HeroSection />
 
-      {/* 01b. 4 Core Offerings */}
-      <FourOfferingsSection />
+      {/* 02. The Problem — The Cost Ambiguity Trap & Why Square-Foot Rates Fail */}
+      <CostAmbiguityTrapSection />
 
-      {/* 02. Trust Strip */}
-      <TrustStatsSection />
+      {/* 03. Hutty's Approach — The 7-Stage Progression Flow (Plot to Total BOQ) */}
+      <VisualStorytellingSection />
 
-      {/* 02b. Public Live Material Prices */}
-      <LiveMaterialPricesSection />
+      {/* 04. Signature A — Architectural Measurement & Setbacks (Large BUA) */}
+      <SignatureMeasurementSection />
 
-      {/* 03. Why Planning */}
-      <WhyPlanningSection />
+      {/* 05. Signature B — Construction Breakdown (What Your Home Consumes: Steel, Cement, Sand) */}
+      <SignatureConstructionBreakdownSection />
 
-      {/* 04. How It Works */}
-      <CalculatorSolutionsSection />
+      {/* 06. Signature C — The Cost Map (Proportional Trade Allocation & Rupee Distribution) */}
+      <SignatureCostMapSection />
 
-      {/* 05. Live Interactive Demo */}
-      <InteractiveDemoSection />
+      {/* 07. Signature D — Homeowner Roadmap (Plan, Measure, Estimate, Review, Build) */}
+      <SignaturePlanningTimelineSection />
 
-      {/* 06. Features Showcase */}
-      <FeatureShowcaseSection />
+      {/* 08. Signature E — Independent Expert Consultation (Flat ₹1,499) */}
+      <SignatureExpertSection />
 
-      {/* 07. Dark Technical Engineering Standards */}
+      {/* 09. Commercial Pricing — Asymmetric Hierarchy (Spotlight ₹499 BOQ Dossier) */}
+      <SignaturePricingSection />
+
+      {/* 10. Engineering Standards — IS 456:2000, IS 1786 Fe550D & NBC 2016 Standards */}
       <EngineeringStandardsSection />
 
-      {/* 08. Construction Packages Matrix */}
-      <PackagesSection />
+      {/* 11. Live Material Trackers — Bangalore Verified Brand Retail Prices */}
+      <LiveMaterialPricesSection />
 
-      {/* 09. Architectural Projects Gallery */}
-      <ProjectGallerySection />
-
-      {/* 10. Large Testimonial */}
-      <TestimonialsSection />
-
-      {/* 11. Minimal FAQ Accordion */}
+      {/* 12. Architectural Planning FAQ */}
       <FaqSection />
 
-      {/* 12. Final Action CTA */}
+      {/* 13. Final Action Callout */}
       <FinalCtaSection />
     </div>
   );

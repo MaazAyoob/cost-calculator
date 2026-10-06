@@ -42,6 +42,8 @@ import {
   Clock,
   ArrowUpRight,
   ArrowDownRight,
+  ChevronDown,
+  ChevronRight,
   AlertCircle,
   FileSpreadsheet,
   CheckSquare,
@@ -86,6 +88,10 @@ import { TradeSections } from './sections/TradeSections';
 import { CalculationMethodsSection } from './sections/CalculationMethodsSection';
 import { TestCalculatorSection } from './sections/TestCalculatorSection';
 import { FormulaLibrarySection } from './sections/FormulaLibrarySection';
+import { AdminConsultantsSection } from './consultation/AdminConsultantsSection';
+import { AdminConsultationsSection } from './consultation/AdminConsultationsSection';
+import { AdminPricingTiersSection } from './pricing/AdminPricingTiersSection';
+import { AdminPricingPurchasesSection } from './pricing/AdminPricingPurchasesSection';
 
 export const AdminPage: React.FC = () => {
   const {
@@ -471,563 +477,772 @@ export const AdminPage: React.FC = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-[#1B3D34] pb-24">
-      {/* ── HEADER & USER STATUS ── */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">Hutty Admin Panel</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
-              Enterprise v2.6
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Deterministic Rate Master · Auto Price Updates · Product Analytics · Account Security
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="text-right hidden sm:block">
-            <span className="text-xs font-bold text-slate-800 block">{adminUser?.name || 'Hutty System Admin'}</span>
-            <span className="text-[11px] font-mono text-slate-500 block">{adminUser?.email || 'admin@hutty.in'}</span>
-          </div>
-          <button
-            type="button"
-            onClick={logout}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors cursor-pointer"
-            title="Sign out of Admin Panel"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ── ALERTS / FEEDBACK ── */}
-      {error && (
-        <div className="p-4 bg-red-50 text-red-800 text-xs rounded-2xl border border-red-200 flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
-            <span>{error}</span>
-          </div>
-          <button onClick={clearMessages} className="text-red-500 hover:text-red-800 font-bold">×</button>
-        </div>
-      )}
-      {successMessage && (
-        <div className="p-4 bg-emerald-50 text-emerald-800 text-xs rounded-2xl border border-emerald-200 flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{successMessage}</span>
-          </div>
-          <button onClick={clearMessages} className="text-emerald-500 hover:text-emerald-800 font-bold">×</button>
-        </div>
-      )}
-
-      {/* ── PHASE 2E: 6 COLLAPSIBLE NAVIGATION GROUPS & GLOBAL SEARCH ── */}
-      {(() => {
-        // Search catalog
-        const searchCatalog = [
-          { label: 'Standard Wall Height', section: 'walls-masonry' as AdminTab, group: 'Construction' },
-          { label: 'Masonry Block Type (AAC / Brick)', section: 'walls-masonry' as AdminTab, group: 'Construction' },
-          { label: 'Ground Steel Factor (kg/sqft)', section: 'rcc-structure' as AdminTab, group: 'Construction' },
-          { label: 'Cement Consumption (bags/sqft)', section: 'rcc-structure' as AdminTab, group: 'Construction' },
-          { label: 'M-Sand & P-Sand Ratios', section: 'rcc-structure' as AdminTab, group: 'Construction' },
-          { label: 'Flooring Tile Wastage %', section: 'flooring-tiles' as AdminTab, group: 'Construction' },
-          { label: 'Bathroom Master & Dimensions', section: 'rooms-spaces' as AdminTab, group: 'Project' },
-          { label: 'Interior Paint Coverage (45 vs 60 sqft/L)', section: 'paint-finishes' as AdminTab, group: 'Construction' },
-          { label: 'Exterior Weatherproof Paint', section: 'paint-finishes' as AdminTab, group: 'Construction' },
-          { label: 'Doors & Windows Master', section: 'doors-windows' as AdminTab, group: 'Construction' },
-          { label: 'Electrical Wiring per Point', section: 'electrical' as AdminTab, group: 'Services' },
-          { label: 'Plumbing Supply & Drainage', section: 'plumbing' as AdminTab, group: 'Services' },
-          { label: 'Sanitaryware & Fixtures', section: 'fixtures-sanitary' as AdminTab, group: 'Services' },
-          { label: 'Labour Rates Master', section: 'labour' as AdminTab, group: 'Pricing' },
-          { label: 'Material Prices (Rate Master)', section: 'material-prices' as AdminTab, group: 'Pricing' },
-          { label: 'Quality & Specification Tiers', section: 'quality-spec' as AdminTab, group: 'Pricing' },
-          { label: 'Contractor Margin & GST Rate', section: 'commercial-tax' as AdminTab, group: 'Pricing' },
-          { label: 'Calculation Methods Switcher', section: 'calculation-methods' as AdminTab, group: 'Calculation' },
-          { label: 'Formula Library & Visual Builder', section: 'formula-library' as AdminTab, group: 'Calculation' },
-          { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculation' },
-          { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Calculation' },
-        ];
-
-        const searchResults = searchQuery.trim()
-          ? searchCatalog.filter((item) => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
-          : [];
-
-        // 6 Collapsible Navigation Groups
-        const navGroups: Array<{
-          id: string;
-          name: string;
-          icon: React.ReactNode;
-          sections: Array<{ id: AdminTab; label: string; badge?: number }>;
-        }> = [
-          {
-            id: 'PROJECT',
-            name: '1. Project',
-            icon: <Building className="w-3.5 h-3.5" />,
-            sections: [
-              { id: 'project-bua', label: 'Project & BUA' },
-              { id: 'rooms-spaces', label: 'Rooms & Spaces' },
-            ],
-          },
-          {
-            id: 'CONSTRUCTION',
-            name: '2. Construction',
-            icon: <Hammer className="w-3.5 h-3.5" />,
-            sections: [
-              { id: 'rcc-structure', label: 'RCC & Structure' },
-              { id: 'steel', label: 'Steel' },
-              { id: 'walls-masonry', label: 'Masonry' },
-              { id: 'cement-aggregates', label: 'Cement & Aggregates' },
-              { id: 'flooring-tiles', label: 'Flooring' },
-              { id: 'waterproofing', label: 'Waterproofing' },
-              { id: 'paint-finishes', label: 'Paint & Finishes' },
-              { id: 'doors-windows', label: 'Doors & Windows' },
-            ],
-          },
-          {
-            id: 'SERVICES',
-            name: '3. Services',
-            icon: <Zap className="w-3.5 h-3.5" />,
-            sections: [
-              { id: 'electrical', label: 'Electrical' },
-              { id: 'plumbing', label: 'Plumbing' },
-              { id: 'fixtures-sanitary', label: 'Fixtures & Sanitary' },
-            ],
-          },
-          {
-            id: 'PRICING',
-            name: '4. Pricing',
-            icon: <Coins className="w-3.5 h-3.5" />,
-            sections: [
-              { id: 'labour', label: 'Labour' },
-              { id: 'material-prices', label: 'Material Prices', badge: overrides.length || undefined },
-              { id: 'commercial-tax', label: 'Commercial & Tax' },
-            ],
-          },
-          {
-            id: 'CALCULATION',
-            name: '5. Calculation',
-            icon: <TrendingUp className="w-3.5 h-3.5" />,
-            sections: [
-              { id: 'calculation-methods', label: 'Calculation Methods' },
-              { id: 'formula-library', label: 'Formula Library' },
-              { id: 'test-calculator', label: 'Test Calculator' },
-              { id: 'versions-history', label: 'Version History' },
-              { id: 'simulation', label: 'Simulation / Impact' },
-            ],
-          },
-          {
-            id: 'REPORT_MGMT',
-            name: '6. Report & System',
-            icon: <Shield className="w-3.5 h-3.5" />,
-            sections: [
-              { id: 'report-settings', label: 'Report Settings' },
-              { id: 'audit', label: 'Audit Trail' },
-              { id: 'analytics', label: 'Analytics' },
-              { id: 'account', label: 'Account & Security' },
-            ],
-          },
-        ];
-
-        // Find current active group
-        const currentGroup = navGroups.find((g) => g.sections.some((s) => s.id === activeTab)) || navGroups[0];
-
-        return (
-          <div className="space-y-3">
-            {/* Top Toolbar: Search + Basic/Advanced Toggle + Overview Button */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('overview')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    activeTab === 'overview'
-                      ? 'bg-[#1B3D34] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  <Home className="w-3.5 h-3.5" />
-                  <span>Overview</span>
-                </button>
-
-                {/* Basic / Advanced Mode Switcher */}
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
-                  <button
-                    type="button"
-                    onClick={() => setAdminViewMode('BASIC')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      adminViewMode === 'BASIC'
-                        ? 'bg-white text-[#1B3D34] shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    Basic
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAdminViewMode('ADVANCED')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      adminViewMode === 'ADVANCED'
-                        ? 'bg-[#1B3D34] text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    Advanced
-                  </button>
-                </div>
-                <span className="text-[11px] text-slate-400 hidden lg:inline">
-                  {adminViewMode === 'BASIC'
-                    ? 'Everyday builder settings'
-                    : 'Deep parameters & logic rules'}
+    <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] pb-24 font-sans">
+      {/* ── TOP ARCHITECTURAL OPERATIONS COMMAND BAR ── */}
+      <header className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40 shadow-xs">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-white flex items-center justify-center font-mono font-bold text-xs tracking-wider shrink-0 shadow-xs">
+              HT//
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-mono text-[10px] font-bold text-[#F28C28] uppercase tracking-widest">
+                  OPS // REGION: BLR-MYS-01
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Engine Live · IS-456:2000
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-slate-100 text-slate-700 border border-slate-200">
+                  v2.6 PROD
                 </span>
               </div>
-
-              {/* Fast Search with Instant Jump */}
-              <div className="relative w-full md:w-80">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Find parameter (e.g. Wall Height, Margin)..."
-                  className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
-                />
-                {searchResults.length > 0 && (
-                  <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
-                    {searchResults.map((r, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => {
-                          setActiveTab(r.section);
-                          setSearchQuery('');
-                        }}
-                        className="w-full px-3 py-2 text-left hover:bg-emerald-50/50 flex items-center justify-between group cursor-pointer"
-                      >
-                        <span className="font-semibold text-slate-800 group-hover:text-[#1B3D34]">{r.label}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">
-                          {r.group}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 6 Collapsible Navigation Groups */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-              {navGroups.map((group) => {
-                const isGroupActive = group.sections.some((s) => s.id === activeTab);
-                return (
-                  <div
-                    key={group.id}
-                    onClick={() => {
-                      if (!isGroupActive) {
-                        setActiveTab(group.sections[0].id);
-                      }
-                    }}
-                    className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-                      isGroupActive
-                        ? 'bg-emerald-50/60 border-emerald-300 ring-1 ring-emerald-400 shadow-xs'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className={isGroupActive ? 'text-[#1B3D34]' : 'text-slate-400'}>
-                        {group.icon}
-                      </span>
-                      <span className={`text-xs font-bold truncate ${isGroupActive ? 'text-[#1B3D34]' : 'text-slate-700'}`}>
-                        {group.name}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-medium truncate">
-                      {group.sections.length} sections
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Active Sub-Sections Bar */}
-            {activeTab !== 'overview' && (
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 scrollbar-none">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider pl-1 pr-2 shrink-0">
-                  {currentGroup.name}:
-                </span>
-                {currentGroup.sections.map((sec) => {
-                  const isSecActive = activeTab === sec.id;
-                  return (
-                    <button
-                      key={sec.id}
-                      type="button"
-                      onClick={() => setActiveTab(sec.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                        isSecActive
-                          ? 'bg-[#1B3D34] text-white shadow-xs'
-                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span>{sec.label}</span>
-                      {sec.badge !== undefined && (
-                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                          isSecActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800 font-bold'
-                        }`}>
-                          {sec.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })()}
-
-      {/* ── PERSISTENT SERVER DRAFT STATUS & PUBLISH BAR ── */}
-      {Object.keys(draftParameters).length > 0 && (
-        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-amber-900 animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
-            <div>
-              <div className="text-sm font-bold flex items-center gap-2">
-                <span>Unpublished Draft: {Object.keys(draftParameters).length} parameter(s) modified</span>
-                {currentDraftId && (
-                  <span className="text-[10px] bg-amber-200/70 text-amber-800 px-2 py-0.5 rounded font-mono">
-                    Backend Draft ID: {currentDraftId.slice(0, 14)}...
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-amber-700 mt-0.5">
-                {lastDraftSavedAt
-                  ? `Persisted to server at ${new Date(lastDraftSavedAt).toLocaleTimeString()} (survives page refresh & multi-session)`
-                  : 'Changes are currently in draft. Run Test Calculator or Publish to activate for customers.'}
-              </p>
+              <h1 className="text-sm sm:text-base font-bold font-heading text-slate-900 tracking-tight mt-0.5">
+                Authoritative Construction Operations Console
+              </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
-            <button
-              type="button"
-              onClick={() => saveDraftToBackend()}
-              disabled={isSavingDraft}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer flex items-center gap-1.5"
-            >
-              {isSavingDraft ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : null}
-              <span>{isSavingDraft ? 'Saving Draft...' : 'Save Draft'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('test-calculator')}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer"
-            >
-              Test Calculator
-            </button>
-
-            <button
-              type="button"
-              onClick={() => publishDraftConfig('Admin published configuration update')}
-              disabled={isPublishingConfig}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1B3D34] text-white hover:bg-[#153029] shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              {isPublishingConfig ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : null}
-              <span>{isPublishingConfig ? 'Publishing...' : 'Publish to Production'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => resetDraftParameters()}
-              title="Discard draft changes"
-              className="px-2.5 py-1.5 rounded-xl text-xs text-amber-700 hover:bg-amber-200/50 transition-colors cursor-pointer"
-            >
-              Discard
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── SECTION 0: OVERVIEW ── */}
-      {activeTab === 'overview' && <AdminOverviewSection onNavigate={setActiveTab} />}
-
-      {/* ── TAB 2: RATE MASTER (MATERIAL PRICES) ── */}
-      {(activeTab === 'rates' || activeTab === 'material-prices') && (
-        <div className="space-y-6">
-          {/* Header Action Strip */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">Authoritative Construction Rate Master</h2>
-              <p className="text-xs text-slate-500">
-                Directly controls monetary unit rates across Bengaluru &amp; Mysuru projects. Quantities remain invariant.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 self-end md:self-auto flex-wrap">
+            {/* Basic / Advanced Mode Switcher */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs">
               <button
                 type="button"
-                onClick={() => setActiveTab('price-update')}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                onClick={() => setAdminViewMode('BASIC')}
+                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                  adminViewMode === 'BASIC'
+                    ? 'bg-white text-[#1B3D34] shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Auto Update Prices</span>
+                Basic
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminViewMode('ADVANCED')}
+                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                  adminViewMode === 'ADVANCED'
+                    ? 'bg-[#1B3D34] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Advanced Ops
               </button>
             </div>
-          </div>
 
-          {/* Filters Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search rate name or ID..."
-                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
-              />
+            {/* Quick Admin Profile */}
+            <div className="text-right hidden sm:block border-l border-slate-200 pl-3">
+              <span className="text-xs font-bold text-slate-800 block">{adminUser?.name || 'Hutty System Admin'}</span>
+              <span className="text-[11px] font-mono text-slate-500 block">{adminUser?.email || 'admin@hutty.in'}</span>
             </div>
 
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as any)}
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+            <button
+              type="button"
+              onClick={logout}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors cursor-pointer"
+              title="Sign out of Admin Panel"
             >
-              {categories.map((c) => (
-                <option key={c} value={c}>{c === 'ALL' ? 'All Categories' : c}</option>
-              ))}
-            </select>
-
-            <select
-              value={selectedPackage}
-              onChange={(e) => setSelectedPackage(e.target.value)}
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
-            >
-              <option value="ALL">All Packages (Global)</option>
-              <option value="STANDARD">Standard</option>
-              <option value="PREMIUM">Premium</option>
-              <option value="LUXURY">Luxury</option>
-            </select>
-
-            <select
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
-            >
-              <option value="ALL">All Locations</option>
-              <option value="Bangalore">Bengaluru</option>
-              <option value="Mysore">Mysuru</option>
-            </select>
-
-            <select
-              value={overrideFilter}
-              onChange={(e) => setOverrideFilter(e.target.value as any)}
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none cursor-pointer font-bold"
-            >
-              <option value="ALL">All Rates ({rates.length})</option>
-              <option value="OVERRIDDEN">Active Overrides Only ({overrides.length})</option>
-              <option value="DEFAULT">Baseline Defaults Only</option>
-            </select>
-          </div>
-
-          {/* Rates Table */}
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
-                    <th className="p-3.5">Category</th>
-                    <th className="p-3.5">Item &amp; ID</th>
-                    <th className="p-3.5">Package</th>
-                    <th className="p-3.5">Location</th>
-                    <th className="p-3.5 text-right">Baseline Rate</th>
-                    <th className="p-3.5 text-right">Effective Rate</th>
-                    <th className="p-3.5 text-center">Status</th>
-                    <th className="p-3.5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredRates.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="p-8 text-center text-slate-400">
-                        No rates found matching current search and filters.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredRates.slice(0, 100).map((item) => {
-                      const activeOverride = overrides.find(
-                        (o) =>
-                          o.rateId === item.id &&
-                          (selectedPackage === 'ALL' || o.packageTier === selectedPackage || o.packageTier === 'ALL') &&
-                          (selectedLocation === 'ALL' || o.location === selectedLocation || o.location === 'ALL')
-                      );
-                      const isOverridden = !!activeOverride;
-                      const effRate = isOverridden
-                        ? activeOverride.rate || activeOverride.overrideRate || item.rate
-                        : item.rate;
-
-                      return (
-                        <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
-                          <td className="p-3.5 font-bold text-slate-800">
-                            <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px]">
-                              {item.category}
-                            </span>
-                          </td>
-                          <td className="p-3.5">
-                            <div className="font-bold text-slate-900">{item.name}</div>
-                            <div className="font-mono text-[10px] text-slate-400">{item.id}</div>
-                          </td>
-                          <td className="p-3.5 font-mono text-[11px] text-slate-600">{item.packageTier}</td>
-                          <td className="p-3.5 font-mono text-[11px] text-slate-600">{item.location}</td>
-                          <td className="p-3.5 text-right font-mono text-slate-500">
-                            ₹{item.rate.toLocaleString('en-IN')} <span className="text-[10px]">{item.unit}</span>
-                          </td>
-                          <td className="p-3.5 text-right font-mono font-bold text-slate-900">
-                            <span className={isOverridden ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : ''}>
-                              ₹{effRate.toLocaleString('en-IN')}
-                            </span>
-                          </td>
-                          <td className="p-3.5 text-center">
-                            {isOverridden ? (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                Overridden
-                              </span>
-                            ) : (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-slate-500 bg-slate-100">
-                                Default
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-3.5 text-right space-x-1">
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEditModal(item)}
-                              className="px-2.5 py-1 text-[11px] font-bold text-[#1B3D34] bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
-                            >
-                              Edit
-                            </button>
-                            {isOverridden && (
-                              <button
-                                type="button"
-                                onClick={() => deleteOverride(item.id)}
-                                className="px-2.5 py-1 text-[11px] font-bold text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
-                                title="Reset to baseline default"
-                              >
-                                Reset
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
           </div>
         </div>
-      )}
+      </header>
+
+      {/* ── MAIN WORKSTATION CONTAINER ── */}
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {(() => {
+          // Search catalog
+          const searchCatalog = [
+            { label: 'Standard Wall Height', section: 'walls-masonry' as AdminTab, group: 'Construction' },
+            { label: 'Masonry Block Type (AAC / Brick)', section: 'walls-masonry' as AdminTab, group: 'Construction' },
+            { label: 'Ground Steel Factor (kg/sqft)', section: 'rcc-structure' as AdminTab, group: 'Construction' },
+            { label: 'Cement Consumption (bags/sqft)', section: 'rcc-structure' as AdminTab, group: 'Construction' },
+            { label: 'M-Sand & P-Sand Ratios', section: 'rcc-structure' as AdminTab, group: 'Construction' },
+            { label: 'Flooring Tile Wastage %', section: 'flooring-tiles' as AdminTab, group: 'Construction' },
+            { label: 'Bathroom Master & Dimensions', section: 'rooms-spaces' as AdminTab, group: 'Project' },
+            { label: 'Interior Paint Coverage (45 vs 60 sqft/L)', section: 'paint-finishes' as AdminTab, group: 'Construction' },
+            { label: 'Exterior Weatherproof Paint', section: 'paint-finishes' as AdminTab, group: 'Construction' },
+            { label: 'Doors & Windows Master', section: 'doors-windows' as AdminTab, group: 'Construction' },
+            { label: 'Electrical Wiring per Point', section: 'electrical' as AdminTab, group: 'Services' },
+            { label: 'Plumbing Supply & Drainage', section: 'plumbing' as AdminTab, group: 'Services' },
+            { label: 'Sanitaryware & Fixtures', section: 'fixtures-sanitary' as AdminTab, group: 'Services' },
+            { label: 'Labour Rates Master', section: 'labour' as AdminTab, group: 'Pricing' },
+            { label: 'Material Prices (Rate Master)', section: 'material-prices' as AdminTab, group: 'Pricing' },
+            { label: 'Quality & Specification Tiers', section: 'quality-spec' as AdminTab, group: 'Pricing' },
+            { label: 'Contractor Margin & GST Rate', section: 'commercial-tax' as AdminTab, group: 'Pricing' },
+            { label: 'Calculation Methods Switcher', section: 'calculation-methods' as AdminTab, group: 'Calculation' },
+            { label: 'Formula Library & Visual Builder', section: 'formula-library' as AdminTab, group: 'Calculation' },
+            { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculation' },
+            { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Calculation' },
+          ];
+
+          const searchResults = searchQuery.trim()
+            ? searchCatalog.filter((item) => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
+            : [];
+
+          // 8 Numbered Operational Groups
+          const navGroups: Array<{
+            num: string;
+            id: string;
+            name: string;
+            icon: React.ReactNode;
+            sections: Array<{ id: AdminTab; label: string; badge?: number }>;
+          }> = [
+            {
+              num: '00',
+              id: 'OVERVIEW',
+              name: 'System Overview',
+              icon: <Home className="w-3.5 h-3.5" />,
+              sections: [{ id: 'overview', label: 'System Overview' }],
+            },
+            {
+              num: '01',
+              id: 'PROJECT',
+              name: 'Project & Planning',
+              icon: <Building className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'project-bua', label: 'Project & BUA' },
+                { id: 'rooms-spaces', label: 'Rooms & Spaces' },
+              ],
+            },
+            {
+              num: '02',
+              id: 'CONSTRUCTION',
+              name: 'Construction & Specs',
+              icon: <Hammer className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'rcc-structure', label: 'RCC & Structure' },
+                { id: 'steel', label: 'Steel' },
+                { id: 'walls-masonry', label: 'Masonry' },
+                { id: 'cement-aggregates', label: 'Cement & Aggregates' },
+                { id: 'flooring-tiles', label: 'Flooring' },
+                { id: 'waterproofing', label: 'Waterproofing' },
+                { id: 'paint-finishes', label: 'Paint & Finishes' },
+                { id: 'doors-windows', label: 'Doors & Windows' },
+              ],
+            },
+            {
+              num: '03',
+              id: 'SERVICES',
+              name: 'MEP Services',
+              icon: <Zap className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'electrical', label: 'Electrical' },
+                { id: 'plumbing', label: 'Plumbing' },
+                { id: 'fixtures-sanitary', label: 'Fixtures & Sanitary' },
+              ],
+            },
+            {
+              num: '04',
+              id: 'PRICING',
+              name: 'Rates & Pricing',
+              icon: <Coins className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'material-prices', label: 'Rate Master', badge: overrides.length || undefined },
+                { id: 'price-update', label: 'Auto Price Updates' },
+                { id: 'labour', label: 'Labour Rates' },
+                { id: 'commercial-tax', label: 'Commercial & Tax' },
+                { id: 'pricing-tiers', label: 'Pricing Tiers' },
+                { id: 'pricing-purchases', label: 'Purchases & Revenue' },
+              ],
+            },
+            {
+              num: '05',
+              id: 'CONSULTATION',
+              name: 'Consultations',
+              icon: <UserCheck className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'admin-consultants', label: 'Consultants' },
+                { id: 'admin-consultation-requests', label: 'Requests' },
+              ],
+            },
+            {
+              num: '06',
+              id: 'CALCULATION',
+              name: 'Engine & Formulas',
+              icon: <TrendingUp className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'calculation-methods', label: 'Calculation Methods' },
+                { id: 'formula-library', label: 'Formula Library' },
+                { id: 'test-calculator', label: 'Test Calculator' },
+                { id: 'versions-history', label: 'Version History' },
+                { id: 'simulation', label: 'Simulation & Impact' },
+              ],
+            },
+            {
+              num: '07',
+              id: 'AUDIT',
+              name: 'System & Audit',
+              icon: <Shield className="w-3.5 h-3.5" />,
+              sections: [
+                { id: 'report-settings', label: 'Report Settings' },
+                { id: 'audit', label: 'Audit Trail' },
+                { id: 'analytics', label: 'Analytics' },
+                { id: 'account', label: 'Account & Security' },
+              ],
+            },
+          ];
+
+          const currentGroup = navGroups.find((g) => g.sections.some((s) => s.id === activeTab)) || navGroups[0];
+
+          return (
+            <div className="space-y-6">
+              {/* ── MOBILE / TABLET HORIZONTAL SECTION STRIP (< lg) ── */}
+              <div className="block lg:hidden space-y-3">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Find parameter (e.g. Wall Height, Margin)..."
+                    className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                  />
+                  {searchResults.length > 0 && (
+                    <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
+                      {searchResults.map((r, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab(r.section);
+                            setSearchQuery('');
+                          }}
+                          className="w-full px-3 py-2 text-left hover:bg-emerald-50/50 flex items-center justify-between group cursor-pointer"
+                        >
+                          <span className="font-semibold text-slate-800 group-hover:text-[#1B3D34]">{r.label}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">
+                            {r.group}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {navGroups.map((g) => {
+                    const isGroupActive = g.sections.some((s) => s.id === activeTab);
+                    return (
+                      <button
+                        key={g.id}
+                        type="button"
+                        onClick={() => setActiveTab(g.sections[0].id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                          isGroupActive
+                            ? 'bg-[#1B3D34] text-white shadow-xs'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span className="font-mono text-[10px] text-[#F28C28]">{g.num}</span>
+                        <span>{g.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {currentGroup.sections.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none pt-1">
+                    {currentGroup.sections.map((sec) => {
+                      const isSecActive = activeTab === sec.id;
+                      return (
+                        <button
+                          key={sec.id}
+                          type="button"
+                          onClick={() => setActiveTab(sec.id)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${
+                            isSecActive
+                              ? 'bg-[#1B3D34]/10 text-[#1B3D34] border border-[#1B3D34]/30'
+                              : 'bg-white text-slate-600 border border-slate-200'
+                          }`}
+                        >
+                          <span>{sec.label}</span>
+                          {sec.badge !== undefined && (
+                            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-amber-100 text-amber-800 font-mono font-bold">
+                              {sec.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* ── 2-COLUMN ENTERPRISE WORKSTATION LAYOUT ── */}
+              <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+                {/* ── LEFT COLUMN: STICKY OPERATIONAL NAVIGATION SIDEBAR (lg:col-span-3) ── */}
+                <aside className="hidden lg:block lg:col-span-3 xl:col-span-3 space-y-4 sticky top-20">
+                  {/* Parameter Jump Search */}
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Fast parameter jump..."
+                      className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] shadow-2xs"
+                    />
+                    {searchResults.length > 0 && (
+                      <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
+                        {searchResults.map((r, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              setActiveTab(r.section);
+                              setSearchQuery('');
+                            }}
+                            className="w-full px-3 py-2 text-left hover:bg-emerald-50/50 flex items-center justify-between group cursor-pointer"
+                          >
+                            <span className="font-semibold text-slate-800 group-hover:text-[#1B3D34]">{r.label}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">
+                              {r.group}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Operational Groups Accordion / Tree */}
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-xs divide-y divide-slate-100 overflow-hidden text-xs">
+                    {navGroups.map((group) => {
+                      const isGroupActive = group.sections.some((s) => s.id === activeTab);
+                      return (
+                        <div key={group.id} className="p-2 space-y-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!isGroupActive) {
+                                setActiveTab(group.sections[0].id);
+                              }
+                            }}
+                            className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl font-bold transition-all text-left cursor-pointer ${
+                              isGroupActive
+                                ? 'bg-emerald-50 text-[#1B3D34] font-extrabold'
+                                : 'text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <span className="font-mono text-[10px] text-[#F28C28]">{group.num}</span>
+                              <span className={isGroupActive ? 'text-[#1B3D34]' : 'text-slate-400'}>
+                                {group.icon}
+                              </span>
+                              <span className="truncate">{group.name}</span>
+                            </div>
+                            <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                              {group.sections.length}
+                            </span>
+                          </button>
+
+                          {/* Sub-sections */}
+                          <div className="pl-6 pr-1 space-y-0.5">
+                            {group.sections.map((sec) => {
+                              const isSecActive = activeTab === sec.id;
+                              return (
+                                <button
+                                  key={sec.id}
+                                  type="button"
+                                  onClick={() => setActiveTab(sec.id)}
+                                  className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all text-left cursor-pointer ${
+                                    isSecActive
+                                      ? 'bg-[#1B3D34] text-white font-bold shadow-xs'
+                                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <span className="truncate">{sec.label}</span>
+                                  {sec.badge !== undefined && (
+                                    <span
+                                      className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold ${
+                                        isSecActive
+                                          ? 'bg-white/20 text-white'
+                                          : 'bg-amber-100 text-amber-800'
+                                      }`}
+                                    >
+                                      {sec.badge}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* System Telemetry Widget */}
+                  <div className="p-3.5 bg-slate-900 text-white rounded-2xl shadow-xs space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-mono text-slate-400 uppercase tracking-wider">Engine State</span>
+                      <span className="text-emerald-400 font-bold font-mono flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        NORMAL
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-[10px]">
+                      <div>
+                        <span className="text-slate-400 block">Rate Items</span>
+                        <span className="font-mono font-bold text-white text-xs">{rates.length}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">Active Overrides</span>
+                        <span className="font-mono font-bold text-amber-400 text-xs">{overrides.length}</span>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+
+                {/* ── RIGHT COLUMN: WORKSPACE AREA (lg:col-span-9) ── */}
+                <div className="lg:col-span-9 xl:col-span-9 space-y-6 min-w-0">
+                  {/* ── ALERTS / FEEDBACK ── */}
+                  {error && (
+                    <div className="p-4 bg-red-50 text-red-800 text-xs rounded-2xl border border-red-200 flex items-center justify-between shadow-xs">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                        <span>{error}</span>
+                      </div>
+                      <button onClick={clearMessages} className="text-red-500 hover:text-red-800 font-bold cursor-pointer">×</button>
+                    </div>
+                  )}
+                  {successMessage && (
+                    <div className="p-4 bg-emerald-50 text-emerald-800 text-xs rounded-2xl border border-emerald-200 flex items-center justify-between shadow-xs">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>{successMessage}</span>
+                      </div>
+                      <button onClick={clearMessages} className="text-emerald-500 hover:text-emerald-800 font-bold cursor-pointer">×</button>
+                    </div>
+                  )}
+
+                  {/* ── PERSISTENT SERVER DRAFT STATUS & PUBLISH BAR ── */}
+                  {Object.keys(draftParameters).length > 0 && (
+                    <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-amber-900 animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center gap-3">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                        <div>
+                          <div className="text-sm font-bold flex items-center gap-2">
+                            <span>Unpublished Draft: {Object.keys(draftParameters).length} parameter(s) modified</span>
+                            {currentDraftId && (
+                              <span className="text-[10px] bg-amber-200/70 text-amber-800 px-2 py-0.5 rounded font-mono">
+                                Backend Draft ID: {currentDraftId.slice(0, 14)}...
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-amber-700 mt-0.5">
+                            {lastDraftSavedAt
+                              ? `Persisted to server at ${new Date(lastDraftSavedAt).toLocaleTimeString()} (survives page refresh & multi-session)`
+                              : 'Changes are currently in draft. Run Test Calculator or Publish to activate for customers.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => saveDraftToBackend()}
+                          disabled={isSavingDraft}
+                          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                          {isSavingDraft ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : null}
+                          <span>{isSavingDraft ? 'Saving Draft...' : 'Save Draft'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('test-calculator')}
+                          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer"
+                        >
+                          Test Calculator
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => publishDraftConfig('Admin published configuration update')}
+                          disabled={isPublishingConfig}
+                          className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1B3D34] text-white hover:bg-[#153029] shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          {isPublishingConfig ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : null}
+                          <span>{isPublishingConfig ? 'Publishing...' : 'Publish to Production'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => resetDraftParameters()}
+                          title="Discard draft changes"
+                          className="px-2.5 py-1.5 rounded-xl text-xs text-amber-700 hover:bg-amber-200/50 transition-colors cursor-pointer"
+                        >
+                          Discard
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── SECTION 0: OVERVIEW ── */}
+                  {activeTab === 'overview' && <AdminOverviewSection onNavigate={setActiveTab} />}
+
+                  {/* ── TAB 2: RATE MASTER (MATERIAL PRICES) ── */}
+                  {(activeTab === 'rates' || activeTab === 'material-prices') && (
+                    <div className="space-y-6">
+                      {/* Header Action Strip */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-base font-bold text-slate-900 font-heading">Authoritative Construction Rate Master</h2>
+                            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">
+                              {rates.length} ITEMS
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Directly controls monetary unit rates across Bengaluru &amp; Mysuru projects. Quantities remain invariant.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('price-update')}
+                            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span>Auto Update Prices</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Filters Bar */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 bg-white p-3 rounded-2xl border border-slate-200 text-xs shadow-2xs">
+                        <div className="relative">
+                          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                          <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search rate name or ID..."
+                            className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                          />
+                        </div>
+
+                        <select
+                          value={selectedCategory}
+                          onChange={(e) => setSelectedCategory(e.target.value as any)}
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+                        >
+                          {categories.map((c) => (
+                            <option key={c} value={c}>{c === 'ALL' ? 'All Categories' : c}</option>
+                          ))}
+                        </select>
+
+                        <select
+                          value={selectedPackage}
+                          onChange={(e) => setSelectedPackage(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+                        >
+                          <option value="ALL">All Packages (Global)</option>
+                          <option value="STANDARD">Standard</option>
+                          <option value="PREMIUM">Premium</option>
+                          <option value="LUXURY">Luxury</option>
+                        </select>
+
+                        <select
+                          value={selectedLocation}
+                          onChange={(e) => setSelectedLocation(e.target.value)}
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+                        >
+                          <option value="ALL">All Locations</option>
+                          <option value="Bangalore">Bengaluru</option>
+                          <option value="Mysore">Mysuru</option>
+                        </select>
+
+                        <select
+                          value={overrideFilter}
+                          onChange={(e) => setOverrideFilter(e.target.value as any)}
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer font-bold"
+                        >
+                          <option value="ALL">All Rates ({rates.length})</option>
+                          <option value="OVERRIDDEN">Active Overrides Only ({overrides.length})</option>
+                          <option value="DEFAULT">Baseline Defaults Only</option>
+                        </select>
+                      </div>
+
+                      {/* ── DESKTOP/TABLET AUTHORITATIVE LEDGER TABLE (hidden on mobile) ── */}
+                      <div className="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs border-collapse">
+                            <thead>
+                              <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                                <th className="p-3.5">Category</th>
+                                <th className="p-3.5">Item &amp; ID</th>
+                                <th className="p-3.5">Package</th>
+                                <th className="p-3.5">Location</th>
+                                <th className="p-3.5 text-right">Baseline Rate</th>
+                                <th className="p-3.5 text-right">Effective Rate</th>
+                                <th className="p-3.5 text-center">Status</th>
+                                <th className="p-3.5 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {filteredRates.length === 0 ? (
+                                <tr>
+                                  <td colSpan={8} className="p-8 text-center text-slate-400">
+                                    No rates found matching current search and filters.
+                                  </td>
+                                </tr>
+                              ) : (
+                                filteredRates.slice(0, 100).map((item) => {
+                                  const activeOverride = overrides.find(
+                                    (o) =>
+                                      o.rateId === item.id &&
+                                      (selectedPackage === 'ALL' || o.packageTier === selectedPackage || o.packageTier === 'ALL') &&
+                                      (selectedLocation === 'ALL' || o.location === selectedLocation || o.location === 'ALL')
+                                  );
+                                  const isOverridden = !!activeOverride;
+                                  const effRate = isOverridden
+                                    ? activeOverride.rate || activeOverride.overrideRate || item.rate
+                                    : item.rate;
+
+                                  return (
+                                    <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
+                                      <td className="p-3.5 font-bold text-slate-800">
+                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px]">
+                                          {item.category}
+                                        </span>
+                                      </td>
+                                      <td className="p-3.5">
+                                        <div className="font-bold text-slate-900">{item.name}</div>
+                                        <div className="font-mono text-[10px] text-slate-400">{item.id}</div>
+                                      </td>
+                                      <td className="p-3.5 font-mono text-[11px] text-slate-600">{item.packageTier}</td>
+                                      <td className="p-3.5 font-mono text-[11px] text-slate-600">{item.location}</td>
+                                      <td className="p-3.5 text-right font-mono text-slate-500">
+                                        ₹{item.rate.toLocaleString('en-IN')} <span className="text-[10px]">{item.unit}</span>
+                                      </td>
+                                      <td className="p-3.5 text-right font-mono font-bold text-slate-900">
+                                        <span className={isOverridden ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : ''}>
+                                          ₹{effRate.toLocaleString('en-IN')}
+                                        </span>
+                                      </td>
+                                      <td className="p-3.5 text-center">
+                                        {isOverridden ? (
+                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                            Overridden
+                                          </span>
+                                        ) : (
+                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-slate-500 bg-slate-100">
+                                            Default
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td className="p-3.5 text-right space-x-1">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleOpenEditModal(item)}
+                                          className="px-2.5 py-1 text-[11px] font-bold text-[#1B3D34] bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+                                        >
+                                          Edit
+                                        </button>
+                                        {isOverridden && (
+                                          <button
+                                            type="button"
+                                            onClick={() => deleteOverride(item.id)}
+                                            className="px-2.5 py-1 text-[11px] font-bold text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                                            title="Reset to baseline default"
+                                          >
+                                            Reset
+                                          </button>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* ── MOBILE STACKED RECORD CARD LEDGER (visible on phone screens) ── */}
+                      <div className="block md:hidden space-y-3">
+                        {filteredRates.length === 0 ? (
+                          <div className="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-200">
+                            No rates found matching current search and filters.
+                          </div>
+                        ) : (
+                          filteredRates.slice(0, 60).map((item) => {
+                            const activeOverride = overrides.find(
+                              (o) =>
+                                o.rateId === item.id &&
+                                (selectedPackage === 'ALL' || o.packageTier === selectedPackage || o.packageTier === 'ALL') &&
+                                (selectedLocation === 'ALL' || o.location === selectedLocation || o.location === 'ALL')
+                            );
+                            const isOverridden = !!activeOverride;
+                            const effRate = isOverridden
+                              ? activeOverride.rate || activeOverride.overrideRate || item.rate
+                              : item.rate;
+
+                            return (
+                              <div key={item.id} className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                                      {item.category}
+                                    </span>
+                                    <h4 className="text-sm font-bold text-slate-900 mt-1">{item.name}</h4>
+                                    <span className="text-[10px] font-mono text-slate-400">{item.id}</span>
+                                  </div>
+                                  {isOverridden ? (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                      Overridden
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-slate-500 bg-slate-100">
+                                      Default
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+                                  <div>
+                                    <span className="text-[10px] text-slate-400 block">Baseline</span>
+                                    <span className="font-mono text-slate-600">₹{item.rate.toLocaleString('en-IN')} /{item.unit}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-[10px] text-slate-400 block">Effective</span>
+                                    <span className={`font-mono font-bold ${isOverridden ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                      ₹{effRate.toLocaleString('en-IN')} /{item.unit}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
+                                  <span className="font-mono text-slate-500">{item.packageTier} · {item.location}</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenEditModal(item)}
+                                      className="px-2.5 py-1 text-xs font-bold text-[#1B3D34] bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
+                                    >
+                                      Edit
+                                    </button>
+                                    {isOverridden && (
+                                      <button
+                                        type="button"
+                                        onClick={() => deleteOverride(item.id)}
+                                        className="px-2.5 py-1 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 rounded-lg cursor-pointer"
+                                      >
+                                        Reset
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  )}
 
       {/* ── TAB 3: AUTO PRICE UPDATE ── */}
       {activeTab === 'price-update' && (
@@ -2077,8 +2292,22 @@ export const AdminPage: React.FC = () => {
       {/* 6. Report & System */}
       {activeTab === 'report-settings' && <TradeParametersTab forcedTab="recommendations" />}
 
+      {/* 7. Consultation Management (Phase 1 MVP) */}
+      {activeTab === 'admin-consultants' && <AdminConsultantsSection />}
+      {activeTab === 'admin-consultation-requests' && <AdminConsultationsSection />}
+
+      {/* 8. Products & Pricing (Pricing Model V1) */}
+      {activeTab === 'pricing-tiers' && <AdminPricingTiersSection />}
+      {activeTab === 'pricing-purchases' && <AdminPricingPurchasesSection />}
+
       {/* Legacy fallbacks */}
       {activeTab === 'parameters' && <ParametersTab />}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </main>
 
       {/* ── MODAL: EDIT RATE OVERRIDE ── */}
       {editingItem && (

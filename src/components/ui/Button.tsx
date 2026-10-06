@@ -3,7 +3,7 @@ import { cn } from '../../utils/cn';
 import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
@@ -26,14 +26,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cc-brand)] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] rounded-[10px] cursor-pointer';
+      'inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] rounded-xl cursor-pointer select-none';
 
     const variants = {
-      primary: 'bg-[var(--cc-brand)] text-white hover:bg-[var(--cc-brand-hover)] shadow-soft-xs hover:shadow-soft-sm',
-      secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200/80',
-      outline: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400',
-      ghost: 'bg-transparent text-slate-700 hover:bg-slate-100',
-      danger: 'bg-red-600 text-white hover:bg-red-700 shadow-soft-xs',
+      primary: 'bg-[#1B3D34] text-white hover:bg-[#132C25] shadow-xs hover:shadow-sm',
+      accent: 'bg-[#F28C28] text-white hover:bg-[#D9771A] shadow-xs hover:shadow-sm font-semibold',
+      secondary: 'bg-[rgba(27,61,52,0.06)] text-[#1B3D34] hover:bg-[rgba(27,61,52,0.10)] border border-[rgba(27,61,52,0.12)]',
+      outline: 'border border-[#E5E7EB] bg-white text-[#1B3D34] hover:bg-[#F8F8F6] hover:border-[#D1D5DB] shadow-2xs',
+      ghost: 'bg-transparent text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.05)]',
+      danger: 'bg-red-600 text-white hover:bg-red-700 shadow-xs',
     };
 
     const sizes = {

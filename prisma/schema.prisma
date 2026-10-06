@@ -44,6 +44,9 @@ model User {
   projects      Project[]
   auditLogs     AuditLog[]
   adminSessions AdminSession[]
+  consultationRequests ConsultationRequest[]
+  pricingPurchases     PricingPurchase[]
+  entitlements         UserEntitlement[]
 
   @@index([email])
 }
@@ -61,6 +64,9 @@ model Project {
   boqItems        BOQItem[]
   paymentSchedule PaymentSchedule[]
   procurementList ProcurementList[]
+  consultationRequests ConsultationRequest[]
+  pricingPurchases     PricingPurchase[]
+  entitlements         UserEntitlement[]
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
 
@@ -491,4 +497,251 @@ model SecurityAuditEvent {
   @@index([createdAt])
   @@map("security_audit_events")
 }
+
+// ═════════════════════════════════════════════════════════════════════════
+// CONSULTATION PLATFORM MODELS (Phase 1 MVP)
+// ═════════════════════════════════════════════════════════════════════════
+
+enum ConsultationStatus {
+  AWAITING_REVIEW
+  UNDER_REVIEW
+  ASSIGNED
+  ACCEPTED
+  SCHEDULED
+  RESCHEDULE_REQUESTED
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUND_PENDING
+  REFUNDED
+}
+
+model Consultant {
+  id              String                 @id @default(uuid())
+  slug            String                 @unique
+  name            String
+  title           String
+  category        String                 // "Architect" | "Structural Engineer" | "Contractor" | "Interior Designer" | "Approvals Consultant" | "Quantity Surveyor" | "Site Supervisor"
+  profileImage    String?
+  experienceYears Int                    @default(5)
+  city            String                 @default("Bangalore")
+  serviceAreas    String[]
+  about           String
+  specializations String[]
+  services        String[]
+  active          Boolean                @default(true)
+  featured        Boolean                @default(false)
+  displayOrder    Int                    @default(0)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  requests        ConsultationRequest[]
+
+  @@index([category])
+  @@index([city])
+  @@index([active])
+  @@index([slug])
+  @@map("consultants")
+}
+
+model ConsultationRequest {
+  id                      String                @id @default(uuid())
+  publicReference         String                @unique // e.g. "HT-CON-89421A"
+  idempotencyKey          String?               @unique
+  userId                  String?
+  user                    User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  consultantId            String?
+  consultant              Consultant?           @relation(fields: [consultantId], references: [id], onDelete: SetNull)
+  consultantNameSnapshot  String?
+  consultantTitleSnapshot String?
+  homeownerName           String
+  homeownerPhone          String
+  homeownerEmail          String
+  projectId               String?
+  project                 Project?              @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectSnapshot         Json?
+  projectLocation         String
+  projectType             String
+  consultationTopic       String
+  message                 String?
+  preferredDate           String
+  preferredTime           String
+  confirmedDateTime       DateTime?
+  status                  ConsultationStatus    @default(AWAITING_REVIEW)
+  amountMinorUnits        Int                   @default(149900) // ₹1,499 in paise
+  currency                String                @default("INR")
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  payments                ConsultationPayment[]
+  events                  ConsultationEvent[]
+
+  @@index([userId])
+  @@index([consultantId])
+  @@index([status])
+  @@index([publicReference])
+  @@index([idempotencyKey])
+  @@index([createdAt])
+  @@map("consultation_requests")
+}
+
+model ConsultationPayment {
+  id                    String              @id @default(uuid())
+  consultationRequestId String
+  consultationRequest   ConsultationRequest @relation(fields: [consultationRequestId], references: [id], onDelete: Cascade)
+  gateway               String              @default("RAZORPAY")
+  gatewayOrderId        String              @unique
+  gatewayPaymentId      String?             @unique
+  gatewaySignature      String?
+  amountMinorUnits      Int                 @default(149900)
+  currency              String              @default("INR")
+  status                PaymentStatus       @default(PENDING)
+  verifiedAt            DateTime?
+  rawResponseJson       Json?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@index([consultationRequestId])
+  @@index([gatewayOrderId])
+  @@index([status])
+  @@map("consultation_payments")
+}
+
+model ConsultationEvent {
+  id                    String              @id @default(uuid())
+  consultationRequestId String
+  consultationRequest   ConsultationRequest @relation(fields: [consultationRequestId], references: [id], onDelete: Cascade)
+  actorId               String?
+  actorRole             String?             // "ADMIN" | "USER" | "SYSTEM"
+  eventType             String              // "REQUEST_CREATED" | "PAYMENT_CONFIRMED" | "STATUS_CHANGED" | "CONSULTANT_ASSIGNED" | "SCHEDULE_CONFIRMED" | "INTERNAL_NOTE_ADDED"
+  title                 String
+  internalNote          String?             // Private to admin
+  metadataJson          Json?
+  createdAt             DateTime            @default(now())
+
+  @@index([consultationRequestId])
+  @@index([createdAt])
+  @@map("consultation_events")
+}
+
+// ============================================================
+// COMMERCIAL PRICING & PRODUCT ENTITLEMENTS (PRICING V1)
+// Tier 1: FREE (0 paise)
+// Tier 2: ₹99 (9900 paise)
+// Tier 3: ₹499 (49900 paise)
+// Tier 4: COMPLETE PACKAGE (Not yet finalized, admin configurable)
+// Canonical calculator mathematics remain completely decoupled.
+// ============================================================
+
+enum PricingPurchaseStatus {
+  CREATED
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+model PricingTier {
+  id               String            @id @default(uuid())
+  code             String            @unique // "FREE" | "ESTIMATE_99" | "DETAILED_ESTIMATE_499" | "COMPLETE_PACKAGE"
+  name             String
+  description      String
+  priceMinorUnits  Int               @default(0) // Integer paise (e.g. 0, 9900, 49900)
+  currency         String            @default("INR")
+  active           Boolean           @default(true)
+  purchasable      Boolean           @default(false)
+  sortOrder        Int               @default(0)
+  badge            String?
+  features         String[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  purchases        PricingPurchase[]
+  auditLogs        PricingAuditLog[]
+
+  @@index([code])
+  @@index([active])
+  @@index([purchasable])
+  @@map("pricing_tiers")
+}
+
+model PricingPurchase {
+  id                 String                @id @default(uuid())
+  publicReference    String                @unique // e.g. "HT-PUR-XXXXXX"
+  userId             String?
+  user               User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tierId             String
+  tier               PricingTier           @relation(fields: [tierId], references: [id])
+  tierCodeSnapshot   String
+  tierNameSnapshot   String
+  amountMinorUnits   Int                   // Preserved historical purchase amount
+  currency           String                @default("INR")
+  status             PricingPurchaseStatus @default(PENDING)
+  gateway            String                @default("RAZORPAY")
+  gatewayOrderId     String?               @unique
+  gatewayPaymentId   String?               @unique
+  leadName           String
+  leadPhone          String
+  leadEmail          String
+  projectId          String?
+  project            Project?              @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectSnapshot    Json?
+  entitlements       UserEntitlement[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@index([userId])
+  @@index([tierId])
+  @@index([status])
+  @@index([publicReference])
+  @@index([gatewayOrderId])
+  @@index([createdAt])
+  @@map("pricing_purchases")
+}
+
+model UserEntitlement {
+  id               String           @id @default(uuid())
+  userId           String?
+  user             User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userEmail        String?
+  projectId        String?
+  project          Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  featureCode      String
+  sourcePurchaseId String?
+  sourcePurchase   PricingPurchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: SetNull)
+  active           Boolean          @default(true)
+  startsAt         DateTime         @default(now())
+  expiresAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([userEmail])
+  @@index([projectId])
+  @@index([featureCode])
+  @@index([active])
+  @@map("user_entitlements")
+}
+
+model PricingAuditLog {
+  id          String       @id @default(uuid())
+  tierId      String?
+  tier        PricingTier? @relation(fields: [tierId], references: [id], onDelete: SetNull)
+  tierCode    String?
+  actorEmail  String       @default("admin@hutty.in")
+  action      String       // "PRICE_UPDATED" | "STATUS_CHANGED" | "FEATURES_UPDATED" | "TIER_CREATED"
+  oldValue    Json?
+  newValue    Json?
+  reason      String?
+  createdAt   DateTime     @default(now())
+
+  @@index([tierId])
+  @@index([createdAt])
+  @@map("pricing_audit_logs")
+}
+
 
