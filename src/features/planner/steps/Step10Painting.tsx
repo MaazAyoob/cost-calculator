@@ -49,18 +49,7 @@ export const Step10Painting: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-          STEP 10
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          PAINTING &amp; COATINGS
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Specify paint manufacturer and finish grades for interior walls and exterior facade.
-        </p>
-      </div>
+
 
       {/* ── 1. BRAND SELECTION ── */}
       <div className="space-y-2.5">
@@ -100,7 +89,7 @@ export const Step10Painting: React.FC = () => {
       </div>
 
       {/* ── 2. INTERIOR PAINT GRADE ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-2.5 pt-2 border-t border-[#E3E8E2]">
         <div className="flex justify-between items-center text-xs">
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             Interior Paint Grade
@@ -160,7 +149,7 @@ export const Step10Painting: React.FC = () => {
       </div>
 
       {/* ── 3. EXTERIOR FACADE COATING ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-2.5 pt-2 border-t border-[#E3E8E2]">
         <div className="flex justify-between items-center text-xs">
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             Exterior Facade Weather Coating
@@ -191,7 +180,7 @@ export const Step10Painting: React.FC = () => {
                   <p className="text-[10px] text-[#4B5563] mt-1 leading-relaxed">{opt.desc}</p>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5E7EB] flex justify-between items-center text-xs font-bold text-[#1B3D34]">
+                <div className="pt-2 border-t border-[#E3E8E2] flex justify-between items-center text-xs font-bold text-[#1B3D34]">
                   <span className="font-mono">~{formatCurrency(optCost)}</span>
                   <span className="text-[10px] text-[#4B5563]">₹{opt.ratePerSqFt}/sq.ft</span>
                 </div>

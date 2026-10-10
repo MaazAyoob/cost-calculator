@@ -62,8 +62,8 @@ export const WebsiteHeader: React.FC = () => {
       <header
         className={`sticky top-0 z-50 transition-all duration-300 border-b ${
           scrolled
-            ? 'bg-[#F8F8F6]/95 backdrop-blur-md border-[#E5E7EB] py-2.5 shadow-sm'
-            : 'bg-[#F8F8F6] border-[#E5E7EB] py-3.5'
+            ? 'bg-[#F8F8F6]/95 backdrop-blur-md border-[#E3E8E2] py-2.5 shadow-xs'
+            : 'bg-[#F8F8F6] border-[#E3E8E2] py-3.5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6">
@@ -81,17 +81,17 @@ export const WebsiteHeader: React.FC = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation: Clean, Human & Uncluttered */}
+          {/* Desktop Navigation: Clean, Human & Architectural */}
           <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main Navigation">
             <button
               onClick={() => {
                 useWizardStore.getState().startNewProject();
                 navigate('/calculator');
               }}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 isCurrent('/calculator') || isCurrent('/planner')
-                  ? 'text-[#1B3D34] bg-[rgba(27,61,52,0.08)] font-semibold shadow-2xs'
-                  : 'text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)]'
+                  ? 'text-[#1B3D34] bg-[#EDF3ED] font-bold shadow-2xs'
+                  : 'text-[#687770] hover:text-[#172722] hover:bg-[rgba(27,61,52,0.04)]'
               }`}
             >
               Calculate
@@ -99,10 +99,10 @@ export const WebsiteHeader: React.FC = () => {
 
             <button
               onClick={() => handleNav('/consult')}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 isCurrent('/consult')
-                  ? 'text-[#1B3D34] bg-[rgba(27,61,52,0.08)] font-semibold shadow-2xs'
-                  : 'text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)]'
+                  ? 'text-[#1B3D34] bg-[#EDF3ED] font-bold shadow-2xs'
+                  : 'text-[#687770] hover:text-[#172722] hover:bg-[rgba(27,61,52,0.04)]'
               }`}
             >
               Consult
@@ -110,10 +110,10 @@ export const WebsiteHeader: React.FC = () => {
 
             <button
               onClick={() => handleNav('/pricing')}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 isCurrent('/pricing')
-                  ? 'text-[#1B3D34] bg-[rgba(27,61,52,0.08)] font-semibold shadow-2xs'
-                  : 'text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)]'
+                  ? 'text-[#1B3D34] bg-[#EDF3ED] font-bold shadow-2xs'
+                  : 'text-[#687770] hover:text-[#172722] hover:bg-[rgba(27,61,52,0.04)]'
               }`}
             >
               Pricing
@@ -121,10 +121,10 @@ export const WebsiteHeader: React.FC = () => {
 
             <button
               onClick={() => handleNav('/dashboard')}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 isCurrent('/dashboard')
-                  ? 'text-[#1B3D34] bg-[rgba(27,61,52,0.08)] font-semibold shadow-2xs'
-                  : 'text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)]'
+                  ? 'text-[#1B3D34] bg-[#EDF3ED] font-bold shadow-2xs'
+                  : 'text-[#687770] hover:text-[#172722] hover:bg-[rgba(27,61,52,0.04)]'
               }`}
             >
               My Project
@@ -147,18 +147,18 @@ export const WebsiteHeader: React.FC = () => {
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-lg lg:hidden text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#E5E7EB]"
+              className="p-2.5 rounded-lg lg:hidden text-[#172722] hover:bg-[rgba(27,61,52,0.06)] transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#E3E8E2]"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 text-[#1B3D34]" /> : <Menu className="w-5 h-5 text-[#1B3D34]" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-[#172722]" /> : <Menu className="w-5 h-5 text-[#172722]" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-[57px] bottom-0 z-50 bg-[#F8F8F6] flex flex-col border-t border-[#E5E7EB] animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="lg:hidden fixed inset-x-0 top-[57px] bottom-0 z-50 bg-[#F8F8F6] flex flex-col border-t border-[#E3E8E2] animate-in fade-in slide-in-from-top-3 duration-200">
             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-3">
               <button
                 onClick={() => {
@@ -166,82 +166,82 @@ export const WebsiteHeader: React.FC = () => {
                   useWizardStore.getState().startNewProject();
                   navigate('/calculator');
                 }}
-                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between ${
+                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/calculator') || isCurrent('/planner')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#1B3D34] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Calculate</span>
-                  <p className={`text-xs ${isCurrent('/calculator') ? 'text-white/70' : 'text-[#4B5563]'}`}>
+                  <p className={`text-xs ${isCurrent('/calculator') ? 'text-white/80' : 'text-[#687770]'}`}>
                     Plot sizing, spaces &amp; live cost calculation
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/calculator') ? 'text-white' : 'text-[#4B5563]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/calculator') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
               </button>
 
               <button
                 onClick={() => handleNav('/consult')}
-                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between ${
+                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/consult')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#1B3D34] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Consult</span>
-                  <p className={`text-xs ${isCurrent('/consult') ? 'text-white/70' : 'text-[#4B5563]'}`}>
+                  <p className={`text-xs ${isCurrent('/consult') ? 'text-white/80' : 'text-[#687770]'}`}>
                     Independent architectural reviews &bull; ₹1,499
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/consult') ? 'text-white' : 'text-[#4B5563]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/consult') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
               </button>
 
               <button
                 onClick={() => handleNav('/pricing')}
-                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between ${
+                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/pricing')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#1B3D34] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Pricing</span>
-                  <p className={`text-xs ${isCurrent('/pricing') ? 'text-white/70' : 'text-[#4B5563]'}`}>
+                  <p className={`text-xs ${isCurrent('/pricing') ? 'text-white/80' : 'text-[#687770]'}`}>
                     Free preview, ₹99 verified, ₹499 bank-ready BOQ
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/pricing') ? 'text-white' : 'text-[#4B5563]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/pricing') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
               </button>
 
               <button
                 onClick={() => handleNav('/dashboard')}
-                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between ${
+                className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/dashboard')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#1B3D34] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">My Project</span>
-                  <p className={`text-xs ${isCurrent('/dashboard') ? 'text-white/70' : 'text-[#4B5563]'}`}>
+                  <p className={`text-xs ${isCurrent('/dashboard') ? 'text-white/80' : 'text-[#687770]'}`}>
                     Active residence status, quantities &amp; budget
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/dashboard') ? 'text-white' : 'text-[#4B5563]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/dashboard') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
               </button>
             </div>
 
             {/* Bottom Sticky Action inside Mobile Drawer */}
-            <div className="p-5 border-t border-[#E5E7EB] bg-white">
+            <div className="p-5 border-t border-[#E3E8E2] bg-white">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   useWizardStore.getState().startNewProject();
                   navigate('/calculator');
                 }}
-                className="w-full hutty-btn-primary py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm min-h-[50px]"
+                className="w-full hutty-btn-primary py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm min-h-[50px] cursor-pointer"
               >
                 <span>Start Free Estimate</span>
                 <ArrowRight className="w-4 h-4 text-[#F28C28]" />

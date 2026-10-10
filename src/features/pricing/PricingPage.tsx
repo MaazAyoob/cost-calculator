@@ -85,7 +85,7 @@ export const PricingPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:underline cursor-pointer bg-white px-4 py-2 rounded-xl border border-[#E5E7EB] shadow-2xs"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:underline cursor-pointer bg-white px-4 py-2 rounded-xl border border-[#E3E8E2] shadow-2xs"
               >
                 <Clock className="w-3.5 h-3.5 text-[#F28C28]" />
                 <span>View My Purchased Plans ({purchases.length})</span>
@@ -101,13 +101,13 @@ export const PricingPage: React.FC = () => {
           <div className="lg:col-span-5 flex flex-col justify-between gap-6">
             
             {/* TIER 01: FREE */}
-            <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
+            <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E3E8E2] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+                <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                   <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
                     TIER 01 // EXPLORE YOUR PROJECT
                   </span>
-                  <span className="font-mono text-xs font-bold text-[#1B3D34] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
+                  <span className="font-mono text-xs font-bold text-[#1B3D34] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E3E8E2]">
                     ₹0 FREE
                   </span>
                 </div>
@@ -121,7 +121,7 @@ export const PricingPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
+                <div className="pt-2 pb-1 border-y border-[#E3E8E2]">
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-black text-[#1B3D34] font-heading">₹0</span>
                     <span className="text-xs text-[#4B5563]">/ forever</span>
@@ -156,9 +156,9 @@ export const PricingPage: React.FC = () => {
             </div>
 
             {/* TIER 02: ₹99 VERIFIED PLAN */}
-            <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
+            <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E3E8E2] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+                <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                   <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563]">
                     TIER 02 // START PLANNING SERIOUSLY
                   </span>
@@ -176,7 +176,7 @@ export const PricingPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
+                <div className="pt-2 pb-1 border-y border-[#E3E8E2]">
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-black text-[#1B3D34] font-heading">₹99</span>
                     <span className="text-xs text-[#4B5563]">/ project</span>
@@ -220,7 +220,7 @@ export const PricingPage: React.FC = () => {
             </div>
 
             <div className="space-y-5 pt-2">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+              <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-3">
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F28C28]">
                   TIER 03 // COMPLETE CONSTRUCTION PICTURE
                 </span>
@@ -243,7 +243,7 @@ export const PricingPage: React.FC = () => {
               </div>
 
               {/* Complete QS Deliverables Matrix */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-4 border-t border-[#E5E7EB] text-xs text-[#1B3D34]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-4 border-t border-[#E3E8E2] text-xs text-[#1B3D34]">
                 <div className="flex items-start gap-2.5">
                   <span className="font-mono font-bold text-[#F28C28] shrink-0">&check;</span>
                   <span><strong>Section A:</strong> Itemized Civil Works BOQ</span>
@@ -271,7 +271,7 @@ export const PricingPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-6 border-t border-[#E5E7EB] space-y-3">
+            <div className="pt-6 border-t border-[#E3E8E2] space-y-3">
               <button
                 type="button"
                 onClick={() => handleSelectTier('DETAILED_ESTIMATE_499')}
@@ -296,7 +296,7 @@ export const PricingPage: React.FC = () => {
         <div className="bg-white rounded-3xl border border-dashed border-[#1B3D34]/30 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xs text-left arch-bracketed opacity-90">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
                 TIER 04
               </span>
               <span className="font-mono text-xs font-bold text-[#F28C28]">
@@ -312,7 +312,7 @@ export const PricingPage: React.FC = () => {
           </div>
 
           <div className="shrink-0 flex items-center gap-3">
-            <span className="text-xs font-mono font-bold text-[#4B5563] bg-[#F8F8F6] px-4 py-2.5 rounded-xl border border-[#E5E7EB]">
+            <span className="text-xs font-mono font-bold text-[#4B5563] bg-[#F8F8F6] px-4 py-2.5 rounded-xl border border-[#E3E8E2]">
               In Pilot Testing
             </span>
           </div>
@@ -379,7 +379,7 @@ export const PricingPage: React.FC = () => {
                 a: 'No. The ₹1,499 Expert Consultation is an independent professional advisory service with verified architects and chartered engineers and is booked separately.',
               },
             ].map((faq, idx) => (
-              <div key={idx} className="bg-white p-5 rounded-2xl border border-[#E5E7EB] space-y-1.5 shadow-2xs">
+              <div key={idx} className="bg-white p-5 rounded-2xl border border-[#E3E8E2] space-y-1.5 shadow-2xs">
                 <h4 className="text-xs sm:text-sm font-bold text-[#1B3D34]">
                   {faq.q}
                 </h4>
@@ -405,8 +405,8 @@ export const PricingPage: React.FC = () => {
       {/* Customer Purchase History Modal */}
       {showHistoryModal && (
         <div className="fixed inset-0 z-50 bg-[#1B3D34]/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-[#E5E7EB] max-w-lg w-full p-6 space-y-4 shadow-2xl text-left relative max-h-[85vh] overflow-y-auto arch-bracketed">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+          <div className="bg-white rounded-3xl border border-[#E3E8E2] max-w-lg w-full p-6 space-y-4 shadow-2xl text-left relative max-h-[85vh] overflow-y-auto arch-bracketed">
+            <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-3">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#F28C28]" />
                 <h3 className="text-base font-extrabold text-[#1B3D34] font-heading">
@@ -424,7 +424,7 @@ export const PricingPage: React.FC = () => {
 
             <div className="space-y-3">
               {purchases.map((p) => (
-                <div key={p.id} className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-2 text-xs">
+                <div key={p.id} className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-[#1B3D34]">{p.tierNameSnapshot}</span>
                     <span className="font-mono font-bold text-[#1B3D34]">

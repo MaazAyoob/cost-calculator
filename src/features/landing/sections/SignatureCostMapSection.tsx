@@ -77,11 +77,11 @@ export const SignatureCostMapSection: React.FC = () => {
   const totalCost = 4482200; // Illustrative benchmark 2,400 sq.ft G+2
 
   return (
-    <section className="py-20 lg:py-28 bg-[#F8F8F6] border-b border-[#E5E7EB] relative select-none">
+    <section className="py-20 lg:py-28 bg-[#F8F8F6] border-b border-[#E3E8E2] relative select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         
         {/* Section Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E5E7EB] pb-6 text-left">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E3E8E2] pb-6 text-left">
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
               <span className="text-[#F28C28] font-bold">Budget Breakdown</span>
@@ -111,7 +111,7 @@ export const SignatureCostMapSection: React.FC = () => {
             <span className="text-[#1B3D34] font-medium">100% of construction budget itemized</span>
           </div>
 
-          <div className="h-10 sm:h-12 w-full rounded-2xl overflow-hidden flex border border-[#E5E7EB] shadow-xs p-1 bg-white">
+          <div className="h-10 sm:h-12 w-full rounded-2xl overflow-hidden flex border border-[#E3E8E2] shadow-xs p-1 bg-white">
             {COST_HEADS.map((head) => (
               <button
                 key={head.id}
@@ -140,7 +140,7 @@ export const SignatureCostMapSection: React.FC = () => {
                 className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                   selectedHeadId === head.id
                     ? 'bg-white border-[#1B3D34] shadow-xs'
-                    : 'bg-[#F8F8F6] border-[#E5E7EB] hover:bg-white'
+                    : 'bg-[#F8F8F6] border-[#E3E8E2] hover:bg-white'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-1">
@@ -158,7 +158,7 @@ export const SignatureCostMapSection: React.FC = () => {
         </div>
 
         {/* Selected Category Deep Dive Panel */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs text-left grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E3E8E2] shadow-xs text-left grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left Summary Metric (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
@@ -180,7 +180,7 @@ export const SignatureCostMapSection: React.FC = () => {
             </div>
 
             {/* Material vs Labour Split */}
-            <div className="pt-4 border-t border-[#E5E7EB] space-y-2 text-xs">
+            <div className="pt-4 border-t border-[#E3E8E2] space-y-2 text-xs">
               <span className="text-[#4B5563] block uppercase text-[10px] font-bold">
                 Material vs Labour Split
               </span>
@@ -190,7 +190,7 @@ export const SignatureCostMapSection: React.FC = () => {
                     <span className="text-[#1B3D34] font-bold">Materials: {activeHead.materialsPercent}%</span>
                     <span className="text-[#4B5563]">Labour: {activeHead.labourPercent}%</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden flex">
+                  <div className="h-2 w-full rounded-full bg-[#E3E8E2] overflow-hidden flex">
                     <div style={{ width: `${activeHead.materialsPercent}%` }} className="bg-[#1B3D34] h-full" />
                     <div style={{ width: `${activeHead.labourPercent}%` }} className="bg-[#F28C28] h-full" />
                   </div>
@@ -200,8 +200,8 @@ export const SignatureCostMapSection: React.FC = () => {
           </div>
 
           {/* Right Included Deliverables Schedule (7 cols) */}
-          <div className="lg:col-span-7 bg-[#F8F8F6] p-6 rounded-2xl border border-[#E5E7EB] space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] block border-b border-[#E5E7EB] pb-2">
+          <div className="lg:col-span-7 bg-[#F8F8F6] p-6 rounded-2xl border border-[#E3E8E2] space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] block border-b border-[#E3E8E2] pb-2">
               Itemized Scope in This Category
             </span>
 
@@ -216,7 +216,7 @@ export const SignatureCostMapSection: React.FC = () => {
               ))}
             </div>
 
-            <div className="pt-3 border-t border-[#E5E7EB] text-xs text-[#4B5563]">
+            <div className="pt-3 border-t border-[#E3E8E2] text-xs text-[#4B5563]">
               &bull; Itemized in Hutty 22-Section Detailed BOQ Dossier
             </div>
           </div>

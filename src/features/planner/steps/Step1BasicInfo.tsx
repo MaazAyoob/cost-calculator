@@ -222,35 +222,25 @@ export const Step1BasicInfo: React.FC = () => {
   return (
     <div className="space-y-6 text-left pb-4">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-            STEP 01
-          </span>
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] font-bold uppercase text-[#4B5563] hidden sm:inline mr-1">
-              Presets:
-            </span>
-            {archetypePresets.map((arch) => (
-              <button
-                key={arch.id}
-                type="button"
-                onClick={() => applyArchetype(arch)}
-                className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F8F8F6] hover:bg-[rgba(27,61,52,0.06)] text-[#1B3D34] border border-[#E5E7EB] hover:border-[#1B3D34] transition-all cursor-pointer"
-              >
-                {arch.label.split(' ')[0]}
-              </button>
-            ))}
-          </div>
+      {/* ── QUICK ARCHETYPE PRESETS STRIP ── */}
+      <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#E3E8E2]">
+        <span className="text-xs font-bold text-[#172722] flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
+          <span>Quick Architecture Presets</span>
+        </span>
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          {archetypePresets.map((arch) => (
+            <button
+              key={arch.id}
+              type="button"
+              onClick={() => applyArchetype(arch)}
+              className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#F8F8F6] hover:bg-[#EDF3ED] text-[#1B3D34] border border-[#E3E8E2] hover:border-[#1B3D34] transition-all cursor-pointer whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-[#1B3D34]"
+              title={`Load ${arch.label} preset`}
+            >
+              {arch.label.split(' ')[0]}
+            </button>
+          ))}
         </div>
-
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          BUILD YOUR HOME
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Authority-informed site planning, setbacks, and configurable Built-Up Area.
-        </p>
       </div>
 
       {/* ── 1. SITE LOCATION & DIMENSIONS ── */}
@@ -320,7 +310,7 @@ export const Step1BasicInfo: React.FC = () => {
                       'text-[10px] font-bold px-2 py-0.5 rounded border transition-all cursor-pointer',
                       isMatch
                         ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                        : 'bg-[#F8F8F6] text-[#4B5563] border-[#E5E7EB] hover:bg-white'
+                        : 'bg-[#F8F8F6] text-[#4B5563] border-[#E3E8E2] hover:bg-white'
                     )}
                   >
                     {p.label}
@@ -337,7 +327,7 @@ export const Step1BasicInfo: React.FC = () => {
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
                   Length (Depth)
                 </span>
-                <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-[#E5E7EB] focus-within:border-[#1B3D34] shadow-2xs">
+                <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-[#E3E8E2] focus-within:border-[#1B3D34] shadow-2xs">
                   <input
                     type="number"
                     min={1}
@@ -357,6 +347,13 @@ export const Step1BasicInfo: React.FC = () => {
                 max={lengthSliderMax}
                 step={1}
                 value={plotLength || 0}
+                aria-label="Plot Length (Depth) in feet"
+                aria-valuemin={1}
+                aria-valuemax={lengthSliderMax}
+                aria-valuenow={plotLength || 0}
+                style={{
+                  '--range-progress': `${Math.min(100, Math.max(0, (((plotLength || 0) - 1) / Math.max(1, lengthSliderMax - 1)) * 100))}%`,
+                } as React.CSSProperties}
                 onChange={(e) => {
                   setPlotDimensions(Number(e.target.value), plotWidth || 30);
                   setUserSelectedBUA(null);
@@ -376,7 +373,7 @@ export const Step1BasicInfo: React.FC = () => {
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
                   Width (Frontage)
                 </span>
-                <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-[#E5E7EB] focus-within:border-[#1B3D34] shadow-2xs">
+                <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-[#E3E8E2] focus-within:border-[#1B3D34] shadow-2xs">
                   <input
                     type="number"
                     min={1}
@@ -396,6 +393,13 @@ export const Step1BasicInfo: React.FC = () => {
                 max={widthSliderMax}
                 step={1}
                 value={plotWidth || 0}
+                aria-label="Plot Width (Frontage) in feet"
+                aria-valuemin={1}
+                aria-valuemax={widthSliderMax}
+                aria-valuenow={plotWidth || 0}
+                style={{
+                  '--range-progress': `${Math.min(100, Math.max(0, (((plotWidth || 0) - 1) / Math.max(1, widthSliderMax - 1)) * 100))}%`,
+                } as React.CSSProperties}
                 onChange={(e) => {
                   setPlotDimensions(plotLength || 40, Number(e.target.value));
                   setUserSelectedBUA(null);
@@ -448,7 +452,7 @@ export const Step1BasicInfo: React.FC = () => {
       </div>
 
       {/* ── 3. NUMBER OF FLOORS ── */}
-      <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-2 pt-2 border-t border-[#E3E8E2]">
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Number of Floors
         </label>
@@ -480,7 +484,7 @@ export const Step1BasicInfo: React.FC = () => {
       </div>
 
       {/* ── 4. HOUSE TYPE & PARKING ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E5E7EB]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E3E8E2]">
         
         {/* House Type */}
         <div className="space-y-2">
@@ -540,58 +544,56 @@ export const Step1BasicInfo: React.FC = () => {
 
       </div>
 
-      {/* ── 5. SEPARATION OF CONCEPTS: PLOT AREA, CALCULATED PERMISSIBLE BUA, & PROPOSED BUA ── */}
-      <div className="space-y-3.5 pt-3 border-t border-[#E5E7EB]">
+      {/* ── 5. SEPARATION OF CONCEPTS: PLOT AREA, PERMISSIBLE BUA, & PROPOSED BUA ── */}
+      <div className="space-y-3.5 pt-3 border-t border-[#E3E8E2]">
         
-        {/* Concept Cards Overview Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {/* Card 1: Plot Area */}
-          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+        {/* Unified 3-Part Metric Strip (No nested card-within-card) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#E3E8E2] border border-[#E3E8E2] rounded-xl bg-[#F8F8F6] overflow-hidden shadow-2xs">
+          {/* Metric 1: Plot Area */}
+          <div className="p-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">
               1. Plot Area
             </span>
-            <span className="text-lg font-black text-[#1B3D34] font-mono block mt-0.5">
-              {plotArea.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+            <span className="text-lg font-black text-[#172722] font-mono block mt-0.5">
+              {plotArea.toLocaleString()} <span className="text-xs font-normal text-[#687770]">sq.ft</span>
             </span>
-            <span className="text-[10px] text-[#4B5563] block mt-0.5">
+            <span className="text-[10px] text-[#687770] block mt-0.5">
               {plotWidth || 0} ft × {plotLength || 0} ft
             </span>
           </div>
 
-          {/* Card 2: Calculated Permissible BUA */}
-          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+          {/* Metric 2: Permissible BUA */}
+          <div className="p-3">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">
                 2. Permissible BUA
               </span>
-              <span className="text-[9px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-1.5 py-0.5 rounded">
+              <span className="text-[9px] font-mono font-bold text-[#1B3D34] bg-[#EDF3ED] px-1.5 py-0.5 rounded border border-[#CBE0CD]">
                 FAR {area.permissibleFAR || 1.75}
               </span>
             </div>
-            <span className="text-lg font-black text-[#1B3D34] font-mono block mt-0.5">
-              {maxBUA.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+            <span className="text-lg font-black text-[#172722] font-mono block mt-0.5">
+              {maxBUA.toLocaleString()} <span className="text-xs font-normal text-[#687770]">sq.ft</span>
             </span>
-            <span className="text-[10px] text-[#4B5563] block mt-0.5">
-              Statutory max limit based on bylaws
+            <span className="text-[10px] text-[#687770] block mt-0.5">
+              Statutory max bylaw limit
             </span>
           </div>
 
-          {/* Card 3: User's Proposed BUA (with direct numeric input) */}
+          {/* Metric 3: User's Proposed BUA */}
           <div className={cn(
-            'p-3 rounded-xl border transition-all',
-            validationState === 'exceeds_permissible'
-              ? 'bg-amber-50/70 border-amber-300'
-              : 'bg-[rgba(27,61,52,0.04)] border-[#1B3D34]/20'
+            'p-3 transition-colors',
+            validationState === 'exceeds_permissible' ? 'bg-amber-50/70' : 'bg-white'
           )}>
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B3D34] block">
                 3. Proposed BUA
               </span>
-              <span className="text-[9px] text-[#4B5563] font-medium">
+              <span className="text-[9px] text-[#687770] font-medium">
                 Editable
               </span>
             </div>
-            <div className="flex items-center gap-1 mt-0.5 bg-white px-2 py-0.5 rounded-md border border-[#E5E7EB] focus-within:border-[#1B3D34] shadow-2xs">
+            <div className="flex items-center gap-1 mt-0.5 bg-white px-2 py-0.5 rounded-md border border-[#E3E8E2] focus-within:border-[#1B3D34] shadow-2xs">
               <input
                 type="number"
                 min={sliderMin}
@@ -600,23 +602,23 @@ export const Step1BasicInfo: React.FC = () => {
                 value={activeBUA === 0 ? '' : Math.min(sliderMax, activeBUA)}
                 placeholder="0"
                 onChange={(e) => handleBUAChange(e.target.value)}
-                className="w-full text-right font-mono text-base font-black text-[#1B3D34] bg-transparent focus:outline-none"
+                className="w-full text-right font-mono text-base font-black text-[#172722] bg-transparent focus:outline-none"
               />
-              <span className="text-xs font-bold text-[#4B5563]">sq.ft</span>
+              <span className="text-xs font-bold text-[#687770]">sq.ft</span>
             </div>
-            <span className="text-[10px] font-mono text-[#4B5563] block mt-0.5 text-right">
+            <span className="text-[10px] font-mono text-[#687770] block mt-0.5 text-right">
               ~{buaPerFloor.toLocaleString()} sq.ft / floor ({numFloors}F)
             </span>
           </div>
         </div>
 
-        {/* Synchronized BUA Slider with Recommended Marker */}
-        <div className="space-y-2 pt-1 bg-white p-3.5 rounded-xl border border-[#E5E7EB]">
+        {/* Synchronized BUA Slider with Recommended Marker (Clean integration) */}
+        <div className="space-y-2 pt-1">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#1B3D34]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#172722]">
               Adjust Proposed BUA
             </span>
-            <span className="text-[11px] font-mono text-[#4B5563]">
+            <span className="text-[11px] font-mono text-[#687770]">
               Rec: <strong className="text-[#1B3D34]">{recBUA.toLocaleString()} sq.ft</strong>
             </span>
           </div>
@@ -633,7 +635,7 @@ export const Step1BasicInfo: React.FC = () => {
               disabled={plotArea === 0 || activeBUA <= sliderMin}
               aria-label="Decrease proposed BUA by 10 sq.ft"
               title="Decrease BUA by 10 sq.ft"
-              className="w-8 h-8 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] hover:bg-[#1B3D34] hover:text-white hover:border-[#1B3D34] text-[#1B3D34] flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer shrink-0 shadow-2xs"
+              className="w-8 h-8 rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] hover:bg-[#1B3D34] hover:text-white hover:border-[#1B3D34] text-[#1B3D34] flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer shrink-0 shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34]"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
@@ -647,6 +649,13 @@ export const Step1BasicInfo: React.FC = () => {
                 step={10}
                 value={Math.min(sliderMax, Math.max(sliderMin, activeBUA))}
                 disabled={plotArea === 0}
+                aria-label="Proposed Built-Up Area in square feet"
+                aria-valuemin={sliderMin}
+                aria-valuemax={sliderMax}
+                aria-valuenow={Math.min(sliderMax, Math.max(sliderMin, activeBUA))}
+                style={{
+                  '--range-progress': `${sliderMax > sliderMin ? Math.min(100, Math.max(0, ((Math.min(sliderMax, Math.max(sliderMin, activeBUA)) - sliderMin) / Math.max(1, sliderMax - sliderMin)) * 100)) : 0}%`,
+                } as React.CSSProperties}
                 onChange={(e) => setUserSelectedBUA(Number(e.target.value))}
                 className="hutty-slider w-full cursor-pointer disabled:opacity-40"
               />
@@ -657,7 +666,7 @@ export const Step1BasicInfo: React.FC = () => {
                   className="absolute top-0 flex flex-col items-center pointer-events-none -translate-x-1/2"
                   style={{ left: `${recMarkerPct}%` }}
                 >
-                  <span className="text-[9px] font-bold font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.1)] px-1.5 py-0.2 rounded border border-[#1B3D34]/20 shadow-2xs whitespace-nowrap">
+                  <span className="text-[9px] font-bold font-mono text-[#1B3D34] bg-[#EDF3ED] px-1.5 py-0.2 rounded border border-[#CBE0CD] shadow-2xs whitespace-nowrap">
                     Rec: {recBUA.toLocaleString()}
                   </span>
                   <div className="w-1.5 h-1.5 bg-[#1B3D34] rotate-45 mt-0.5" />
@@ -676,15 +685,15 @@ export const Step1BasicInfo: React.FC = () => {
               disabled={plotArea === 0 || activeBUA >= sliderMax}
               aria-label="Increase proposed BUA by 10 sq.ft"
               title="Increase BUA by 10 sq.ft"
-              className="w-8 h-8 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] hover:bg-[#1B3D34] hover:text-white hover:border-[#1B3D34] text-[#1B3D34] flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer shrink-0 shadow-2xs"
+              className="w-8 h-8 rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] hover:bg-[#1B3D34] hover:text-white hover:border-[#1B3D34] text-[#1B3D34] flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer shrink-0 shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34]"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="flex justify-between items-center text-[10px] font-mono text-[#4B5563]">
+          <div className="flex justify-between items-center text-[10px] font-mono text-[#687770]">
             <span>Min: {sliderMin.toLocaleString()} sq.ft</span>
-            <span className="text-[9px] text-[#4B5563]/80 italic">Slider &amp; numeric box stay synchronized</span>
+            <span className="text-[9px] text-[#687770]/80 italic">Slider &amp; numeric box stay synchronized</span>
             <span>Max: {sliderMax.toLocaleString()} sq.ft</span>
           </div>
         </div>
@@ -769,13 +778,13 @@ export const Step1BasicInfo: React.FC = () => {
 
         {/* Floor-wise BUA breakdown for multi-storey */}
         {numFloors > 1 && plotArea > 0 && (
-          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-1.5 text-xs">
+          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] space-y-1.5 text-xs">
             <span className="font-bold text-[#1B3D34] text-[11px] uppercase tracking-wider block">
               Floor-Wise Area Allocation ({numFloors} Floors)
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
               {Array.from({ length: numFloors }).map((_, idx) => (
-                <div key={idx} className="bg-white p-2 rounded-lg border border-[#E5E7EB] flex justify-between">
+                <div key={idx} className="bg-white p-2 rounded-lg border border-[#E3E8E2] flex justify-between">
                   <span className="text-[#4B5563]">{idx === 0 ? 'Ground Floor' : `Floor ${idx + 1}`}:</span>
                   <span className="font-bold text-[#1B3D34] font-mono">{buaPerFloor.toLocaleString()} sq.ft</span>
                 </div>
@@ -786,7 +795,7 @@ export const Step1BasicInfo: React.FC = () => {
 
         {/* ── EXPANDABLE "HOW IS THIS CALCULATED?" AUTHORITY EXPLAINER ── */}
         {plotArea > 0 && (
-          <div className="border border-[#E5E7EB] rounded-xl overflow-hidden">
+          <div className="border border-[#E3E8E2] rounded-xl overflow-hidden">
             <button
               type="button"
               onClick={() => setShowHowCalculated(!showHowCalculated)}
@@ -800,7 +809,7 @@ export const Step1BasicInfo: React.FC = () => {
             </button>
 
             {showHowCalculated && (
-              <div className="p-4 bg-white border-t border-[#E5E7EB] space-y-3 text-xs">
+              <div className="p-4 bg-white border-t border-[#E3E8E2] space-y-3 text-xs">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div>
                     <span className="text-[#4B5563] block text-[10px] uppercase">Plot Area</span>
@@ -828,25 +837,25 @@ export const Step1BasicInfo: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5E7EB] space-y-1">
+                <div className="pt-2 border-t border-[#E3E8E2] space-y-1">
                   <span className="text-[11px] font-bold text-[#1B3D34] block">Required Statutory Setbacks:</span>
                   <div className="flex flex-wrap gap-2 text-[11px] font-mono text-[#4B5563]">
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
                       Front: {area.setbacks?.frontSetbackFt?.toFixed(1) || 3.3} ft
                     </span>
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
                       Rear: {area.setbacks?.rearSetbackFt?.toFixed(1) || 3.3} ft
                     </span>
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
                       Left: {area.setbacks?.leftSetbackFt?.toFixed(1) || 3.3} ft
                     </span>
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
                       Right: {area.setbacks?.rightSetbackFt?.toFixed(1) || 3.3} ft
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#E5E7EB] text-[10px] text-[#4B5563] space-y-1">
+                <div className="pt-2 border-t border-[#E3E8E2] text-[10px] text-[#4B5563] space-y-1">
                   <p>
                     <strong className="text-[#1B3D34]">Planning Authority:</strong> {area.authorityMetadata?.city} &bull; {area.authorityMetadata?.authorityFullName || area.authorityMetadata?.authority}
                   </p>

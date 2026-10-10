@@ -86,21 +86,10 @@ export const Step4Flooring: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-          STEP 04
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          FLOORING FINISHES
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Select surface finishes by zone to calculate tile, granite, and wooden flooring takeoffs.
-        </p>
-      </div>
+
 
       {/* ── ZONE SWITCHER TABS ── */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar border-b border-[#E5E7EB]">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar border-b border-[#E3E8E2]">
         {zones.map((z) => {
           const isActive = activeZoneKey === z.key;
           const isConfigured = Boolean(flooringZones[z.key]);
@@ -113,7 +102,7 @@ export const Step4Flooring: React.FC = () => {
                 'px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2',
                 isActive
                   ? 'bg-[#1B3D34] text-white shadow-xs'
-                  : 'bg-white text-[#4B5563] border border-[#E5E7EB] hover:text-[#1B3D34] hover:bg-[#F8F8F6]'
+                  : 'bg-white text-[#4B5563] border border-[#E3E8E2] hover:text-[#1B3D34] hover:bg-[#F8F8F6]'
               )}
             >
               <span>{z.label}</span>

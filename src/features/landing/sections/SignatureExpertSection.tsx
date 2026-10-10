@@ -30,11 +30,11 @@ export const SignatureExpertSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 lg:py-28 bg-[#F8F8F6] border-b border-[#E5E7EB] relative select-none">
+    <section className="py-20 lg:py-28 bg-[#F8F8F6] border-b border-[#E3E8E2] relative select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Section Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E5E7EB] pb-6 text-left">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E3E8E2] pb-6 text-left">
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
               <span className="text-[#F28C28] font-bold">Expert Advice</span>
@@ -62,10 +62,10 @@ export const SignatureExpertSection: React.FC = () => {
           {EXPERT_SPECIALTIES.map((spec, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E5E7EB] shadow-xs flex flex-col justify-between space-y-6 hover:border-[#1B3D34] transition-all"
+              className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E3E8E2] shadow-xs flex flex-col justify-between space-y-6 hover:border-[#1B3D34] transition-all"
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+                <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
                     {spec.badge}
                   </span>
@@ -83,7 +83,7 @@ export const SignatureExpertSection: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="space-y-2 pt-2 border-t border-[#E5E7EB]">
+                <div className="space-y-2 pt-2 border-t border-[#E3E8E2]">
                   {spec.deliverables.map((item, dIdx) => (
                     <div key={dIdx} className="flex items-start gap-2 text-xs text-[#4B5563]">
                       <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
@@ -93,7 +93,7 @@ export const SignatureExpertSection: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[#E5E7EB] space-y-3">
+              <div className="pt-4 border-t border-[#E3E8E2] space-y-3">
                 <div className="flex items-center gap-1.5 text-xs text-[#4B5563]">
                   <Award className="w-3.5 h-3.5 text-[#F28C28] shrink-0" />
                   <span className="truncate">{spec.credential}</span>
@@ -112,7 +112,7 @@ export const SignatureExpertSection: React.FC = () => {
         </div>
 
         {/* Credibility Guarantee Strip */}
-        <div className="p-6 bg-white rounded-2xl border border-[#E5E7EB] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left">
+        <div className="p-6 bg-white rounded-2xl border border-[#E3E8E2] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left">
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-6 h-6 text-[#1B3D34] shrink-0" />
             <div>

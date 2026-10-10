@@ -57,18 +57,7 @@ export const Step9BathroomFittings: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-          STEP 09
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          BATHROOM &amp; PLUMBING
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Configure sanitaryware fixture tiers and CPVC water supply pipe brands (~{fixtureSets} bathroom sets computed).
-        </p>
-      </div>
+
 
       {/* ── 1. SANITARYWARE SPECIFICATION ── */}
       <div className="space-y-2.5">
@@ -106,7 +95,7 @@ export const Step9BathroomFittings: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#1B3D34]">{tier.title}</h4>
-                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E3E8E2]">
                         {tier.brands}
                       </span>
                       {isRecommended && (
@@ -132,7 +121,7 @@ export const Step9BathroomFittings: React.FC = () => {
       </div>
 
       {/* ── 2. CPVC PIPE BRAND ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-2.5 pt-2 border-t border-[#E3E8E2]">
         <div className="flex justify-between items-center text-xs">
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             CPVC Internal Plumbing Pipes

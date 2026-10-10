@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWizardStore } from '../../store/useWizardStore';
+import { modalScaleVariant, backdropFadeVariant } from '../../animations/variants';
 import {
   useBudgetResult,
   useArea,
@@ -20,14 +21,18 @@ import {
   Calculator,
   X,
   Sparkles,
+  ChevronRight,
+  Eye,
 } from 'lucide-react';
 
 interface LivePreviewPanelProps {
   onOpenPackageComparison?: () => void;
+  onReviewAllSelections?: () => void;
 }
 
 export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
   onOpenPackageComparison,
+  onReviewAllSelections,
 }) => {
   const store = useWizardStore();
   const {
@@ -62,7 +67,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
   const totalCost = budget.totalProjectCost || 0;
   const buaSqFt = area.totalBUASqFt || 0;
   const ratePerSqFt = totalCost > 0 && buaSqFt > 0 ? Math.round(totalCost / buaSqFt) : 0;
-  const plotArea = area.plotAreaSqFt || plotLength * plotWidth || 0;
+  const plotArea = area.plotAreaSqFt || (plotLength || 0) * (plotWidth || 0) || 0;
   const remainingGround = area.remainingGroundAreaSqFt || area.remainingGroundArea || Math.max(0, plotArea - (area.buaPerFloorSqFt || 0));
 
   // Package & customizations
@@ -109,177 +114,32 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
   };
 
   const isZeroState = buaSqFt === 0 || totalCost === 0;
+  const floorDesc = (floors || 1) === 1 ? 'Ground floor' : `G+${(floors || 1) - 1}`;
 
   return (
-    <aside className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-5 lg:p-6 shadow-xs flex flex-col justify-between space-y-4 text-left relative">
+    <aside className="w-full bg-white rounded-[14px] border border-[#E3E8E2] p-4 sm:p-5 shadow-xs flex flex-col space-y-4 text-left relative">
       
-      {/* ── 1. PROMINENT ESTIMATE HERO AREA ── */}
-      <div className="space-y-3 pb-3 border-b border-[#E5E7EB]">
-        
-        {/* Top Status, Package Badge & Delta Bar */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${isZeroState ? 'bg-[#4B5563]' : 'bg-[#1B3D34] animate-pulse'}`} />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-[#1B3D34] font-heading">
-              ESTIMATED PROJECT COST
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {costDelta !== null && costDelta !== 0 && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.9, y: 2 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                  costDelta > 0
-                    ? 'bg-[#F28C28]/15 text-[#D9771A] border border-[#F28C28]/30'
-                    : 'bg-[#1B3D34]/10 text-[#1B3D34] border border-[#1B3D34]/20'
-                }`}
-              >
-                {costDelta > 0 ? <TrendingUp className="w-3 h-3 text-[#F28C28]" /> : <TrendingDown className="w-3 h-3 text-[#1B3D34]" />}
-                <span>
-                  {costDelta > 0 ? '+' : ''}
-                  <AnimatedNumber value={costDelta} format={(v) => formatCurrency(Math.round(v))} duration={300} />
-                </span>
-              </motion.span>
-            )}
-
-            <span className="text-[10px] font-mono font-bold text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded-md border border-[#E5E7EB]">
-              LIVE ENGINE SYNC
-            </span>
-          </div>
-        </div>
-
-        {/* Large Estimate Number with Tabular Motion */}
-        <div className="flex items-baseline gap-3 flex-wrap">
-          <div className="text-3xl sm:text-4xl font-black text-[#1B3D34] tracking-tight font-heading leading-none tabular-nums">
-            {isZeroState ? (
-              <span className="text-[#9CA3AF]">₹0</span>
-            ) : (
-              <AnimatedNumber value={totalCost} format={(v) => formatCurrency(Math.round(v))} duration={400} />
-            )}
-          </div>
-
-          {ratePerSqFt > 0 && (
-            <span className="text-xs sm:text-sm font-mono font-bold text-[#4B5563] tabular-nums">
-              @ ₹<AnimatedNumber value={ratePerSqFt} duration={350} /> / sq.ft BUA
-            </span>
-          )}
-        </div>
-
-        {/* Construction Package Active Status & Compare Trigger */}
-        <div className="p-2.5 bg-[rgba(27,61,52,0.03)] rounded-xl border border-[#1B3D34]/15 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-              {selectedPackage?.charAt(0) || 'P'}
-            </div>
-            <div className="min-w-0 truncate">
-              <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">
-                Standard Profile
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-extrabold text-[#1B3D34] truncate">
-                  {pkgConfig.title} Package
-                </span>
-                {customizations.length > 0 ? (
-                  <span className="text-[10px] font-bold text-[#F28C28] bg-[rgba(242,140,40,0.12)] px-1.5 py-0.2 rounded border border-[#F28C28]/25 shrink-0">
-                    {customizations.length} customized
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-[#4B5563] font-medium shrink-0">
-                    · Pure Spec
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {onOpenPackageComparison && (
-            <button
-              type="button"
-              onClick={onOpenPackageComparison}
-              className="text-[11px] font-bold text-[#1B3D34] hover:text-[#132C25] bg-white border border-[#E5E7EB] hover:border-[#1B3D34]/30 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
-            >
-              <Sparkles className="w-3 h-3 text-[#F28C28]" />
-              <span>Compare 3 Tiers</span>
-            </button>
-          )}
-        </div>
-
-        {/* Architectural Metrics Bar */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#4B5563] pt-1">
-          <button
-            type="button"
-            onClick={() =>
-              openInspector(
-                'Built-Up Area (BUA)',
-                'Total BUA = Built-up Footprint per Floor × Number of Storeys',
-                [
-                  { label: 'Footprint / Floor', value: `${area.buaPerFloorSqFt || 0} sq.ft` },
-                  { label: 'Storeys / Floors', value: `${floors || 1} Storeys` },
-                ],
-                'BBMP / BDA Comprehensive Development Plan (CDP) & Zonal Regulations',
-                `${buaSqFt.toLocaleString()} sq.ft`
-              )
-            }
-            className="flex items-center gap-1.5 hover:text-[#1B3D34] transition-colors cursor-pointer group"
-          >
-            <span className="font-bold text-[#1B3D34] font-mono text-xs tabular-nums">
-              {buaSqFt > 0 ? (
-                <>
-                  <AnimatedNumber value={buaSqFt} duration={350} /> sq.ft
-                </>
-              ) : (
-                '0 sq.ft'
-              )}
-            </span>
-            <span>BUA</span>
-            <Info className="w-3 h-3 text-[#4B5563] opacity-60 group-hover:opacity-100" />
-          </button>
-
-          <span className="text-[#E5E7EB]">•</span>
-
-          <button
-            type="button"
-            onClick={() =>
-              openInspector(
-                'Remaining Ground Area',
-                'Remaining Open Area = Total Site Area - Ground Floor Footprint',
-                [
-                  { label: 'Total Plot Area', value: `${plotArea.toLocaleString()} sq.ft` },
-                  { label: 'Ground Footprint', value: `${area.buaPerFloorSqFt || 0} sq.ft` },
-                ],
-                'Permissible ground coverage & landscape setback requirements',
-                `${Math.round(remainingGround).toLocaleString()} sq.ft`
-              )
-            }
-            className="flex items-center gap-1.5 hover:text-[#1B3D34] transition-colors cursor-pointer group"
-          >
-            <span className="font-bold text-[#1B3D34] font-mono text-xs tabular-nums">
-              {remainingGround > 0 ? (
-                <>
-                  <AnimatedNumber value={Math.round(remainingGround)} duration={350} /> sq.ft
-                </>
-              ) : (
-                '0 sq.ft'
-              )}
-            </span>
-            <span>Open Yard</span>
-            <Info className="w-3 h-3 text-[#4B5563] opacity-60 group-hover:opacity-100" />
-          </button>
-
-          <span className="text-[#E5E7EB]">•</span>
-
-          <span className="font-mono text-[#4B5563] text-xs tabular-nums">
-            {plotArea > 0 ? `${plotArea.toLocaleString()} sq.ft plot` : '0 sq.ft plot'}
+      {/* ── 1. SNAPSHOT HEADER ── */}
+      <div className="flex items-center justify-between pb-3 border-b border-[#E3E8E2]">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">
+            YOUR HOME SNAPSHOT
+          </span>
+          <span className="text-xs font-bold text-[#172722]">
+            {city || 'Bengaluru'} Project
           </span>
         </div>
 
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#1B3D34] animate-pulse" />
+          <span className="text-[9px] font-mono font-bold text-[#1B3D34] bg-[#EDF3ED] px-2 py-0.5 rounded-md border border-[#CBE0CD]">
+            LIVE ENGINE
+          </span>
+        </div>
       </div>
 
-      {/* ── 2. PROMINENT 3D ARCHITECTURAL CANVAS ── */}
-      <div className="w-full h-64 sm:h-72 lg:h-80 xl:h-[340px] 2xl:h-[380px] rounded-xl overflow-hidden border border-[#E5E7EB] relative bg-[#1B3D34] shrink-0 shadow-2xs">
+      {/* ── 2. 3D ARCHITECTURAL HOUSE PREVIEW (Properly Proportioned) ── */}
+      <div className="w-full h-44 sm:h-48 lg:h-52 rounded-xl overflow-hidden border border-[#E3E8E2] relative bg-[#112821] shrink-0 shadow-inner group">
         <Architectural3DViewer
           city={city}
           plotLength={plotLength || 30}
@@ -305,212 +165,322 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
         />
       </div>
 
-      {/* ── 3. LIVE STEP-AWARE TAKEOFF & 4-HEAD BREAKDOWN ── */}
-      <div className="pt-2 border-t border-[#E5E7EB] space-y-2.5">
+      {/* ── 3. ESTIMATE PREVIEW HERO CARD ── */}
+      <div className="p-3.5 bg-[#F0F5F0] rounded-xl border border-[#D5E3D6] space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B3D34]">
+            ESTIMATED PROJECT COST
+          </span>
+
+          {costDelta !== null && costDelta !== 0 && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.9, y: 1 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full flex items-center gap-0.5 ${
+                costDelta > 0
+                  ? 'bg-[#F28C28]/20 text-[#D9771A]'
+                  : 'bg-[#1B3D34]/15 text-[#1B3D34]'
+              }`}
+            >
+              {costDelta > 0 ? <TrendingUp className="w-2.5 h-2.5 text-[#F28C28]" /> : <TrendingDown className="w-2.5 h-2.5 text-[#1B3D34]" />}
+              <span>
+                {costDelta > 0 ? '+' : ''}
+                <AnimatedNumber value={costDelta} format={(v) => formatCurrency(Math.round(v))} duration={300} />
+              </span>
+            </motion.span>
+          )}
+        </div>
+
+        <div className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading tracking-tight tabular-nums leading-none">
+          {isZeroState ? (
+            <span className="text-[#9CA3AF]">₹0</span>
+          ) : (
+            <AnimatedNumber value={totalCost} format={(v) => formatCurrency(Math.round(v))} duration={400} />
+          )}
+        </div>
+
+        <div className="flex items-center justify-between text-[11px] text-[#687770] pt-0.5 font-mono">
+          <span>
+            {ratePerSqFt > 0 ? `@ ₹${ratePerSqFt.toLocaleString()} / sq.ft BUA` : 'Awaiting plot inputs'}
+          </span>
+          {buaSqFt > 0 && (
+            <span className="font-bold text-[#172722]">{buaSqFt.toLocaleString()} sq.ft BUA</span>
+          )}
+        </div>
+      </div>
+
+      {/* ── 4. SNAPSHOT KEY PARAMETERS (Prototype Clean Stats) ── */}
+      <div className="space-y-2 pt-1 border-t border-[#E3E8E2] text-xs">
         
-        {/* Dynamic Step Takeoff Strip */}
-        {currentStep === 1 && (
-          <div className="flex items-center justify-between text-xs p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-            <div>
-              <span className="text-[#4B5563] block text-[10px] uppercase font-bold">Municipal Setbacks</span>
-              <span className="font-bold text-[#1B3D34] font-mono">
-                Front {area.setbacks?.frontSetbackFt ?? 3.5}' • Rear {area.setbacks?.rearSetbackFt ?? 3.0}' • Sides {area.setbacks?.leftSetbackFt ?? 3.0}'
-              </span>
+        {/* Selected Package */}
+        <div className="flex items-center justify-between py-1.5 border-b border-[#E3E8E2]/70">
+          <div>
+            <span className="text-[10px] text-[#687770] block">Selected package</span>
+            <div className="flex items-center gap-1.5">
+              <b className="text-[13px] text-[#172722]">{pkgConfig.title}</b>
+              {customizations.length > 0 && (
+                <span className="text-[9px] font-bold text-[#F28C28] bg-[#F28C28]/10 px-1 py-0.2 rounded">
+                  {customizations.length} custom
+                </span>
+              )}
             </div>
-            <div className="text-right">
-              <span className="text-[#4B5563] block text-[10px] uppercase font-bold">Buildable Footprint</span>
-              <span className="font-bold text-[#1B3D34] font-mono">
+          </div>
+          {onOpenPackageComparison && (
+            <button
+              type="button"
+              onClick={onOpenPackageComparison}
+              className="text-[11px] font-bold text-[#1B3D34] hover:text-[#142F28] flex items-center gap-0.5 cursor-pointer"
+            >
+              <Sparkles className="w-3 h-3 text-[#F28C28]" />
+              <span>Tiers</span>
+            </button>
+          )}
+        </div>
+
+        {/* Plot Area */}
+        <div className="flex items-center justify-between py-1.5 border-b border-[#E3E8E2]/70">
+          <div>
+            <span className="text-[10px] text-[#687770] block">Plot area</span>
+            <b className="text-[13px] text-[#172722] font-mono">
+              {plotArea > 0 ? `${plotArea.toLocaleString()} sq.ft` : '—'}
+            </b>
+          </div>
+          <span className="text-[11px] text-[#687770] font-mono">
+            {plotLength > 0 && plotWidth > 0 ? `${plotLength} × ${plotWidth} ft` : ''}
+          </span>
+        </div>
+
+        {/* Home Configuration */}
+        <div className="flex items-center justify-between py-1.5 border-b border-[#E3E8E2]/70">
+          <div>
+            <span className="text-[10px] text-[#687770] block">Home configuration</span>
+            <b className="text-[13px] text-[#172722]">
+              {houseType || 'Independent house'} &bull; {floorDesc}
+            </b>
+          </div>
+        </div>
+
+        {/* Rooms */}
+        <div className="flex items-center justify-between py-1.5 border-b border-[#E3E8E2]/70">
+          <div>
+            <span className="text-[10px] text-[#687770] block">Rooms</span>
+            <b className="text-[13px] text-[#172722]">
+              {rooms.bedrooms || 0} bedrooms &bull; {rooms.bathrooms || 0} bathrooms
+            </b>
+          </div>
+          <span className="text-[11px] text-[#687770]">
+            {rooms.kitchen || 1} kitchen
+          </span>
+        </div>
+
+      </div>
+
+      {/* ── 5. STEP-AWARE TAKEOFF STRIP ── */}
+      <div className="space-y-2">
+        {currentStep === 1 && (
+          <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] text-xs">
+            <span className="text-[10px] uppercase font-bold text-[#687770] block">Planning Takeoff</span>
+            <div className="flex justify-between items-center mt-1">
+              <span className="text-[#687770]">Buildable Footprint:</span>
+              <b className="text-[#172722] font-mono">
                 {area.buildableFootprintSqFt ? `${area.buildableFootprintSqFt.toLocaleString()} sq.ft` : '—'}
-              </span>
+              </b>
             </div>
           </div>
         )}
 
         {currentStep === 2 && (
-          <div className="grid grid-cols-4 gap-2 text-center text-xs">
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="text-[10px] font-bold text-[#4B5563] block">Doors</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{quantities.totalDoorsCount || 8}</span>
+          <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
+            <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+              <span className="text-[9px] font-bold text-[#687770] block">Doors</span>
+              <b className="text-[#172722] font-mono">{quantities.totalDoorsCount || 8}</b>
             </div>
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="text-[10px] font-bold text-[#4B5563] block">Windows</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{quantities.windowsCount || 10}</span>
+            <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+              <span className="text-[9px] font-bold text-[#687770] block">Windows</span>
+              <b className="text-[#172722] font-mono">{quantities.windowsCount || 10}</b>
             </div>
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="text-[10px] font-bold text-[#4B5563] block">Electrical Pts</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{quantities.totalElectricalPoints || 120}</span>
-            </div>
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <span className="text-[10px] font-bold text-[#4B5563] block">Paint sq.ft</span>
-              <span className="font-bold text-[#1B3D34] font-mono">{Math.round((quantities.totalPaintableAreaSqFt || 8000) / 1000)}k</span>
+            <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+              <span className="text-[9px] font-bold text-[#687770] block">Electrical</span>
+              <b className="text-[#172722] font-mono">{quantities.totalElectricalPoints || 120} pts</b>
             </div>
           </div>
         )}
 
         {currentStep === 3 && (
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
-              <div>
-                <span className="font-bold text-[#1B3D34] block text-[11px]">Rebar Steel</span>
-                <span className="text-[9px] text-[#4B5563] truncate block">{materialBrands?.steel || 'Tata Tiscon'}</span>
-              </div>
-              <span className="font-bold text-[#1B3D34] font-mono text-xs sm:text-sm mt-1 tabular-nums">
+          <div className="grid grid-cols-3 gap-1.5 text-xs">
+            <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+              <span className="text-[9px] font-bold text-[#687770] block">Steel</span>
+              <b className="text-[#172722] font-mono block mt-0.5">
                 <AnimatedNumber value={quantities.steelTonnes || 0} decimals={2} duration={350} /> T
-              </span>
+              </b>
             </div>
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
-              <div>
-                <span className="font-bold text-[#1B3D34] block text-[11px]">Portland Cement</span>
-                <span className="text-[9px] text-[#4B5563] truncate block">{materialBrands?.cement || 'UltraTech'}</span>
-              </div>
-              <span className="font-bold text-[#1B3D34] font-mono text-xs sm:text-sm mt-1 tabular-nums">
+            <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+              <span className="text-[9px] font-bold text-[#687770] block">Cement</span>
+              <b className="text-[#172722] font-mono block mt-0.5">
                 <AnimatedNumber value={quantities.cementBags || 0} duration={350} /> Bags
-              </span>
+              </b>
             </div>
-            <div className="p-2 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
-              <div>
-                <span className="font-bold text-[#1B3D34] block text-[11px]">Masonry</span>
-                <span className="text-[9px] text-[#4B5563] truncate block">{quantities.masonryMaterial || 'AAC Blocks'}</span>
-              </div>
-              <span className="font-bold text-[#1B3D34] font-mono text-xs sm:text-sm mt-1 tabular-nums">
+            <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+              <span className="text-[9px] font-bold text-[#687770] block">Masonry</span>
+              <b className="text-[#172722] font-mono block mt-0.5">
                 <AnimatedNumber value={quantities.masonryUnitsCount || 0} duration={350} /> {quantities.masonryUnit || 'Nos'}
-              </span>
+              </b>
             </div>
           </div>
         )}
 
         {currentStep >= 4 && currentStep <= 10 && (
-          <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex justify-between items-center text-xs">
+          <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex justify-between items-center text-xs">
             <div>
-              <span className="font-bold text-[#1B3D34] block">
-                {currentStep === 4 ? 'Flooring Surface' : currentStep === 5 ? 'Wall Dado Cladding' : currentStep === 6 ? 'Door Joinery' : currentStep === 7 ? 'Window Glazing' : currentStep === 8 ? 'MEP Wiring' : currentStep === 9 ? 'Bathroom Plumbing' : 'Wall Paint Area'}
+              <span className="font-bold text-[#172722] block text-[11px]">
+                {currentStep === 4 ? 'Flooring Coverage' : currentStep === 5 ? 'Wall Dado Coverage' : currentStep === 6 ? 'Door Openings' : currentStep === 7 ? 'Window Glazing' : currentStep === 8 ? 'MEP Wiring' : currentStep === 9 ? 'Bathroom Fittings' : 'Paint Surface Area'}
               </span>
-              <span className="text-[10px] text-[#4B5563]">Physical Takeoff Computed</span>
+              <span className="text-[10px] text-[#687770]">Calculated Physical Takeoff</span>
             </div>
-            <span className="font-bold text-[#1B3D34] font-mono text-sm tabular-nums">
+            <b className="text-[#172722] font-mono">
               {currentStep === 4 ? (
-                <>
-                  <AnimatedNumber value={quantities.floorTilesSqFt || Math.round(buaSqFt * 0.85)} duration={350} /> sq.ft
-                </>
+                `${quantities.floorTilesSqFt || Math.round(buaSqFt * 0.85)} sq.ft`
               ) : currentStep === 5 ? (
-                <>
-                  <AnimatedNumber value={quantities.wallTilesSqFt || 580} duration={350} /> sq.ft
-                </>
+                `${quantities.wallTilesSqFt || 580} sq.ft`
               ) : currentStep === 6 ? (
                 `${quantities.totalDoorsCount || 8} Sets`
               ) : currentStep === 7 ? (
                 `${quantities.windowAreaSqFt || 200} sq.ft`
               ) : currentStep === 8 ? (
-                <>
-                  <AnimatedNumber value={quantities.electricalWireMetres || 850} duration={350} />m Wire
-                </>
+                `${quantities.electricalWireMetres || 850}m`
               ) : currentStep === 9 ? (
-                `${quantities.bathroomFixtureSets || 3} Bath Sets`
+                `${quantities.bathroomFixtureSets || 3} Sets`
               ) : (
-                <>
-                  <AnimatedNumber value={quantities.totalPaintableAreaSqFt || 8000} duration={350} /> sq.ft
-                </>
+                `${quantities.totalPaintableAreaSqFt || 8000} sq.ft`
               )}
+            </b>
+          </div>
+        )}
+      </div>
+
+      {/* ── 6. 4-HEAD TRADE ALLOCATION (When Cost > 0) ── */}
+      {totalCost > 0 && (
+        <div className="grid grid-cols-4 gap-1.5 pt-2 border-t border-[#E3E8E2] text-[10px]">
+          <div className="border-r border-[#E3E8E2] pr-1">
+            <span className="block font-bold text-[#687770] uppercase text-[8.5px]">Structure</span>
+            <span className="font-bold text-[#172722] font-mono tabular-nums block">
+              <AnimatedNumber value={structureCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
             </span>
           </div>
-        )}
-
-        {/* 4-Head Allocation Breakdown */}
-        {totalCost > 0 && (
-          <div className="grid grid-cols-4 gap-2 pt-1 text-[11px] text-[#4B5563]">
-            <div className="border-r border-[#E5E7EB] pr-1.5">
-              <span className="block text-[9px] font-bold text-[#4B5563] uppercase">Civil Structure</span>
-              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
-                <AnimatedNumber value={structureCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
-              </span>
-            </div>
-            <div className="border-r border-[#E5E7EB] pr-1.5">
-              <span className="block text-[9px] font-bold text-[#4B5563] uppercase">Finishes</span>
-              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
-                <AnimatedNumber value={finishesCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
-              </span>
-            </div>
-            <div className="border-r border-[#E5E7EB] pr-1.5">
-              <span className="block text-[9px] font-bold text-[#4B5563] uppercase">MEP</span>
-              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
-                <AnimatedNumber value={mepCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
-              </span>
-            </div>
-            <div>
-              <span className="block text-[9px] font-bold text-[#4B5563] uppercase">GST &amp; Misc</span>
-              <span className="font-bold text-[#1B3D34] font-mono tabular-nums">
-                <AnimatedNumber value={gstAndContingency} format={(v) => formatCurrency(Math.round(v))} duration={350} />
-              </span>
-            </div>
+          <div className="border-r border-[#E3E8E2] pr-1">
+            <span className="block font-bold text-[#687770] uppercase text-[8.5px]">Finishes</span>
+            <span className="font-bold text-[#172722] font-mono tabular-nums block">
+              <AnimatedNumber value={finishesCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+            </span>
           </div>
-        )}
+          <div className="border-r border-[#E3E8E2] pr-1">
+            <span className="block font-bold text-[#687770] uppercase text-[8.5px]">MEP</span>
+            <span className="font-bold text-[#172722] font-mono tabular-nums block">
+              <AnimatedNumber value={mepCost} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+            </span>
+          </div>
+          <div>
+            <span className="block font-bold text-[#687770] uppercase text-[8.5px]">GST/Misc</span>
+            <span className="font-bold text-[#172722] font-mono tabular-nums block">
+              <AnimatedNumber value={gstAndContingency} format={(v) => formatCurrency(Math.round(v))} duration={350} />
+            </span>
+          </div>
+        </div>
+      )}
 
+      {/* ── 7. ACTION / REVIEW BUTTON ── */}
+      <div className="pt-2 border-t border-[#E3E8E2]">
+        <button
+          type="button"
+          onClick={() => {
+            if (onReviewAllSelections) {
+              onReviewAllSelections();
+            } else {
+              store.setStep(10);
+            }
+          }}
+          className="w-full py-2.5 px-3 rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] hover:bg-[#EDF3ED] hover:border-[#1B3D34]/30 text-xs font-bold text-[#172722] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+        >
+          <span>Review All Selections</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[#F28C28]" />
+        </button>
       </div>
 
       {/* ── FORMULA INSPECTOR MODAL ── */}
-      {inspectorItem && (
-        <div className="fixed inset-0 z-50 bg-[#1B3D34]/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-2xl border border-[#E5E7EB] p-6 max-w-md w-full space-y-4 shadow-xl text-left"
-          >
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
-              <div className="flex items-center gap-2">
-                <Calculator className="w-4 h-4 text-[#1B3D34]" />
-                <h3 className="text-sm font-bold text-[#1B3D34] font-heading">{inspectorItem.title}</h3>
-              </div>
-              <button
-                onClick={() => setInspectorItem(null)}
-                className="p-1 rounded-md text-[#4B5563] hover:text-[#1B3D34] cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3 bg-[rgba(27,61,52,0.06)] rounded-xl border border-[#1B3D34]/15 space-y-1">
-                <span className="text-[10px] font-mono font-bold text-[#F28C28] uppercase tracking-wider block">
-                  ENGINEERING FORMULA
-                </span>
-                <code className="text-xs font-mono font-bold text-[#1B3D34] block">
-                  {inspectorItem.formula}
-                </code>
-              </div>
-
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-1.5">
-                {inspectorItem.variables.map((v, i) => (
-                  <div key={i} className="flex justify-between items-center py-0.5 border-b border-[#E5E7EB]/60 last:border-0">
-                    <span className="text-[#4B5563]">{v.label}</span>
-                    <span className="font-bold text-[#1B3D34] font-mono">{v.value}</span>
-                  </div>
-                ))}
+      <AnimatePresence>
+        {inspectorItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              variants={backdropFadeVariant}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              onClick={() => setInspectorItem(null)}
+              className="fixed inset-0 bg-[#1B3D34]/40 backdrop-blur-xs"
+            />
+            <motion.div
+              variants={modalScaleVariant}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="relative z-10 bg-white rounded-[14px] border border-[#E3E8E2] p-6 max-w-md w-full space-y-4 shadow-xl text-left"
+            >
+              <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-3">
+                <div className="flex items-center gap-2">
+                  <Calculator className="w-4 h-4 text-[#1B3D34]" />
+                  <h3 className="text-sm font-bold text-[#172722] font-heading">{inspectorItem.title}</h3>
+                </div>
+                <button
+                  onClick={() => setInspectorItem(null)}
+                  className="p-1 rounded-md text-[#687770] hover:text-[#172722] cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] text-[11px] text-[#4B5563]">
-                <span className="font-bold text-[#1B3D34] block">Reference Standard:</span>
-                <p>{inspectorItem.standardNorm}</p>
+              <div className="space-y-3 text-xs">
+                <div className="p-3 bg-[rgba(27,61,52,0.06)] rounded-lg border border-[#1B3D34]/15 space-y-1">
+                  <span className="text-[10px] font-mono font-bold text-[#F28C28] uppercase tracking-wider block">
+                    ENGINEERING FORMULA
+                  </span>
+                  <code className="text-xs font-mono font-bold text-[#172722] block">
+                    {inspectorItem.formula}
+                  </code>
+                </div>
+
+                <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1.5">
+                  {inspectorItem.variables.map((v, i) => (
+                    <div key={i} className="flex justify-between items-center py-0.5 border-b border-[#E3E8E2]/60 last:border-0">
+                      <span className="text-[#687770]">{v.label}</span>
+                      <span className="font-bold text-[#172722] font-mono">{v.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] text-[11px] text-[#687770]">
+                  <span className="font-bold text-[#172722] block">Reference Standard:</span>
+                  <p>{inspectorItem.standardNorm}</p>
+                </div>
+
+                <div className="p-3 bg-[#1B3D34] text-white rounded-lg flex items-center justify-between font-bold">
+                  <span>Calculated Value:</span>
+                  <span className="font-mono text-sm text-[#F28C28]">{inspectorItem.result}</span>
+                </div>
               </div>
 
-              <div className="p-3 bg-[#1B3D34] text-white rounded-xl flex items-center justify-between font-bold">
-                <span>Calculated Value:</span>
-                <span className="font-mono text-sm text-[#F28C28]">{inspectorItem.result}</span>
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setInspectorItem(null)}
+                  className="hutty-btn-primary px-4 py-2 text-xs rounded-lg cursor-pointer"
+                >
+                  Close
+                </button>
               </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setInspectorItem(null)}
-                className="hutty-btn-primary px-4 py-2 text-xs rounded-lg cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </aside>
   );

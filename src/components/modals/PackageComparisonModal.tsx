@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWizardStore } from '../../store/useWizardStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
@@ -7,6 +7,7 @@ import {
   ConstructionPackageId,
 } from '../../calculation-engine/data/packageConfig';
 import { formatCurrency, cn } from '../../utils/cn';
+import { modalScaleVariant, backdropFadeVariant } from '../../animations/variants';
 import {
   X,
   Check,
@@ -28,7 +29,26 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
   const { selectedPackage, setSelectedPackage } = useWizardStore();
   const { result } = useCalculationStore();
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Run independent deterministic calculations for all 3 packages using the current project geometry
   const comparison = computeMultiPackageComparison(result.input, selectedPackage);
@@ -51,14 +71,32 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 bg-[#1B3D34]/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 10 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-white rounded-3xl border border-[#E5E7EB] w-full max-w-5xl my-auto shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-left select-none"
+          key="package-comparison-portal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="comparison-modal-title"
         >
+          {/* Backdrop */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-[#1B3D34]/50 backdrop-blur-xs"
+            aria-hidden="true"
+          />
+
+          <motion.div
+            variants={modalScaleVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative bg-white rounded-3xl border border-[#E5E7EB] w-full max-w-5xl my-auto shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-left select-none z-10"
+          >
           {/* ── MODAL HEADER ── */}
           <div className="p-5 sm:p-6 bg-[#F8F8F6] border-b border-[#E5E7EB] flex items-center justify-between shrink-0">
             <div className="space-y-1">
@@ -252,7 +290,8 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
             </button>
           </div>
         </motion.div>
-      </div>
-    </AnimatePresence>
-  );
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 };

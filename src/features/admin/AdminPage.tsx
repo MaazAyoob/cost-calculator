@@ -479,7 +479,7 @@ export const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] pb-24 font-sans">
       {/* ── TOP ARCHITECTURAL OPERATIONS COMMAND BAR ── */}
-      <header className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40 shadow-xs">
+      <header className="bg-white border-b border-[#E3E8E2] sticky top-0 z-40 shadow-xs">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-3.5">
             <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-white flex items-center justify-center font-mono font-bold text-xs tracking-wider shrink-0 shadow-xs">

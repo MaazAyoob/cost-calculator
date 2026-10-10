@@ -26,18 +26,7 @@ export const Step5WallCladding: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-          STEP 05
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          WALL CLADDING &amp; DADO
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Configure wall tile cladding heights for kitchen splash zones and bathroom wet areas.
-        </p>
-      </div>
+
 
       {/* ── 1. KITCHEN DADO ── */}
       <div className="space-y-2.5">
@@ -78,7 +67,7 @@ export const Step5WallCladding: React.FC = () => {
       </div>
 
       {/* ── 2. BATHROOM TILE HEIGHT ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-2.5 pt-2 border-t border-[#E3E8E2]">
         <div className="flex justify-between items-center text-xs">
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             Bathroom Wet Area Tile Height

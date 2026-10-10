@@ -44,7 +44,7 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB] relative select-none">
+    <section className="py-20 lg:py-28 bg-white border-b border-[#E3E8E2] relative select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Section Header */}
@@ -70,14 +70,14 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
           {TIMELINE_STAGES.map((stg, idx) => (
             <div
               key={stg.step}
-              className="p-6 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-6 text-left"
+              className="p-6 bg-[#F8F8F6] rounded-3xl border border-[#E3E8E2] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-6 text-left"
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+                <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                   <span className="text-xs font-bold text-[#F28C28]">
                     Step {idx + 1}
                   </span>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#1B3D34] bg-white px-2 py-0.5 rounded-lg border border-[#E5E7EB]">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#1B3D34] bg-white px-2 py-0.5 rounded-lg border border-[#E3E8E2]">
                     {stg.phase}
                   </span>
                 </div>
@@ -91,7 +91,7 @@ export const SignaturePlanningTimelineSection: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-[#E5E7EB] space-y-1">
+              <div className="pt-3 border-t border-[#E3E8E2] space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
                   Deliverable:
                 </span>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEntitlementStore } from '../../store/useEntitlementStore';
 import { usePricingStore } from '../../store/usePricingStore';
 import { useReportStore } from '../../store/useReportStore';
@@ -8,6 +9,7 @@ import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } f
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { X, Check, Lock, Download, ShieldCheck, FileText, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { PricingTierCode } from '../../types/pricing';
+import { modalScaleVariant, backdropFadeVariant } from '../../animations/variants';
 
 interface Props {
   isOpen: boolean;
@@ -39,7 +41,26 @@ export const UnlockReportModal: React.FC<Props> = ({
   const [isDevGenerating, setIsDevGenerating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const projectId = result.report?.projectId || 'HUTTY-PROJ-01';
 
@@ -152,8 +173,33 @@ export const UnlockReportModal: React.FC<Props> = ({
   const selectedTierPriceDisplay = selectedTier === 'ESTIMATE_99' ? '₹99' : '₹499';
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1B3D34]/40 backdrop-blur-xs flex items-center justify-center p-4 select-none">
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-left relative max-h-[90vh] overflow-y-auto">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="unlock-report-portal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unlock-report-title"
+        >
+          {/* Backdrop */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-[#1B3D34]/40 backdrop-blur-xs"
+            aria-hidden="true"
+          />
+
+          <motion.div
+            variants={modalScaleVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 bg-white rounded-2xl border border-[#E3E8E2] max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
+          >
         
         {/* Close Button */}
         <button
@@ -188,7 +234,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                 className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                   selectedTier === 'ESTIMATE_99'
                     ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E5E7EB] bg-[#F8F8F6] hover:bg-white'
+                    : 'border-[#E3E8E2] bg-[#F8F8F6] hover:bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -207,7 +253,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                 className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
                   selectedTier === 'DETAILED_ESTIMATE_499'
                     ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E5E7EB] bg-[#F8F8F6] hover:bg-white'
+                    : 'border-[#E3E8E2] bg-[#F8F8F6] hover:bg-white'
                 }`}
               >
                 <span className="absolute -top-2 right-2 bg-[#F28C28] text-white text-[9px] font-bold px-1.5 py-0.2 rounded font-mono">
@@ -225,14 +271,14 @@ export const UnlockReportModal: React.FC<Props> = ({
             </div>
 
             {/* Pricing Banner */}
-            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
+            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">One-time payment</span>
                 <span className="text-2xl font-black text-[#1B3D34] font-mono">{selectedTierPriceDisplay}</span>
                 <span className="text-[10px] text-[#4B5563] ml-1">all inclusive</span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E5E7EB] block font-mono">
+                <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E3E8E2] block font-mono">
                   {selectedTier === 'DETAILED_ESTIMATE_499' ? 'Instant PDF • Lifetime Access' : 'Verified Lead Record'}
                 </span>
               </div>
@@ -287,7 +333,7 @@ export const UnlockReportModal: React.FC<Props> = ({
             </div>
 
             {/* Checkout Form */}
-            <form onSubmit={handleUnlock} className="space-y-4 pt-2 border-t border-[#E5E7EB]">
+            <form onSubmit={handleUnlock} className="space-y-4 pt-2 border-t border-[#E3E8E2]">
               {formError && (
                 <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg">
                   {formError}
@@ -303,7 +349,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                     placeholder="e.g. Rahul Sharma"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
                   />
                 </div>
                 <div className="space-y-1">
@@ -314,7 +360,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                     placeholder="10-digit mobile"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -327,7 +373,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                   placeholder="rahul@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
                 />
               </div>
 
@@ -347,7 +393,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                       className={`py-2 px-2.5 rounded-lg border font-bold text-center transition-all cursor-pointer ${
                         paymentMethod === m.id
                           ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                          : 'bg-[#F8F8F6] text-[#4B5563] border-[#E5E7EB] hover:bg-white'
+                          : 'bg-[#F8F8F6] text-[#4B5563] border-[#E3E8E2] hover:bg-white'
                       }`}
                     >
                       {m.label}
@@ -430,7 +476,7 @@ export const UnlockReportModal: React.FC<Props> = ({
               </p>
             </div>
 
-            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-2 text-xs text-left">
+            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] space-y-2 text-xs text-left">
               <div className="flex justify-between">
                 <span className="text-[#4B5563]">Recipient:</span>
                 <span className="font-bold text-[#1B3D34]">{name || 'Valued Homeowner'}</span>
@@ -483,7 +529,9 @@ export const UnlockReportModal: React.FC<Props> = ({
           </div>
         )}
 
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

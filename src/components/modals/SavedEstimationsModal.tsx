@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Copy, Trash2, ArrowRight, FolderOpen } from 'lucide-react';
 import { useSavedEstimationsStore } from '../../store/useSavedEstimationsStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { useUIStore } from '../../store/useUIStore';
 import { formatCurrency } from '../../utils/cn';
+import { modalScaleVariant, backdropFadeVariant } from '../../animations/variants';
 
 interface SavedEstimationsModalProps {
   isOpen: boolean;
@@ -19,7 +20,26 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
 
   const [newEstimateName, setNewEstimateName] = useState('');
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleSaveCurrent = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,15 +57,35 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B3D34]/40 backdrop-blur-xs select-none">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E5E7EB] space-y-6 max-h-[85vh] overflow-y-auto text-left"
-      >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="saved-estimations-portal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="saved-estimations-title"
+        >
+          {/* Backdrop */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-[#1B3D34]/40 backdrop-blur-xs"
+            aria-hidden="true"
+          />
+
+          <motion.div
+            variants={modalScaleVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E3E8E2] space-y-6 max-h-[85vh] overflow-y-auto text-left"
+          >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
+        <div className="flex items-center justify-between pb-4 border-b border-[#E3E8E2]">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
               PROJECT WORKSPACE
@@ -63,7 +103,7 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
         </div>
 
         {/* Form: Save Current Draft */}
-        <form onSubmit={handleSaveCurrent} className="bg-[#F8F8F6] rounded-xl p-4 border border-[#E5E7EB] space-y-3">
+        <form onSubmit={handleSaveCurrent} className="bg-[#F8F8F6] rounded-xl p-4 border border-[#E3E8E2] space-y-3">
           <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
             Save Current Calculation State
           </label>
@@ -73,7 +113,7 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
               placeholder="e.g., Whitefield Villa 30x40"
               value={newEstimateName}
               onChange={(e) => setNewEstimateName(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg text-xs border border-[#E5E7EB] bg-white text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
+              className="flex-1 px-3 py-2 rounded-lg text-xs border border-[#E3E8E2] bg-white text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
             />
             <button
               type="submit"
@@ -91,7 +131,7 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
           </span>
 
           {savedEstimations.length === 0 ? (
-            <div className="text-center py-10 border-2 border-dashed border-[#E5E7EB] rounded-xl space-y-2">
+            <div className="text-center py-10 border-2 border-dashed border-[#E3E8E2] rounded-xl space-y-2">
               <FolderOpen className="w-8 h-8 text-[#4B5563]/50 mx-auto" />
               <p className="text-sm font-bold text-[#1B3D34] font-heading">No saved projects yet</p>
               <p className="text-xs text-[#4B5563] max-w-xs mx-auto">
@@ -108,7 +148,7 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
                     className={`p-4 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                       isActive
                         ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34]'
-                        : 'bg-white border-[#E5E7EB] hover:border-[#D1D5DB]'
+                        : 'bg-white border-[#E3E8E2] hover:border-[#D1D5DB]'
                     }`}
                   >
                     <div>
@@ -146,7 +186,7 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
                       <button
                         type="button"
                         onClick={() => duplicateEstimation(item.id)}
-                        className="p-1.5 rounded-lg border border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg border border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)] text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
                         title="Duplicate"
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -154,7 +194,7 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
                       <button
                         type="button"
                         onClick={() => deleteEstimation(item.id)}
-                        className="p-1.5 rounded-lg border border-[#E5E7EB] hover:bg-red-50 text-[#4B5563] hover:text-red-600 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg border border-[#E3E8E2] hover:bg-red-50 text-[#4B5563] hover:text-red-600 transition-colors cursor-pointer"
                         title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -165,8 +205,10 @@ export const SavedEstimationsModal: React.FC<SavedEstimationsModalProps> = ({ is
               })}
             </div>
           )}
-        </div>
+          </div>
+        </motion.div>
       </motion.div>
-    </div>
-  );
+    )}
+  </AnimatePresence>
+);
 };

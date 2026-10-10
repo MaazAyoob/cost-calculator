@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { useStepExplanation } from '../../store/useCalculationStore';
 import { formatCurrency, cn } from '../../utils/cn';
+import { motion, AnimatePresence } from 'framer-motion';
+import { accordionVariant } from '../../animations/variants';
 
 interface HowWeCalculatedThisProps {
   stepKey: string;
@@ -101,8 +103,16 @@ export const HowWeCalculatedThis: React.FC<HowWeCalculatedThisProps> = ({
       </div>
 
       {/* ── EXPANDED TRANSPARENCY BODY ── */}
-      {isExpanded && (
-        <div className="p-4 sm:p-6 space-y-6 bg-white divide-y divide-[#F0F2F1]">
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            variants={accordionVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="overflow-hidden"
+          >
+            <div className="p-4 sm:p-6 space-y-6 bg-white divide-y divide-[#F0F2F1]">
           {/* ── SECTION 1: SUMMARY METRICS PILLS ── */}
           {summaryMetrics.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pb-5">
@@ -325,8 +335,10 @@ export const HowWeCalculatedThis: React.FC<HowWeCalculatedThisProps> = ({
               </div>
             </div>
           )}
-        </div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

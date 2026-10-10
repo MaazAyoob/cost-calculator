@@ -36,7 +36,7 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
+    <div className="bg-white border border-[#E3E8E2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
       {/* Top Bar: Search Input + Location Dropdown + Fixed Fee Badge */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
         {/* Search Input */}
@@ -47,7 +47,7 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by consultant name, expertise, or keyword..."
-            className="w-full pl-10 pr-9 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] placeholder-[#4B5563]/70 focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+            className="w-full pl-10 pr-9 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] placeholder-[#4B5563]/70 focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
           />
           {searchQuery && (
             <button
@@ -67,7 +67,7 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
           <select
             value={selectedCity}
             onChange={(e) => onSelectCity(e.target.value)}
-            className="w-full pl-10 pr-8 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all cursor-pointer appearance-none font-medium"
+            className="w-full pl-10 pr-8 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all cursor-pointer appearance-none font-medium"
           >
             <option value="ALL">All Bangalore &amp; Zones</option>
             {POPULAR_LOCATIONS.map((loc) => (
@@ -79,16 +79,16 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
         </div>
 
         {/* Launch Fee Badge */}
-        <div className="shrink-0 flex items-center justify-between md:justify-center gap-2 px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs">
+        <div className="shrink-0 flex items-center justify-between md:justify-center gap-2 px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs">
           <span className="text-[#4B5563] font-medium">Standard Fee:</span>
-          <span className="font-mono font-bold text-[#1B3D34] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
+          <span className="font-mono font-bold text-[#1B3D34] bg-white px-2 py-0.5 rounded border border-[#E3E8E2]">
             {LAUNCH_CONSULTATION_PRICE_DISPLAY}
           </span>
         </div>
       </div>
 
       {/* Category Pills (Horizontal scrollable on mobile) */}
-      <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between gap-4">
+      <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between gap-4">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none max-w-full">
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat;
@@ -100,7 +100,7 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   isSelected
                     ? 'bg-[#1B3D34] text-white shadow-xs'
-                    : 'bg-[#F8F8F6] text-[#4B5563] hover:text-[#1B3D34] hover:bg-[#E5E7EB]/50'
+                    : 'bg-[#F8F8F6] text-[#4B5563] hover:text-[#1B3D34] hover:bg-[#E3E8E2]/50'
                 }`}
               >
                 {cat === 'ALL' ? 'All Experts' : cat}

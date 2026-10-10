@@ -8,7 +8,7 @@ export const SignaturePricingSection: React.FC = () => {
   const { startNewProject } = useWizardStore();
 
   return (
-    <section className="py-20 lg:py-28 bg-white border-b border-[#E5E7EB] relative select-none">
+    <section className="py-20 lg:py-28 bg-white border-b border-[#E3E8E2] relative select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
         {/* Section Header */}
@@ -35,12 +35,12 @@ export const SignaturePricingSection: React.FC = () => {
           <div className="lg:col-span-5 flex flex-col justify-between gap-6">
             
             {/* Free Tier Card */}
-            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all text-left space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E3E8E2] hover:border-[#1B3D34] transition-all text-left space-y-4">
+              <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
                   Explore Your Project
                 </span>
-                <span className="text-xs font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E5E7EB]">
+                <span className="text-xs font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E3E8E2]">
                   ₹0 Free
                 </span>
               </div>
@@ -54,7 +54,7 @@ export const SignaturePricingSection: React.FC = () => {
                 </p>
               </div>
 
-              <div className="space-y-2 text-xs text-[#4B5563] pt-2 border-t border-[#E5E7EB]">
+              <div className="space-y-2 text-xs text-[#4B5563] pt-2 border-t border-[#E3E8E2]">
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
                   <span>Interactive 3D building massing preview</span>
@@ -81,12 +81,12 @@ export const SignaturePricingSection: React.FC = () => {
             </div>
 
             {/* ₹99 Verified Estimate Tier Card */}
-            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all text-left space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+            <div className="p-6 sm:p-7 bg-[#F8F8F6] rounded-3xl border border-[#E3E8E2] hover:border-[#1B3D34] transition-all text-left space-y-4">
+              <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
                   Save &amp; Customize
                 </span>
-                <span className="text-xs font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E5E7EB]">
+                <span className="text-xs font-bold text-[#1B3D34] bg-white px-2.5 py-0.5 rounded-lg border border-[#E3E8E2]">
                   ₹99 One-time
                 </span>
               </div>
@@ -100,7 +100,7 @@ export const SignaturePricingSection: React.FC = () => {
                 </p>
               </div>
 
-              <div className="space-y-2 text-xs text-[#4B5563] pt-2 border-t border-[#E5E7EB]">
+              <div className="space-y-2 text-xs text-[#4B5563] pt-2 border-t border-[#E3E8E2]">
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
                   <span>Permanent project save &amp; dashboard recovery</span>
@@ -157,7 +157,7 @@ export const SignaturePricingSection: React.FC = () => {
               </div>
 
               {/* Dossier Feature Matrix */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-[#E5E7EB] text-xs text-[#1B3D34]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-[#E3E8E2] text-xs text-[#1B3D34]">
                 <div className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
                   <span><strong>Full Material Schedules:</strong> Steel, cement, sand, aggregate, blocks, and tiles.</span>
@@ -177,7 +177,7 @@ export const SignaturePricingSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-6 border-t border-[#E5E7EB] space-y-3">
+            <div className="pt-6 border-t border-[#E3E8E2] space-y-3">
               <button
                 onClick={() => navigate('/pricing')}
                 className="w-full hutty-btn-primary py-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"

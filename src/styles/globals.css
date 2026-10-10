@@ -15,18 +15,18 @@
     color-scheme: light;
 
     /* Backgrounds */
-    --cc-bg:            #F8F8F6;
-    --cc-surface:       #FFFFFF;
-    --cc-surface-muted: rgba(27, 61, 52, 0.04);
+    --cc-bg:             #F8F8F6;
+    --cc-surface:        #FFFFFF;
+    --cc-surface-muted:  rgba(27, 61, 52, 0.04);
 
     /* Text */
-    --cc-text-primary:   #1B3D34;
-    --cc-text-secondary: #4B5563;
+    --cc-text-primary:   #172722;
+    --cc-text-secondary: #687770;
     --cc-text-disabled:  #9CA3AF;
 
     /* Hutty Brand Colors */
     --cc-brand:          #1B3D34;
-    --cc-brand-hover:    #132C25;
+    --cc-brand-hover:    #142F28;
     --cc-brand-soft:     rgba(27, 61, 52, 0.08);
     --cc-brand-light:    rgba(27, 61, 52, 0.04);
     
@@ -36,19 +36,25 @@
     --cc-accent-soft:    rgba(242, 140, 40, 0.10);
     --cc-accent-light:   rgba(242, 140, 40, 0.05);
 
+    /* Semantic Feedback Surfaces */
+    --cc-success-surface:#E7F3E8;
+    --cc-soft-mint:      #DDF4E7;
+    --cc-soft-lavender:  #EEE8FF;
+    --cc-info-blue:      #4285F4;
+
     /* Neutral Border */
-    --cc-border:         #E5E7EB;
-    --cc-border-strong:  #D1D5DB;
+    --cc-border:         #E3E8E2;
+    --cc-border-strong:  #CBD5CB;
 
     /* Overlay */
     --cc-overlay:        rgba(27, 61, 52, 0.40);
 
     /* Architectural Radii System */
-    --cc-radius-panel:   18px;
-    --cc-radius-card:    14px;
-    --cc-radius-btn:     10px;
-    --cc-radius-input:   10px;
-    --cc-radius-badge:   8px;
+    --cc-radius-panel:   14px;
+    --cc-radius-card:    10px;
+    --cc-radius-btn:     8px;
+    --cc-radius-input:   8px;
+    --cc-radius-badge:   6px;
     --cc-radius-pill:    9999px;
 
     /* Shadows: Subtle, derived strictly from Hutty Green */
@@ -378,12 +384,31 @@
   border: 1px solid transparent;
   cursor: pointer;
   box-shadow: var(--cc-shadow-sm);
-  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
 }
-.hutty-btn-primary:hover {
-  background-color: #132C25;
+.hutty-btn-primary:hover:not(:disabled) {
+  background-color: #142F28;
   box-shadow: var(--cc-shadow-md);
   transform: translateY(-1px);
+}
+.hutty-btn-primary:active:not(:disabled) {
+  background-color: #112821;
+  transform: scale(0.985);
+  box-shadow: var(--cc-shadow-xs);
+}
+.hutty-btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1B3D34;
+}
+.hutty-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
 }
 
 .hutty-btn-secondary {
@@ -394,27 +419,46 @@
   padding: 0.75rem 1.5rem;
   border-radius: var(--cc-radius-btn);
   background-color: #FFFFFF;
-  color: #1B3D34;
+  color: #172722;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: -0.01em;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #E3E8E2;
   cursor: pointer;
   box-shadow: var(--cc-shadow-xs);
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
 }
-.hutty-btn-secondary:hover {
+.hutty-btn-secondary:hover:not(:disabled) {
   background-color: rgba(27, 61, 52, 0.04);
-  border-color: #D1D5DB;
+  border-color: #CBD5CB;
   transform: translateY(-1px);
+}
+.hutty-btn-secondary:active:not(:disabled) {
+  background-color: rgba(27, 61, 52, 0.08);
+  transform: scale(0.985);
+}
+.hutty-btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1B3D34;
+}
+.hutty-btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ============================================================
-   TACTILE ARCHITECTURAL INPUTS & CARDS
+   TACTILE ARCHITECTURAL INPUTS & CARDS (Prototype-Informed)
    ============================================================ */
 .hutty-tactile-card {
   background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #E3E8E2;
   border-radius: var(--cc-radius-card);
   padding: 0.875rem 1rem;
   transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
@@ -423,7 +467,7 @@
 }
 
 .hutty-tactile-card:hover {
-  border-color: #D1D5DB;
+  border-color: #CBD5CB;
   background-color: rgba(27, 61, 52, 0.04);
   transform: translateY(-1px);
 }
@@ -433,10 +477,93 @@
 }
 
 .hutty-tactile-card-selected {
-  background-color: rgba(27, 61, 52, 0.08) !important;
+  background-color: #F0F5F0 !important;
   border-color: #1B3D34 !important;
   box-shadow: 0 0 0 1.5px #1B3D34 !important;
   transform: scale(1.008);
+}
+
+/* Prototype Choice Button */
+.hutty-choice-btn {
+  border: 1px solid #E3E8E2;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  padding: 14px;
+  text-align: left;
+  min-height: 65px;
+  color: #172722;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.hutty-choice-btn:hover {
+  border-color: #CBD5CB;
+  background-color: #F8FAF8;
+}
+.hutty-choice-btn.active {
+  border: 1.5px solid #1B3D34;
+  background-color: #F0F5F0;
+}
+.hutty-choice-btn b {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #172722;
+}
+.hutty-choice-btn small {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #687770;
+}
+
+/* Stepper Counter */
+.hutty-counter-control {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.hutty-counter-control button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #E3E8E2;
+  border-radius: 6px;
+  background: white;
+  color: #172722;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.15s ease,
+              background-color 0.15s ease,
+              box-shadow 0.15s ease;
+}
+.hutty-counter-control button:hover:not(:disabled) {
+  border-color: #1B3D34;
+  background: #F0F5F0;
+}
+.hutty-counter-control button:active:not(:disabled) {
+  transform: scale(0.92);
+  background: #E3EDE4;
+}
+.hutty-counter-control button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #1B3D34;
+}
+.hutty-counter-control button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+}
+.hutty-counter-control input {
+  width: 36px;
+  border: 0;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  background: transparent;
+  color: #172722;
 }
 
 /* Tactile Numeric Input Box */
@@ -458,15 +585,29 @@
   box-shadow: 0 0 0 1.5px #1B3D34;
 }
 
-/* Tactile Custom Range Slider */
+/* Tactile Custom Range Slider with Dynamic Green Active Track */
 input[type="range"].hutty-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 6px;
-  background: #E5E7EB;
+  background: linear-gradient(to right, #1B3D34 var(--range-progress, 0%), #E3E8E2 var(--range-progress, 0%));
   border-radius: 9999px;
   outline: none;
+  cursor: pointer;
+  touch-action: pan-x;
+  transition: background 0.08s ease;
+}
+
+input[type="range"].hutty-slider:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(27, 61, 52, 0.18);
+}
+
+input[type="range"].hutty-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: transparent;
 }
 
 input[type="range"].hutty-slider::-webkit-slider-thumb {
@@ -476,15 +617,38 @@ input[type="range"].hutty-slider::-webkit-slider-thumb {
   height: 18px;
   border-radius: 50%;
   background: #1B3D34;
-  cursor: pointer;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(27, 61, 52, 0.25);
-  transition: transform 0.1s ease, background-color 0.1s ease;
+  cursor: grab;
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(27, 61, 52, 0.28);
+  margin-top: -6px;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              box-shadow 0.15s ease;
 }
 
 input[type="range"].hutty-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  background: #132C25;
+  background: #142F28;
+  box-shadow: 0 2px 6px rgba(27, 61, 52, 0.35);
+}
+
+input[type="range"].hutty-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.22);
+  background: #0F231D;
+  box-shadow: 0 0 0 4px rgba(27, 61, 52, 0.18), 0 2px 8px rgba(27, 61, 52, 0.4);
+}
+
+input[type="range"].hutty-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: #E3E8E2;
+}
+
+input[type="range"].hutty-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 9999px;
+  background: #1B3D34;
 }
 
 input[type="range"].hutty-slider::-moz-range-thumb {
@@ -492,9 +656,24 @@ input[type="range"].hutty-slider::-moz-range-thumb {
   height: 18px;
   border-radius: 50%;
   background: #1B3D34;
-  cursor: pointer;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(27, 61, 52, 0.25);
+  cursor: grab;
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(27, 61, 52, 0.28);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              box-shadow 0.15s ease;
+}
+
+input[type="range"].hutty-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  background: #142F28;
+}
+
+input[type="range"].hutty-slider::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.22);
+  background: #0F231D;
+  box-shadow: 0 0 0 4px rgba(27, 61, 52, 0.18);
 }
 
 /* ============================================================

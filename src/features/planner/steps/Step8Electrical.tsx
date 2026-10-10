@@ -67,24 +67,16 @@ export const Step8Electrical: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-          STEP 08
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          ELECTRICAL &amp; MEP
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Configure electrical specifications. Quantities are dynamically generated from your {rooms.bedrooms || 0} bedrooms, {rooms.bathrooms || 0} bathrooms, and {floors || 1} floor layout.
-        </p>
-      </div>
-
       {/* ── 1. WIRING QUALITY TIERS ── */}
       <div className="space-y-2.5">
-        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          Wiring Cable Manufacturer Tier
-        </label>
+        <div className="flex justify-between items-center text-xs">
+          <label className="font-bold text-[#172722] uppercase tracking-wider block">
+            Wiring Cable Manufacturer Tier
+          </label>
+          <span className="font-mono text-[#687770] text-[11px]">
+            {rooms.bedrooms || 0} Bed · {rooms.bathrooms || 0} Bath · {floors || 1}F
+          </span>
+        </div>
         <div className="space-y-2">
           {wireTiers.map((tier) => {
             const isSelected = selectedTier === tier.id;
@@ -118,7 +110,7 @@ export const Step8Electrical: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#1B3D34]">{tier.title}</h4>
-                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E3E8E2]">
                         {tier.brand}
                       </span>
                       {isRecommended && (
@@ -144,7 +136,7 @@ export const Step8Electrical: React.FC = () => {
       </div>
 
       {/* ── 2. WHAT AM I INSTALLING? (POINTS SCHEDULE) ── */}
-      <div className="p-4 bg-white rounded-xl border border-[#E5E7EB] space-y-3">
+      <div className="p-4 bg-white rounded-xl border border-[#E3E8E2] space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-[#F28C28]" />
@@ -152,41 +144,41 @@ export const Step8Electrical: React.FC = () => {
               What Am I Installing? (Room Point Schedule)
             </h3>
           </div>
-          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
             {quantities.totalElectricalPoints} Points Total
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">Light Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.lightingPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">Ceiling Fan Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.fanPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">Power Sockets</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.socketPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">AC Points (Dedicated)</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.acPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">Geyser Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.geyserPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">TV / Data Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.tvDataPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">Distribution Boards</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.mainDBCount} Main + {quantities.floorDBCount} Sub-DBs</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">EV Charging Point</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.evPoints > 0 ? '1 (32A Provision)' : 'None'}</span>
           </div>
@@ -194,7 +186,7 @@ export const Step8Electrical: React.FC = () => {
       </div>
 
       {/* ── 3. WHAT AM I CONSUMING? (PHYSICAL TAKEOFF) ── */}
-      <div className="p-4 bg-white rounded-xl border border-[#E5E7EB] space-y-3">
+      <div className="p-4 bg-white rounded-xl border border-[#E3E8E2] space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Box className="w-4 h-4 text-[#1B3D34]" />
@@ -202,35 +194,35 @@ export const Step8Electrical: React.FC = () => {
               What Am I Consuming? (Conductor &amp; Conduit Takeoff)
             </h3>
           </div>
-          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
             {quantities.electricalWireMetres}m Conductor Total
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">1.5 sq.mm Wire (Lights/Fans)</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.wire1_5SqMmMetres} Metres</span>
             <span className="text-[9px] text-[#4B5563] block mt-0.5">@ ₹{rate1_5}/m</span>
           </div>
-          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">2.5 sq.mm Wire (Sockets/TV)</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.wire2_5SqMmMetres} Metres</span>
             <span className="text-[9px] text-[#4B5563] block mt-0.5">@ ₹{rate2_5}/m</span>
           </div>
-          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">4.0 sq.mm Wire (AC/Geysers)</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.wire4SqMmMetres} Metres</span>
             <span className="text-[9px] text-[#4B5563] block mt-0.5">@ ₹{rate4_0}/m</span>
           </div>
-          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
+          <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
             <span className="text-[10px] text-[#4B5563] block">6.0 sq.mm Wire (Risers/EV)</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.wire6SqMmMetres} Metres</span>
             <span className="text-[9px] text-[#4B5563] block mt-0.5">@ ₹{rate6_0}/m</span>
           </div>
         </div>
 
-        <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB] flex items-center justify-between text-xs">
+        <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] flex items-center justify-between text-xs">
           <div>
             <span className="font-bold text-[#1B3D34] block">Heavy-Duty PVC Conduit (25mm ISI Embedded)</span>
             <span className="text-[10px] text-[#4B5563]">Slab embedment, wall drop chases, and vertical distribution risers</span>
@@ -243,8 +235,8 @@ export const Step8Electrical: React.FC = () => {
       </div>
 
       {/* ── 4. WHAT DOES IT COST? (ELECTRICAL BOQ TABLE) ── */}
-      <div className="p-4 bg-white rounded-xl border border-[#E5E7EB] space-y-3">
-        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+      <div className="p-4 bg-white rounded-xl border border-[#E3E8E2] space-y-3">
+        <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-[#1B3D34]" />
             <h3 className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
@@ -258,14 +250,14 @@ export const Step8Electrical: React.FC = () => {
 
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[#E5E7EB] text-[#4B5563]">
+            <tr className="border-b border-[#E3E8E2] text-[#4B5563]">
               <th className="py-2 font-bold uppercase">Item / Specification</th>
               <th className="py-2 font-bold uppercase text-right">Quantity</th>
               <th className="py-2 font-bold uppercase text-right">Rate</th>
               <th className="py-2 font-bold uppercase text-right">Amount</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5E7EB]">
+          <tbody className="divide-y divide-[#E3E8E2]">
             {electricalBOQItems.map((item) => (
               <tr key={item.code || item.slNo}>
                 <td className="py-2 text-[#1B3D34] font-medium">

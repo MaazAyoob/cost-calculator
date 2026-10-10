@@ -63,31 +63,20 @@ export const Step3CoreMaterials: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-            STEP 03
-          </span>
-          <span className="text-[10px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded-full border border-[#1B3D34]/15">
-            {recommendedCore.badge}
-          </span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          CORE STRUCTURAL MATERIALS
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Select structural TMT steel and Portland cement brands. Physical quantities remain invariant while unit rates reflect manufacturer grade.
-        </p>
-      </div>
-
       {/* ── 1. STRUCTURAL STEEL ── */}
       <div className="space-y-2.5">
         <div className="flex justify-between items-center text-xs">
-          <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
-            TMT Rebar Steel
-          </label>
-          <span className="font-mono font-extrabold text-[#1B3D34]">
+          <div className="flex items-center gap-2">
+            <label className="font-bold text-[#172722] uppercase tracking-wider">
+              TMT Rebar Steel
+            </label>
+            {recommendedCore.badge && (
+              <span className="text-[10px] font-bold text-[#1B3D34] bg-[#EDF3ED] px-2 py-0.5 rounded-full border border-[#CBE0CD]">
+                {recommendedCore.badge}
+              </span>
+            )}
+          </div>
+          <span className="font-mono font-extrabold text-[#172722]">
             {steelTonnes > 0 ? `${steelTonnes} Tonnes Required` : '0 T'}
           </span>
         </div>
@@ -111,32 +100,32 @@ export const Step3CoreMaterials: React.FC = () => {
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#D1D5DB]'
+                      isSelected ? 'bg-[#1B3D34] text-white' : 'border border-[#CBD5CB]'
                     )}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.brand}</h4>
-                      <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                      <h4 className="text-xs font-extrabold text-[#172722]">{item.brand}</h4>
+                      <span className="text-[10px] font-mono text-[#687770] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E3E8E2]">
                         {item.grade}
                       </span>
                       {isRecommended && (
-                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded-full border border-[#1B3D34]/20">
+                        <span className="text-[9px] font-bold text-[#1B3D34] bg-[#EDF3ED] px-2 py-0.5 rounded-full border border-[#CBE0CD]">
                           Recommended for your plan
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-[#4B5563] mt-0.5">{item.desc}</p>
+                    <p className="text-[10px] text-[#687770] mt-0.5">{item.desc}</p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0 pl-3">
-                  <span className="text-xs font-black text-[#1B3D34] block font-mono">
+                  <span className="text-xs font-black text-[#172722] block font-mono">
                     {steelTonnes > 0 ? formatCurrency(itemCost) : `₹${item.ratePerKg}/kg`}
                   </span>
-                  <span className="text-[10px] text-[#4B5563]">₹{item.ratePerKg}/kg</span>
+                  <span className="text-[10px] text-[#687770]">₹{item.ratePerKg}/kg</span>
                 </div>
               </div>
             );

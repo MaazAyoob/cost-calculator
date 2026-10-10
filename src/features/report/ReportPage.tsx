@@ -139,7 +139,7 @@ export const ReportPage: React.FC = () => {
                 useWizardStore.getState().startNewProject();
                 navigate('/calculator');
               }}
-              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white transition-colors cursor-pointer shadow-2xs"
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] px-3 py-1.5 rounded-lg border border-[#E3E8E2] bg-white transition-colors cursor-pointer shadow-2xs"
             >
               <RotateCcw className="w-3.5 h-3.5 text-[#F28C28]" /> Start New Project
             </button>
@@ -149,7 +149,7 @@ export const ReportPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowTraceModal(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
             >
               <Calculator className="w-3.5 h-3.5 text-[#F28C28]" /> How Calculated
             </button>
@@ -159,7 +159,7 @@ export const ReportPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePrintRequest}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
                 >
                   <Printer className="w-3.5 h-3.5 text-[#1B3D34]" /> Print
                 </button>
@@ -248,8 +248,8 @@ export const ReportPage: React.FC = () => {
         )}
 
         {/* ── GRAND ARCHITECTURAL HERO BANNER ── */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs space-y-6 arch-bracketed print:hidden text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E3E8E2] shadow-xs space-y-6 arch-bracketed print:hidden text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E3E8E2] pb-4">
             <div className="space-y-1">
               <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">
                 YOUR HOME &bull; ESTIMATED CONSTRUCTION PICTURE
@@ -278,7 +278,7 @@ export const ReportPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
               <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
                 GROSS BUILT-UP AREA
               </span>
@@ -290,7 +290,7 @@ export const ReportPage: React.FC = () => {
               </span>
             </div>
 
-            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
               <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
                 ESTIMATED TIMELINE
               </span>
@@ -305,7 +305,7 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* Document Sheet */}
-        <div className="bg-white border border-[#E5E7EB] rounded-3xl p-8 sm:p-12 shadow-xs space-y-10 print:border-none print:shadow-none print:p-0 arch-bracketed">
+        <div className="bg-white border border-[#E3E8E2] rounded-3xl p-8 sm:p-12 shadow-xs space-y-10 print:border-none print:shadow-none print:p-0 arch-bracketed">
 
           {/* 1. Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b-2 border-[#1B3D34]">
@@ -339,19 +339,19 @@ export const ReportPage: React.FC = () => {
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Direct Construction Budget</span>
                 <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">{formatCurrency(budget.directConstructionBudget || budget.totalProjectCost)}</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Built-Up Area (BUA)</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Direct Execution Rate</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">₹{(budget.directCostPerSqFt || budget.costPerSqFt).toLocaleString()} / sq.ft</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Estimated Timeline</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">{timeline.totalMonths} Months</span>
               </div>
@@ -376,7 +376,7 @@ export const ReportPage: React.FC = () => {
 
           {/* 3. Key Quantities Summary (Free Preview) */}
           <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
+            <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-1.5">
               <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
                 2. Key Structural Quantities
               </h2>
@@ -389,38 +389,38 @@ export const ReportPage: React.FC = () => {
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Structural Steel</span>
                 <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.steelTonnes} Tonnes</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Portland Cement</span>
                 <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.cementBags?.toLocaleString()} Bags</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Total RCC Concrete</span>
                 <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.rccConcreteTotalCuM || 0} m³</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
                 <span className="text-[#4B5563] block">Block Wall Coverage</span>
                 <span className="text-sm font-bold text-[#1B3D34] font-mono">{(quantities.blockWallCoverageSqFt || quantities.netWallAreaSqFt)?.toLocaleString()} sq.ft</span>
                 <span className="text-[10px] text-[#4B5563] block">{quantities.masonryUnitsCount?.toLocaleString()} Nos</span>
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
-              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
                 <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Footing Concrete</span>
                 <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.footingConcreteCuM || 0} m³</span>
               </div>
-              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
                 <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Column Concrete</span>
                 <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.columnConcreteCuM || 0} m³</span>
               </div>
-              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
                 <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Slab Concrete</span>
                 <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.slabConcreteCuM || 0} m³</span>
               </div>
-              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
+              <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
                 <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Sand &amp; Aggregates</span>
                 <span className="text-xs font-bold text-[#1B3D34] font-mono">{((quantities.mSandCuFt || 0) + (quantities.pSandCuFt || 0) + (quantities.coarseAggregateCuFt || 0))?.toLocaleString()} CFT</span>
               </div>
@@ -440,9 +440,10 @@ export const ReportPage: React.FC = () => {
                 <span className="text-xs text-[#4B5563] font-mono font-bold">{boq.length} Line Items</span>
               </div>
               
-              <table className="w-full text-left text-xs border-collapse">
+              <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+                <table className="w-full text-left text-xs border-collapse min-w-[560px]">
                 <thead>
-                  <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                  <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
                     <th className="py-2.5 font-bold uppercase w-10">Sl</th>
                     <th className="py-2.5 font-bold uppercase">Activity / Work Description</th>
                     <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
@@ -450,21 +451,22 @@ export const ReportPage: React.FC = () => {
                     <th className="py-2.5 font-bold uppercase text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E5E7EB]">
+                <tbody className="divide-y divide-[#E3E8E2]">
                   {(isUnlocked ? boq : boq.slice(0, 4)).map((item) => (
-                    <tr key={item.code || item.slNo}>
-                      <td className="py-2.5 font-mono text-[#4B5563]">{item.slNo}</td>
-                      <td className="py-2.5 text-[#1B3D34] font-medium">
+                    <tr key={item.code || item.slNo} className="hover:bg-[#F8F8F6]/60 transition-colors">
+                      <td className="py-2.5 font-mono text-[#687770]">{item.slNo}</td>
+                      <td className="py-2.5 text-[#172722] font-medium">
                         {item.description}
-                        <span className="block text-[10px] text-[#4B5563] font-normal">{item.brand} &bull; {item.remarks}</span>
+                        <span className="block text-[10px] text-[#687770] font-normal">{item.brand} &bull; {item.remarks}</span>
                       </td>
-                      <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">{item.quantity} {item.unit}</td>
-                      <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{item.unitRate.toLocaleString()}</td>
-                      <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(item.amount)}</td>
+                      <td className="py-2.5 text-right text-[#687770] font-mono whitespace-nowrap">{item.quantity} {item.unit}</td>
+                      <td className="py-2.5 text-right text-[#687770] font-mono whitespace-nowrap">₹{item.unitRate.toLocaleString()}</td>
+                      <td className="py-2.5 text-right font-bold text-[#172722] font-mono whitespace-nowrap">{formatCurrency(item.amount)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
 
               {/* Free Teaser for Remaining Items */}
               {!isUnlocked && boq.length > 4 && (
@@ -499,9 +501,10 @@ export const ReportPage: React.FC = () => {
                     </div>
                     <span className="text-xs text-[#4B5563] font-mono font-bold">{materialSchedule.length} Physical Materials</span>
                   </div>
-                  <table className="w-full text-left text-xs border-collapse">
+                  <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+                    <table className="w-full text-left text-xs border-collapse min-w-[560px]">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                      <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
                         <th className="py-2.5 font-bold uppercase w-10">Sl</th>
                         <th className="py-2.5 font-bold uppercase">Physical Material &amp; Brand</th>
                         <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
@@ -509,21 +512,22 @@ export const ReportPage: React.FC = () => {
                         <th className="py-2.5 font-bold uppercase text-right">Total</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#E5E7EB]">
+                    <tbody className="divide-y divide-[#E3E8E2]">
                       {materialSchedule.map((mat) => (
-                        <tr key={mat.slNo}>
-                          <td className="py-2.5 font-mono text-[#4B5563]">{mat.slNo}</td>
-                          <td className="py-2.5 text-[#1B3D34] font-medium">
+                        <tr key={mat.slNo} className="hover:bg-[#F8F8F6]/60 transition-colors">
+                          <td className="py-2.5 font-mono text-[#687770]">{mat.slNo}</td>
+                          <td className="py-2.5 text-[#172722] font-medium">
                             {mat.material}
-                            <span className="block text-[10px] text-[#4B5563] font-normal">{mat.brand} &bull; {mat.specification}</span>
+                            <span className="block text-[10px] text-[#687770] font-normal">{mat.brand} &bull; {mat.specification}</span>
                           </td>
-                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">{mat.quantity.toLocaleString()} {mat.unit}</td>
-                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{mat.unitRate.toLocaleString()}</td>
-                          <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(mat.amount)}</td>
+                          <td className="py-2.5 text-right text-[#687770] font-mono whitespace-nowrap">{mat.quantity.toLocaleString()} {mat.unit}</td>
+                          <td className="py-2.5 text-right text-[#687770] font-mono whitespace-nowrap">₹{mat.unitRate.toLocaleString()}</td>
+                          <td className="py-2.5 text-right font-bold text-[#172722] font-mono whitespace-nowrap">{formatCurrency(mat.amount)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </section>
               )}
 
@@ -537,11 +541,12 @@ export const ReportPage: React.FC = () => {
                         WHAT WE INSTALL &bull; FIXTURES &amp; FITTINGS SCHEDULE
                       </h2>
                     </div>
-                    <span className="text-xs text-[#4B5563] font-mono font-bold">{fixtureSchedule.length} Installed Units</span>
+                    <span className="text-xs text-[#687770] font-mono font-bold">{fixtureSchedule.length} Installed Units</span>
                   </div>
-                  <table className="w-full text-left text-xs border-collapse">
+                  <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+                    <table className="w-full text-left text-xs border-collapse min-w-[560px]">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                      <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
                         <th className="py-2.5 font-bold uppercase w-10">Sl</th>
                         <th className="py-2.5 font-bold uppercase">Installed Fixture / Equipment</th>
                         <th className="py-2.5 font-bold uppercase">Location</th>
@@ -550,22 +555,23 @@ export const ReportPage: React.FC = () => {
                         <th className="py-2.5 font-bold uppercase text-right">Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#E5E7EB]">
+                    <tbody className="divide-y divide-[#E3E8E2]">
                       {fixtureSchedule.map((fix) => (
-                        <tr key={fix.slNo}>
-                          <td className="py-2.5 font-mono text-[#4B5563]">{fix.slNo}</td>
-                          <td className="py-2.5 text-[#1B3D34] font-medium">
+                        <tr key={fix.slNo} className="hover:bg-[#F8F8F6]/60 transition-colors">
+                          <td className="py-2.5 font-mono text-[#687770]">{fix.slNo}</td>
+                          <td className="py-2.5 text-[#172722] font-medium">
                             {fix.item}
-                            <span className="block text-[10px] text-[#4B5563] font-normal">{fix.brand} &bull; {fix.specification}</span>
+                            <span className="block text-[10px] text-[#687770] font-normal">{fix.brand} &bull; {fix.specification}</span>
                           </td>
-                          <td className="py-2.5 text-[#4B5563] text-[11px]">{fix.location}</td>
-                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">{fix.quantity} {fix.unit}</td>
-                          <td className="py-2.5 text-right text-[#4B5563] font-mono whitespace-nowrap">₹{fix.unitRate.toLocaleString()}</td>
-                          <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono whitespace-nowrap">{formatCurrency(fix.amount)}</td>
+                          <td className="py-2.5 text-[#687770] text-[11px]">{fix.location}</td>
+                          <td className="py-2.5 text-right text-[#687770] font-mono whitespace-nowrap">{fix.quantity} {fix.unit}</td>
+                          <td className="py-2.5 text-right text-[#687770] font-mono whitespace-nowrap">₹{fix.unitRate.toLocaleString()}</td>
+                          <td className="py-2.5 text-right font-bold text-[#172722] font-mono whitespace-nowrap">{formatCurrency(fix.amount)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </section>
               )}
 
@@ -578,15 +584,15 @@ export const ReportPage: React.FC = () => {
                       WHAT IT COSTS &bull; TRADE ALLOCATION &amp; COMMERCIAL BUDGET
                     </h2>
                   </div>
-                  <span className="text-xs text-[#4B5563] font-mono font-bold">100% RECONCILED</span>
+                  <span className="text-xs text-[#687770] font-mono font-bold">100% RECONCILED</span>
                 </div>
 
                 {/* Proportional Trade Allocation Horizontal Bar */}
-                <div className="space-y-2 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+                <div className="space-y-2 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#687770] block">
                     WHERE YOUR MONEY GOES (PROPORTIONAL DISTRIBUTION)
                   </span>
-                  <div className="h-6 w-full rounded-xl overflow-hidden flex border border-[#E5E7EB] bg-white p-0.5">
+                  <div className="h-6 w-full rounded-xl overflow-hidden flex border border-[#E3E8E2] bg-white p-0.5">
                     {budget.heads.map((head, idx) => (
                       <div
                         key={head.id}
@@ -602,20 +608,21 @@ export const ReportPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <table className="w-full text-left text-xs border-collapse">
+                  <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+                    <table className="w-full text-left text-xs border-collapse min-w-[500px]">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB] text-[#4B5563] font-mono">
+                      <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
                         <th className="py-2.5 font-bold uppercase">Trade Category</th>
                         <th className="py-2.5 font-bold uppercase text-right">Amount (INR)</th>
                         <th className="py-2.5 font-bold uppercase text-right">% of Total</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#E5E7EB]">
+                    <tbody className="divide-y divide-[#E3E8E2]">
                       {budget.heads.map((head) => (
-                        <tr key={head.id}>
-                          <td className="py-2.5 font-medium text-[#1B3D34]">{head.name}</td>
-                          <td className="py-2.5 text-right font-bold text-[#1B3D34] font-mono">{formatCurrency(head.allocatedAmount)}</td>
-                          <td className="py-2.5 text-right font-mono text-[#4B5563]">{head.percentage}%</td>
+                        <tr key={head.id} className="hover:bg-[#F8F8F6]/60 transition-colors">
+                          <td className="py-2.5 font-medium text-[#172722]">{head.name}</td>
+                          <td className="py-2.5 text-right font-bold text-[#172722] font-mono">{formatCurrency(head.allocatedAmount)}</td>
+                          <td className="py-2.5 text-right font-mono text-[#687770]">{head.percentage}%</td>
                         </tr>
                       ))}
                     </tbody>
@@ -627,6 +634,7 @@ export const ReportPage: React.FC = () => {
                       </tr>
                     </tfoot>
                   </table>
+                  </div>
                 </div>
               </section>
             </>
@@ -634,7 +642,7 @@ export const ReportPage: React.FC = () => {
             /* Locked Teaser Banner for What Am I Paying For? */
             <div className="p-8 bg-[#F8F8F6] rounded-2xl border-2 border-dashed border-[#1B3D34]/30 space-y-6 text-center">
               <div className="space-y-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] bg-white px-3 py-1 rounded-md border border-[#E5E7EB] inline-block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] bg-white px-3 py-1 rounded-md border border-[#E3E8E2] inline-block">
                   WHAT AM I PAYING FOR? &bull; ₹499
                 </span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading">
@@ -647,21 +655,21 @@ export const ReportPage: React.FC = () => {
 
               {/* Teaser Points */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left max-w-xl mx-auto">
-                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <FileText className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section B &bull; Materials</span>
                   </div>
                   <p className="text-[10px] text-[#4B5563]">Exact steel tonnage, cement bags, sand &amp; masonry block takeoffs.</p>
                 </div>
-                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section C &bull; Fixtures</span>
                   </div>
                   <p className="text-[10px] text-[#4B5563]">Door schedule, window areas, sanitary suites &amp; CPVC plumbing lengths.</p>
                 </div>
-                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section D &bull; Costs</span>
@@ -721,12 +729,12 @@ export const ReportPage: React.FC = () => {
           {/* Milestone Payment Schedule */}
           {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E3E8E2] pb-1.5 font-heading">
                 5. Milestone Disbursement Roadmap
               </h2>
               <div className="space-y-2">
                 {paymentPlan.map((stage) => (
-                  <div key={stage.stage} className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between text-xs">
+                  <div key={stage.stage} className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center justify-between text-xs">
                     <div>
                       <span className="font-bold text-[#1B3D34] block">Stage {stage.stage}: {stage.title}</span>
                       <span className="text-[10px] text-[#4B5563]">{stage.description}</span>
@@ -742,7 +750,7 @@ export const ReportPage: React.FC = () => {
           )}
 
           {/* 7. Preliminary Estimate Disclaimers & Engineering Notice */}
-          <section className="space-y-2 text-xs text-[#4B5563] border-t border-[#E5E7EB] pt-4">
+          <section className="space-y-2 text-xs text-[#4B5563] border-t border-[#E3E8E2] pt-4">
             <h3 className="font-bold text-[#1B3D34]">IMPORTANT — PRELIMINARY ESTIMATE &amp; ENGINEERING NOTICE</h3>
             <p>
               * Generated using Hutty's preliminary estimation rules; final structural design is by the appointed engineer.
@@ -759,7 +767,7 @@ export const ReportPage: React.FC = () => {
           </section>
 
           {/* Document Footer */}
-          <div className="pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[#4B5563]">
+          <div className="pt-6 border-t border-[#E3E8E2] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[#4B5563]">
             <span>Hutty &bull; Construction Estimate &amp; BOQ &bull; Engine {result.rateSourceMetadata?.calculationEngineVersion || 'v2.6.0'}</span>
             <span>Rate Master: {result.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'} &bull; https://hutty.in</span>
           </div>

@@ -5,6 +5,8 @@ import { WebsiteFooter } from './WebsiteFooter';
 import { ToastContainer } from '../ui/Toast';
 import { rateService } from '../../calculation-engine/data/rateService';
 
+import { motion } from 'framer-motion';
+
 export const AppLayout: React.FC = () => {
   const location = useLocation();
 
@@ -40,7 +42,15 @@ export const AppLayout: React.FC = () => {
     <div className="min-h-screen bg-[#F8F8F6] flex flex-col font-sans antialiased text-[#1B3D34]">
       <WebsiteHeader />
       <main className="flex-1 w-full min-w-0">
-        <Outlet />
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full"
+        >
+          <Outlet />
+        </motion.div>
       </main>
       <WebsiteFooter />
       <ToastContainer />

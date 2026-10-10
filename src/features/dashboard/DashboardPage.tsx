@@ -157,7 +157,7 @@ export const DashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowSavedModal(true)}
-              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer shadow-2xs"
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] px-3 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer shadow-2xs"
             >
               <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
               Saved Projects
@@ -166,8 +166,8 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* ── HOME COMMAND CENTER HERO ── */}
-        <section className="bg-white border border-[#E5E7EB] rounded-3xl p-6 sm:p-9 shadow-xs space-y-6 arch-bracketed text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
+        <section className="bg-white border border-[#E3E8E2] rounded-3xl p-6 sm:p-9 shadow-xs space-y-6 arch-bracketed text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E3E8E2] pb-4">
             <div className="space-y-1">
               <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">
                 YOUR HOME &bull; PRE-CONSTRUCTION COMMAND CENTER
@@ -198,7 +198,7 @@ export const DashboardPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
                     GROSS BUILT-UP AREA
                   </span>
@@ -210,7 +210,7 @@ export const DashboardPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
+                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
                     SITE COORDINATES
                   </span>
@@ -224,7 +224,7 @@ export const DashboardPage: React.FC = () => {
               </div>
 
               {/* Physical Material Consumption Takeoff Strip */}
-              <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-3">
+              <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono">
                   <span className="text-[#4B5563] uppercase font-bold text-[10px]">
                     PHYSICAL MATERIAL CONSUMPTION TAKEOFF
@@ -234,19 +234,19 @@ export const DashboardPage: React.FC = () => {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E3E8E2]">
                     <span className="text-[#4B5563] text-[10px] block">Fe550D Steel:</span>
                     <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.steelTonnes || 8.64} Tonnes</span>
                   </div>
-                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E3E8E2]">
                     <span className="text-[#4B5563] text-[10px] block">Grade 53 Cement:</span>
                     <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.cementBags?.toLocaleString() || 1080} Bags</span>
                   </div>
-                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E3E8E2]">
                     <span className="text-[#4B5563] text-[10px] block">RCC Concrete:</span>
                     <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.rccConcreteTotalCuM || 48} m³</span>
                   </div>
-                  <div className="bg-white p-2.5 rounded-xl border border-[#E5E7EB]">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E3E8E2]">
                     <span className="text-[#4B5563] text-[10px] block">Masonry Blocks:</span>
                     <span className="text-sm font-bold text-[#1B3D34] block mt-0.5">{quantities.masonryUnitsCount?.toLocaleString() || 10752} Nos</span>
                   </div>
@@ -309,7 +309,7 @@ export const DashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             
             {/* 1. Free Estimate */}
-            <div className="p-5 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3 flex flex-col justify-between">
+            <div className="p-5 bg-white rounded-2xl border border-[#E3E8E2] shadow-xs space-y-3 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ export const DashboardPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
+              <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between">
                 <span className="text-[11px] font-mono font-bold text-[#1B3D34]">{formatCurrency(totalCost)}</span>
                 <button
                   type="button"
@@ -341,7 +341,7 @@ export const DashboardPage: React.FC = () => {
 
             {/* 2. Detailed Report (₹499) */}
             <div className={`p-5 bg-white rounded-2xl border shadow-xs space-y-3 flex flex-col justify-between transition-all ${
-              isReportUnlocked ? 'border-[#1B3D34] ring-1 ring-[#1B3D34]' : 'border-[#E5E7EB]'
+              isReportUnlocked ? 'border-[#1B3D34] ring-1 ring-[#1B3D34]' : 'border-[#E3E8E2]'
             }`}>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -366,7 +366,7 @@ export const DashboardPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between gap-2">
+              <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => navigate('/report')}
@@ -428,7 +428,7 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             {/* 3. Quote Review (₹8,999) */}
-            <div className="p-5 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3 flex flex-col justify-between">
+            <div className="p-5 bg-white rounded-2xl border border-[#E3E8E2] shadow-xs space-y-3 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -446,7 +446,7 @@ export const DashboardPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
+              <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between">
                 <span className="text-[11px] text-[#4B5563]">Before appointing contractor</span>
                 <button
                   type="button"
@@ -460,7 +460,7 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             {/* 4. Build Tracking (Subscription) */}
-            <div className="p-5 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3 flex flex-col justify-between">
+            <div className="p-5 bg-white rounded-2xl border border-[#E3E8E2] shadow-xs space-y-3 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -478,7 +478,7 @@ export const DashboardPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between">
+              <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between">
                 <span className="text-[11px] text-[#4B5563]">During site construction</span>
                 <button
                   type="button"
@@ -496,11 +496,11 @@ export const DashboardPage: React.FC = () => {
 
         {/* ── 3. TRADE ALLOCATION PREVIEW ── */}
         {hasProject && (
-          <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs space-y-3">
+          <section className="bg-white border border-[#E3E8E2] rounded-2xl p-6 sm:p-8 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#4B5563] block">
               TRADE COST ALLOCATION
             </span>
-            <div className="divide-y divide-[#E5E7EB] text-xs">
+            <div className="divide-y divide-[#E3E8E2] text-xs">
               {breakdownRows.map((row) => (
                 <div key={row.label} className="py-2.5 flex items-center justify-between">
                   <span className="text-[#4B5563]">{row.label}</span>

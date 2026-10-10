@@ -53,7 +53,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
   };
 
   return (
-    <section id="live-prices" className="py-16 sm:py-20 bg-[#F8F8F6] border-y border-[#E5E7EB] select-none">
+    <section id="live-prices" className="py-16 sm:py-20 bg-[#F8F8F6] border-y border-[#E3E8E2] select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
         {/* Section Header */}
@@ -75,7 +75,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
           <div className="flex flex-wrap items-center gap-3 self-start md:self-end">
             
             {/* Location Selector */}
-            <div className="inline-flex p-1 bg-white border border-[#E5E7EB] rounded-xl shadow-2xs">
+            <div className="inline-flex p-1 bg-white border border-[#E3E8E2] rounded-xl shadow-2xs">
               <button
                 type="button"
                 onClick={() => setSelectedLocation('Bengaluru')}
@@ -103,7 +103,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
             </div>
 
             {/* Package Tier Selector */}
-            <div className="inline-flex p-1 bg-white border border-[#E5E7EB] rounded-xl shadow-2xs">
+            <div className="inline-flex p-1 bg-white border border-[#E3E8E2] rounded-xl shadow-2xs">
               {(['Standard', 'Premium', 'Luxury'] as const).map((pkg) => (
                 <button
                   key={pkg}
@@ -126,7 +126,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
               onClick={loadRates}
               disabled={loading}
               title="Refresh latest rates from server"
-              className="p-2 bg-white border border-[#E5E7EB] rounded-xl text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer disabled:opacity-50"
+              className="p-2 bg-white border border-[#E3E8E2] rounded-xl text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer disabled:opacity-50"
             >
               <RotateCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#F28C28]' : ''}`} />
             </button>
@@ -134,7 +134,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
         </div>
 
         {/* Status Line */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-[#4B5563] pb-2 border-b border-[#E5E7EB]">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-[#4B5563] pb-2 border-b border-[#E3E8E2]">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
             <span>Active context: <strong className="text-[#1B3D34]">{selectedLocation}</strong> &bull; <strong className="text-[#1B3D34]">{selectedPackage} Tier</strong></span>
@@ -159,11 +159,11 @@ export const LiveMaterialPricesSection: React.FC = () => {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-[#1B3D34]/40 hover:shadow-xs transition-all text-left"
+              className="bg-white border border-[#E3E8E2] rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-[#1B3D34]/40 hover:shadow-xs transition-all text-left"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
                     {item.category}
                   </span>
                   {item.source === 'OVERRIDE' ? (
@@ -182,7 +182,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
                 </h3>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-[#E5E7EB] flex items-baseline justify-between">
+              <div className="pt-4 mt-3 border-t border-[#E3E8E2] flex items-baseline justify-between">
                 <div>
                   <span className="text-lg sm:text-xl font-bold font-mono text-[#1B3D34] tracking-tight">
                     {formatCurrency(item.rate)}
@@ -197,7 +197,7 @@ export const LiveMaterialPricesSection: React.FC = () => {
         </div>
 
         {/* Bottom Verification Banner & Calculator Link */}
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-left shadow-2xs">
+        <div className="bg-white border border-[#E3E8E2] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-left shadow-2xs">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[rgba(27,61,52,0.08)] text-[#1B3D34] flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5 text-[#1B3D34]" />

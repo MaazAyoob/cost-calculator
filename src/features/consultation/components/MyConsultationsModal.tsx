@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Clock, Calendar, CheckCircle2, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useConsultationStore } from '../../../store/useConsultationStore';
 import { LAUNCH_CONSULTATION_PRICE_DISPLAY } from '../../../config/consultation';
+import { modalScaleVariant, backdropFadeVariant } from '../../../animations/variants';
 
 interface MyConsultationsModalProps {
   isOpen: boolean;
@@ -20,7 +21,26 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
     }
   }, [isOpen, fetchMyConsultations]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleLookupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,14 +86,34 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1B3D34]/50 backdrop-blur-xs overflow-y-auto">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        className="bg-white rounded-3xl p-5 sm:p-7 max-w-2xl w-full shadow-2xl border border-[#E5E7EB] my-8 text-left space-y-5 max-h-[88vh] overflow-y-auto"
-      >
-        <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="my-consultations-portal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="my-consultations-title"
+        >
+          {/* Backdrop */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-[#1B3D34]/50 backdrop-blur-xs"
+            aria-hidden="true"
+          />
+
+          <motion.div
+            variants={modalScaleVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 bg-white rounded-3xl p-5 sm:p-7 max-w-2xl w-full shadow-2xl border border-[#E3E8E2] my-8 text-left space-y-5 max-h-[88vh] overflow-y-auto"
+          >
+        <div className="flex items-center justify-between pb-3 border-b border-[#E3E8E2]">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
               HOMEOWNER PORTAL
@@ -99,7 +139,7 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
             value={lookupEmail}
             onChange={(e) => setLookupEmail(e.target.value)}
             placeholder="Enter your booking email (e.g. rahul@example.com)..."
-            className="flex-1 px-3.5 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-[#F8F8F6]"
+            className="flex-1 px-3.5 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-[#F8F8F6]"
           />
           <button
             type="submit"
@@ -116,7 +156,7 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
               Loading your consultation requests...
             </div>
           ) : myConsultations.length === 0 ? (
-            <div className="p-8 text-center bg-[#F8F8F6] rounded-2xl border border-dashed border-[#E5E7EB] space-y-2">
+            <div className="p-8 text-center bg-[#F8F8F6] rounded-2xl border border-dashed border-[#E3E8E2] space-y-2">
               <ShieldCheck className="w-8 h-8 text-[#4B5563]/50 mx-auto" />
               <p className="text-xs font-semibold text-[#1B3D34]">
                 {hasSearched ? 'No consultation requests found for this email.' : 'Look up your requests using your booking email.'}
@@ -129,11 +169,11 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
             myConsultations.map((req) => (
               <div
                 key={req.id}
-                className="bg-[#F8F8F6] p-4 rounded-2xl border border-[#E5E7EB] space-y-2.5 text-xs text-[#1B3D34]"
+                className="bg-[#F8F8F6] p-4 rounded-2xl border border-[#E3E8E2] space-y-2.5 text-xs text-[#1B3D34]"
               >
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-xs bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
+                    <span className="font-mono font-bold text-xs bg-white px-2 py-0.5 rounded border border-[#E3E8E2]">
                       {req.publicReference}
                     </span>
                     <span className="text-xs font-bold text-[#1B3D34]">
@@ -143,7 +183,7 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
                   {getStatusBadge(req.status)}
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-[#E5E7EB]/70 text-[11px]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-[#E3E8E2]/70 text-[11px]">
                   <div>
                     <span className="text-[#4B5563] block">Topic</span>
                     <span className="font-semibold truncate block">{req.consultationTopic}</span>
@@ -173,8 +213,10 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
               </div>
             ))
           )}
-        </div>
+          </div>
+        </motion.div>
       </motion.div>
-    </div>
-  );
+    )}
+  </AnimatePresence>
+);
 };

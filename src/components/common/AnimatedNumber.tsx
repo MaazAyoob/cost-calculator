@@ -33,6 +33,18 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
       return;
     }
 
+    // Respect user's prefers-reduced-motion setting
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      setDisplayValue(targetVal);
+      prevValueRef.current = targetVal;
+      return;
+    }
+
     startTimeRef.current = null;
 
     const animate = (now: number) => {

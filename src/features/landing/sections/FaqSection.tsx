@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { accordionVariant } from '../../../animations/variants';
 
 export const FaqSection: React.FC = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
@@ -28,7 +30,7 @@ export const FaqSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq" className="py-20 lg:py-24 bg-white border-b border-[#E5E7EB] select-none">
+    <section id="faq" className="py-20 lg:py-24 bg-white border-b border-[#E3E8E2] select-none">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         
         {/* Section Header */}
@@ -45,7 +47,7 @@ export const FaqSection: React.FC = () => {
         </div>
 
         {/* Minimal Accordion with Thin Dividers and Plus/Minus Icons */}
-        <div className="divide-y divide-[#E5E7EB] border-y border-[#E5E7EB] text-left">
+        <div className="divide-y divide-[#E3E8E2] border-y border-[#E3E8E2] text-left">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
@@ -58,16 +60,26 @@ export const FaqSection: React.FC = () => {
                   <span className="text-base sm:text-lg font-bold text-[#1B3D34] group-hover:text-[#132C25] transition-colors leading-snug font-heading">
                     {faq.q}
                   </span>
-                  <div className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[#1B3D34] shrink-0 group-hover:border-[#1B3D34] transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-[#E3E8E2] flex items-center justify-center text-[#1B3D34] shrink-0 group-hover:border-[#1B3D34] transition-colors">
                     {isOpen ? <Minus className="w-4 h-4 text-[#F28C28]" /> : <Plus className="w-4 h-4" />}
                   </div>
                 </button>
 
-                {isOpen && (
-                  <p className="mt-4 text-xs sm:text-sm text-[#4B5563] leading-relaxed font-normal pr-10">
-                    {faq.a}
-                  </p>
-                )}
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      variants={accordionVariant}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      className="overflow-hidden"
+                    >
+                      <p className="mt-4 text-xs sm:text-sm text-[#4B5563] leading-relaxed font-normal pr-10">
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}

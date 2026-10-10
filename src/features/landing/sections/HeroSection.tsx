@@ -103,10 +103,10 @@ export const HeroSection: React.FC = () => {
                     key={plot.label}
                     type="button"
                     onClick={() => handleSelectPlot(i)}
-                    className={`py-2 px-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-center ${
+                    className={`py-2 px-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ease-out active:scale-95 cursor-pointer text-center select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
                       activePlotIdx === i
                         ? 'bg-[#1B3D34] text-white shadow-xs'
-                        : 'bg-[#F8F8F6] text-[#4B5563] border border-[#E5E7EB] hover:bg-[#E5E7EB]'
+                        : 'bg-[#F8F8F6] text-[#4B5563] border border-[#E5E7EB] hover:bg-[#E5E7EB] hover:text-[#1B3D34]'
                     }`}
                   >
                     {plot.label}
@@ -124,10 +124,10 @@ export const HeroSection: React.FC = () => {
                       key={fl}
                       type="button"
                       onClick={() => handleSelectFloor(fl)}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
                         selectedFloorCount === fl
                           ? 'bg-[#1B3D34] text-white shadow-xs'
-                          : 'bg-[#F8F8F6] text-[#4B5563] hover:bg-[#E5E7EB]'
+                          : 'bg-[#F8F8F6] text-[#4B5563] hover:bg-[#E5E7EB] hover:text-[#1B3D34]'
                       }`}
                     >
                       {fl === 1 ? 'Ground' : `G+${fl - 1}`}
@@ -212,50 +212,50 @@ export const HeroSection: React.FC = () => {
 
               {/* Bottom Specification Data Cards */}
               <div className="mt-3.5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
-                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
-                  <span className="text-xs font-semibold text-[#4B5563] block">
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E3E8E2]">
+                  <span className="text-xs font-semibold text-[#687770] block">
                     Built-Up Area
                   </span>
-                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                  <span className="text-base font-extrabold text-[#172722] block font-heading tabular-nums mt-0.5">
                     {buaSqFt.toLocaleString()} sq.ft
                   </span>
-                  <span className="text-[11px] text-[#4B5563] block">
+                  <span className="text-[11px] text-[#687770] block">
                     Ground + Floors
                   </span>
                 </div>
 
-                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
-                  <span className="text-xs font-semibold text-[#4B5563] block">
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E3E8E2]">
+                  <span className="text-xs font-semibold text-[#687770] block">
                     Structural Steel
                   </span>
-                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                  <span className="text-base font-extrabold text-[#172722] block font-heading tabular-nums mt-0.5">
                     {steelTonnes} T
                   </span>
-                  <span className="text-[11px] text-[#4B5563] block">
+                  <span className="text-[11px] text-[#687770] block">
                     Fe550D TMT
                   </span>
                 </div>
 
-                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
-                  <span className="text-xs font-semibold text-[#4B5563] block">
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E3E8E2]">
+                  <span className="text-xs font-semibold text-[#687770] block">
                     Cement
                   </span>
-                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                  <span className="text-base font-extrabold text-[#172722] block font-heading tabular-nums mt-0.5">
                     {cementBags.toLocaleString()} Bags
                   </span>
-                  <span className="text-[11px] text-[#4B5563] block">
+                  <span className="text-[11px] text-[#687770] block">
                     Grade 53
                   </span>
                 </div>
 
-                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E5E7EB]">
-                  <span className="text-xs font-semibold text-[#4B5563] block">
+                <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E3E8E2]">
+                  <span className="text-xs font-semibold text-[#687770] block">
                     BOQ Schedule
                   </span>
-                  <span className="text-base font-extrabold text-[#1B3D34] block font-heading tabular-nums mt-0.5">
+                  <span className="text-base font-extrabold text-[#172722] block font-heading tabular-nums mt-0.5">
                     13 Stages
                   </span>
-                  <span className="text-[11px] text-[#4B5563] block">
+                  <span className="text-[11px] text-[#687770] block">
                     Bank-Appraisal Ready
                   </span>
                 </div>

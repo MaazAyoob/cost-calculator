@@ -30,6 +30,7 @@ import { useSavedEstimationsStore } from '../../../store/useSavedEstimationsStor
 import { useCalculationStore } from '../../../store/useCalculationStore';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { formatCurrency } from '../../../utils/cn';
+import { modalScaleVariant, backdropFadeVariant } from '../../../animations/variants';
 
 interface ConsultationBookingModalProps {
   isOpen: boolean;
@@ -86,7 +87,26 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     }
   }, [isOpen, tomorrowStr, wizard.city]);
 
-  if (!isOpen || !consultant) return null;
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Handle Project Linking selection
   const handleSelectSavedProject = (projectId: string) => {
@@ -143,6 +163,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
   // Handle Final Payment & Request Submission
   const handleInitiatePaymentAndSubmit = async () => {
+    if (!consultant) return;
     setErrorMessage(null);
     try {
       // 1. Submit booking details to backend (Strictly resolves to ₹1,499)
@@ -213,15 +234,34 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1B3D34]/50 backdrop-blur-xs overflow-y-auto">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        className="bg-white rounded-3xl p-5 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E5E7EB] my-8 text-left space-y-6 max-h-[92vh] overflow-y-auto"
-      >
+    <AnimatePresence>
+      {isOpen && consultant && (
+        <motion.div
+          key="consultation-booking-portal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* Backdrop */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-[#1B3D34]/50 backdrop-blur-xs"
+            aria-hidden="true"
+          />
+
+          <motion.div
+            variants={modalScaleVariant}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 bg-white rounded-3xl p-5 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E3E8E2] my-8 text-left space-y-6 max-h-[92vh] overflow-y-auto"
+          >
         {/* Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-[#E5E7EB]">
+        <div className="flex items-start justify-between pb-4 border-b border-[#E3E8E2]">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
@@ -251,7 +291,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
         {/* Step Progress Indicators */}
         {step !== 4 && (
-          <div className="flex items-center justify-between text-xs font-bold text-[#4B5563] bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E5E7EB]">
+          <div className="flex items-center justify-between text-xs font-bold text-[#4B5563] bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E3E8E2]">
             <span className={step === 1 ? 'text-[#1B3D34]' : ''}>1. Consultation Details</span>
             <span>→</span>
             <span className={step === 2 ? 'text-[#1B3D34]' : ''}>2. Optional Project Link</span>
@@ -275,8 +315,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         {step === 1 && (
           <form onSubmit={handleProceedToStep2} className="space-y-4">
             {/* Consultant Quick Summary Bar */}
-            <div className="flex items-center gap-3 p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
-              <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shrink-0 border border-[#E5E7EB]">
+            <div className="flex items-center gap-3 p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shrink-0 border border-[#E3E8E2]">
                 {consultant.profileImage ? (
                   <img src={consultant.profileImage} alt={consultant.name} className="w-full h-full object-cover object-top" />
                 ) : (
@@ -309,7 +349,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                     value={homeownerName}
                     onChange={(e) => setHomeownerName(e.target.value)}
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -326,7 +366,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                     value={homeownerPhone}
                     onChange={(e) => setHomeownerPhone(e.target.value)}
                     placeholder="e.g. 9876543210"
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -344,7 +384,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                   value={homeownerEmail}
                   onChange={(e) => setHomeownerEmail(e.target.value)}
                   placeholder="e.g. rahul@example.com"
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                 />
               </div>
               <span className="text-[10px] text-[#4B5563] mt-0.5 block">
@@ -361,7 +401,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 <select
                   value={consultationTopic}
                   onChange={(e) => setConsultationTopic(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-white cursor-pointer"
+                  className="w-full px-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-white cursor-pointer"
                 >
                   {LAUNCH_CONSULTATION_TOPICS.map((topic) => (
                     <option key={topic} value={topic}>
@@ -381,7 +421,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                   value={projectType}
                   onChange={(e) => setProjectType(e.target.value)}
                   placeholder="e.g. Independent Villa, Duplex, G+3"
-                  className="w-full px-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                  className="w-full px-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                 />
               </div>
             </div>
@@ -400,7 +440,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                     value={projectLocation}
                     onChange={(e) => setProjectLocation(e.target.value)}
                     placeholder="e.g. Indiranagar, Bangalore"
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -416,7 +456,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                     min={tomorrowStr}
                     value={preferredDate}
                     onChange={(e) => setPreferredDate(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-white cursor-pointer"
+                    className="w-full px-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-white cursor-pointer"
                   />
                 </div>
               </div>
@@ -428,7 +468,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 <select
                   value={preferredTime}
                   onChange={(e) => setPreferredTime(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-white cursor-pointer"
+                  className="w-full px-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-white cursor-pointer"
                 >
                   <option value="10:00 AM - 12:00 PM">Morning (10:00 AM – 12:00 PM)</option>
                   <option value="02:00 PM - 04:00 PM">Afternoon (02:00 PM – 04:00 PM)</option>
@@ -447,7 +487,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Mention specific concerns, e.g. 'Need structural review of our 30x40 G+2 slab thickness' or 'Review contractor quotation timeline'..."
-                className="w-full px-3 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] resize-none"
+                className="w-full px-3 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] resize-none"
               />
             </div>
 
@@ -485,7 +525,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                   linkProjectChoice === 'current'
                     ? 'border-[#1B3D34] bg-emerald-50/50 ring-1 ring-[#1B3D34]'
-                    : 'border-[#E5E7EB] bg-white hover:border-slate-300'
+                    : 'border-[#E3E8E2] bg-white hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -497,7 +537,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                   </div>
                   {linkProjectChoice === 'current' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                 </div>
-                <div className="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-[#E5E7EB]/70 text-xs">
+                <div className="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-[#E3E8E2]/70 text-xs">
                   <div>
                     <span className="text-[10px] text-[#4B5563] block">Built-Up Area</span>
                     <strong className="text-[#1B3D34]">{result.area.totalBUASqFt} sq.ft</strong>
@@ -528,7 +568,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                         className={`p-3 rounded-xl border text-xs transition-all cursor-pointer ${
                           isSelected
                             ? 'border-[#1B3D34] bg-emerald-50/50 ring-1 ring-[#1B3D34]'
-                            : 'border-[#E5E7EB] bg-white hover:border-slate-300'
+                            : 'border-[#E3E8E2] bg-white hover:border-slate-300'
                         }`}
                       >
                         <div className="flex items-center justify-between font-bold text-[#1B3D34]">
@@ -552,7 +592,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
               className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                 linkProjectChoice === 'none'
                   ? 'border-[#1B3D34] bg-emerald-50/50 ring-1 ring-[#1B3D34]'
-                  : 'border-[#E5E7EB] bg-white hover:border-slate-300'
+                  : 'border-[#E3E8E2] bg-white hover:border-slate-300'
               }`}
             >
               <div>
@@ -565,7 +605,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
             </div>
 
             {/* Step 2 Actions */}
-            <div className="pt-3 flex items-center justify-between border-t border-[#E5E7EB]">
+            <div className="pt-3 flex items-center justify-between border-t border-[#E3E8E2]">
               <button
                 type="button"
                 onClick={() => setStep(1)}
@@ -591,8 +631,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         {step === 3 && (
           <div className="space-y-5">
             {/* Booking Summary Card */}
-            <div className="bg-[#F8F8F6] p-4 sm:p-5 rounded-2xl border border-[#E5E7EB] space-y-3 text-xs">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2.5">
+            <div className="bg-[#F8F8F6] p-4 sm:p-5 rounded-2xl border border-[#E3E8E2] space-y-3 text-xs">
+              <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2.5">
                 <span className="text-[#4B5563]">Selected Expert:</span>
                 <strong className="text-[#1B3D34] text-sm">{consultant.name} ({consultant.category})</strong>
               </div>
@@ -627,7 +667,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
               </div>
 
               {/* Price Breakdown */}
-              <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-sm">
+              <div className="pt-2.5 border-t border-[#E3E8E2] flex items-center justify-between text-sm">
                 <span className="font-bold text-[#1B3D34]">Total Consultation Fee:</span>
                 <span className="font-mono font-extrabold text-base text-[#1B3D34]">
                   {LAUNCH_CONSULTATION_PRICE_DISPLAY}
@@ -649,7 +689,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
             </div>
 
             {/* Step 3 Actions */}
-            <div className="pt-3 flex items-center justify-between border-t border-[#E5E7EB]">
+            <div className="pt-3 flex items-center justify-between border-t border-[#E3E8E2]">
               <button
                 type="button"
                 onClick={() => setStep(2)}
@@ -695,8 +735,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
             </div>
 
             {/* Confirmation Dossier Card */}
-            <div className="bg-[#F8F8F6] rounded-2xl p-5 border border-[#E5E7EB] text-left text-xs space-y-2.5 max-w-md mx-auto">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+            <div className="bg-[#F8F8F6] rounded-2xl p-5 border border-[#E3E8E2] text-left text-xs space-y-2.5 max-w-md mx-auto">
+              <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-2">
                 <span className="text-[#4B5563]">Reference ID:</span>
                 <span className="font-mono font-bold text-[#1B3D34]">{confirmedRequest.publicReference}</span>
               </div>
@@ -725,7 +765,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
             </div>
 
             {/* Next Steps Card */}
-            <div className="bg-white p-4 rounded-xl border border-[#E5E7EB] text-xs text-[#4B5563] text-left space-y-1.5 max-w-md mx-auto">
+            <div className="bg-white p-4 rounded-xl border border-[#E3E8E2] text-xs text-[#4B5563] text-left space-y-1.5 max-w-md mx-auto">
               <strong className="text-[#1B3D34] block">What happens next?</strong>
               <p>1. Hutty Admin reviews your topic and verifies expert availability.</p>
               <p>2. You will receive an email confirmation with the scheduled video/call link.</p>
@@ -744,6 +784,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
           </div>
         )}
       </motion.div>
-    </div>
+    </motion.div>
+  )}
+</AnimatePresence>
   );
 };

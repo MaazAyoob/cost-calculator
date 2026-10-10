@@ -85,7 +85,7 @@ export const ConsultationPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowHistoryModal(true)}
-            className="self-start sm:self-auto px-4 py-2 bg-white hover:bg-[#F8F8F6] text-xs font-bold text-[#1B3D34] border border-[#E5E7EB] rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-2 cursor-pointer"
+            className="self-start sm:self-auto px-4 py-2 bg-white hover:bg-[#F8F8F6] text-xs font-bold text-[#1B3D34] border border-[#E3E8E2] rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-2 cursor-pointer"
           >
             <Clock className="w-3.5 h-3.5 text-[#1B3D34]" />
             <span>Track My Consultation</span>
@@ -109,18 +109,18 @@ export const ConsultationPage: React.FC = () => {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-[#E5E7EB] p-6 space-y-4 animate-pulse h-72"
+                className="bg-white rounded-2xl border border-[#E3E8E2] p-6 space-y-4 animate-pulse h-72"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-[#E5E7EB]" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#E3E8E2]" />
                   <div className="space-y-2 flex-1">
-                    <div className="h-4 bg-[#E5E7EB] rounded w-3/4" />
-                    <div className="h-3 bg-[#E5E7EB] rounded w-1/2" />
+                    <div className="h-4 bg-[#E3E8E2] rounded w-3/4" />
+                    <div className="h-3 bg-[#E3E8E2] rounded w-1/2" />
                   </div>
                 </div>
                 <div className="space-y-2 pt-2">
-                  <div className="h-3 bg-[#E5E7EB] rounded w-full" />
-                  <div className="h-3 bg-[#E5E7EB] rounded w-5/6" />
+                  <div className="h-3 bg-[#E3E8E2] rounded w-full" />
+                  <div className="h-3 bg-[#E3E8E2] rounded w-5/6" />
                 </div>
               </div>
             ))}
@@ -140,7 +140,7 @@ export const ConsultationPage: React.FC = () => {
             </button>
           </div>
         ) : consultants.length === 0 ? (
-          <div className="bg-white p-12 rounded-2xl border border-[#E5E7EB] text-center space-y-3 shadow-xs">
+          <div className="bg-white p-12 rounded-2xl border border-[#E3E8E2] text-center space-y-3 shadow-xs">
             <SearchX className="w-10 h-10 text-[#4B5563]/50 mx-auto" />
             <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
               No experts match your current filters
@@ -173,7 +173,7 @@ export const ConsultationPage: React.FC = () => {
         )}
 
         {/* ── HOW HUTTY CONSULTATION WORKS ── */}
-        <section className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-10 shadow-xs space-y-8 mt-14">
+        <section className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-10 shadow-xs space-y-8 mt-14">
           <div className="max-w-2xl">
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
               TRANSPARENT PROCESS
@@ -187,7 +187,7 @@ export const ConsultationPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-2.5">
+            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-2.5">
               <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-[#F28C28] flex items-center justify-center font-bold text-sm">
                 1
               </div>
@@ -197,7 +197,7 @@ export const ConsultationPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-2.5">
+            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-2.5">
               <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-[#F28C28] flex items-center justify-center font-bold text-sm">
                 2
               </div>
@@ -207,7 +207,7 @@ export const ConsultationPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-2.5">
+            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-2.5">
               <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-[#F28C28] flex items-center justify-center font-bold text-sm">
                 3
               </div>

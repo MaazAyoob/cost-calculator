@@ -43,24 +43,16 @@ export const Step7Windows: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       
-      {/* ── STEP HEADER ── */}
-      <div className="space-y-1.5 pb-2 border-b border-[#E5E7EB]">
-        <span className="text-[11px] font-mono font-bold tracking-widest text-[#F28C28] uppercase block">
-          STEP 07
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] tracking-tight font-heading leading-tight">
-          WINDOWS &amp; GLAZING
-        </h1>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
-          Choose window framing and glass acoustic performance (~{totalWindowAreaSqFt} sq.ft across {windowsCount} openings).
-        </p>
-      </div>
-
       {/* ── 1. FRAMING MATERIAL ── */}
       <div className="space-y-2.5">
-        <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
-          Framing Material
-        </label>
+        <div className="flex justify-between items-center text-xs">
+          <label className="font-bold text-[#172722] uppercase tracking-wider block">
+            Framing Material
+          </label>
+          <span className="font-mono text-[#687770] text-[11px]">
+            ~{totalWindowAreaSqFt} sq.ft across {windowsCount} openings
+          </span>
+        </div>
         <div className="grid grid-cols-3 gap-2">
           {materials.map((mat) => {
             const isSelected = selectedMaterial === mat.id;
@@ -93,7 +85,7 @@ export const Step7Windows: React.FC = () => {
       </div>
 
       {/* ── 2. SUB-GRADE PERFORMANCE ── */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+      <div className="space-y-2.5 pt-2 border-t border-[#E3E8E2]">
         <div className="flex justify-between items-center text-xs">
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             {selectedMaterial} Specification Tier

@@ -731,13 +731,18 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         </span>
       </div>
 
-      {/* 3D Controls Bar */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-[#1B3D34]/90 backdrop-blur-md p-1 rounded-xl border border-white/15 z-10">
+      {/* 3D Floating Controls Toolbar */}
+      <div
+        className="absolute bottom-2.5 right-2.5 flex items-center gap-0.5 bg-[#112821]/90 backdrop-blur-md p-1 rounded-lg border border-white/15 z-10 shadow-md"
+        role="toolbar"
+        aria-label="3D Model Viewer Controls"
+      >
         <button
           type="button"
           onClick={() => setIsExplodedView(!isExplodedView)}
-          className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-            isExplodedView ? 'bg-[#F28C28] text-[#1B3D34]' : 'text-white/70 hover:text-white hover:bg-white/10'
+          aria-label={isExplodedView ? 'Collapse floor slices' : 'Explode floor slices'}
+          className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
+            isExplodedView ? 'bg-[#F28C28] text-[#112821]' : 'text-white/75 hover:text-white hover:bg-white/10'
           }`}
           title="Toggle Exploded Floor Slice View"
         >
@@ -747,10 +752,11 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         <button
           type="button"
           onClick={() => setIsPaintedMode(!isPaintedMode)}
-          className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-            isPaintedMode ? 'bg-[#F28C28] text-[#1B3D34]' : 'text-white/70 hover:text-white hover:bg-white/10'
+          aria-label={isPaintedMode ? 'Switch to raw concrete texture' : 'Switch to painted plaster finish'}
+          className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
+            isPaintedMode ? 'bg-[#F28C28] text-[#112821]' : 'text-white/75 hover:text-white hover:bg-white/10'
           }`}
-          title={isPaintedMode ? 'Switch to Raw Concrete' : 'Switch to Painted Plaster'}
+          title={isPaintedMode ? 'Raw Concrete Finish' : 'Painted Plaster Finish'}
         >
           <PaintBucket className="w-3.5 h-3.5" />
         </button>
@@ -758,8 +764,9 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         <button
           type="button"
           onClick={() => setIsNightMode(!isNightMode)}
-          className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-            isNightMode ? 'bg-white/20 text-[#F28C28]' : 'text-white/70 hover:text-white hover:bg-white/10'
+          aria-label={isNightMode ? 'Switch to daylight lighting' : 'Switch to evening lighting'}
+          className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
+            isNightMode ? 'bg-white/20 text-[#F28C28]' : 'text-white/75 hover:text-white hover:bg-white/10'
           }`}
           title={isNightMode ? 'Day Sunlight' : 'Evening Lighting'}
         >
@@ -769,8 +776,9 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         <button
           type="button"
           onClick={() => setIsAutoRotating(!isAutoRotating)}
-          className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-            isAutoRotating ? 'bg-white/20 text-[#F28C28]' : 'text-white/70 hover:text-white hover:bg-white/10'
+          aria-label={isAutoRotating ? 'Stop turntable rotation' : 'Start turntable rotation'}
+          className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
+            isAutoRotating ? 'bg-white/20 text-[#F28C28]' : 'text-white/75 hover:text-white hover:bg-white/10'
           }`}
           title="Toggle Turntable Rotation"
         >
@@ -780,7 +788,8 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         <button
           type="button"
           onClick={() => handleZoom(1.15)}
-          className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 text-xs transition-colors cursor-pointer"
+          aria-label="Zoom in model"
+          className="p-1.5 rounded-md text-white/75 hover:text-white hover:bg-white/10 text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none"
           title="Zoom In"
         >
           <ZoomIn className="w-3.5 h-3.5" />
@@ -789,7 +798,8 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         <button
           type="button"
           onClick={() => handleZoom(0.85)}
-          className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 text-xs transition-colors cursor-pointer"
+          aria-label="Zoom out model"
+          className="p-1.5 rounded-md text-white/75 hover:text-white hover:bg-white/10 text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none"
           title="Zoom Out"
         >
           <ZoomOut className="w-3.5 h-3.5" />
@@ -798,17 +808,18 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         <button
           type="button"
           onClick={handleResetView}
-          className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 text-xs transition-colors cursor-pointer"
+          aria-label="Reset 3D camera view"
+          className="p-1.5 rounded-md text-white/75 hover:text-white hover:bg-white/10 text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none"
           title="Reset View"
         >
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Drag Hint */}
-      <div className="absolute bottom-3 left-3 text-[10px] text-white/70 font-medium pointer-events-none flex items-center gap-1.5 bg-[#1B3D34]/80 backdrop-blur-sm px-2 py-0.5 rounded">
-        <Eye className="w-3 h-3 text-[#F28C28]" />
-        <span>Drag to orbit 360°</span>
+      {/* Drag Hint (Compact Pill, never collides with toolbar) */}
+      <div className="absolute bottom-2.5 left-2.5 text-[9px] text-white/75 font-medium pointer-events-none flex items-center gap-1 bg-[#112821]/80 backdrop-blur-xs px-2 py-1 rounded-md border border-white/10">
+        <Eye className="w-2.5 h-2.5 text-[#F28C28]" />
+        <span>Orbit 360°</span>
       </div>
     </div>
   );
