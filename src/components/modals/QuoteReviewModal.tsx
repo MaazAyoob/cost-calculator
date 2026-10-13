@@ -56,13 +56,13 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
             {/* Price Card */}
             <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">One-time consultation</span>
-                <span className="text-2xl font-black text-[#1B3D34] font-mono">₹8,999</span>
-                <span className="text-[10px] text-[#4B5563] ml-1">all inclusive</span>
+                <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">Professional Consultation</span>
+                <span className="text-2xl font-black text-[#1B3D34] font-mono">₹1,499</span>
+                <span className="text-[10px] text-[#4B5563] ml-1.5">• 45-min session &amp; written advice</span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2.5 py-1 rounded border border-[#E5E7EB] font-mono">
-                  48-Hour Turnaround
+                  Verified Expert
                 </span>
               </div>
             </div>
@@ -147,7 +147,7 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 type="submit"
                 className="w-full hutty-btn-primary py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
-                <span>Get a Second Opinion — ₹8,999</span>
+                <span>Get a Second Opinion — ₹1,499</span>
                 <ArrowRight className="w-4 h-4 text-[#F28C28]" />
               </button>
             </form>

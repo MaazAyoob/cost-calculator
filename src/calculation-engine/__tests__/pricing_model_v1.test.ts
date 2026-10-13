@@ -116,51 +116,54 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
   // 2. PRICING TIER ARCHITECTURE & COMPLETE PACKAGE SAFETY
   // ═════════════════════════════════════════════════════════════════════════
   describe('Pricing Tier Configuration & Safety Rules', () => {
-    it('initializes the four commercial levels with exact launch prices', async () => {
-      const tiers = await pricingService.getPublicTiers();
-      const codes = tiers.map((t) => t.code);
+    it('initializes the confirmed commercial calculator tiers (Free, ₹499, ₹1,499) and keeps ₹99 inactive', async () => {
+      const publicTiers = await pricingService.getPublicTiers();
+      const publicCodes = publicTiers.map((t) => t.code);
 
-      expect(codes).toContain(PRICING_TIER_CODES.FREE);
-      expect(codes).toContain(PRICING_TIER_CODES.ESTIMATE_99);
-      expect(codes).toContain(PRICING_TIER_CODES.DETAILED_ESTIMATE_499);
-      expect(codes).toContain(PRICING_TIER_CODES.COMPLETE_PACKAGE);
+      expect(publicCodes).toContain(PRICING_TIER_CODES.FREE);
+      expect(publicCodes).toContain(PRICING_TIER_CODES.DETAILED_ESTIMATE_499);
+      expect(publicCodes).toContain(PRICING_TIER_CODES.PREMIUM_1499);
+      expect(publicCodes).not.toContain(PRICING_TIER_CODES.ESTIMATE_99); // ₹99 removed from public purchasable tiers
 
-      const freeTier = tiers.find((t) => t.code === PRICING_TIER_CODES.FREE);
-      const tier99 = tiers.find((t) => t.code === PRICING_TIER_CODES.ESTIMATE_99);
-      const tier499 = tiers.find((t) => t.code === PRICING_TIER_CODES.DETAILED_ESTIMATE_499);
-      const completeTier = tiers.find((t) => t.code === PRICING_TIER_CODES.COMPLETE_PACKAGE);
+      const freeTier = publicTiers.find((t) => t.code === PRICING_TIER_CODES.FREE);
+      const tier499 = publicTiers.find((t) => t.code === PRICING_TIER_CODES.DETAILED_ESTIMATE_499);
+      const tier1499 = publicTiers.find((t) => t.code === PRICING_TIER_CODES.PREMIUM_1499);
 
       expect(freeTier?.priceMinorUnits).toBe(0);
-      expect(tier99?.priceMinorUnits).toBe(9900); // ₹99
       expect(tier499?.priceMinorUnits).toBe(49900); // ₹499
-      expect(completeTier?.priceMinorUnits).toBe(0); // Unfinalized
-      expect(completeTier?.purchasable).toBe(false); // Strictly non-purchasable
+      expect(tier1499?.priceMinorUnits).toBe(149900); // ₹1,499
+      expect(tier1499?.purchasable).toBe(true);
+
+      const allTiers = await pricingService.getAllTiersAdmin();
+      const historicalTier99 = allTiers.find((t) => t.code === PRICING_TIER_CODES.ESTIMATE_99);
+      expect(historicalTier99?.active).toBe(false);
+      expect(historicalTier99?.purchasable).toBe(false);
     });
 
-    it('rejects making Complete Package purchasable when price is <= 0', async () => {
-      const completeTier = await pricingService.getTierByCode(PRICING_TIER_CODES.COMPLETE_PACKAGE);
-      expect(completeTier).toBeDefined();
+    it('rejects making an unpriced tier purchasable when price is <= 0', async () => {
+      const tier1499 = await pricingService.getTierByCode(PRICING_TIER_CODES.PREMIUM_1499);
+      expect(tier1499).toBeDefined();
 
       await expect(
-        pricingService.updateTier(completeTier!.id, {
+        pricingService.updateTier(tier1499!.id, {
           purchasable: true,
           priceMinorUnits: 0,
         })
-      ).rejects.toThrow(/cannot be made purchasable until a valid final price/);
+      ).rejects.toThrow(/until a valid final price/);
     });
 
-    it('allows making Complete Package purchasable only after Admin sets a valid price > 0', async () => {
-      const completeTier = await pricingService.getTierByCode(PRICING_TIER_CODES.COMPLETE_PACKAGE);
-      expect(completeTier).toBeDefined();
+    it('allows updating tier prices through valid admin operations', async () => {
+      const tier1499 = await pricingService.getTierByCode(PRICING_TIER_CODES.PREMIUM_1499);
+      expect(tier1499).toBeDefined();
 
-      const updated = await pricingService.updateTier(completeTier!.id, {
-        priceMinorUnits: 199900, // ₹1,999.00
+      const updated = await pricingService.updateTier(tier1499!.id, {
+        priceMinorUnits: 149900,
         purchasable: true,
         active: true,
-        reason: 'Admin finalized package pricing',
+        reason: 'Admin confirmed tier pricing',
       });
 
-      expect(updated.priceMinorUnits).toBe(199900);
+      expect(updated.priceMinorUnits).toBe(149900);
       expect(updated.purchasable).toBe(true);
       expect(updated.active).toBe(true);
     });
@@ -187,16 +190,16 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
   // 3. SERVER-SIDE PRICE AUTHORITY
   // ═════════════════════════════════════════════════════════════════════════
   describe('Server-Side Price Authority (Minor Units Resolution)', () => {
-    it('authoritatively resolves ₹99 as 9900 paise and ₹499 as 49900 paise', async () => {
-      const purchase99 = await pricingService.initiatePurchase({
-        tierCode: PRICING_TIER_CODES.ESTIMATE_99,
-        leadName: 'Ramesh Gupta',
-        leadPhone: '9845012345',
-        leadEmail: 'ramesh@example.com',
-      });
-
-      expect(purchase99.purchase.amountMinorUnits).toBe(9900);
-      expect(purchase99.gatewayOrder?.amountMinorUnits).toBe(9900);
+    it('authoritatively resolves ₹499 as 49900 paise and ₹1,499 as 149900 paise, rejecting inactive ₹99', async () => {
+      // Inactive ₹99 cannot be purchased
+      await expect(
+        pricingService.initiatePurchase({
+          tierCode: PRICING_TIER_CODES.ESTIMATE_99,
+          leadName: 'Ramesh Gupta',
+          leadPhone: '9845012345',
+          leadEmail: 'ramesh@example.com',
+        })
+      ).rejects.toThrow(/is currently inactive/);
 
       const purchase499 = await pricingService.initiatePurchase({
         tierCode: PRICING_TIER_CODES.DETAILED_ESTIMATE_499,
@@ -207,19 +210,28 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
 
       expect(purchase499.purchase.amountMinorUnits).toBe(49900);
       expect(purchase499.gatewayOrder?.amountMinorUnits).toBe(49900);
+
+      const purchase1499 = await pricingService.initiatePurchase({
+        tierCode: PRICING_TIER_CODES.PREMIUM_1499,
+        leadName: 'Vikram Joshi',
+        leadPhone: '9845011223',
+        leadEmail: 'vikram@example.com',
+      });
+
+      expect(purchase1499.purchase.amountMinorUnits).toBe(149900);
+      expect(purchase1499.gatewayOrder?.amountMinorUnits).toBe(149900);
     });
 
-    it('rejects purchase attempts on unconfigured Complete Package', async () => {
-      // Re-create a fresh service where Complete Package is not configured
+    it('rejects purchase attempts on invalid tier codes', async () => {
       const freshService = new PricingService();
       await expect(
         freshService.initiatePurchase({
-          tierCode: PRICING_TIER_CODES.COMPLETE_PACKAGE,
+          tierCode: 'INVALID_TIER' as any,
           leadName: 'Suresh Patil',
           leadPhone: '9988776655',
           leadEmail: 'suresh@example.com',
         })
-      ).rejects.toThrow(/not yet available for purchase/);
+      ).rejects.toThrow(/Invalid pricing tier code/);
     });
   });
 
@@ -312,12 +324,14 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
       expect(CONSULTATION_PRICE_PAISE).toBe(149900);
     });
 
-    it('does not include Consultation in calculator tiers or pricing tiers seeds', async () => {
+    it('does not bundle Consultation into calculator tiers or pricing tiers seeds', async () => {
       const tiers = await pricingService.getPublicTiers();
       for (const t of tiers) {
-        expect(t.priceMinorUnits).not.toBe(149900);
         expect(t.features).not.toContain('EXPERT_CONSULTATION');
       }
+      const premiumTier = tiers.find((t) => t.code === PRICING_TIER_CODES.PREMIUM_1499);
+      expect(premiumTier?.priceMinorUnits).toBe(149900);
+      expect(premiumTier?.features).not.toContain('EXPERT_CONSULTATION');
     });
   });
 });

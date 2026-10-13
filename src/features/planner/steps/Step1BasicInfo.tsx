@@ -43,6 +43,10 @@ export const Step1BasicInfo: React.FC = () => {
     setDoorSelection,
     setWindowSelection,
     setBathroomFittingSelection,
+    isCornerPlot,
+    roadFacingBoundaries,
+    setIsCornerPlot,
+    setRoadFacingBoundaries,
     setPaintingSelection,
   } = useWizardStore();
 
@@ -449,6 +453,91 @@ export const Step1BasicInfo: React.FC = () => {
           </div>
         </div>
 
+        {/* Plot Type & Road Frontage (Corner Plots) */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex justify-between items-baseline">
+            <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
+              Plot Type &amp; Road Frontage
+            </label>
+            <span className="text-[10px] text-[#4B5563]">
+              Corner plots require front setback clearance on secondary roads
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsCornerPlot(false);
+                setRoadFacingBoundaries(['front']);
+              }}
+              className={cn(
+                'hutty-tactile-card p-2.5 text-left cursor-pointer transition-all',
+                !isCornerPlot && 'hutty-tactile-card-selected'
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#1B3D34]">Standard Plot</span>
+                {!isCornerPlot && <Check className="w-3.5 h-3.5 text-[#1B3D34]" />}
+              </div>
+              <p className="text-[10px] text-[#4B5563] mt-0.5">Single front road frontage</p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsCornerPlot(true);
+                if (!roadFacingBoundaries?.includes('left') && !roadFacingBoundaries?.includes('right')) {
+                  setRoadFacingBoundaries(['front', 'left']);
+                }
+              }}
+              className={cn(
+                'hutty-tactile-card p-2.5 text-left cursor-pointer transition-all',
+                isCornerPlot && 'hutty-tactile-card-selected'
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#1B3D34]">Corner Plot</span>
+                {isCornerPlot && <Check className="w-3.5 h-3.5 text-[#1B3D34]" />}
+              </div>
+              <p className="text-[10px] text-[#4B5563] mt-0.5">2+ road-facing boundaries</p>
+            </button>
+          </div>
+
+          {isCornerPlot && (
+            <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1.5 mt-1">
+              <span className="text-[11px] font-bold text-[#1B3D34] block">Secondary Road-Facing Boundary:</span>
+              <div className="flex gap-2">
+                {[
+                  { id: 'left' as const, label: 'Left Boundary' },
+                  { id: 'right' as const, label: 'Right Boundary' },
+                  { id: 'rear' as const, label: 'Rear Boundary' },
+                ].map((side) => {
+                  const isChecked = roadFacingBoundaries?.includes(side.id);
+                  return (
+                    <button
+                      key={side.id}
+                      type="button"
+                      onClick={() => {
+                        const updated: Array<'front' | 'rear' | 'left' | 'right'> = ['front'];
+                        if (!isChecked) updated.push(side.id);
+                        setRoadFacingBoundaries(updated);
+                      }}
+                      className={cn(
+                        'px-2.5 py-1 text-[11px] font-medium rounded border transition-all cursor-pointer',
+                        isChecked
+                          ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
+                          : 'bg-white text-[#4B5563] border-[#E3E8E2] hover:bg-[#F0F2EE]'
+                      )}
+                    >
+                      {side.label} {isChecked && '✓'}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
       </div>
 
       {/* ── 3. NUMBER OF FLOORS ── */}
@@ -547,6 +636,24 @@ export const Step1BasicInfo: React.FC = () => {
       {/* ── 5. SEPARATION OF CONCEPTS: PLOT AREA, PERMISSIBLE BUA, & PROPOSED BUA ── */}
       <div className="space-y-3.5 pt-3 border-t border-[#E3E8E2]">
         
+        {/* Everyday Homeowner Explanation for BUA */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1 text-left">
+          <div>
+            <h3 className="text-xs font-bold text-[#1B3D34]">Total Built-Up Area (BUA)</h3>
+            <p className="text-[11px] text-[#4B5563]">
+              The total constructed floor space across all floors combined (including walls and balconies).
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowHowCalculated(true)}
+            className="text-[11px] font-bold text-[#1B3D34] hover:underline self-start sm:self-auto cursor-pointer flex items-center gap-1"
+          >
+            <Info className="w-3.5 h-3.5 text-[#F28C28]" />
+            <span>How we calculate your estimate</span>
+          </button>
+        </div>
+
         {/* Unified 3-Part Metric Strip (No nested card-within-card) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#E3E8E2] border border-[#E3E8E2] rounded-xl bg-[#F8F8F6] overflow-hidden shadow-2xs">
           {/* Metric 1: Plot Area */}
@@ -837,20 +944,70 @@ export const Step1BasicInfo: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#E3E8E2] space-y-1">
-                  <span className="text-[11px] font-bold text-[#1B3D34] block">Required Statutory Setbacks:</span>
-                  <div className="flex flex-wrap gap-2 text-[11px] font-mono text-[#4B5563]">
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
-                      Front: {area.setbacks?.frontSetbackFt?.toFixed(1) || 3.3} ft
-                    </span>
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
-                      Rear: {area.setbacks?.rearSetbackFt?.toFixed(1) || 3.3} ft
-                    </span>
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
-                      Left: {area.setbacks?.leftSetbackFt?.toFixed(1) || 3.3} ft
-                    </span>
-                    <span className="bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
-                      Right: {area.setbacks?.rightSetbackFt?.toFixed(1) || 3.3} ft
+                <div className="pt-2 border-t border-[#E3E8E2] space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] font-bold text-[#1B3D34]">Required Statutory Setbacks:</span>
+                    {area.authorityMetadata?.matchedRuleName && (
+                      <span className="text-[10px] bg-[#EAF2ED] text-[#1B3D34] px-2 py-0.5 rounded-full font-medium">
+                        {area.authorityMetadata.matchedRuleName}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                    <div className="bg-[#F8F8F6] p-2 rounded-lg border border-[#E3E8E2]">
+                      <span className="text-[10px] text-[#4B5563] uppercase block font-semibold">Front</span>
+                      <span className="font-bold text-[#1B3D34] font-mono">
+                        {area.setbacks?.frontSetbackFt !== undefined ? `${area.setbacks.frontSetbackFt.toFixed(2)} ft` : 'Pending'}
+                      </span>
+                    </div>
+
+                    <div className="bg-[#F8F8F6] p-2 rounded-lg border border-[#E3E8E2]">
+                      <span className="text-[10px] text-[#4B5563] uppercase block font-semibold">Rear</span>
+                      <span className="font-bold text-[#1B3D34] font-mono">
+                        {area.authorityMetadata?.rearMethod === 'UNSPECIFIED' ? (
+                          <span className="text-[#B45309] text-[10px] font-sans font-medium">Review required*</span>
+                        ) : (
+                          `${(area.setbacks?.rearSetbackFt ?? 0).toFixed(2)} ft`
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="bg-[#F8F8F6] p-2 rounded-lg border border-[#E3E8E2]">
+                      <span className="text-[10px] text-[#4B5563] uppercase block font-semibold">Left Side</span>
+                      <span className="font-bold text-[#1B3D34] font-mono">
+                        {(area.setbacks?.leftSetbackFt ?? 0).toFixed(2)} ft
+                      </span>
+                    </div>
+
+                    <div className="bg-[#F8F8F6] p-2 rounded-lg border border-[#E3E8E2]">
+                      <span className="text-[10px] text-[#4B5563] uppercase block font-semibold">Right Side</span>
+                      <span className="font-bold text-[#1B3D34] font-mono">
+                        {(area.setbacks?.rightSetbackFt ?? 0) === 0 && (area.setbacks?.leftSetbackFt ?? 0) > 0 ? (
+                          <span className="text-[#4B5563] text-[10px] font-sans font-medium">0 ft (1 side)</span>
+                        ) : (
+                          `${(area.setbacks?.rightSetbackFt ?? 0).toFixed(2)} ft`
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  {area.authorityMetadata?.isAuthoritativeBuildableResolved === false && (
+                    <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 text-[11px] flex items-start gap-1.5">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="font-semibold block">Planning Estimate Advisory:</strong>
+                        <span>
+                          {area.authorityMetadata.unresolvedReasons?.[0] || 'Statutory clearance contains unverified conditions. Confirm with BBMP/BDA and your architect before sanction plan submission.'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-[11px] text-[#4B5563] flex justify-between items-center pt-1">
+                    <span>Buildable Envelope:</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">
+                      {area.buildableLengthFt} ft (length) × {area.buildableWidthFt} ft (width)
                     </span>
                   </div>
                 </div>

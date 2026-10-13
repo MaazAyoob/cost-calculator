@@ -11,17 +11,17 @@ export const WhyPlanningSection: React.FC = () => {
         { title: 'Vague Lump-Sum Quotes', desc: 'Contractors quote "₹2,200/sq.ft" with unwritten material assumptions and ambiguous finish grades.' },
         { title: 'Hidden Quantity Disputes', desc: 'Steel tonnage and cement bags are calculated informally on-site, causing frequent cost escalations.' },
         { title: 'Brand Substitution', desc: 'Lower-grade steel (Fe 500 vs 550D) or lower cement grades are swapped in without client awareness.' },
-        { title: '15-30% Budget Overruns', desc: 'Unplanned architectural variations and unclear BOQ schedules derail finances midway through construction.' },
+        { title: 'Unexpected Extra Costs', desc: 'Unplanned architectural changes and unclear work schedules can derail your budget midway through construction.' },
       ],
     },
     with: {
-      title: 'With Hutty Planning Intelligence',
-      badge: 'BANK & TENDER READY',
+      title: 'With Hutty Planning',
+      badge: 'CLEAR & ACTIONABLE',
       points: [
-        { title: 'Formulaic Quantity Certainty', desc: 'Physical steel weight (T), cement bags, and masonry are calculated upfront from exact structural spans.' },
-        { title: 'Deterministic Brand Matrix', desc: 'Tata Tiscon, UltraTech, and premium fittings are locked down with invariant physical geometry.' },
-        { title: 'Bank-Ready 13-Stage BOQ', desc: 'Clear line-item Schedule of Rates ready for home loan disbursements and transparent contractor tenders.' },
-        { title: 'Predictable Fixed Budget', desc: 'Complete mathematical transparency with real-time feedback for every room, floor, or finish change.' },
+        { title: 'Clear Quantities Upfront', desc: 'See the steel, cement, and masonry needed for your house calculated directly from your floor plan.' },
+        { title: 'Selected Materials Locked', desc: 'Your choices for steel brands, cement grades, and fittings stay clearly documented.' },
+        { title: 'Detailed Construction Cost Report', desc: 'A clear stage-by-stage cost schedule you can review and discuss with your contractor or bank.' },
+        { title: 'Predictable Budget', desc: 'Clear cost visibility with immediate updates whenever you change rooms, floors, or finishes.' },
       ],
     },
   };
@@ -78,7 +78,7 @@ export const WhyPlanningSection: React.FC = () => {
             </div>
 
             <div className="p-3 bg-red-50/70 border border-red-200/70 rounded-xl text-[11px] text-red-900 font-medium">
-              Average 18–25% budget overruns due to undisclosed takeoff discrepancies.
+              Unclear contractor quotes often hide unexpected costs and material disputes.
             </div>
           </div>
 

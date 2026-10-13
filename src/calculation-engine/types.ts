@@ -103,6 +103,12 @@ export interface EngineInput {
   electrical: ElectricalSelection;
   bathroomFittings: BathroomFittingSelection;
   painting: PaintingSelection;
+  // Setback conditions & road frontages (Plot Setback System V2)
+  roadFacingBoundaries?: Array<'front' | 'rear' | 'left' | 'right'>;
+  isCornerPlot?: boolean;
+  roadWideningFt?: number;
+  prescribedBuildingLineFt?: number;
+  overrideReason?: string;
   // Commercial & contractor mode options
   contractorMode?: 'independent' | 'contractor';
   contractorMarginRate?: number; // Configurable contractor margin (e.g. 0.08 to 0.15, default 0.10)
@@ -311,6 +317,16 @@ export interface AreaResult {
     disclaimer: string;
     requiresConfirmation: boolean;
     confirmationReason?: string;
+    matchedRuleId?: string;
+    matchedRuleName?: string;
+    verificationStatus?: string;
+    frontMethod?: string;
+    rearMethod?: string;
+    leftMethod?: string;
+    rightMethod?: string;
+    isAuthoritativeBuildableResolved?: boolean;
+    unresolvedReasons?: string[];
+    explanationSteps?: any[];
   };
 }
 

@@ -4,6 +4,7 @@ import {
   getConsultantBySlug,
   getConsultationCategories,
   createBookingRequest,
+  createGeneralEnquiry,
   verifyPayment,
   getMyConsultations,
   getMyConsultationById,
@@ -55,6 +56,9 @@ consultationCustomerRouter.post(
 );
 
 consultationCustomerRouter.post('/:id/verify-payment', paymentVerifyRateLimiter, verifyPayment as any);
+
+// General Expert Enquiry & Fallback lead endpoint (Rate limited)
+consultationCustomerRouter.post('/enquiries', bookingRateLimiter, createGeneralEnquiry as any);
 
 // Optional auth: if token present, populated via header, otherwise email query param checked
 consultationCustomerRouter.get('/my', (req, res, next) => {

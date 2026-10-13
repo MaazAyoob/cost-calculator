@@ -5,6 +5,7 @@ import {
   createConsultantSchema,
   updateConsultantSchema,
   createBookingRequestSchema,
+  createGeneralEnquirySchema,
   verifyPaymentSchema,
   assignConsultantSchema,
   scheduleConsultationSchema,
@@ -108,6 +109,28 @@ export async function createBookingRequest(req: AuthenticatedRequest, res: Respo
     res.status(400).json({
       success: false,
       error: err.message || 'Failed to create consultation request',
+    });
+  }
+}
+
+export async function createGeneralEnquiry(req: Request, res: Response): Promise<void> {
+  try {
+    const parsed = createGeneralEnquirySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const result = await consultationService.createGeneralEnquiry(parsed.data);
+    res.status(201).json(result);
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Failed to submit enquiry',
     });
   }
 }

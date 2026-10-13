@@ -17,7 +17,7 @@ export const FeatureShowcaseSection: React.FC = () => {
       rate: '₹74 / kg',
       standard: 'IS 1786 High-Ductility Grade',
       details: 'High-ductility seismic-resistant TMT rebar with superior rib pattern for concrete bonding.',
-      takeoff: '4.32 Tonnes for 1,440 sq.ft BUA',
+      takeoff: '4.32 Tonnes for 1,440 sq.ft built-up area',
     },
     cement: {
       name: 'Structural Portland Cement',
@@ -25,7 +25,7 @@ export const FeatureShowcaseSection: React.FC = () => {
       rate: '₹410 / 50kg Bag',
       standard: 'IS 12269 & IS 269 Compliant',
       details: 'High early-strength portland cement designed for foundation footings, columns, and RCC slabs.',
-      takeoff: '576 Bags (0.40 bags/sq.ft BUA)',
+      takeoff: '576 Bags (0.40 bags/sq.ft area)',
     },
     masonry: {
       name: 'Autoclaved Aerated Blocks',
@@ -33,7 +33,7 @@ export const FeatureShowcaseSection: React.FC = () => {
       rate: '₹68 / Block (600×200×150mm)',
       standard: 'IS 2185 Part 3 Certified',
       details: 'Lightweight thermal-insulating block masonry reducing dead load by up to 50% vs red clay bricks.',
-      takeoff: '1,799 Blocks (1.25 blocks/sq.ft BUA)',
+      takeoff: '1,799 Blocks (1.25 blocks/sq.ft area)',
     },
     flooring: {
       name: 'Living & Bedroom Surfaces',
@@ -41,7 +41,7 @@ export const FeatureShowcaseSection: React.FC = () => {
       rate: '₹85 / sq.ft (Tile + Adhesive)',
       standard: 'Nano-Polished Gloss Finish',
       details: 'Stain-resistant vitrified tiles with 2mm paper joints and epoxy-grouted wet areas.',
-      takeoff: '1,407 sq.ft Flooring Takeoff',
+      takeoff: '1,407 sq.ft Flooring Area',
     },
     windows: {
       name: 'Weather-Proof Joinery',
@@ -82,7 +82,7 @@ export const FeatureShowcaseSection: React.FC = () => {
             across every material and trade.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Hutty operates on invariant engineering formulas. Select materials below to inspect physical takeoffs and cost composition.
+            See how much material your house needs and how different brand choices affect the total cost.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export const FeatureShowcaseSection: React.FC = () => {
                 INTERACTIVE SPECIFICATION BOARD
               </span>
               <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading mt-0.5">
-                Brand Specifications &amp; Invariant Takeoffs
+                Materials Needed &amp; Brand Choices
               </h3>
             </div>
             <span className="text-xs font-mono text-[#4B5563] bg-white px-3 py-1 rounded-full border border-[#E5E7EB]">
@@ -187,7 +187,7 @@ export const FeatureShowcaseSection: React.FC = () => {
                 Cost Allocation Buildup
               </h3>
               <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
-                Deterministic cost allocation based on IS 456 quantities and verified Bengaluru contractor schedules.
+                Clear cost breakdown based on estimated material quantities and typical regional labour rates.
               </p>
 
               {/* Stacked Proportional Bar */}

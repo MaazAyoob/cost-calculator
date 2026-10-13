@@ -7,9 +7,9 @@ interface SEOProps {
 }
 
 export const SEO: React.FC<SEOProps> = ({
-  title = "Hutty — Home Construction Planning Platform | Build your home with clarity",
-  description = "Plan your plot, spaces, materials and construction cost before you build with Hutty. Deterministic, quantity-based estimates and bank-ready BOQ.",
-  keywords = "Hutty, home construction planning, residential cost estimator, Bangalore house planning, BOQ generator, architectural cost planning, construction cost calculator",
+  title = "Hutty — Understand your home before you build",
+  description = "Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need it.",
+  keywords = "Hutty, home construction planning, residential cost estimator, Bangalore house planning, construction cost calculator, materials needed",
 }) => {
   useEffect(() => {
     document.title = title;

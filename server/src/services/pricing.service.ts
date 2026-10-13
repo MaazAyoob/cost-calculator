@@ -88,6 +88,7 @@ export class PricingService {
   private inMemoryPurchases: PricingPurchaseEntity[] = [];
   private inMemoryEntitlements: UserEntitlementEntity[] = [];
   private inMemoryAuditLogs: PricingAuditLogEntity[] = [];
+  private dbConnected: boolean = false;
 
   constructor() {
     this.seedInMemoryTiers();
@@ -96,6 +97,7 @@ export class PricingService {
       this.syncSeedsToPrisma();
     } catch {
       this.prisma = null;
+      this.dbConnected = false;
     }
   }
 
@@ -121,6 +123,7 @@ export class PricingService {
     if (!this.prisma) return;
     try {
       const count = await (this.prisma as any).pricingTier.count();
+      this.dbConnected = true;
       if (count === 0) {
         for (const t of this.inMemoryTiers) {
           await (this.prisma as any).pricingTier.create({
@@ -140,9 +143,32 @@ export class PricingService {
           });
         }
       }
-    } catch {
-      // Non-blocking fallback
+    } catch (err: any) {
+      this.dbConnected = false;
+      if (process.env.NODE_ENV === 'production') {
+        console.error('[PricingService] CRITICAL: PostgreSQL connection failed in production:', err.message);
+      }
     }
+  }
+
+  public isDatabaseConnected(): boolean {
+    return this.dbConnected;
+  }
+
+  public getPersistenceStatus(): {
+    mode: 'POSTGRESQL_DURABLE' | 'IN_MEMORY_TRANSIENT';
+    databaseConnected: boolean;
+    persistenceGuaranteed: boolean;
+    warning: string | null;
+  } {
+    return {
+      mode: this.dbConnected ? 'POSTGRESQL_DURABLE' : 'IN_MEMORY_TRANSIENT',
+      databaseConnected: this.dbConnected,
+      persistenceGuaranteed: this.dbConnected,
+      warning: this.dbConnected
+        ? null
+        : 'In-memory fallback active. Purchases and entitlements are transient and will not survive process restarts until PostgreSQL DATABASE_URL is connected.',
+    };
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -239,14 +265,14 @@ export class PricingService {
       }
     }
 
-    // Validation 2: Complete Package safety
+    // Validation 2: Paid tier purchasable safety
     const targetCode = existing.code;
     const finalPrice = updates.priceMinorUnits !== undefined ? updates.priceMinorUnits : existing.priceMinorUnits;
     const finalPurchasable = updates.purchasable !== undefined ? updates.purchasable : existing.purchasable;
 
-    if (targetCode === PRICING_TIER_CODES.COMPLETE_PACKAGE && finalPurchasable) {
+    if (targetCode !== PRICING_TIER_CODES.FREE && finalPurchasable) {
       if (finalPrice <= 0) {
-        throw new Error('Complete Package cannot be made purchasable until a valid final price (> 0) is configured');
+        throw new Error('Tier cannot be made purchasable until a valid final price (> 0) is configured');
       }
     }
 
@@ -405,7 +431,7 @@ export class PricingService {
       updatedAt: new Date().toISOString(),
     };
 
-    if (this.prisma) {
+    if (this.prisma && this.dbConnected) {
       try {
         await (this.prisma as any).pricingPurchase.create({
           data: {
@@ -428,7 +454,16 @@ export class PricingService {
             projectSnapshot: purchase.projectSnapshot,
           },
         });
-      } catch {}
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to record purchase in database: ' + err.message);
+        }
+        console.warn('[PricingService] Prisma purchase create failed, recorded in-memory:', err.message);
+      }
+    } else if (!isFree && process.env.NODE_ENV === 'production' && !this.dbConnected) {
+      throw new Error(
+        'DURABLE_STORAGE_UNAVAILABLE: Payment order initiation aborted because database persistence is offline. Production transactions cannot be created without durable storage.'
+      );
     }
     this.inMemoryPurchases.unshift(purchase);
 
@@ -454,24 +489,65 @@ export class PricingService {
   public async confirmPurchasePayment(
     purchaseId: string,
     gatewayPaymentId: string,
-    gatewayOrderId?: string
+    gatewayOrderId?: string,
+    razorpaySignature?: string
   ): Promise<{ purchase: PricingPurchaseEntity; entitlements: UserEntitlementEntity[] }> {
-    const purchase = this.inMemoryPurchases.find((p) => p.id === purchaseId || p.gatewayOrderId === gatewayOrderId);
+    let purchase = this.inMemoryPurchases.find(
+      (p) => p.id === purchaseId || p.gatewayOrderId === gatewayOrderId || p.publicReference === purchaseId
+    );
+    if (!purchase && this.prisma) {
+      try {
+        purchase = await (this.prisma as any).pricingPurchase.findFirst({
+          where: {
+            OR: [
+              { id: purchaseId },
+              { gatewayOrderId: gatewayOrderId || purchaseId },
+              { publicReference: purchaseId },
+            ],
+          },
+        });
+      } catch {}
+    }
     if (!purchase) {
       throw new Error(`Purchase record not found for ID "${purchaseId}"`);
     }
 
+    // Cryptographic HMAC-SHA256 signature verification when secret is configured
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (keySecret) {
+      if (!razorpaySignature) {
+        throw new Error('Cryptographic signature verification failed: signature is required when gateway secret is configured.');
+      }
+      const orderIdToVerify = gatewayOrderId || purchase.gatewayOrderId || '';
+      const hmac = crypto.createHmac('sha256', keySecret);
+      hmac.update(`${orderIdToVerify}|${gatewayPaymentId}`);
+      const expectedSignature = hmac.digest('hex');
+      const isValid =
+        expectedSignature.length === razorpaySignature.length &&
+        crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpaySignature));
+      if (!isValid) {
+        throw new Error('Cryptographic signature verification failed: signature mismatch.');
+      }
+    }
+
     if (purchase.status === 'PAID') {
       // Already confirmed (idempotent)
-      const existingEnts = this.inMemoryEntitlements.filter((e) => e.sourcePurchaseId === purchase.id);
+      const existingEnts = await this.getUserEntitlements(purchase.userId, purchase.leadEmail, purchase.projectId);
       return { purchase, entitlements: existingEnts };
+    }
+
+    // In production, enforce fail-closed if durable storage is offline
+    if (process.env.NODE_ENV === 'production' && !this.dbConnected) {
+      throw new Error(
+        'DURABLE_STORAGE_UNAVAILABLE: Cannot confirm payment because database persistence is offline. Transaction aborted to protect customer records.'
+      );
     }
 
     purchase.status = 'PAID';
     purchase.gatewayPaymentId = gatewayPaymentId;
     purchase.updatedAt = new Date().toISOString();
 
-    if (this.prisma) {
+    if (this.prisma && this.dbConnected) {
       try {
         await (this.prisma as any).pricingPurchase.update({
           where: { id: purchase.id },
@@ -480,7 +556,12 @@ export class PricingService {
             gatewayPaymentId,
           },
         });
-      } catch {}
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to update payment status in database: ' + err.message);
+        }
+        console.warn('[PricingService] Prisma purchase update failed, using in-memory:', err.message);
+      }
     }
 
     const tier = await this.getTierById(purchase.tierId);
@@ -488,6 +569,50 @@ export class PricingService {
     const entitlements = await this.grantEntitlementsForPurchase(purchase, features);
 
     return { purchase, entitlements };
+  }
+
+  public async getPurchaseByPublicReference(publicReference: string): Promise<PricingPurchaseEntity | null> {
+    if (this.prisma) {
+      try {
+        const found = await (this.prisma as any).pricingPurchase.findUnique({
+          where: { publicReference },
+        });
+        if (found) return found;
+      } catch {}
+    }
+    return this.inMemoryPurchases.find((p) => p.publicReference === publicReference) || null;
+  }
+
+  public async getPurchaseById(id: string): Promise<PricingPurchaseEntity | null> {
+    if (this.prisma) {
+      try {
+        const found = await (this.prisma as any).pricingPurchase.findUnique({
+          where: { id },
+        });
+        if (found) return found;
+      } catch {}
+    }
+    return this.inMemoryPurchases.find((p) => p.id === id) || null;
+  }
+
+  public async failPurchasePayment(purchaseId: string, reason?: string): Promise<PricingPurchaseEntity> {
+    const purchase = this.inMemoryPurchases.find((p) => p.id === purchaseId || p.gatewayOrderId === purchaseId);
+    if (!purchase) {
+      throw new Error(`Purchase record not found for ID "${purchaseId}"`);
+    }
+    if (purchase.status !== 'PAID') {
+      purchase.status = 'FAILED';
+      purchase.updatedAt = new Date().toISOString();
+      if (this.prisma) {
+        try {
+          await (this.prisma as any).pricingPurchase.update({
+            where: { id: purchase.id },
+            data: { status: 'FAILED' },
+          });
+        } catch {}
+      }
+    }
+    return purchase;
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -501,6 +626,11 @@ export class PricingService {
     const granted: UserEntitlementEntity[] = [];
 
     for (const feat of features) {
+      const alreadyExists = this.inMemoryEntitlements.some(
+        (e) => e.sourcePurchaseId === purchase.id && e.featureCode === feat && e.active
+      );
+      if (alreadyExists) continue;
+
       const ent: UserEntitlementEntity = {
         id: `ent-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         userId: purchase.userId,
@@ -518,7 +648,7 @@ export class PricingService {
       this.inMemoryEntitlements.push(ent);
       granted.push(ent);
 
-      if (this.prisma) {
+      if (this.prisma && this.dbConnected) {
         try {
           await (this.prisma as any).userEntitlement.create({
             data: {
@@ -532,7 +662,12 @@ export class PricingService {
               startsAt: new Date(ent.startsAt),
             },
           });
-        } catch {}
+        } catch (err: any) {
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to persist user entitlement in database: ' + err.message);
+          }
+          console.warn('[PricingService] Prisma entitlement create failed, using in-memory:', err.message);
+        }
       }
     }
 
@@ -546,13 +681,179 @@ export class PricingService {
   ): Promise<UserEntitlementEntity[]> {
     const normalizedEmail = userEmail?.trim().toLowerCase();
 
+    // 1. Query Prisma if connected
+    if (this.prisma && this.dbConnected) {
+      try {
+        const dbEnts = await (this.prisma as any).userEntitlement.findMany({
+          where: {
+            active: true,
+            OR: [
+              projectId ? { projectId } : undefined,
+              userId ? { userId } : undefined,
+              normalizedEmail ? { userEmail: normalizedEmail } : undefined,
+            ].filter(Boolean) as any,
+          },
+        });
+
+        if (dbEnts && dbEnts.length > 0) {
+          return dbEnts
+            .map((e: any) => ({
+              id: e.id,
+              userId: e.userId,
+              userEmail: e.userEmail,
+              projectId: e.projectId,
+              featureCode: e.featureCode,
+              sourcePurchaseId: e.sourcePurchaseId,
+              active: e.active,
+              startsAt: e.startsAt?.toISOString?.() || String(e.startsAt),
+              expiresAt: e.expiresAt ? (e.expiresAt.toISOString?.() || String(e.expiresAt)) : null,
+              createdAt: e.createdAt?.toISOString?.() || String(e.createdAt),
+              updatedAt: e.updatedAt?.toISOString?.() || String(e.updatedAt),
+            }))
+            .filter((e: UserEntitlementEntity) => {
+              if (projectId && e.projectId && e.projectId !== projectId) return false;
+              if (normalizedEmail && e.userEmail && e.userEmail.toLowerCase() !== normalizedEmail) return false;
+              if (userId && e.userId && e.userId !== userId) return false;
+              if (projectId && e.projectId === projectId) return true;
+              if (userId && e.userId === userId && !e.projectId) return true;
+              if (normalizedEmail && e.userEmail === normalizedEmail && !e.projectId) return true;
+              return false;
+            });
+        }
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production') {
+          console.error('[PricingService] Error reading entitlements from Prisma:', err.message);
+        }
+      }
+    }
+
+    // 2. Query in-memory store
     return this.inMemoryEntitlements.filter((e) => {
       if (!e.active) return false;
+
+      // Cross-project mismatch: if projectId requested does not match entitlement's projectId
+      if (projectId && e.projectId && e.projectId !== projectId) {
+        return false;
+      }
+
+      // Cross-user / cross-email mismatch: if email requested does not match entitlement's email
+      if (normalizedEmail && e.userEmail && e.userEmail !== normalizedEmail) {
+        return false;
+      }
+
+      // Cross-userId mismatch: if userId requested does not match entitlement's userId
+      if (userId && e.userId && e.userId !== userId) {
+        return false;
+      }
+
+      // If project matches
       if (projectId && e.projectId === projectId) return true;
-      if (userId && e.userId === userId) return true;
-      if (normalizedEmail && e.userEmail === normalizedEmail) return true;
+
+      // If user or email matches for global/non-project-scoped entitlement
+      if (userId && e.userId === userId && !e.projectId) return true;
+      if (normalizedEmail && e.userEmail === normalizedEmail && !e.projectId) return true;
+
       return false;
     });
+  }
+
+  public async getPurchaseByGatewayOrderId(gatewayOrderId: string): Promise<PricingPurchaseEntity | null> {
+    if (this.prisma && this.dbConnected) {
+      try {
+        const found = await (this.prisma as any).pricingPurchase.findFirst({
+          where: { gatewayOrderId },
+        });
+        if (found) return found;
+      } catch {}
+    }
+    return this.inMemoryPurchases.find((p) => p.gatewayOrderId === gatewayOrderId) || null;
+  }
+
+  /**
+   * Processes verified incoming webhooks from Razorpay with full idempotency.
+   * Handles payment.captured, order.paid, and payment.failed events for pricing purchases.
+   */
+  public async handleRazorpayWebhook(
+    rawBody: string,
+    signatureHeader?: string
+  ): Promise<{ status: string; message: string; handled: boolean }> {
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (webhookSecret) {
+      if (!signatureHeader) {
+        throw new Error('Webhook signature header missing');
+      }
+
+      const expectedSignature = crypto
+        .createHmac('sha256', webhookSecret)
+        .update(rawBody)
+        .digest('hex');
+
+      const isValid =
+        expectedSignature.length === signatureHeader.length &&
+        crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signatureHeader));
+
+      if (!isValid) {
+        throw new Error('Invalid webhook signature');
+      }
+    }
+
+    let payload: any;
+    try {
+      payload = JSON.parse(rawBody);
+    } catch {
+      throw new Error('Malformed webhook JSON payload');
+    }
+
+    const eventName = payload.event;
+    if (eventName === 'payment.captured' || eventName === 'order.paid') {
+      const paymentObj = payload.payload?.payment?.entity;
+      const orderId = paymentObj?.order_id || payload.payload?.order?.entity?.id;
+      const paymentId = paymentObj?.id;
+
+      if (!orderId) {
+        return { status: 'skipped', message: 'No order ID in webhook payload', handled: false };
+      }
+
+      let purchase = await this.getPurchaseByGatewayOrderId(orderId);
+      if (!purchase) {
+        return { status: 'ignored', message: `Order ${orderId} not found in pricing purchases`, handled: false };
+      }
+
+      // Verify amount matches authoritative purchase amount
+      if (paymentObj?.amount && paymentObj.amount !== purchase.amountMinorUnits) {
+        await this.failPurchasePayment(
+          purchase.id,
+          `Webhook amount mismatch: expected ${purchase.amountMinorUnits}, got ${paymentObj.amount}`
+        );
+        throw new Error(`Webhook payment amount mismatch: expected ${purchase.amountMinorUnits}, got ${paymentObj.amount}`);
+      }
+
+      // Idempotency: if already PAID, return clean 200 OK
+      if (purchase.status === 'PAID') {
+        return { status: 'idempotent', message: 'Purchase already marked as PAID', handled: true };
+      }
+
+      // Confirm payment and grant entitlements
+      await this.confirmPurchasePayment(purchase.id, paymentId || `pay_wh_${Date.now()}`, orderId);
+      return { status: 'success', message: 'Pricing purchase verified and entitlements granted via webhook', handled: true };
+    }
+
+    if (eventName === 'payment.failed') {
+      const paymentObj = payload.payload?.payment?.entity;
+      const orderId = paymentObj?.order_id;
+      if (orderId) {
+        const purchase = await this.getPurchaseByGatewayOrderId(orderId);
+        if (purchase && purchase.status === 'PENDING') {
+          const reason = paymentObj?.error_description || 'Razorpay webhook payment failed';
+          await this.failPurchasePayment(purchase.id, reason);
+          return { status: 'failed_recorded', message: `Purchase ${purchase.id} marked as failed`, handled: true };
+        }
+      }
+      return { status: 'skipped', message: 'payment.failed event processed', handled: false };
+    }
+
+    return { status: 'unhandled_event', message: `Event ${eventName} ignored`, handled: false };
   }
 
   public async canAccessFeature(

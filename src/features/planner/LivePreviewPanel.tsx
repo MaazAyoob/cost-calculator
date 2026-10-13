@@ -279,7 +279,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
       <div className="space-y-2">
         {currentStep === 1 && (
           <div className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] text-xs">
-            <span className="text-[10px] uppercase font-bold text-[#687770] block">Planning Takeoff</span>
+            <span className="text-[10px] uppercase font-bold text-[#687770] block">Plot &amp; Footprint</span>
             <div className="flex justify-between items-center mt-1">
               <span className="text-[#687770]">Buildable Footprint:</span>
               <b className="text-[#172722] font-mono">
@@ -335,7 +335,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
               <span className="font-bold text-[#172722] block text-[11px]">
                 {currentStep === 4 ? 'Flooring Coverage' : currentStep === 5 ? 'Wall Dado Coverage' : currentStep === 6 ? 'Door Openings' : currentStep === 7 ? 'Window Glazing' : currentStep === 8 ? 'MEP Wiring' : currentStep === 9 ? 'Bathroom Fittings' : 'Paint Surface Area'}
               </span>
-              <span className="text-[10px] text-[#687770]">Calculated Physical Takeoff</span>
+              <span className="text-[10px] text-[#687770]">Materials Needed</span>
             </div>
             <b className="text-[#172722] font-mono">
               {currentStep === 4 ? (
@@ -358,7 +358,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
         )}
       </div>
 
-      {/* ── 6. 4-HEAD TRADE ALLOCATION (When Cost > 0) ── */}
+      {/* ── 6. LABOUR & WORK COSTS BREAKDOWN (When Cost > 0) ── */}
       {totalCost > 0 && (
         <div className="grid grid-cols-4 gap-1.5 pt-2 border-t border-[#E3E8E2] text-[10px]">
           <div className="border-r border-[#E3E8E2] pr-1">

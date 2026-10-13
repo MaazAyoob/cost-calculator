@@ -73,7 +73,7 @@ const STEP_METADATA = [
     step: 3,
     title: 'Steel, cement & core materials',
     subtitle: 'Choose preferred brands and structural material categories.',
-    help: 'Concrete volumes, steel tonnage, and masonry block counts are derived deterministically.',
+    help: 'Concrete, steel, and masonry block quantities are calculated directly from your house plan.',
     shortTitle: 'Structure',
   },
   {
@@ -287,7 +287,7 @@ export const PlannerPage: React.FC = () => {
             ? 'Choose Construction Package | Hutty Calculator'
             : `Step ${currentStep} of 10: ${currentMeta.title} | Hutty Calculator`
         }
-        description="Configure plot dimensions, room allocations, structural materials, and finishes to compute your deterministic home construction estimate."
+        description="Configure plot dimensions, room layout, materials, and finishes to calculate your home construction estimate."
       />
 
       {/* ── 1. GLOBAL ARCHITECTURAL TOP HEADER ── */}
@@ -612,7 +612,7 @@ export const PlannerPage: React.FC = () => {
                           <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] text-xs text-[#687770] flex items-center gap-2">
                             <FileCheck2 className="w-4 h-4 text-[#1B3D34] shrink-0" />
                             <span>
-                              Ready for full engineering report preparation: itemized BOQ, physical takeoffs, and trade cost schedules.
+                              Ready for full cost report preparation: itemized work list, materials needed, and payment plan.
                             </span>
                           </div>
                         </div>
@@ -828,8 +828,8 @@ export const PlannerPage: React.FC = () => {
           </div>
 
           <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1">
-            <span className="font-bold text-[#172722] block">Deterministic Quantity Surveying</span>
-            <p>Calculations compute true structural concrete volumes, rebar tonnage, and exact masonry counts based on geometry and Bangalore/Mysore municipal bylaws.</p>
+            <span className="font-bold text-[#172722] block">How We Calculate Your Estimate</span>
+            <p>We calculate the concrete, steel needed, and masonry counts based on your plot size, floor plans, and local building bylaws.</p>
           </div>
 
           <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1">

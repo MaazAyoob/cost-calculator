@@ -115,8 +115,8 @@ export const UnlockReportModal: React.FC<Props> = ({
     });
 
     try {
-      // Initiate checkout via server API (server authoritatively resolves ₹499 or ₹99)
-      const { purchase, requiresPayment } = await initiatePurchase({
+      // Initiate checkout via server API (server authoritatively resolves ₹499 or ₹1,499)
+      const { purchase, requiresPayment, gatewayOrder } = await initiatePurchase({
         tierCode: selectedTier,
         leadName,
         leadPhone,
@@ -127,28 +127,88 @@ export const UnlockReportModal: React.FC<Props> = ({
           totalCostINR: result.budget?.totalProjectCost,
           houseType: result.input?.houseType,
         },
-        testBypassPayment: true, // Controlled testing environment
+        testBypassPayment: false, // Enforce verified checkout
       });
 
+      const hasRazorpay = typeof (window as any).Razorpay !== 'undefined';
+
+      if (requiresPayment && hasRazorpay && gatewayOrder?.keyId && !gatewayOrder.keyId.includes('placeholder')) {
+        // Real Razorpay gateway checkout
+        const rzp = new (window as any).Razorpay({
+          key: gatewayOrder.keyId,
+          amount: gatewayOrder.amountMinorUnits,
+          currency: gatewayOrder.currency,
+          name: 'Hutty Pre-Construction Platform',
+          description: selectedTier === 'PREMIUM_1499' ? 'Calculator — Premium BOQ' : 'Calculator — Detailed BOQ',
+          order_id: gatewayOrder.orderId,
+          prefill: {
+            name: leadName,
+            email: leadEmail,
+            contact: leadPhone,
+          },
+          theme: { color: '#1B3D34' },
+          handler: async (response: any) => {
+            try {
+              await confirmPurchasePayment(
+                purchase.id,
+                response.razorpay_payment_id,
+                response.razorpay_order_id,
+                response.razorpay_signature
+              );
+              setCompletedOrderRef(purchase.publicReference);
+              grantReportAccess(projectId, purchase.publicReference);
+              grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
+
+              try {
+                await generateAndDownloadDetailedReportPdf({
+                  data: result,
+                  projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+                  preparedFor: leadName,
+                  specificationTier: specificationTier || 'Premium',
+                });
+              } catch (pdfErr) {
+                console.warn('PDF auto-download notification:', pdfErr);
+              }
+
+              setIsProcessing(false);
+              setIsCompleted(true);
+              if (onSuccess) onSuccess();
+            } catch (verErr: any) {
+              setIsProcessing(false);
+              setFormError(verErr.message || 'Payment verification failed. Please contact support.');
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              setIsProcessing(false);
+              setFormError('Payment was cancelled. You can retry whenever you are ready.');
+            },
+          },
+        });
+        rzp.open();
+        return;
+      }
+
+      // In Sandbox / Test environment or when payment is confirmed:
+      // Confirm with server to activate entitlements
+      if (requiresPayment) {
+        const testPaymentId = `pay_sandbox_${Date.now()}`;
+        await confirmPurchasePayment(purchase.id, testPaymentId, gatewayOrder?.orderId);
+      }
+
       setCompletedOrderRef(purchase.publicReference);
+      grantReportAccess(projectId, purchase.publicReference);
+      grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
 
-      if (selectedTier === 'DETAILED_ESTIMATE_499') {
-        grantReportAccess(projectId, purchase.publicReference);
-        grantEntitlementsDirectly('DETAILED_ESTIMATE_499', projectId, leadEmail, purchase.publicReference);
-
-        // Auto-download PDF for detailed report purchase
-        try {
-          await generateAndDownloadDetailedReportPdf({
-            data: result,
-            projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
-            preparedFor: leadName,
-            specificationTier: specificationTier || 'Premium',
-          });
-        } catch (pdfErr) {
-          console.warn('PDF auto-download notification:', pdfErr);
-        }
-      } else {
-        grantEntitlementsDirectly('ESTIMATE_99', projectId, leadEmail, purchase.publicReference);
+      try {
+        await generateAndDownloadDetailedReportPdf({
+          data: result,
+          projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+          preparedFor: leadName,
+          specificationTier: specificationTier || 'Premium',
+        });
+      } catch (pdfErr) {
+        console.warn('PDF auto-download notification:', pdfErr);
       }
 
       setIsProcessing(false);
@@ -156,21 +216,13 @@ export const UnlockReportModal: React.FC<Props> = ({
       if (onSuccess) onSuccess();
     } catch (err: any) {
       console.error('Checkout error:', err);
-      // Fallback graceful offline entitlement grant so user is never blocked
-      const orderRef = `HT-PUR-${Date.now().toString(36).toUpperCase()}`;
-      setCompletedOrderRef(orderRef);
-      if (selectedTier === 'DETAILED_ESTIMATE_499') {
-        grantReportAccess(projectId, orderRef);
-      } else {
-        grantEntitlementsDirectly('ESTIMATE_99', projectId, leadEmail, orderRef);
-      }
+      // Strictly enforce access control: NEVER grant free entitlement on error
       setIsProcessing(false);
-      setIsCompleted(true);
-      if (onSuccess) onSuccess();
+      setFormError(err.message || 'Payment processing failed. Please check your network or retry.');
     }
   };
 
-  const selectedTierPriceDisplay = selectedTier === 'ESTIMATE_99' ? '₹99' : '₹499';
+  const selectedTierPriceDisplay = selectedTier === 'PREMIUM_1499' ? '₹1,499' : '₹499';
 
   return (
     <AnimatePresence>
@@ -215,38 +267,19 @@ export const UnlockReportModal: React.FC<Props> = ({
             <div className="space-y-1.5 pr-6">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-2 py-0.5 rounded border border-[#F28C28]/20">
-                  HUTTY PRICING &bull; VERIFIED COMMERCIAL ESTIMATE
+                  HUTTY ESTIMATION &bull; DETAILED REPORT UNLOCK
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
-                Unlock Bank-Ready Construction Dossier
+                Unlock Detailed Construction Cost Report
               </h2>
               <p className="text-xs text-[#4B5563]">
-                Access detailed itemized BOQ, physical material takeoff schedules, fixture allocations, and commercial breakdowns.
+                Get a comprehensive breakdown of the work, materials needed, estimated costs, and downloadable PDF report.
               </p>
             </div>
 
             {/* Plan Tier Selector */}
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setSelectedTier('ESTIMATE_99')}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                  selectedTier === 'ESTIMATE_99'
-                    ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E3E8E2] bg-[#F8F8F6] hover:bg-white'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4B5563]">
-                    Starter Plan
-                  </span>
-                  <span className="text-xs font-mono font-black text-[#1B3D34]">₹99</span>
-                </div>
-                <div className="text-xs font-bold text-[#1B3D34] mt-1">Verified Estimate</div>
-                <p className="text-[10px] text-[#4B5563] mt-0.5 line-clamp-1">Save project &amp; preliminary metrics</p>
-              </button>
-
               <button
                 type="button"
                 onClick={() => setSelectedTier('DETAILED_ESTIMATE_499')}
@@ -257,16 +290,35 @@ export const UnlockReportModal: React.FC<Props> = ({
                 }`}
               >
                 <span className="absolute -top-2 right-2 bg-[#F28C28] text-white text-[9px] font-bold px-1.5 py-0.2 rounded font-mono">
-                  POPULAR
+                  RECOMMENDED
                 </span>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28]">
-                    Full Dossier
+                    Detailed Report
                   </span>
                   <span className="text-xs font-mono font-black text-[#1B3D34]">₹499</span>
                 </div>
-                <div className="text-xs font-bold text-[#1B3D34] mt-1">Detailed QS Report</div>
-                <p className="text-[10px] text-[#4B5563] mt-0.5 line-clamp-1">Works BOQ + Schedules + PDF</p>
+                <div className="text-xs font-bold text-[#1B3D34] mt-1">Detailed BOQ Report</div>
+                <p className="text-[10px] text-[#4B5563] mt-0.5 line-clamp-1">Works BOQ + Materials + PDF</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedTier('PREMIUM_1499')}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  selectedTier === 'PREMIUM_1499'
+                    ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
+                    : 'border-[#E3E8E2] bg-[#F8F8F6] hover:bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4B5563]">
+                    Upgraded
+                  </span>
+                  <span className="text-xs font-mono font-black text-[#1B3D34]">₹1,499</span>
+                </div>
+                <div className="text-xs font-bold text-[#1B3D34] mt-1">Calculator — Premium</div>
+                <p className="text-[10px] text-[#4B5563] mt-0.5 line-clamp-1">Multi-scenario compare + Full suite</p>
               </button>
             </div>
 
@@ -279,53 +331,53 @@ export const UnlockReportModal: React.FC<Props> = ({
               </div>
               <div className="text-right">
                 <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E3E8E2] block font-mono">
-                  {selectedTier === 'DETAILED_ESTIMATE_499' ? 'Instant PDF • Lifetime Access' : 'Verified Lead Record'}
+                  Instant PDF • Lifetime Access
                 </span>
+                {selectedTier === 'PREMIUM_1499' && (
+                  <span className="text-[9px] text-[#4B5563] block mt-0.5">
+                    *Consultation is a separate service
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Deliverables Checklist */}
             <div className="space-y-2 text-xs text-[#1B3D34]">
               <span className="font-bold text-[11px] uppercase tracking-wider text-[#4B5563] block">
-                {selectedTier === 'DETAILED_ESTIMATE_499' ? 'Included in ₹499 Detailed Report:' : 'Included in ₹99 Verified Plan:'}
+                {selectedTier === 'PREMIUM_1499'
+                  ? 'Included in ₹1,499 Calculator — Premium Plan:'
+                  : 'Included in ₹499 Detailed BOQ Report:'}
               </span>
               <div className="grid grid-cols-1 gap-2">
-                {selectedTier === 'DETAILED_ESTIMATE_499' ? (
+                <div className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <span><strong>Works BOQ (What We Build):</strong> Detailed civil, structural, finishing, and joinery line items with estimated quantities and market rates.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <span><strong>Materials Needed (What We Consume):</strong> Quantities for steel needed for the house, cement bags, sand, aggregate, blocks, tiles &amp; paint.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <span><strong>Installed Fixtures (What We Install):</strong> Doors, windows, sanitary sets, and plumbing runs.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <span><strong>Cost Summary &amp; Payment Plan:</strong> Labour and work costs, margin &amp; tax schedule, and milestone payment plan.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <span><strong>Downloadable PDF Report:</strong> A detailed report you can discuss with your bank or contractor.</span>
+                </div>
+                {selectedTier === 'PREMIUM_1499' && (
                   <>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Section A — Works BOQ:</strong> Itemized civil, structural, finishes and joinery items with quantities and market rates.</span>
+                    <div className="flex items-start gap-2 text-[#1B3D34] font-medium">
+                      <Sparkles className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
+                      <span><strong>Multi-Scenario Comparison:</strong> Save and compare different house plan layouts, floor areas, and finish options side by side.</span>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Section B — Material Takeoff:</strong> Exact quantities for steel rebar, cement bags, M-sand, P-sand, coarse aggregate, AAC blocks, tiles &amp; paint.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Section C — Installed Fixtures:</strong> Granular schedule for doors, windows, sanitary sets, and CPVC plumbing lines.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Section D — Commercial Breakdown:</strong> Contractor margins, architectural fees, contingency reserves, and GST schedule.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Bank-Ready PDF Download:</strong> High-resolution multi-page PDF ready for contractor negotiation and bank home loan disbursement.</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Saved Project Feasibility:</strong> Cloud save your plot configuration, footprint and floor dimensions.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>High-Level Trade Estimates:</strong> Major civil, MEP, and finishes cost bracket indications.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                      <span><strong>Direct Upgrade Path:</strong> Seamless upgrade to the ₹499 Full Detailed Construction Dossier at any time.</span>
+                    <div className="flex items-start gap-2 text-[#1B3D34] font-medium">
+                      <Sparkles className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
+                      <span><strong>Premium Specification Customizer:</strong> Fine-tune luxury material brands, fixture upgrades, and custom structural specifications.</span>
                     </div>
                   </>
                 )}
@@ -488,35 +540,33 @@ export const UnlockReportModal: React.FC<Props> = ({
               <div className="flex justify-between">
                 <span className="text-[#4B5563]">Plan:</span>
                 <span className="font-bold text-[#1B3D34]">
-                  {selectedTier === 'DETAILED_ESTIMATE_499' ? 'Detailed Construction Dossier' : 'Verified Estimate'}
+                  {selectedTier === 'PREMIUM_1499' ? 'Calculator — Premium BOQ (₹1,499)' : 'Detailed BOQ Report (₹499)'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#4B5563]">Status:</span>
                 <span className="font-bold text-[#1B3D34]">
-                  {selectedTier === 'DETAILED_ESTIMATE_499' ? 'Unlocked • PDF Generated' : 'Active • Cloud Saved'}
+                  Unlocked • PDF Generated
                 </span>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              {selectedTier === 'DETAILED_ESTIMATE_499' && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await generateAndDownloadDetailedReportPdf({
-                      data: result,
-                      projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
-                      preparedFor: name || 'Valued Homeowner',
-                      specificationTier: specificationTier || 'Premium',
-                    });
-                  }}
-                  className="hutty-btn-primary py-3 px-6 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Download className="w-4 h-4 text-[#F28C28]" />
-                  <span>Download PDF Again</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={async () => {
+                  await generateAndDownloadDetailedReportPdf({
+                    data: result,
+                    projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+                    preparedFor: name || 'Valued Homeowner',
+                    specificationTier: specificationTier || 'Premium',
+                  });
+                }}
+                className="hutty-btn-primary py-3 px-6 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Download className="w-4 h-4 text-[#F28C28]" />
+                <span>Download PDF Again</span>
+              </button>
 
               <button
                 type="button"

@@ -61,10 +61,10 @@ export const Step10LoadingExperience: React.FC = () => {
           <div className="text-center space-y-3">
             <HuttyLogo variant="compact" width={130} />
             <h2 className="heading-sm text-2xl font-extrabold text-[#1B3D34] tracking-tight">
-              Executing Engineering Takeoff
+              Calculating Your Estimate
             </h2>
             <p className="text-xs sm:text-sm text-[#4B5563]">
-              Computing physical quantities and market rates for {city || 'Bangalore'}...
+              Calculating materials needed and current rates for {city || 'Bangalore'}...
             </p>
           </div>
 
@@ -137,7 +137,7 @@ export const Step10LoadingExperience: React.FC = () => {
               Your Estimate is Ready.
             </h2>
             <p className="text-xs sm:text-sm text-[#4B5563] max-w-md mx-auto leading-relaxed">
-              Your itemized Bill of Quantities, physical material takeoffs, and payment schedule are fully compiled.
+              Your itemized cost list, materials needed, and payment plan are ready.
             </p>
           </div>
 

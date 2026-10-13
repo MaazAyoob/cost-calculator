@@ -12,7 +12,7 @@ export const EngineeringStandardsSection: React.FC = () => {
     {
       code: 'IS 1786',
       title: 'High Strength Deformed Steel Bars for Concrete Reinforcement',
-      assumption: 'Fe 500D / Fe 550D rebar structural multipliers (4.0 to 5.0 kg / sq.ft BUA).',
+      assumption: 'Fe 500D / Fe 550D rebar standards (4.0 to 5.0 kg per sq.ft of total built-up area).',
     },
     {
       code: 'NBC 2016',
@@ -20,14 +20,14 @@ export const EngineeringStandardsSection: React.FC = () => {
       assumption: 'Permissible FSI, ground coverage limits, room ventilation & clear ceiling heights.',
     },
     {
-      code: 'ENGINEERING ASSUMPTIONS',
-      title: 'Defined Civil Engineering Multipliers',
-      assumption: 'Concrete volumes, mortar ratios, wall surface takeoff & floor efficiency formulas.',
+      code: 'BUILDING STANDARDS',
+      title: 'Defined Residential Building Norms',
+      assumption: 'Concrete volumes, mortar ratios, wall surfaces & floor efficiency standards.',
     },
     {
       code: 'MARKET RATES',
-      title: 'Bangalore Regional Trade Indices',
-      assumption: 'Indexed material and trade labor rates from verified regional construction tenders.',
+      title: 'Bangalore Regional Cost Indices',
+      assumption: 'Material and labour rates reflecting current regional construction market levels.',
     },
   ];
 

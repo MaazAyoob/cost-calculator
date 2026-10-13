@@ -12,6 +12,7 @@ import {
   ConfigurationVersion,
 } from './types';
 import { ROOM_SIZE_ASSUMPTIONS } from '../data/engineeringAssumptions';
+import { GBA_2026_SETBACK_RULES } from '../data/authorityRules/gbaRules';
 
 export const HUTTY_BASELINE_VERSION: ConfigurationVersion = {
   id: 'cfg-ver-1.0.0',
@@ -324,6 +325,23 @@ export const HUTTY_BASELINE_PARAMETERS: CalculationParameter[] = [
     location: 'ALL',
     specificationTier: 'ALL',
     source: 'BBMP / BDA / MUDA By-laws Benchmark',
+    status: 'ACTIVE',
+    version: 'v1.0.0',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'p-setbacks-rules',
+    key: 'config.setbacks.rules',
+    name: 'Authoritative Plot Setback Rules Dataset',
+    description: 'Versioned, boundary-specific municipal setback rules for Bengaluru and Mysuru (GBA 2026 Amendment).',
+    category: 'BUA_SETBACKS',
+    value: GBA_2026_SETBACK_RULES,
+    unit: 'rules',
+    valueType: 'json',
+    location: 'ALL',
+    specificationTier: 'ALL',
+    source: 'Karnataka Gazette amendment dated 5 January 2026',
     status: 'ACTIVE',
     version: 'v1.0.0',
     createdAt: '2026-01-01T00:00:00.000Z',

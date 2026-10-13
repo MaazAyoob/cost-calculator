@@ -7,6 +7,8 @@
 import { EngineInput, AreaResult, SetbackGeometry } from '../types';
 import { SUPER_BUA_FACTOR } from '../data/coefficients';
 import { evaluateAuthorityLimits, getAuthorityRules } from '../data/authorityRules';
+import { configResolver } from '../config';
+import { PlotSetbackRule } from '../data/authorityRules/types';
 
 export function calculateArea(input: EngineInput): AreaResult {
   const length = Math.max(0, input.plotLength || 0);
@@ -96,6 +98,24 @@ export function calculateArea(input: EngineInput): AreaResult {
     rightSetbackFt: input.rightSetback,
   } : undefined;
 
+  const activeSetbackRules = configResolver.resolveParameter<PlotSetbackRule[] | undefined>(
+    'config.setbacks.rules',
+    { city: input.city, location: input.city },
+    undefined
+  );
+
+  const matchingRules = Array.isArray(activeSetbackRules) && activeSetbackRules.length > 0
+    ? activeSetbackRules.filter((r) => {
+        if (!r.jurisdiction || r.jurisdiction === 'ALL') return true;
+        const normJurisdiction = r.jurisdiction.toLowerCase();
+        const normCity = (input.city || '').toLowerCase();
+        if (normCity === 'mysore' || normCity === 'mysuru') {
+          return normJurisdiction.includes('mysor') || normJurisdiction.includes('muda');
+        }
+        return normJurisdiction.includes('bengaluru') || normJurisdiction.includes('bangalore') || normJurisdiction.includes('gba') || normJurisdiction.includes('bbmp');
+      })
+    : undefined;
+
   const authEval = evaluateAuthorityLimits({
     city: input.city,
     plotLength: length,
@@ -103,6 +123,12 @@ export function calculateArea(input: EngineInput): AreaResult {
     roadWidthFt,
     floors,
     customSetbacks,
+    roadFacingBoundaries: input.roadFacingBoundaries,
+    isCornerPlot: input.isCornerPlot,
+    roadWideningFt: input.roadWideningFt,
+    prescribedBuildingLineFt: input.prescribedBuildingLineFt,
+    overrideReason: input.overrideReason,
+    activeRules: matchingRules && matchingRules.length > 0 ? matchingRules : undefined,
   });
 
   const statutorySetbacks: SetbackGeometry = {
@@ -231,6 +257,16 @@ export function calculateArea(input: EngineInput): AreaResult {
       disclaimer: authEval.disclaimer,
       requiresConfirmation: authEval.requiresClientConfirmation,
       confirmationReason: authEval.confirmationReason,
+      matchedRuleId: authEval.matchedRuleId,
+      matchedRuleName: authEval.matchedRuleName,
+      verificationStatus: authEval.verificationStatus,
+      frontMethod: authEval.frontMethod,
+      rearMethod: authEval.rearMethod,
+      leftMethod: authEval.leftMethod,
+      rightMethod: authEval.rightMethod,
+      isAuthoritativeBuildableResolved: authEval.isAuthoritativeBuildableResolved,
+      unresolvedReasons: authEval.unresolvedReasons,
+      explanationSteps: authEval.setbackExplanationSteps,
     },
   };
 }

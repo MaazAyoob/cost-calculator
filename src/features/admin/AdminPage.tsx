@@ -83,6 +83,7 @@ import { SimulationImpactTab } from './tabs/SimulationImpactTab';
 import { VersionHistoryTab } from './tabs/VersionHistoryTab';
 import { AdminOverviewSection } from './sections/AdminOverviewSection';
 import { ProjectBuaSection } from './sections/ProjectBuaSection';
+import { PlotSetbacksSection } from './sections/PlotSetbacksSection';
 import { RoomsSpacesSection } from './sections/RoomsSpacesSection';
 import { TradeSections } from './sections/TradeSections';
 import { CalculationMethodsSection } from './sections/CalculationMethodsSection';
@@ -562,6 +563,7 @@ export const AdminPage: React.FC = () => {
             { label: 'M-Sand & P-Sand Ratios', section: 'rcc-structure' as AdminTab, group: 'Construction' },
             { label: 'Flooring Tile Wastage %', section: 'flooring-tiles' as AdminTab, group: 'Construction' },
             { label: 'Bathroom Master & Dimensions', section: 'rooms-spaces' as AdminTab, group: 'Project' },
+            { label: 'Plot Setback Rules (Front, Rear, Sides)', section: 'plot-setbacks' as AdminTab, group: 'Project' },
             { label: 'Interior Paint Coverage (45 vs 60 sqft/L)', section: 'paint-finishes' as AdminTab, group: 'Construction' },
             { label: 'Exterior Weatherproof Paint', section: 'paint-finishes' as AdminTab, group: 'Construction' },
             { label: 'Doors & Windows Master', section: 'doors-windows' as AdminTab, group: 'Construction' },
@@ -604,6 +606,7 @@ export const AdminPage: React.FC = () => {
               icon: <Building className="w-3.5 h-3.5" />,
               sections: [
                 { id: 'project-bua', label: 'Project & BUA' },
+                { id: 'plot-setbacks', label: 'Plot Setbacks' },
                 { id: 'rooms-spaces', label: 'Rooms & Spaces' },
               ],
             },
@@ -2259,6 +2262,7 @@ export const AdminPage: React.FC = () => {
       {/* ── PHASE 2E SECTIONS ROUTER ── */}
       {/* 1. Project */}
       {(activeTab === 'project-bua' || activeTab === 'authority') && <ProjectBuaSection />}
+      {activeTab === 'plot-setbacks' && <PlotSetbacksSection />}
       {(activeTab === 'rooms-spaces' || activeTab === 'space-rooms') && <RoomsSpacesSection />}
 
       {/* 2. Construction */}

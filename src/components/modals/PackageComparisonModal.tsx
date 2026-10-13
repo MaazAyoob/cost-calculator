@@ -110,7 +110,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
                 Compare Construction Standards
               </h2>
               <p className="text-xs text-[#4B5563]">
-                Deterministic cost estimates computed for your {buaSqFt > 0 ? `${buaSqFt.toLocaleString()} sq.ft` : ''} project based on municipal bylaws and live market rates.
+                Cost estimates computed for your {buaSqFt > 0 ? `${buaSqFt.toLocaleString()} sq.ft` : ''} house based on plot bylaws and current market rates.
               </p>
             </div>
 
@@ -267,10 +267,10 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
             {/* Invariance note */}
             <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] text-xs text-[#4B5563] space-y-1">
               <span className="font-bold text-[#1B3D34] block">
-                Deterministic Quantity Surveying Guarantee:
+                How We Calculate Your Estimate:
               </span>
               <p>
-                Concrete volumes, structural steel rebar tonnage, and wall masonry quantities are derived directly from site geometry and remain identical across all 3 packages. Cost differences stem strictly from material grade, finish specifications, fixture tiers, and contractor trade rates.
+                Concrete, steel needed for your house, and wall masonry quantities depend on your house size and remain the same across all 3 packages. Cost differences come strictly from your choice of materials, finishes, fixtures, and workmanship.
               </p>
             </div>
 

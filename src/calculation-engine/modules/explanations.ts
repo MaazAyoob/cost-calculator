@@ -123,6 +123,12 @@ export function generateStepExplanations(
       substitutions: `${area?.plotLength || 0} ft × ${area?.plotWidth || 0} ft`,
       resultText: `${formatNumber(area?.plotAreaSqFt)} sq.ft`,
     },
+    ...((area?.authorityMetadata?.explanationSteps || []).map((step: any) => ({
+      title: `${step.boundary} Setback (${step.method.replace(/_/g, ' ')})`,
+      formula: step.formula,
+      substitutions: step.substitutions,
+      resultText: `${step.valueFt} ft`,
+    }))),
     {
       title: 'Buildable Footprint',
       formula: '(Plot Length - Front - Rear) × (Plot Width - Left - Right)',

@@ -71,6 +71,10 @@ export interface ConfiguratorState {
   rearSetback: number | null;
   leftSetback: number | null;
   rightSetback: number | null;
+  roadFacingBoundaries: Array<'front' | 'rear' | 'left' | 'right'>;
+  isCornerPlot: boolean;
+  roadWideningFt: number;
+  prescribedBuildingLineFt: number;
   floors: number;
   houseType: HouseType | null;
   parkingType: ParkingTypeOption | null;
@@ -116,6 +120,10 @@ export interface ConfiguratorState {
   setBuiltUpAreaPerFloor: (bua: number) => void;
   setUserSelectedBUA: (bua: number | null) => void;
   setCustomSetbacks: (front?: number | null, rear?: number | null, left?: number | null, right?: number | null) => void;
+  setRoadFacingBoundaries: (boundaries: Array<'front' | 'rear' | 'left' | 'right'>) => void;
+  setIsCornerPlot: (isCorner: boolean) => void;
+  setRoadWideningFt: (wideningFt: number) => void;
+  setPrescribedBuildingLineFt: (buildingLineFt: number) => void;
   setHouseConfig: (type: HouseType, floors: number) => void;
   setParkingConfig: (parkingType: ParkingTypeOption, carCount: number, bikeCount: number, evCharging: boolean) => void;
   updateRoomCount: (room: keyof RoomCounts, delta: number) => void;
@@ -169,6 +177,10 @@ export function getFreshZeroState() {
     rearSetback: null as number | null,
     leftSetback: null as number | null,
     rightSetback: null as number | null,
+    roadFacingBoundaries: ['front'] as Array<'front' | 'rear' | 'left' | 'right'>,
+    isCornerPlot: false,
+    roadWideningFt: 0,
+    prescribedBuildingLineFt: 0,
     floors: 0,
     houseType: null as any,
     parkingType: null as any,
@@ -349,6 +361,26 @@ export const useWizardStore = create<ConfiguratorState>()(
           rightSetback: right !== undefined ? right : get().rightSetback,
           hasStartedSelection: true,
         });
+      },
+
+      setRoadFacingBoundaries: (boundaries) => {
+        set({ roadFacingBoundaries: boundaries, hasStartedSelection: true });
+      },
+
+      setIsCornerPlot: (isCorner) => {
+        const currentBoundaries = get().roadFacingBoundaries;
+        const nextBoundaries = isCorner && currentBoundaries.length === 1
+          ? ['front', 'left'] as Array<'front' | 'rear' | 'left' | 'right'>
+          : currentBoundaries;
+        set({ isCornerPlot: isCorner, roadFacingBoundaries: nextBoundaries, hasStartedSelection: true });
+      },
+
+      setRoadWideningFt: (wideningFt) => {
+        set({ roadWideningFt: Math.max(0, wideningFt || 0), hasStartedSelection: true });
+      },
+
+      setPrescribedBuildingLineFt: (buildingLineFt) => {
+        set({ prescribedBuildingLineFt: Math.max(0, buildingLineFt || 0), hasStartedSelection: true });
       },
 
       // Rule 2 & Rule 4 enforcement:

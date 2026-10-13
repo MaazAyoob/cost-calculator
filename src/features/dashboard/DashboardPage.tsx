@@ -227,10 +227,10 @@ export const DashboardPage: React.FC = () => {
               <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-3">
                 <div className="flex items-center justify-between text-xs font-mono">
                   <span className="text-[#4B5563] uppercase font-bold text-[10px]">
-                    PHYSICAL MATERIAL CONSUMPTION TAKEOFF
+                    MATERIALS NEEDED FOR YOUR HOUSE
                   </span>
                   <span className="text-[#1B3D34] font-bold text-[10px]">
-                    IS-456 DETERMINISTIC QUANTITIES
+                    ESTIMATED MATERIAL QUANTITIES
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
@@ -323,7 +323,7 @@ export const DashboardPage: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-xs text-[#4B5563] leading-relaxed">
-                  Interactive deterministic construction estimate based on site geometry and municipal bylaws.
+                  Interactive construction estimate based on your plot size, floor plan, and local bylaws.
                 </p>
               </div>
 
@@ -427,7 +427,7 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 3. Quote Review (₹8,999) */}
+            {/* 3. Quote Review (₹1,499) */}
             <div className="p-5 bg-white rounded-2xl border border-[#E3E8E2] shadow-xs space-y-3 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -438,7 +438,7 @@ export const DashboardPage: React.FC = () => {
                     <span className="text-xs font-bold text-[#1B3D34]">Should I sign this?</span>
                   </div>
                   <span className="text-[10px] font-mono font-bold text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-2 py-0.5 rounded border border-[#F28C28]/20">
-                    ₹8,999
+                    ₹1,499
                   </span>
                 </div>
                 <p className="text-xs text-[#4B5563] leading-relaxed">

@@ -63,13 +63,13 @@ export const CalculatorSolutionsSection: React.FC = () => {
     {
       id: 'quantity',
       num: '04',
-      title: 'QUANTITY TAKEOFF',
-      sub: 'DETERMINISTIC BOQ',
+      title: 'MATERIALS NEEDED',
+      sub: 'DETAILED ESTIMATE',
       icon: PackageCheck,
       meta: '4.32 T Steel &bull; 576 Bags Cement &bull; 1,799 AAC Blocks',
       visual: {
         headline: 'Physical Material Schedule',
-        badge: 'ZERO GUESSWORK',
+        badge: 'ITEMIZED QUANTITIES',
         items: [
           { k: 'TMT Rebar Steel', v: '4.320 Tonnes' },
           { k: 'Portland Cement', v: '576 Bags (50 kg)' },
@@ -83,10 +83,10 @@ export const CalculatorSolutionsSection: React.FC = () => {
       title: 'LINE-ITEM COST',
       sub: '₹51,06,442',
       icon: Banknote,
-      meta: '₹3,546 / sq.ft BUA &bull; 13-stage BOQ &bull; Bank disbursement ready',
+      meta: '₹3,546 / sq.ft &bull; 13-stage cost breakdown &bull; Clear payment milestones',
       visual: {
         headline: 'Total Project Cost & BOQ',
-        badge: 'BANK READY',
+        badge: 'DETAILED REPORT',
         items: [
           { k: 'Civil & Structure', v: '₹35,24,114' },
           { k: 'Finishes & MEP', v: '₹15,82,328' },
@@ -106,10 +106,10 @@ export const CalculatorSolutionsSection: React.FC = () => {
             CONSTRUCTION PIPELINE
           </span>
           <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
-            From plot geometry to bank-ready BOQ.
+            From plot size to detailed cost report.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Hutty translates physical plot boundaries into volumetric space models, calculates physical material takeoffs, and compiles your exact construction budget.
+            Hutty takes your plot dimensions and floor plans, calculates the materials needed, and compiles a clear construction budget.
           </p>
         </div>
 

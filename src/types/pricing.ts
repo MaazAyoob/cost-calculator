@@ -4,11 +4,12 @@
 // Consultation (₹1,499) is strictly decoupled and governed separately.
 // ==============================================================================
 
-export type PricingTierCode = 'FREE' | 'ESTIMATE_99' | 'DETAILED_ESTIMATE_499' | 'COMPLETE_PACKAGE';
+export type PricingTierCode = 'FREE' | 'BASIC_ESTIMATE_PDF' | 'DETAILED_ESTIMATE_499' | 'PREMIUM_1499' | 'ESTIMATE_99' | 'COMPLETE_PACKAGE';
 
 export type PricingFeatureCode =
   | 'BASIC_PROJECT_SUMMARY'
   | 'BASIC_COST_SUMMARY'
+  | 'BASIC_PDF_DOWNLOAD'
   | 'LEAD_CAPTURE'
   | 'SAVED_PROJECT'
   | 'PROJECT_HISTORY'
@@ -21,6 +22,8 @@ export type PricingFeatureCode =
   | 'DETAILED_COST_BREAKDOWN'
   | 'FULL_PDF_REPORT'
   | 'REPORT_DOWNLOAD'
+  | 'PREMIUM_COMPARISON'
+  | 'PREMIUM_SPEC_CUSTOMIZATION'
   | 'COMPLETE_PACKAGE_FEATURES';
 
 export interface PricingTier {
@@ -28,12 +31,14 @@ export interface PricingTier {
   code: PricingTierCode | string;
   name: string;
   description: string;
-  priceMinorUnits: number; // Integer paise (0, 9900, 49900)
+  priceMinorUnits: number; // Integer paise (0, 49900, 149900)
   currency: string;
   active: boolean;
   purchasable: boolean;
   sortOrder: number;
   badge?: string | null;
+  isCalculatorPlan?: boolean;
+  category?: 'CALCULATOR_PLAN' | 'ADDON_PRODUCT' | 'SERVICE';
   features: PricingFeatureCode[] | string[];
   createdAt?: string;
   updatedAt?: string;

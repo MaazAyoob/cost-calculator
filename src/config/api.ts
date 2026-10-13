@@ -32,7 +32,15 @@ export const API_BASE_URL = resolveApiBaseUrl();
  * @returns Complete URL e.g. 'https://hutty-api.onrender.com/api/v1/health'
  */
 export function getApiUrl(endpoint: string): string {
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  // Guarantee that relative API routes include the /api/v1 prefix required by Express routes & Vite proxy
+  if (!cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = `/api/v1${cleanEndpoint}`;
+  } else if (!cleanEndpoint.startsWith('/api/v1/')) {
+    cleanEndpoint = `/api/v1${cleanEndpoint.slice(4)}`;
+  }
+
   if (!API_BASE_URL) {
     return cleanEndpoint;
   }

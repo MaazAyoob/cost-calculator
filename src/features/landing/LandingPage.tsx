@@ -18,8 +18,8 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="w-full min-h-screen font-sans bg-[#F8F8F6] text-[#1B3D34]">
       <SEO
-        title="Hutty — Home Construction Planning Platform | Build your home with clarity"
-        description="Plan your plot, spaces, materials and construction cost before you build with Hutty. Deterministic, quantity-based estimates and bank-ready BOQ."
+        title="Hutty — Understand your home before you build"
+        description="Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need it."
       />
 
       {/* 01. Hero — Architectural Split Statement + Interactive 3D Massing HUD */}

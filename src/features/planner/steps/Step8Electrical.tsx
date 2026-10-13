@@ -191,7 +191,7 @@ export const Step8Electrical: React.FC = () => {
           <div className="flex items-center gap-2">
             <Box className="w-4 h-4 text-[#1B3D34]" />
             <h3 className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
-              What Am I Consuming? (Conductor &amp; Conduit Takeoff)
+              What Am I Consuming? (Wires &amp; Pipes Needed)
             </h3>
           </div>
           <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">

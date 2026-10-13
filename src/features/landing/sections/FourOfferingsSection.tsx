@@ -41,12 +41,12 @@ export const FourOfferingsSection: React.FC = () => {
     {
       num: '03',
       question: 'Should I sign this?',
-      price: '₹8,999',
-      purpose: 'Quote review, negotiation and agreement support',
-      bestFor: 'Users before appointing a contractor',
-      cta: 'GET A SECOND OPINION',
+      price: '₹1,499',
+      purpose: 'Consult an expert to review your contractor quote & drawings',
+      bestFor: 'Homeowners before signing a contractor agreement',
+      cta: 'TALK TO AN EXPERT',
       action: () => {
-        setShowQuoteModal(true);
+        navigate('/consult');
       },
       icon: FileCheck,
       isPrimary: false,
@@ -54,10 +54,10 @@ export const FourOfferingsSection: React.FC = () => {
     {
       num: '04',
       question: 'Where is my money going?',
-      price: 'SUBSCRIPTION',
+      price: 'COMING SOON',
       purpose: 'Construction budget, spending and progress tracking',
       bestFor: 'Users during construction',
-      cta: 'TRACK MY BUILD',
+      cta: 'LEARN MORE',
       action: () => {
         setShowTrackModal(true);
       },
@@ -79,7 +79,7 @@ export const FourOfferingsSection: React.FC = () => {
             Four questions every home builder asks.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Whether you are exploring costs for a vacant plot, evaluating a contractor quote, or managing site disbursements, Hutty provides deterministic clarity at every step.
+            Whether you are exploring costs for a vacant plot, evaluating a contractor quote, or planning your payment schedule, Hutty provides clear, reliable guidance at every step.
           </p>
         </div>
 

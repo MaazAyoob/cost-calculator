@@ -6,30 +6,41 @@ import { useReportStore } from '../../store/useReportStore';
 import { useCalculationStore } from '../../store/useCalculationStore';
 import { useWizardStore } from '../../store/useWizardStore';
 import { useEntitlementStore } from '../../store/useEntitlementStore';
+import { usePricingStore } from '../../store/usePricingStore';
+import { PricingTierCode } from '../../types/pricing';
 import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
+import { UnlockBasicPdfModal } from '../../components/modals/UnlockBasicPdfModal';
 import { CalculationTraceModal } from '../../components/modals/CalculationTraceModal';
-import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab } from './pdfService';
+import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab, generateAndDownloadBasicEstimatePdf } from './pdfService';
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
-import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Sparkles, FileText, ArrowRight, Calculator, RotateCcw } from 'lucide-react';
+import { Printer, Download, ArrowLeft, Lock, ShieldCheck, Sparkles, FileText, ArrowRight, Calculator, RotateCcw, AlertCircle, CheckCircle2, Check, ChevronRight } from 'lucide-react';
 import { formatCurrency } from '../../utils/cn';
 import { HuttyLogo } from '../../components/common/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
+import { getApiUrl } from '../../config/api';
 
 export const ReportPage: React.FC = () => {
   const navigate = useNavigate();
   const { preparedFor } = useReportStore();
   const { specificationTier } = useWizardStore();
   const { result } = useCalculationStore();
-  const { hasDetailedReportAccess } = useEntitlementStore();
+  const { hasDetailedReportAccess, hasBasicPdfAccess, revokeReportAccess, revokeBasicPdfAccess } = useEntitlementStore();
+  const { canAccessFeature, getProjectTier } = usePricingStore();
 
   const { report, area, quantities, budget, timeline, paymentPlan, boq, materialSchedule, fixtureSchedule } = result;
   const projectId = report?.projectId || 'HUTTY-2026-BLR';
   const isUnlocked = hasDetailedReportAccess(projectId);
+  const isBasicPdfUnlocked = hasBasicPdfAccess(projectId);
+  const currentTier = getProjectTier(projectId);
+  const isPremiumUnlocked = canAccessFeature('PREMIUM_COMPARISON', projectId) || currentTier === 'PREMIUM_1499';
   const devTestingActive = isDevPdfTestingEnabled();
 
+  const [unlockModalTier, setUnlockModalTier] = useState<PricingTierCode>('DETAILED_ESTIMATE_499');
   const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [showBasicPdfModal, setShowBasicPdfModal] = useState(false);
   const [showTraceModal, setShowTraceModal] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [isGeneratingBasicPdf, setIsGeneratingBasicPdf] = useState(false);
   const [isGeneratingDevPdf, setIsGeneratingDevPdf] = useState(false);
   const [devPdfError, setDevPdfError] = useState<string | null>(null);
 
@@ -43,6 +54,7 @@ export const ReportPage: React.FC = () => {
         projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
         preparedFor: preparedFor || 'Developer Testing',
         specificationTier: specificationTier || 'Premium',
+        isPremium: true,
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -63,6 +75,7 @@ export const ReportPage: React.FC = () => {
         projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
         preparedFor: preparedFor || 'Developer Testing',
         specificationTier: specificationTier || 'Premium',
+        isPremium: true,
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -75,17 +88,38 @@ export const ReportPage: React.FC = () => {
 
   const handleDownloadPdf = async () => {
     if (!isUnlocked) {
+      setUnlockModalTier('DETAILED_ESTIMATE_499');
       setShowUnlockModal(true);
       return;
     }
 
     setIsGeneratingPdf(true);
     try {
+      // Server-authoritative entitlement verification (do not trust localStorage alone)
+      try {
+        const leadEmail = useReportStore.getState().leadInfo?.email || '';
+        const verifyRes = await fetch(
+          getApiUrl(`/api/v1/pricing/check-access?featureCode=FULL_PDF_REPORT&projectId=${encodeURIComponent(projectId)}&email=${encodeURIComponent(leadEmail)}`)
+        );
+        if (verifyRes.ok) {
+          const authData = await verifyRes.json();
+          if (authData && authData.allowed === false) {
+            revokeReportAccess(projectId);
+            setUnlockModalTier('DETAILED_ESTIMATE_499');
+            setShowUnlockModal(true);
+            return;
+          }
+        }
+      } catch {
+        // Network offline graceful fallback
+      }
+
       await generateAndDownloadDetailedReportPdf({
         data: result,
         projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
         preparedFor: preparedFor || 'Valued Client',
-        specificationTier: specificationTier || 'Premium',
+        specificationTier: isPremiumUnlocked ? 'Calculator — Premium' : (specificationTier || 'Detailed BOQ'),
+        isPremium: isPremiumUnlocked,
       });
     } catch (err) {
       console.error('Error generating PDF:', err);
@@ -94,8 +128,48 @@ export const ReportPage: React.FC = () => {
     }
   };
 
+  const handleDownloadBasicPdf = async () => {
+    if (!isBasicPdfUnlocked) {
+      setShowBasicPdfModal(true);
+      return;
+    }
+
+    setIsGeneratingBasicPdf(true);
+    try {
+      // Server-authoritative entitlement verification (do not trust localStorage alone)
+      try {
+        const leadEmail = useReportStore.getState().leadInfo?.email || '';
+        const verifyRes = await fetch(
+          getApiUrl(`/api/v1/pricing/check-access?featureCode=BASIC_PDF_DOWNLOAD&projectId=${encodeURIComponent(projectId)}&email=${encodeURIComponent(leadEmail)}`)
+        );
+        if (verifyRes.ok) {
+          const authData = await verifyRes.json();
+          if (authData && authData.allowed === false) {
+            revokeBasicPdfAccess(projectId);
+            setShowBasicPdfModal(true);
+            return;
+          }
+        }
+      } catch {
+        // Network offline graceful fallback
+      }
+
+      await generateAndDownloadBasicEstimatePdf({
+        data: result,
+        projectName: `${result.input?.houseType || 'Residential'} Estimate`,
+        preparedFor: preparedFor || 'Valued Homeowner',
+        specificationTier: specificationTier || 'Premium',
+      });
+    } catch (err) {
+      console.error('Error generating Basic PDF:', err);
+    } finally {
+      setIsGeneratingBasicPdf(false);
+    }
+  };
+
   const handlePrintRequest = () => {
     if (!isUnlocked) {
+      setUnlockModalTier('DETAILED_ESTIMATE_499');
       setShowUnlockModal(true);
       return;
     }
@@ -117,8 +191,8 @@ export const ReportPage: React.FC = () => {
       className="min-h-screen bg-[#F8F8F6] py-8 sm:py-12 select-none"
     >
       <SEO
-        title={isUnlocked ? "Detailed Construction Dossier & BOQ | Hutty" : "Construction Estimate Preview | Hutty"}
-        description="Authoritative pre-construction digital QS dossier: Works BOQ, Material Takeoff, Fixtures Schedule & Cost Breakdown."
+        title={isUnlocked ? "Detailed Construction Report & Work List | Hutty" : "Construction Estimate Preview | Hutty"}
+        description="Detailed pre-construction report: Construction Works, Materials Needed, Fixtures & Fittings, and Cost Summary."
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6 text-left">
@@ -165,12 +239,21 @@ export const ReportPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={handleDownloadBasicPdf}
+                  disabled={isGeneratingBasicPdf}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
+                  title="Download concise 1-page summary PDF"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#1B3D34]" /> Basic PDF
+                </button>
+                <button
+                  type="button"
                   onClick={handleDownloadPdf}
                   disabled={isGeneratingPdf}
                   className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5 text-[#F28C28]" />
-                  <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download PDF'}</span>
+                  <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download Detailed PDF'}</span>
                 </button>
               </>
             ) : (
@@ -211,11 +294,27 @@ export const ReportPage: React.FC = () => {
                 )}
                 <button
                   type="button"
+                  onClick={handleDownloadBasicPdf}
+                  disabled={isGeneratingBasicPdf}
+                  className="px-3.5 py-1.5 rounded-lg border border-[#1B3D34] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  title="Concise estimate summary in downloadable PDF format"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <span>
+                    {isGeneratingBasicPdf
+                      ? 'Generating PDF...'
+                      : isBasicPdfUnlocked
+                      ? 'Download Basic Estimate PDF'
+                      : 'Download Basic Estimate PDF — ₹99'}
+                  </span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setShowUnlockModal(true)}
                   className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                  <span>Unlock Detailed Report — ₹4,999</span>
+                  <span>Unlock Detailed Report — ₹499</span>
                 </button>
               </div>
             )}
@@ -232,7 +331,7 @@ export const ReportPage: React.FC = () => {
               <div>
                 <h3 className="text-xs font-bold text-[#1B3D34]">Your detailed report is ready.</h3>
                 <p className="text-[11px] text-[#4B5563]">
-                  All works BOQ, physical material takeoffs, and trade cost schedules are fully unlocked.
+                  All construction works, materials needed, and stage-by-stage cost schedules are fully unlocked.
                 </p>
               </div>
             </div>
@@ -242,8 +341,52 @@ export const ReportPage: React.FC = () => {
               className="hutty-btn-primary px-4 py-2 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-[#F28C28]" />
-              <span>Download PDF</span>
+              <span>Download Detailed PDF</span>
             </button>
+          </div>
+        )}
+
+        {/* ── FREE ESTIMATE SUMMARY BANNER (Section 3) ── */}
+        {!isUnlocked && (
+          <div className="p-4 sm:p-5 bg-white border border-[#E3E8E2] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs print:hidden">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1B3D34] bg-[#F0F5F3] px-2 py-0.5 rounded border border-[#1B3D34]/15">
+                  ✓ YOUR ESTIMATE IS READY
+                </span>
+                <span className="text-xs font-bold text-[#1B3D34]">
+                  You can view your estimate here for free.
+                </span>
+              </div>
+              <p className="text-xs text-[#4B5563] leading-relaxed max-w-2xl">
+                Your full house configuration, estimated built-up area, and preliminary cost breakdown are visible below. If you need a downloadable copy for your records, unlock the Basic Estimate PDF for ₹99, or get the complete contractor-grade Detailed BOQ for ₹499.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleDownloadBasicPdf}
+                disabled={isGeneratingBasicPdf}
+                className="px-3.5 py-2 rounded-xl border border-[#1B3D34] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <Download className="w-3.5 h-3.5 text-[#F28C28]" />
+                <span>
+                  {isGeneratingBasicPdf
+                    ? 'Generating...'
+                    : isBasicPdfUnlocked
+                    ? 'Download Basic Estimate PDF'
+                    : 'Download Basic Estimate PDF — ₹99'}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowUnlockModal(true)}
+                className="hutty-btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
+                <span>Unlock Detailed Report — ₹499</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -301,6 +444,22 @@ export const ReportPage: React.FC = () => {
                 {specificationTier?.toUpperCase() || 'PREMIUM'} STANDARDS
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* ── MANDATORY CLIENT ESTIMATE NOTE & COST NOTICE ── */}
+        <div className="p-4 sm:p-5 bg-amber-50/90 border-2 border-amber-300 rounded-2xl text-amber-950 flex items-start gap-3.5 shadow-2xs text-left">
+          <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 font-heading">
+              Important Estimate Note
+            </h4>
+            <p className="text-xs sm:text-sm font-semibold text-amber-950 leading-relaxed">
+              This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked.
+            </p>
+            <p className="text-[11px] text-amber-800 leading-normal">
+              Estimated prices can change by location, material choices, house design, and site conditions. All rates shown are baseline estimates for residential planning.
+            </p>
           </div>
         </div>
 
@@ -496,7 +655,7 @@ export const ReportPage: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-xl font-black text-[#F28C28]">02</span>
                       <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
-                        WHAT WE CONSUME &bull; MATERIAL TAKEOFF SCHEDULE
+                        WHAT WE CONSUME &bull; MATERIALS NEEDED
                       </h2>
                     </div>
                     <span className="text-xs text-[#4B5563] font-mono font-bold">{materialSchedule.length} Physical Materials</span>
@@ -538,7 +697,7 @@ export const ReportPage: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-xl font-black text-[#F28C28]">03</span>
                       <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
-                        WHAT WE INSTALL &bull; FIXTURES &amp; FITTINGS SCHEDULE
+                        WHAT WE INSTALL &bull; FIXTURES, FITTINGS, AND SERVICES
                       </h2>
                     </div>
                     <span className="text-xs text-[#687770] font-mono font-bold">{fixtureSchedule.length} Installed Units</span>
@@ -581,10 +740,42 @@ export const ReportPage: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-xl font-black text-[#F28C28]">04</span>
                     <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
-                      WHAT IT COSTS &bull; TRADE ALLOCATION &amp; COMMERCIAL BUDGET
+                      WHAT IT COSTS &bull; COST SUMMARY &amp; COMMERCIAL DETAILS
                     </h2>
                   </div>
                   <span className="text-xs text-[#687770] font-mono font-bold">100% RECONCILED</span>
+                </div>
+
+                {/* 4 Summary Cards: Materials, Labour, Other Costs, Total Estimated Cost */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">Materials</span>
+                    <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
+                      {formatCurrency(budget.baseConstructionCost ? Math.round(budget.baseConstructionCost * 0.65) : Math.round((budget.totalProjectCost || 0) * 0.55))}
+                    </span>
+                    <span className="text-[10px] text-[#687770] block">Civil materials, steel, cement &amp; finishes</span>
+                  </div>
+                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">Labour</span>
+                    <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
+                      {formatCurrency(budget.baseConstructionCost ? Math.round(budget.baseConstructionCost * 0.35) : Math.round((budget.totalProjectCost || 0) * 0.25))}
+                    </span>
+                    <span className="text-[10px] text-[#687770] block">Execution trades &amp; workmanship</span>
+                  </div>
+                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">Other Costs</span>
+                    <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
+                      {formatCurrency((budget.contractorMargin || 0) + (budget.contingency || 0) + (budget.gstAmount || 0))}
+                    </span>
+                    <span className="text-[10px] text-[#687770] block">Margin, contingency &amp; GST</span>
+                  </div>
+                  <div className="p-3.5 bg-[rgba(27,61,52,0.06)] rounded-xl border border-[#1B3D34]/20">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B3D34] block">Total Estimated Cost</span>
+                    <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
+                      {formatCurrency(budget.totalProjectCost)}
+                    </span>
+                    <span className="text-[10px] text-[#1B3D34] font-semibold block">All-inclusive total</span>
+                  </div>
                 </div>
 
                 {/* Proportional Trade Allocation Horizontal Bar */}
@@ -660,7 +851,7 @@ export const ReportPage: React.FC = () => {
                     <FileText className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section B &bull; Materials</span>
                   </div>
-                  <p className="text-[10px] text-[#4B5563]">Exact steel tonnage, cement bags, sand &amp; masonry block takeoffs.</p>
+                  <p className="text-[10px] text-[#4B5563]">Exact steel needed, cement bags, sand &amp; masonry block quantities.</p>
                 </div>
                 <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
@@ -730,7 +921,7 @@ export const ReportPage: React.FC = () => {
           {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E3E8E2] pb-1.5 font-heading">
-                5. Milestone Disbursement Roadmap
+                5. Payment Plan (Milestone Schedule)
               </h2>
               <div className="space-y-2">
                 {paymentPlan.map((stage) => (
@@ -745,6 +936,333 @@ export const ReportPage: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── SECTION 05, 06, 07: PREMIUM DELIVERABLES (₹1,499) ── */}
+          {isPremiumUnlocked ? (
+            <div className="space-y-8 pt-4 border-t-2 border-[#1B3D34]">
+              {/* Premium Plan Unlocked Header */}
+              <div className="flex items-center justify-between pb-2 border-b border-[#E3E8E2]">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-black text-white bg-[#1B3D34] px-2.5 py-1 rounded">
+                    PREMIUM TIER DELIVERABLES
+                  </span>
+                  <span className="text-xs font-bold text-[#1B3D34]">
+                    Contractor Quote Audit, Finish Sensitivity &amp; Multi-Scenario Comparison
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> UNLOCKED
+                </span>
+              </div>
+
+              {/* 05. Contractor Quote Audit & Redline Checklist */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xl font-black text-[#F28C28]">05</span>
+                    <div>
+                      <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                        CONTRACTOR QUOTE AUDIT &bull; REDLINE CHECKLIST
+                      </h2>
+                      <p className="text-[11px] text-[#4B5563]">
+                        Compare your contractor's quotation against Bangalore benchmark trade rates and verify high-risk exclusions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trade Tolerance Benchmarks Table */}
+                <div className="border border-[#E3E8E2] rounded-2xl overflow-hidden bg-white shadow-2xs">
+                  <div className="p-3 bg-[#F8F8F6] border-b border-[#E3E8E2] flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#1B3D34]">Trade Rate Tolerance Benchmarks (Bangalore Q1 2026)</span>
+                    <span className="text-[10px] text-[#4B5563] font-mono">Acceptable Market Tolerances</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs font-mono">
+                      <thead className="bg-[#F8F8F6]/60 border-b border-[#E3E8E2] text-[10px] text-[#4B5563] uppercase">
+                        <tr>
+                          <th className="py-2.5 px-4">Material / Trade Item</th>
+                          <th className="py-2.5 px-4">Standard Unit</th>
+                          <th className="py-2.5 px-4 text-right">Market Benchmark</th>
+                          <th className="py-2.5 px-4 text-right">Allowable Variance</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#E3E8E2]">
+                        <tr className="hover:bg-[#F8F8F6]">
+                          <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Structural TMT Steel (Fe 550D)</td>
+                          <td className="py-2.5 px-4 text-[#4B5563]">Per Kg</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹68 – ₹76</td>
+                          <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±5% max</td>
+                        </tr>
+                        <tr className="hover:bg-[#F8F8F6]">
+                          <td className="py-2.5 px-4 font-bold text-[#1B3D34]">53-Grade Portland Cement</td>
+                          <td className="py-2.5 px-4 text-[#4B5563]">50kg Bag</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹380 – ₹420</td>
+                          <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±4% max</td>
+                        </tr>
+                        <tr className="hover:bg-[#F8F8F6]">
+                          <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Solid Concrete Masonry Blocks (6")</td>
+                          <td className="py-2.5 px-4 text-[#4B5563]">Per Block</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹42 – ₹48</td>
+                          <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±5% max</td>
+                        </tr>
+                        <tr className="hover:bg-[#F8F8F6]">
+                          <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Civil RCC Labour (Framed Structure)</td>
+                          <td className="py-2.5 px-4 text-[#4B5563]">Per sq.ft BUA</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹240 – ₹280</td>
+                          <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±6% max</td>
+                        </tr>
+                        <tr className="hover:bg-[#F8F8F6]">
+                          <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Tile Laying &amp; Grouting Labour</td>
+                          <td className="py-2.5 px-4 text-[#4B5563]">Per sq.ft</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹35 – ₹45</td>
+                          <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±8% max</td>
+                        </tr>
+                        <tr className="hover:bg-[#F8F8F6]">
+                          <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Interior Emulsion (2 Coats + Putty)</td>
+                          <td className="py-2.5 px-4 text-[#4B5563]">Per sq.ft</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹18 – ₹26</td>
+                          <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±7% max</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Missing Scope Redlines Checklist */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      <span>Soil Bearing Capacity Test</span>
+                    </div>
+                    <p className="text-[11px] text-amber-950 leading-relaxed">
+                      Frequently excluded by turnkey contractors. Demand a geotechnical soil test report before footing depth sign-off to prevent foundation settlement.
+                    </p>
+                  </div>
+                  <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      <span>Temporary 3-Phase Power &amp; Water</span>
+                    </div>
+                    <p className="text-[11px] text-amber-950 leading-relaxed">
+                      Verify whether BESCOM temporary power deposit, commercial meter wiring, and borewell curing water are included in contractor lump sum.
+                    </p>
+                  </div>
+                  <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      <span>Compound Wall &amp; Gate Columns</span>
+                    </div>
+                    <p className="text-[11px] text-amber-950 leading-relaxed">
+                      Often billed as an unexpected extra variation later. Ensure running linear footage, foundation depth, and main gate pillars are in contract.
+                    </p>
+                  </div>
+                  <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      <span>Sump Waterproofing &amp; Debris Clearing</span>
+                    </div>
+                    <p className="text-[11px] text-amber-950 leading-relaxed">
+                      Ensure 2-coat crystalline polymer waterproofing for underground RCC water tank and periodic carting of construction debris away from site.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* 06. Material Finish Sensitivity Matrix */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xl font-black text-[#F28C28]">06</span>
+                    <div>
+                      <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                        MATERIAL FINISH SENSITIVITY &bull; PRICE MATRIX
+                      </h2>
+                      <p className="text-[11px] text-[#4B5563]">
+                        Trade-off analysis across Standard, Premium, and Luxury specifications on your {area.totalBUASqFt.toLocaleString()} sq.ft gross BUA.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-[#E3E8E2] rounded-2xl overflow-hidden bg-white shadow-2xs">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead className="bg-[#F8F8F6] border-b border-[#E3E8E2] text-[10px] text-[#4B5563] uppercase">
+                      <tr>
+                        <th className="py-2.5 px-4">Finish Package</th>
+                        <th className="py-2.5 px-4">Material Specification Scope</th>
+                        <th className="py-2.5 px-4 text-right">Est. Rate / sq.ft</th>
+                        <th className="py-2.5 px-4 text-right">Total Project Delta</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E3E8E2]">
+                      <tr className="hover:bg-[#F8F8F6]">
+                        <td className="py-3 px-4 font-bold text-[#1B3D34]">Standard Package</td>
+                        <td className="py-3 px-4 text-[#4B5563]">Vitrified 2x2, standard 3-track UPVC, OBD paint, baseline CP fixtures</td>
+                        <td className="py-3 px-4 text-right font-bold text-[#1B3D34]">₹1,950 / sq.ft</td>
+                        <td className="py-3 px-4 text-right font-bold text-emerald-700">
+                          - {formatCurrency(Math.max(0, (budget.costPerSqFt || 2250) - 1950) * area.totalBUASqFt)}
+                        </td>
+                      </tr>
+                      <tr className="bg-[rgba(27,61,52,0.04)] font-bold text-[#1B3D34]">
+                        <td className="py-3 px-4 flex items-center gap-1.5">
+                          <span>Premium Package</span>
+                          <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-[#1B3D34] text-white">Selected</span>
+                        </td>
+                        <td className="py-3 px-4 text-[#1B3D34]">GVT 4x2, Schuco/Kommerling UPVC, Royal luxury emulsion, Jaguar fittings</td>
+                        <td className="py-3 px-4 text-right">₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')} / sq.ft</td>
+                        <td className="py-3 px-4 text-right text-[#F28C28]">Baseline Reference</td>
+                      </tr>
+                      <tr className="hover:bg-[#F8F8F6]">
+                        <td className="py-3 px-4 font-bold text-[#1B3D34]">Luxury Package</td>
+                        <td className="py-3 px-4 text-[#4B5563]">Italian marble/engineered wood, thermal-break aluminium, Grohe/Kohler, smart home</td>
+                        <td className="py-3 px-4 text-right font-bold text-[#1B3D34]">₹2,850 / sq.ft</td>
+                        <td className="py-3 px-4 text-right font-bold text-red-700">
+                          + {formatCurrency(Math.max(0, 2850 - (budget.costPerSqFt || 2250)) * area.totalBUASqFt)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              {/* 07. Multi-Scenario Layout Comparison */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between border-b-2 border-[#1B3D34] pb-2">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xl font-black text-[#F28C28]">07</span>
+                    <div>
+                      <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
+                        MULTI-SCENARIO PROJECT COMPARISON
+                      </h2>
+                      <p className="text-[11px] text-[#4B5563]">
+                        Compare alternative floor configurations on your {result.input?.plotLength || 30}' × {result.input?.plotWidth || 40}' plot.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-4 bg-[#F8F8F6] border border-[#E3E8E2] rounded-2xl space-y-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#4B5563] block">Scenario A</span>
+                    <h3 className="text-sm font-bold text-[#1B3D34]">Single Floor (Compact)</h3>
+                    <div className="text-xs space-y-1 pt-1 font-mono">
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Gross BUA:</span>
+                        <span className="font-bold text-[#1B3D34]">{(area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (result.input?.floors || 1))).toLocaleString()} sq.ft</span>
+                      </div>
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Budget:</span>
+                        <span className="font-bold text-[#1B3D34]">{formatCurrency((area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (result.input?.floors || 1))) * (budget.costPerSqFt || 2250))}</span>
+                      </div>
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Rate:</span>
+                        <span>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}/sqft</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-[rgba(27,61,52,0.06)] border-2 border-[#1B3D34] rounded-2xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#1B3D34] font-bold">Scenario B</span>
+                      <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-[#1B3D34] text-white font-bold">Current Plan</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-[#1B3D34]">G+{Math.max(0, (result.input?.floors || 1) - 1)} Design ({result.input?.floors || 1} Floors)</h3>
+                    <div className="text-xs space-y-1 pt-1 font-mono">
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Gross BUA:</span>
+                        <span className="font-bold text-[#1B3D34]">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
+                      </div>
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Budget:</span>
+                        <span className="font-bold text-[#1B3D34]">{formatCurrency(budget.totalProjectCost || budget.directConstructionBudget)}</span>
+                      </div>
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Rate:</span>
+                        <span>₹{Math.round(budget.costPerSqFt || budget.directCostPerSqFt).toLocaleString('en-IN')}/sqft</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-[#F8F8F6] border border-[#E3E8E2] rounded-2xl space-y-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#4B5563] block">Scenario C</span>
+                    <h3 className="text-sm font-bold text-[#1B3D34]">+1 Floor (Rental Unit)</h3>
+                    <div className="text-xs space-y-1 pt-1 font-mono">
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Gross BUA:</span>
+                        <span className="font-bold text-[#1B3D34]">{(area.totalBUASqFt + Math.round(area.totalBUASqFt / (result.input?.floors || 1))).toLocaleString()} sq.ft</span>
+                      </div>
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Budget:</span>
+                        <span className="font-bold text-[#1B3D34]">{formatCurrency((budget.totalProjectCost || budget.directConstructionBudget) + Math.round(area.totalBUASqFt / (result.input?.floors || 1)) * (budget.costPerSqFt || 2250) * 0.88)}</span>
+                      </div>
+                      <div className="flex justify-between text-[#4B5563]">
+                        <span>Rate:</span>
+                        <span>₹{Math.round((budget.costPerSqFt || 2250) * 0.96).toLocaleString('en-IN')}/sqft</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          ) : (
+            /* Premium Teaser / Upgrade Card (shown for Free or Detailed BOQ users) */
+            <section className="p-6 bg-gradient-to-br from-[rgba(27,61,52,0.04)] to-[rgba(242,140,40,0.04)] border-2 border-dashed border-[#1B3D34]/20 rounded-3xl space-y-4 text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#1B3D34] text-white">
+                      CALCULATOR — PREMIUM DELIVERABLES
+                    </span>
+                    <span className="text-xs font-mono font-black text-[#1B3D34]">₹1,499</span>
+                  </div>
+                  <h3 className="text-base font-bold text-[#1B3D34]">
+                    Contractor Quote Audit, Finish Sensitivity &amp; Multi-Scenario Comparison
+                  </h3>
+                  <p className="text-xs text-[#4B5563]">
+                    Upgrade your calculator package to unlock benchmark rate vetting, high-risk contractor redlines, and 1-floor vs multi-floor plot scenarios.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUnlockModalTier('PREMIUM_1499');
+                    setShowUnlockModal(true);
+                  }}
+                  className="hutty-btn-primary px-5 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Sparkles className="w-4 h-4 text-[#F28C28]" />
+                  <span>Upgrade to Premium — ₹1,499</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+                <div className="p-3 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                  <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-[#F28C28]" />
+                    Contractor Quote Audit
+                  </span>
+                  <p className="text-[10px] text-[#4B5563]">Bangalore market tolerance benchmarks for steel, cement, masonry, and civil labour.</p>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                  <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-[#F28C28]" />
+                    Finish Sensitivity Matrix
+                  </span>
+                  <p className="text-[10px] text-[#4B5563]">Live INR cost delta across Standard, Premium, and Luxury brand specifications.</p>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                  <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-[#F28C28]" />
+                    Multi-Scenario Comparison
+                  </span>
+                  <p className="text-[10px] text-[#4B5563]">Side-by-side plot area and budget comparison for single floor vs multi-floor variants.</p>
+                </div>
               </div>
             </section>
           )}
@@ -779,6 +1297,12 @@ export const ReportPage: React.FC = () => {
       <UnlockReportModal
         isOpen={showUnlockModal}
         onClose={() => setShowUnlockModal(false)}
+        initialTierCode={unlockModalTier}
+      />
+
+      <UnlockBasicPdfModal
+        isOpen={showBasicPdfModal}
+        onClose={() => setShowBasicPdfModal(false)}
       />
 
       <CalculationTraceModal

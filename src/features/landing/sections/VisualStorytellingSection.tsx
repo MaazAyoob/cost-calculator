@@ -5,51 +5,51 @@ import { useNavigate } from 'react-router-dom';
 const FLOW_NODES = [
   {
     step: '01',
-    label: 'PLOT GEOMETRY',
+    label: 'PLOT SIZE & SETBACKS',
     title: 'Plot Length & Width',
-    detail: 'Physical site boundaries (e.g. 30\' × 50\', 1,500 sq.ft) and Bangalore BBMP setback zoning constraints.',
+    detail: 'Site boundaries (e.g. 30\' × 50\', 1,500 sq.ft) and municipal setback guidelines for your location.',
     metric: '1,500 sq.ft Site',
   },
   {
     step: '02',
-    label: 'MASSING & BUA',
-    title: 'Built-Up Area Synthesis',
-    detail: 'Ground + Upper floor footprints, circulation, balconies, and utility corridors calculated deterministically.',
-    metric: '2,400 sq.ft BUA',
+    label: 'FLOOR PLAN & AREA',
+    title: 'Total Built-Up Area',
+    detail: 'Ground and upper floor spaces, stairs, balconies, and utility corridors calculated clearly.',
+    metric: '2,400 sq.ft Total Area',
   },
   {
     step: '03',
-    label: 'SPATIAL MATRIX',
-    title: 'Room Program & Wet Areas',
-    detail: 'Bedrooms, living spaces, kitchens, and attached bathrooms generate specific perimeter wall lengths.',
+    label: 'ROOM LAYOUT',
+    title: 'Rooms & Bathrooms',
+    detail: 'Bedrooms, living spaces, kitchens, and attached bathrooms generate wall lengths and surface areas.',
     metric: '4 BHK + 4 Baths',
   },
   {
     step: '04',
     label: 'STRUCTURAL FRAME',
-    title: 'IS-456 RCC & Steel Physics',
-    detail: 'Column grid, footings, plinth beams, and slab thicknesses dictate physical tonnes of high-yield steel.',
-    metric: '8.64 Tonnes Fe550D',
+    title: 'Steel Needed for the House',
+    detail: 'Pillars, foundations, beams, and roof slabs dictate the steel rebar needed for your home.',
+    metric: '8.64 Tonnes Steel',
   },
   {
     step: '05',
-    label: 'MATERIAL TAKEOFF',
-    title: 'Physical Core Schedules',
-    detail: 'Bags of cement, cubic feet of manufactured sand, coarse aggregate, solid concrete blocks, and floor tiles.',
+    label: 'MATERIALS NEEDED',
+    title: 'Core Construction Materials',
+    detail: 'Bags of cement, sand, aggregate, concrete blocks, and floor tiles.',
     metric: '1,080 Bags Cement',
   },
   {
     step: '06',
-    label: 'TRADE LABOUR',
-    title: '13 Execution Trades',
-    detail: 'Bar bending, shuttering carpentry, masonry, plastering, electrical conduit, and plumbing installation.',
+    label: 'LABOUR & WORK COSTS',
+    title: 'Construction & Trade Work',
+    detail: 'Bar bending, formwork, masonry, plastering, electrical wiring, and plumbing installation.',
     metric: 'Standardized Rates',
   },
   {
     step: '07',
-    label: 'BANK-READY BOQ',
-    title: 'Itemized Total Cost Dossier',
-    detail: 'Fully reconciled Bill of Quantities with zero guesswork. Ready for bank loan sanction and contract execution.',
+    label: 'DETAILED COST REPORT',
+    title: 'Itemized Construction Cost Report',
+    detail: 'A clear stage-by-stage cost schedule you can review with your contractor or bank.',
     metric: '₹44.82 L Total Cost',
   },
 ];
@@ -74,7 +74,7 @@ export const VisualStorytellingSection: React.FC = () => {
           </h2>
 
           <p className="body-lg text-[#4B5563] leading-relaxed">
-            Hutty breaks construction down into physical realities. Here is how your building flows from raw plot boundaries into an itemized, bank-ready financial plan.
+            Hutty breaks construction down into practical steps. Here is how your building flows from raw plot boundaries into a detailed, understandable cost report.
           </p>
         </div>
 

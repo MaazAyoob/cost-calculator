@@ -726,6 +726,89 @@ class ConfigVersionService {
         }
       }
 
+      // 4b. Setback Rules Dataset validation
+      if (p.key === 'config.setbacks.rules' && Array.isArray(val)) {
+        const rules = val;
+        for (let i = 0; i < rules.length; i++) {
+          const r = rules[i];
+          if (!r.name) {
+            schemaErrors.push({
+              key: p.key,
+              parameterName: p.name,
+              currentValue: r,
+              error: `Setback rule at index ${i} is missing a rule name.`,
+              category: p.category,
+              isCritical: true,
+            });
+          }
+          if (typeof r.minPlotAreaSqFt !== 'number' || typeof r.maxPlotAreaSqFt !== 'number' || r.minPlotAreaSqFt < 0 || r.maxPlotAreaSqFt < r.minPlotAreaSqFt) {
+            schemaErrors.push({
+              key: p.key,
+              parameterName: p.name,
+              currentValue: r,
+              error: `Invalid plot area range in rule '${r.name || i}': [${r.minPlotAreaSqFt}, ${r.maxPlotAreaSqFt}].`,
+              category: p.category,
+              isCritical: true,
+            });
+          }
+          const boundaries = ['front', 'rear', 'left', 'right'];
+          for (const b of boundaries) {
+            const req = r[b];
+            if (!req || !req.method) {
+              schemaErrors.push({
+                key: p.key,
+                parameterName: p.name,
+                currentValue: r,
+                error: `Rule '${r.name}' is missing requirement definition for boundary '${b}'.`,
+                category: p.category,
+                isCritical: true,
+              });
+            } else if (req.method === 'FIXED_DISTANCE' || req.method === 'MINIMUM_REQUIRED') {
+              const bVal = req.value ?? req.minDistanceFt;
+              if (typeof bVal !== 'number' || isNaN(bVal) || !isFinite(bVal) || bVal < 0) {
+                schemaErrors.push({
+                  key: p.key,
+                  parameterName: p.name,
+                  currentValue: req,
+                  error: `Boundary '${b}' in rule '${r.name}' must have a non-negative finite distance.`,
+                  category: p.category,
+                  isCritical: true,
+                });
+              }
+            } else if (req.method === 'PERCENT_OF_DEPTH' || req.method === 'PERCENT_OF_WIDTH') {
+              if (typeof req.value !== 'number' || req.value < 0 || req.value > 100) {
+                schemaErrors.push({
+                  key: p.key,
+                  parameterName: p.name,
+                  currentValue: req,
+                  error: `Percentage boundary '${b}' in rule '${r.name}' must be between 0% and 100%.`,
+                  category: p.category,
+                  isCritical: true,
+                });
+              }
+            }
+          }
+
+          // Check overlap with other active rules
+          for (let j = i + 1; j < rules.length; j++) {
+            const r2 = rules[j];
+            if (r.isActive !== false && r2.isActive !== false) {
+              const overlap = Math.max(r.minPlotAreaSqFt, r2.minPlotAreaSqFt) < Math.min(r.maxPlotAreaSqFt, r2.maxPlotAreaSqFt);
+              if (overlap && (r.precedence || 0) === (r2.precedence || 0)) {
+                schemaErrors.push({
+                  key: p.key,
+                  parameterName: p.name,
+                  currentValue: { rule1: r.name, rule2: r2.name },
+                  error: `Overlapping plot area range detected between '${r.name}' and '${r2.name}' without explicit precedence.`,
+                  category: p.category,
+                  isCritical: true,
+                });
+              }
+            }
+          }
+        }
+      }
+
       // 5. Check against Business Conflict Registry
       const conflict = KNOWN_CONFLICT_REGISTRY.find((c) => c.key === p.key);
       if (conflict) {

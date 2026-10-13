@@ -117,10 +117,10 @@ export const SignatureExpertSection: React.FC = () => {
             <ShieldCheck className="w-6 h-6 text-[#1B3D34] shrink-0" />
             <div>
               <span className="font-heading text-sm font-bold text-[#1B3D34] block">
-                The Hutty Conflict-Free Guarantee
+                Independent, Unbiased Advice
               </span>
               <p className="text-xs text-[#4B5563]">
-                Our consultants do not take contractor commissions or sell construction contracts. Their only incentive is protecting your build quality and budget.
+                Clear information to help you discuss the work with your contractor. Our consultants do not take contractor commissions or sell construction services.
               </p>
             </div>
           </div>

@@ -22,11 +22,11 @@ export const CostAmbiguityTrapSection: React.FC = () => {
           </h2>
 
           <p className="body-lg text-[#4B5563] leading-relaxed">
-            Every residential project starts with an innocent question: <em className="text-[#1B3D34] font-semibold">"What is your rate per square foot?"</em> And almost every project suffers 25% to 40% cost overruns because of it.
+            Not sure about your contractor’s quote? Check the work and costs, or speak to an expert.
           </p>
         </div>
 
-        {/* Visual Architectural Comparison: Blind Guess vs Deterministic Quantity */}
+        {/* Visual Architectural Comparison: Blind Guess vs Transparent Quantity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           
           {/* LEFT: The Conventional Blind Flat-Rate Trap */}
@@ -56,7 +56,7 @@ export const CostAmbiguityTrapSection: React.FC = () => {
             <div className="space-y-3 pt-4 border-t border-[#E5E7EB] text-xs text-[#4B5563]">
               <div className="flex items-start gap-2.5">
                 <span className="text-red-500 font-bold shrink-0">&times;</span>
-                <span><strong>No Physical Steel Count:</strong> Contractor assumes 2.8 kg/sqft, but actual structural design requires 3.8 kg/sqft — resulting in ₹3.5L unexpected variation.</span>
+                <span><strong>No Physical Steel Count:</strong> Contractor assumes 2.8 kg/sqft, but actual structural design requires 3.8 kg/sqft — resulting in unexpected variations.</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <span className="text-red-500 font-bold shrink-0">&times;</span>
@@ -70,12 +70,12 @@ export const CostAmbiguityTrapSection: React.FC = () => {
 
             <div className="mt-6 p-3.5 bg-red-50/70 rounded-2xl border border-red-100 text-left">
               <span className="text-xs font-semibold text-red-700 block">
-                Typical Outcome: ₹12L &ndash; ₹18L budget compromises mid-construction
+                Typical Outcome: Unplanned budget compromises mid-construction
               </span>
             </div>
           </div>
 
-          {/* RIGHT: Hutty's Deterministic Quantity Takeoff */}
+          {/* RIGHT: Hutty's Transparent Quantity Planning */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#1B3D34] shadow-md relative overflow-hidden text-left">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#F28C28]" />
             
@@ -85,7 +85,7 @@ export const CostAmbiguityTrapSection: React.FC = () => {
                 Hutty Quantity-First Planning
               </span>
               <span className="text-xs font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded">
-                Deterministic
+                Transparent
               </span>
             </div>
 
@@ -95,14 +95,14 @@ export const CostAmbiguityTrapSection: React.FC = () => {
                 8.64 T <span className="text-lg font-normal text-[#4B5563]">Steel + 1,080 Bags</span>
               </div>
               <p className="text-xs text-[#1B3D34] font-medium">
-                Deterministic mathematical formulas calculated strictly from building physics and room matrix.
+                How we calculate your estimate: based on your room layout and actual house dimensions.
               </p>
             </div>
 
             <div className="space-y-3 pt-4 border-t border-[#E5E7EB] text-xs text-[#4B5563]">
               <div className="flex items-start gap-2.5">
                 <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                <span><strong>Mathematical BUA Calculation:</strong> Sets setbacks, carpet areas, and structural ratios based strictly on BBMP bye-laws and floor loads.</span>
+                <span><strong>Total Built-Up Area Calculation:</strong> Sets setbacks, room layout, and structural ratios based on standard municipal guidelines.</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
@@ -110,7 +110,7 @@ export const CostAmbiguityTrapSection: React.FC = () => {
               </div>
               <div className="flex items-start gap-2.5">
                 <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                <span><strong>Bank-Ready 13-Stage BOQ:</strong> Itemized schedule ready for nationalized bank construction loan appraisal and contractor agreement exhibits.</span>
+                <span><strong>Detailed 13-Stage Work Schedule:</strong> A detailed report you can discuss with your bank or contractor.</span>
               </div>
             </div>
 

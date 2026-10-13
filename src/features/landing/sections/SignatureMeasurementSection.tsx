@@ -15,11 +15,11 @@ export const SignatureMeasurementSection: React.FC = () => {
               <span>Spatial Planning &amp; Bylaws</span>
             </div>
             <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
-              Calculated to the inch.
+              Clear space and setback planning.
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-[#4B5563] max-w-md">
-            BBMP &amp; BDA Residential Zoning Standards &bull; Setback Optimization &bull; Gross Built-Up Area (BUA)
+            Local residential setback rules &bull; Plot layout optimization &bull; Total built-up area
           </p>
         </div>
 

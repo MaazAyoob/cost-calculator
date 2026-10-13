@@ -35,7 +35,7 @@ export const WebsiteFooter: React.FC = () => {
                 </div>
               </div>
               <p className="text-sm text-white/70 max-w-sm font-normal leading-relaxed">
-                Build your home with clarity. Formula-driven architectural planning, physical quantities, and bank-ready construction cost estimates.
+                Plan your home with clarity. Architectural planning, materials needed, and detailed construction cost estimates.
               </p>
               <div className="text-xs text-white/40 pt-1">
                 Bangalore &bull; Mysore &bull; Karnataka
@@ -58,18 +58,18 @@ export const WebsiteFooter: React.FC = () => {
                 </li>
                 <li>
                   <button
-                    onClick={() => navigate('/pricing')}
+                    onClick={() => navigate('/report')}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    2. Quick Estimate (₹99)
+                    2. Detailed Estimate &amp; BOQ (₹499)
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => navigate('/report')}
+                    onClick={() => navigate('/pricing')}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    3. Detailed Estimate & BOQ (₹499)
+                    3. Calculator — Premium (₹1,499)
                   </button>
                 </li>
                 <li>
@@ -152,7 +152,7 @@ export const WebsiteFooter: React.FC = () => {
             <div className="flex items-center gap-6">
               <span>Privacy Policy</span>
               <span>Terms of Service</span>
-              <span>Deterministic Quantity Takeoff</span>
+              <span>Transparent Quantity Estimation</span>
             </div>
           </div>
         </div>

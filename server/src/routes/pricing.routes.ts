@@ -6,10 +6,13 @@
 import { Router } from 'express';
 import { PricingController } from '../controllers/pricing.controller';
 import { authenticateToken, requireAdmin } from '../middlewares/auth.middleware';
-import { publicRateLimiter, bookingRateLimiter, paymentVerifyRateLimiter } from '../middlewares/rateLimiter.middleware';
+import { publicRateLimiter, bookingRateLimiter, paymentVerifyRateLimiter, webhookRateLimiter } from '../middlewares/rateLimiter.middleware';
 
 // ── Public Pricing Router (Mounted at /api/v1/pricing) ──
 export const pricingPublicRouter = Router();
+
+// Webhook endpoint for Razorpay server-to-server notifications
+pricingPublicRouter.post('/webhook', webhookRateLimiter, PricingController.handleWebhook);
 
 // Get active pricing tiers for /pricing page and calculator modals
 pricingPublicRouter.get('/tiers', publicRateLimiter, PricingController.getPublicTiers);
@@ -33,6 +36,9 @@ pricingPublicRouter.post(
 
 // Confirm purchase payment and activate entitlements
 pricingPublicRouter.post('/purchases/confirm', paymentVerifyRateLimiter, PricingController.confirmPurchase);
+
+// Mark purchase as failed or cancelled
+pricingPublicRouter.post('/purchases/fail', paymentVerifyRateLimiter, PricingController.failPurchase);
 
 // Query user/project entitlements
 pricingPublicRouter.get('/my/entitlements', (req, res, next) => {

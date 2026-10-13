@@ -29,6 +29,7 @@ interface PricingState {
   canAccessFeature: (featureCode: PricingFeatureCode | string, projectId?: string) => boolean;
   getProjectTier: (projectId?: string) => PricingTierCode;
   hasDetailedReportAccess: (projectId?: string) => boolean;
+  hasBasicPdfAccess: (projectId?: string) => boolean;
 
   // Sync & CRUD
   fetchTiers: () => Promise<void>;
@@ -51,8 +52,10 @@ interface PricingState {
   confirmPurchasePayment: (
     purchaseId: string,
     gatewayPaymentId: string,
-    gatewayOrderId?: string
+    gatewayOrderId?: string,
+    razorpaySignature?: string
   ) => Promise<void>;
+  failPurchasePayment: (purchaseId: string, reason?: string) => Promise<void>;
 
   // Direct local entitlement grant (e.g. for offline/dev test or instant unlocked state)
   grantEntitlementsDirectly: (
@@ -96,17 +99,24 @@ export const usePricingStore = create<PricingState>()(
 
       getProjectTier: (projectId?: string): PricingTierCode => {
         const state = get();
+        if (state.canAccessFeature('PREMIUM_COMPARISON', projectId)) {
+          return 'PREMIUM_1499';
+        }
         if (state.canAccessFeature('FULL_PDF_REPORT', projectId)) {
           return 'DETAILED_ESTIMATE_499';
-        }
-        if (state.canAccessFeature('SAVED_PROJECT', projectId)) {
-          return 'ESTIMATE_99';
         }
         return 'FREE';
       },
 
       hasDetailedReportAccess: (projectId?: string): boolean => {
         return get().canAccessFeature('FULL_PDF_REPORT', projectId);
+      },
+
+      hasBasicPdfAccess: (projectId?: string): boolean => {
+        return (
+          get().canAccessFeature('BASIC_PDF_DOWNLOAD', projectId) ||
+          get().canAccessFeature('FULL_PDF_REPORT', projectId)
+        );
       },
 
       fetchTiers: async () => {
@@ -185,13 +195,13 @@ export const usePricingStore = create<PricingState>()(
         }
       },
 
-      confirmPurchasePayment: async (purchaseId, gatewayPaymentId, gatewayOrderId) => {
+      confirmPurchasePayment: async (purchaseId, gatewayPaymentId, gatewayOrderId, razorpaySignature) => {
         set({ isLoading: true, error: null });
         try {
           const res = await fetch(getApiUrl('/pricing/purchases/confirm'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ purchaseId, gatewayPaymentId, gatewayOrderId }),
+            body: JSON.stringify({ purchaseId, gatewayPaymentId, gatewayOrderId, razorpaySignature }),
           });
 
           const json = await res.json();
@@ -210,6 +220,16 @@ export const usePricingStore = create<PricingState>()(
           set({ isLoading: false, error: err.message });
           throw err;
         }
+      },
+
+      failPurchasePayment: async (purchaseId, reason) => {
+        try {
+          await fetch(getApiUrl('/pricing/purchases/fail'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ purchaseId, reason }),
+          });
+        } catch {}
       },
 
       grantEntitlementsDirectly: (tierCode, projectId, leadEmail, orderId) => {

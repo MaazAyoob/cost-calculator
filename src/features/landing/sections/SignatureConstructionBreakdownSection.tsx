@@ -125,13 +125,13 @@ export const SignatureConstructionBreakdownSection: React.FC = () => {
         <div className="p-6 sm:p-8 bg-[#112821] rounded-3xl text-white flex flex-col md:flex-row md:items-center justify-between gap-6 arch-bracketed text-left">
           <div className="space-y-1">
             <span className="text-xs font-semibold tracking-wide text-[#F28C28] block">
-              Accurate Takeoff For Your Exact Plot
+              Materials Needed For Your Plot
             </span>
             <h3 className="text-xl sm:text-2xl font-bold font-heading text-white">
-              Want to see what your specific plot and room layout will consume?
+              Want to see the materials your house will need?
             </h3>
             <p className="text-xs text-white/70 max-w-xl">
-              Input your custom site dimensions to run the live calculation engine. Receive your exact material takeoff schedule in 60 seconds.
+              Input your site dimensions and floor plan to see your estimated materials and costs in 60 seconds.
             </p>
           </div>
 

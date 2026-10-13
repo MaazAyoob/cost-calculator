@@ -11,6 +11,8 @@ try {
   console.warn('[AdminController] Prisma client initialization warning:', err);
 }
 
+const isPrismaAvailable = () => Boolean(prisma && process.env.DATABASE_URL);
+
 // In-memory persistent fallback cache in case PostgreSQL is running in container or offline
 interface OverrideRecord {
   id: string;
@@ -70,7 +72,7 @@ function getOverrideKey(rateId: string, packageTier = 'ALL', location = 'ALL'): 
 export async function getRates(req: Request, res: Response) {
   try {
     let overrides: any[] = [];
-    if (prisma && (prisma as any).rateOverride) {
+    if (isPrismaAvailable() && (prisma as any).rateOverride) {
       try {
         overrides = await (prisma as any).rateOverride.findMany({
           where: { isActive: true },
@@ -132,7 +134,7 @@ export async function setOverride(req: AuthenticatedRequest, res: Response) {
     }
 
     // 2. Inherit from database if missing
-    if ((!category || !unit) && prisma && (prisma as any).rateOverride) {
+    if ((!category || !unit) && isPrismaAvailable() && (prisma as any).rateOverride) {
       try {
         const dbExisting = await (prisma as any).rateOverride.findFirst({
           where: { rateId },
@@ -210,7 +212,7 @@ export async function setOverride(req: AuthenticatedRequest, res: Response) {
     inMemoryAuditLogs.unshift(auditEntry);
 
     // Persist to Prisma DB if available
-    if (prisma && (prisma as any).rateOverride) {
+    if (isPrismaAvailable() && (prisma as any).rateOverride) {
       try {
         await (prisma as any).rateOverride.upsert({
           where: {
@@ -314,7 +316,7 @@ export async function removeOverride(req: AuthenticatedRequest, res: Response) {
     };
     inMemoryAuditLogs.unshift(auditEntry);
 
-    if (prisma && (prisma as any).rateOverride) {
+    if (isPrismaAvailable() && (prisma as any).rateOverride) {
       try {
         await (prisma as any).rateOverride.deleteMany({
           where: {
@@ -386,7 +388,7 @@ export async function resetAllOverrides(req: AuthenticatedRequest, res: Response
     };
     inMemoryAuditLogs.unshift(auditEntry);
 
-    if (prisma && (prisma as any).rateOverride) {
+    if (isPrismaAvailable() && (prisma as any).rateOverride) {
       try {
         await (prisma as any).rateOverride.deleteMany({});
         await (prisma as any).rateAuditLog.create({
@@ -426,7 +428,7 @@ export async function getAuditLogs(req: AuthenticatedRequest, res: Response) {
     const maxItems = Math.min(200, parseInt(limit as string, 10) || 100);
 
     let logs: any[] = inMemoryAuditLogs;
-    if (prisma && (prisma as any).rateAuditLog) {
+    if (isPrismaAvailable() && (prisma as any).rateAuditLog) {
       try {
         const query: any = {
           orderBy: { timestamp: 'desc' },

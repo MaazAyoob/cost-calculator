@@ -90,7 +90,7 @@ export const Step7Windows: React.FC = () => {
           <label className="font-bold text-[#1B3D34] uppercase tracking-wider">
             {selectedMaterial} Specification Tier
           </label>
-          <span className="font-mono text-[#4B5563] text-[11px]">Computed takeoff</span>
+          <span className="font-mono text-[#4B5563] text-[11px]">Calculated area</span>
         </div>
 
         <div className="space-y-2">

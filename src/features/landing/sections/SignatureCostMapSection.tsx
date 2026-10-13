@@ -99,7 +99,7 @@ export const SignatureCostMapSection: React.FC = () => {
               Total Estimate: {formatCurrency(totalCost)}
             </span>
             <span className="text-xs text-[#4B5563] block">
-              ~₹1,867 / sq.ft on 2,400 sq.ft BUA
+              ~₹1,867 / sq.ft on 2,400 sq.ft built-up area
             </span>
           </div>
         </div>

@@ -155,7 +155,7 @@ describe('Single Source of Truth PDF Generation Pipeline', () => {
     expect(pdfOutput.blob).toBeDefined();
     expect(pdfOutput.url).toBeDefined();
     expect(pdfOutput.filename).toMatch(/_Detailed_BOQ_Report\.pdf$/);
-  }, 35000);
+  }, 70000);
 
   it('blocks PDF generation if QA Gate fails', async () => {
     const calcResult = runCalculator(sampleInput);

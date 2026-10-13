@@ -29,11 +29,15 @@ router.use('/', consultationPublicRouter);
 router.use('/consultations', consultationCustomerRouter);
 router.use('/pricing', pricingPublicRouter);
 
+import { pricingService } from '../services/pricing.service';
+
 // Health check
 router.get('/health', (_req: Request, res: Response) => {
+  const persistence = pricingService.getPersistenceStatus();
   res.json({
     status: 'online',
     platform: 'Cost Calculator API Engine v1.0.0',
+    database: persistence,
     timestamp: new Date().toISOString(),
   });
 });

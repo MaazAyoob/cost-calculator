@@ -70,6 +70,7 @@ export type AdminTab =
   | 'account'
   // Phase 2E Section aliases:
   | 'project-bua'
+  | 'plot-setbacks'
   | 'rooms-spaces'
   | 'walls-masonry'
   | 'rcc-structure'
@@ -1457,7 +1458,7 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       value,
       name: key.replace(/\./g, ' ').toUpperCase(),
       category: key.split('.')[1]?.toUpperCase() || 'CUSTOM',
-      valueType: typeof value === 'number' ? 'NUMBER' : 'STRING',
+      valueType: typeof value === 'number' ? 'NUMBER' : (typeof value === 'object' && value !== null ? 'JSON' : 'STRING'),
       status: 'ACTIVE',
     }));
 

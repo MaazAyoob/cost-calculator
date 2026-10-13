@@ -77,12 +77,11 @@ export const HeroSection: React.FC = () => {
             {/* Editorial Heading with Scale Contrast */}
             <div className="space-y-4">
               <h1 className="heading-display text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.03] text-[#1B3D34] font-black tracking-tight">
-                Build with <br />
-                <span className="text-[#1B3D34] underline decoration-[#F28C28] decoration-4 underline-offset-8">mathematical</span> <br />
-                clarity.
+                Understand your home <br />
+                <span className="text-[#1B3D34] underline decoration-[#F28C28] decoration-4 underline-offset-8">before you build</span>.
               </h1>
               <p className="body-lg text-[#4B5563] font-normal leading-relaxed max-w-md">
-                From raw plot dimensions to verified steel and cement quantities, estimate your entire construction budget before you break ground.
+                Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need it.
               </p>
             </div>
 
@@ -154,7 +153,7 @@ export const HeroSection: React.FC = () => {
                 className="hutty-btn-secondary text-sm font-semibold px-5 py-3.5 rounded-xl cursor-pointer min-h-[48px]"
               >
                 <Compass className="w-4 h-4 text-[#1B3D34]" />
-                <span>Consult an Expert (₹1,499)</span>
+                <span>Consult an Expert — ₹1,499</span>
               </button>
             </div>
           </motion.div>
@@ -182,7 +181,7 @@ export const HeroSection: React.FC = () => {
                     {selectedFloorCount === 1 ? 'Ground Floor' : `G+${selectedFloorCount - 1} Duplex`}
                   </span>
                   <span className="text-xs font-semibold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-1 rounded-lg border border-[#1B3D34]/15">
-                    {buaSqFt.toLocaleString()} sq.ft BUA
+                    {buaSqFt.toLocaleString()} sq.ft built-up area
                   </span>
                 </div>
               </div>
@@ -226,7 +225,7 @@ export const HeroSection: React.FC = () => {
 
                 <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E3E8E2]">
                   <span className="text-xs font-semibold text-[#687770] block">
-                    Structural Steel
+                    Steel Needed
                   </span>
                   <span className="text-base font-extrabold text-[#172722] block font-heading tabular-nums mt-0.5">
                     {steelTonnes} T
@@ -250,13 +249,13 @@ export const HeroSection: React.FC = () => {
 
                 <div className="bg-[#F8F8F6] p-3 rounded-xl border border-[#E3E8E2]">
                   <span className="text-xs font-semibold text-[#687770] block">
-                    BOQ Schedule
+                    Work Schedule
                   </span>
                   <span className="text-base font-extrabold text-[#172722] block font-heading tabular-nums mt-0.5">
                     13 Stages
                   </span>
                   <span className="text-[11px] text-[#687770] block">
-                    Bank-Appraisal Ready
+                    Detailed cost report
                   </span>
                 </div>
               </div>

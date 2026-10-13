@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Briefcase, CheckCircle2, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { MapPin, Briefcase, CheckCircle2, ArrowRight, ShieldCheck, Sparkles, Clock } from 'lucide-react';
 import { Consultant } from '../../../types/consultation';
 import { LAUNCH_CONSULTATION_PRICE_DISPLAY } from '../../../config/consultation';
 
@@ -106,6 +106,16 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
             </div>
           </div>
         )}
+
+        {/* Session Inclusions Strip */}
+        <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between text-[11px] text-[#4B5563]">
+          <span className="flex items-center gap-1 font-semibold text-[#1B3D34]">
+            <Clock className="w-3.5 h-3.5 text-[#F28C28]" /> 45-min session
+          </span>
+          <span className="text-[#4B5563]">
+            Includes review &amp; written advice
+          </span>
+        </div>
       </div>
 
       {/* Card Footer: Fee + Action Buttons */}

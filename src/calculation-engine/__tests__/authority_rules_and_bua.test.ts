@@ -83,13 +83,14 @@ describe('Authority-Based BUA & Setback Engine Suite', () => {
     expect(area.plotAreaSqFt).toBe(1200);
     expect(area.authorityMetadata.authority).toBe('BBMP/BDA');
     expect(area.authorityMetadata.city).toBe('Bengaluru');
-    expect(area.authorityMetadata.ruleId).toBe('BLR-BDA-RMP2015-RES-V2.4');
+    expect(area.authorityMetadata.ruleId).toBe('BLR-GBA-2026-RES-V1.0');
 
-    // 30x40 (1200 sqft / 111.5 sqm) setback slab in BDA
-    expect(area.statutorySetbacks.frontSetbackFt).toBeCloseTo(3.28, 1);
-    expect(area.statutorySetbacks.rearSetbackFt).toBeCloseTo(3.28, 1);
-    expect(area.statutorySetbacks.leftSetbackFt).toBeCloseTo(3.28, 1);
-    expect(area.statutorySetbacks.rightSetbackFt).toBeCloseTo(3.28, 1);
+    // 30x40 (1200 sqft) under GBA 2026 (Gazette Jan 2026: 2.95ft front, 2.30ft rear, 2.30ft one side)
+    expect(area.statutorySetbacks.frontSetbackFt).toBeCloseTo(2.95, 2);
+    expect(area.statutorySetbacks.rearSetbackFt).toBeCloseTo(2.30, 2);
+    expect(area.statutorySetbacks.leftSetbackFt).toBeCloseTo(2.30, 2);
+    expect(area.statutorySetbacks.rightSetbackFt).toBe(0);
+    expect(area.authorityMetadata.matchedRuleId).toBe('GBA-2026-SMALL');
 
     // Coverage & FAR
     expect(area.maxPermissibleCoveragePct).toBe(70);

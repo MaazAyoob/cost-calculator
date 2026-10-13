@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReportStore } from '../../store/useReportStore';
+import { usePricingStore } from '../../store/usePricingStore';
+import { useCalculationStore } from '../../store/useCalculationStore';
 import { FileText, ShieldCheck, ArrowRight, User, Phone, Mail, X } from 'lucide-react';
 
 interface LeadCaptureModalProps {
@@ -15,15 +17,18 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
   onSuccess,
 }) => {
   const { saveLeadInfo, leadInfo } = useReportStore();
+  const { initiatePurchase } = usePricingStore();
+  const { result } = useCalculationStore();
 
   const [name, setName] = useState(leadInfo?.name || '');
   const [phone, setPhone] = useState(leadInfo?.phone || '');
   const [email, setEmail] = useState(leadInfo?.email || '');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim() || !email.trim()) {
       setError('Please provide your name, phone number, and email address.');
@@ -34,9 +39,29 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
       return;
     }
     setError('');
+    setIsSubmitting(true);
     saveLeadInfo({ name: name.trim(), phone: phone.trim(), email: email.trim() });
-    if (onSuccess) onSuccess();
-    onClose();
+
+    try {
+      await initiatePurchase({
+        tierCode: 'FREE',
+        leadName: name.trim(),
+        leadPhone: phone.trim(),
+        leadEmail: email.trim(),
+        projectId: result.report?.projectId,
+        projectSnapshot: {
+          buaSqFt: result.area?.totalBUASqFt,
+          totalCostINR: result.budget?.totalProjectCost,
+          houseType: result.input?.houseType,
+        },
+      });
+    } catch (err) {
+      console.warn('Backend lead persistence warning:', err);
+    } finally {
+      setIsSubmitting(false);
+      if (onSuccess) onSuccess();
+      onClose();
+    }
   };
 
   return (
@@ -64,9 +89,9 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
           <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-start gap-3">
             <FileText className="w-5 h-5 text-[#1B3D34] shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <h4 className="font-bold text-[#1B3D34] text-xs">Bank-Ready Construction Dossier</h4>
+              <h4 className="font-bold text-[#1B3D34] text-xs">Detailed Construction Cost Report</h4>
               <p className="text-[#4B5563] text-[11px]">
-                Receive the itemized 13-stage BOQ schedule, material quantities takeoff, and SBI/HDFC format payment roadmap.
+                Receive the itemized 13-stage cost schedule, materials needed, and stage-by-stage payment plan.
               </p>
             </div>
           </div>
@@ -132,9 +157,10 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full hutty-btn-primary py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full hutty-btn-primary py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
-                <span>Download Report</span>
+                <span>{isSubmitting ? 'Saving...' : 'Download Report'}</span>
                 <ArrowRight className="w-4 h-4 text-[#F28C28]" />
               </button>
             </div>

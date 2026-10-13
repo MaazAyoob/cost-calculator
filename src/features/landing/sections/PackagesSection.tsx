@@ -249,11 +249,11 @@ export const PackagesSection: React.FC = () => {
                 Side-by-Side Trade Matrix
               </h3>
               <p className="text-xs text-[#4B5563]">
-                Physical quantity measurements remain deterministic; rates and brands scale cleanly by standard.
+                Required material quantities stay consistent for your home; rates and brands scale cleanly by package.
               </p>
             </div>
             <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.06)] px-2.5 py-1 rounded border border-[#1B3D34]/15 hidden sm:inline-block">
-              ZERO ARBITRARY MULTIPLIERS
+              CONSISTENT QUANTITIES
             </span>
           </div>
 

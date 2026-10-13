@@ -55,7 +55,7 @@ export const ProjectGallerySection: React.FC = () => {
                   40 × 60 Residence
                 </span>
                 <span className="text-xs text-[#4B5563] font-mono">
-                  G+3 Villa &bull; 3,840 sq.ft BUA &bull; Bangalore South
+                  G+3 Villa &bull; 3,840 sq.ft built-up area &bull; Bangalore South
                 </span>
               </div>
             </div>

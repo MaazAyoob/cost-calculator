@@ -9,15 +9,15 @@ export const FaqSection: React.FC = () => {
   const faqs = [
     {
       q: 'How does Hutty estimate residential construction costs?',
-      a: 'The engine applies deterministic civil engineering formulas anchored to Indian Standards (IS 456, IS 1786) and Bangalore Schedule of Rates. It calculates required volumes of concrete, steel rebar tonnage, AAC masonry, flooring, plumbing, electrical, and paint directly from room and floor dimensions.',
+      a: 'Hutty calculates the required concrete, steel rebar, masonry blocks, flooring, plumbing, electrical, and paint directly from your plot dimensions and floor plans using established residential building standards and local market rates.',
     },
     {
       q: 'Can I compare specific material brands like UltraTech vs ACC or Tata Tiscon vs JSW?',
-      a: 'Yes. In the planning calculator, you can switch between brand tiers and finishes. The physical required quantity (e.g. 9.6 tonnes of steel) remains engineering-invariant while your itemized rates update dynamically.',
+      a: 'Yes. In the planning calculator, you can compare material brands and finishes. The amount of steel or cement needed stays consistent for your house size, while the itemized rates update to reflect your choices.',
     },
     {
-      q: 'Are the generated BOQ reports accepted for bank home loans?',
-      a: 'Yes. Hutty generates 13-stage itemized Bills of Quantities and a 6-stage milestone disbursement roadmap structured according to standard Indian bank appraisal formats (SBI, HDFC, ICICI, Axis).',
+      q: 'Can I use the report for a bank loan or contractor discussions?',
+      a: 'Yes. Hutty provides a detailed construction cost report and milestone payment plan you can review and discuss with your bank or contractor. (Final loan appraisal depends on your bank\'s specific review.)',
     },
     {
       q: 'What plot sizes and storeys are supported?',
@@ -25,7 +25,7 @@ export const FaqSection: React.FC = () => {
     },
     {
       q: 'Is there any fee to plan and download estimates?',
-      a: 'No. The planning calculator, 3D architectural viewer, interactive summary, and BOQ previews are completely free for homeowners.',
+      a: 'You can explore your house plan and see a basic estimate for free (₹0). When you need the complete itemized report with all materials and costs, you can unlock the Detailed BOQ for ₹499 or the Premium package for ₹1,499.',
     },
   ];
 
@@ -42,7 +42,7 @@ export const FaqSection: React.FC = () => {
             Everything you need to know.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Common questions regarding calculation assumptions, material grades, and bank-loan BOQ reports.
+            Common questions regarding your estimate, materials, and cost reports.
           </p>
         </div>
 

@@ -320,11 +320,11 @@ export const InteractiveDemoSection: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#1B3D34] animate-pulse" />
                 <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
-                  Live Calculation Takeoff
+                  Live Estimate Preview
                 </span>
               </div>
               <span className="text-[10px] font-mono text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded-full font-bold">
-                CANONICAL ENGINE
+                LIVE CALCULATION
               </span>
             </div>
 

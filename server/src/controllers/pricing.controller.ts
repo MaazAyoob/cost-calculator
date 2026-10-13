@@ -72,15 +72,21 @@ export class PricingController {
 
   public static async confirmPurchase(req: Request, res: Response): Promise<void> {
     try {
-      const { purchaseId, gatewayPaymentId, gatewayOrderId } = req.body;
+      const { purchaseId, gatewayPaymentId, gatewayOrderId, razorpaySignature, gatewaySignature } = req.body;
 
       if (!purchaseId) {
         res.status(400).json({ success: false, message: 'purchaseId is required' });
         return;
       }
 
+      const sig = razorpaySignature || gatewaySignature || req.headers['x-razorpay-signature'];
       const paymentId = gatewayPaymentId || `pay_manual_${Date.now()}`;
-      const result = await pricingService.confirmPurchasePayment(purchaseId, paymentId, gatewayOrderId);
+      const result = await pricingService.confirmPurchasePayment(
+        purchaseId,
+        paymentId,
+        gatewayOrderId,
+        typeof sig === 'string' ? sig : undefined
+      );
 
       res.json({
         success: true,
@@ -88,6 +94,31 @@ export class PricingController {
       });
     } catch (error: any) {
       res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  public static async failPurchase(req: Request, res: Response): Promise<void> {
+    try {
+      const { purchaseId, reason } = req.body;
+      if (!purchaseId) {
+        res.status(400).json({ success: false, message: 'purchaseId is required' });
+        return;
+      }
+      const purchase = await pricingService.failPurchasePayment(purchaseId, reason);
+      res.json({ success: true, data: purchase });
+    } catch (error: any) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  public static async handleWebhook(req: Request, res: Response): Promise<void> {
+    try {
+      const signature = (req.headers['x-razorpay-signature'] || req.headers['X-Razorpay-Signature']) as string | undefined;
+      const rawBody = (req as any).rawBody || JSON.stringify(req.body);
+      const result = await pricingService.handleRazorpayWebhook(rawBody, signature);
+      res.json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'Webhook processing failed' });
     }
   }
 

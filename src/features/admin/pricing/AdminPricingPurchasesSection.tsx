@@ -199,7 +199,7 @@ export const AdminPricingPurchasesSection: React.FC = () => {
             <FileText className="w-8 h-8 text-slate-300 mx-auto" />
             <h4 className="text-sm font-bold text-slate-700">No purchase records found</h4>
             <p className="text-xs text-slate-400">
-              When users initiate or complete purchases for ₹99 or ₹499 tiers, their records and historical snapshots appear here.
+              When users initiate or complete purchases for ₹499 or ₹1,499 tiers, their records and historical snapshots appear here.
             </p>
           </div>
         ) : (

@@ -209,7 +209,7 @@ export const WebsiteHeader: React.FC = () => {
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Pricing</span>
                   <p className={`text-xs ${isCurrent('/pricing') ? 'text-white/80' : 'text-[#687770]'}`}>
-                    Free preview, ₹99 verified, ₹499 bank-ready BOQ
+                    Free estimate, ₹499 detailed BOQ, ₹1,499 premium
                   </p>
                 </div>
                 <ArrowRight className={`w-4 h-4 ${isCurrent('/pricing') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />

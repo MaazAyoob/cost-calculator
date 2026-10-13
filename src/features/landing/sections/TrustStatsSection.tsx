@@ -4,8 +4,8 @@ export const TrustStatsSection: React.FC = () => {
   const pillars = [
     {
       label: 'FORMULA-DRIVEN',
-      title: 'Deterministic Structural Ratios',
-      desc: 'Steel tonnage and concrete quantities derived mathematically from plot geometry and floor loads.',
+      title: 'Reliable Material Ratios',
+      desc: 'Steel and concrete quantities calculated from your plot size and floor layout.',
     },
     {
       label: 'QUANTITY-BASED',
@@ -15,12 +15,12 @@ export const TrustStatsSection: React.FC = () => {
     {
       label: 'MATERIAL-SPECIFIC',
       title: 'Real Market Brand Rates',
-      desc: 'Compare material tiers transparently without altering the underlying structural physics.',
+      desc: 'Compare material brands transparently without changing the core quantities needed.',
     },
     {
-      label: 'BOQ-READY',
-      title: 'Bank-Grade Cost Schedule',
-      desc: '13-stage itemized Bills of Quantities ready for bank appraisals and contractor contracts.',
+      label: 'REPORT-READY',
+      title: 'Detailed Cost Schedule',
+      desc: '13-stage itemized cost list ready to review with your contractor or bank.',
     },
   ];
 

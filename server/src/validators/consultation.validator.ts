@@ -23,7 +23,7 @@ export const createConsultantSchema = z.object({
 export const updateConsultantSchema = createConsultantSchema.partial();
 
 export const createBookingRequestSchema = z.object({
-  consultantId: z.string().min(1, 'Consultant ID is required'),
+  consultantId: z.string().optional().nullable(),
   homeownerName: z.string().min(2, 'Full name is required').max(100),
   homeownerPhone: z.string().min(10, 'Valid 10-digit mobile number required').max(15),
   homeownerEmail: z.string().email('Valid email address required'),
@@ -38,6 +38,16 @@ export const createBookingRequestSchema = z.object({
   // Explicitly capture any tampering attempt so it can be discarded by service
   amount: z.any().optional(),
   fee: z.any().optional(),
+});
+
+export const createGeneralEnquirySchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100),
+  phone: z.string().min(10, 'Valid 10-digit mobile number required').max(15),
+  email: z.string().email('Valid email address required'),
+  topic: z.string().min(2, 'Topic is required').max(150),
+  message: z.string().min(5, 'Message must be at least 5 characters').max(2000),
+  city: z.string().max(100).optional(),
+  projectType: z.string().max(100).optional(),
 });
 
 export const verifyPaymentSchema = z.object({

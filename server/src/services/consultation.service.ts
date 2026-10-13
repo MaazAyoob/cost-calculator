@@ -546,7 +546,7 @@ export class ConsultationService {
    */
   public async createBookingRequest(
     data: {
-      consultantId: string;
+      consultantId?: string | null;
       homeownerName: string;
       homeownerPhone: string;
       homeownerEmail: string;
@@ -575,13 +575,16 @@ export class ConsultationService {
       prefill: { name: string; email: string; contact: string };
     };
   }> {
-    // 1. Verify consultant exists and is active
-    const consultant = await this.getConsultantById(data.consultantId);
-    if (!consultant) {
-      throw new Error('Selected consultant does not exist.');
-    }
-    if (!consultant.active) {
-      throw new Error('Selected consultant is currently unavailable for bookings.');
+    // 1. Verify consultant exists and is active (if a specific consultant was chosen)
+    let consultant: ConsultantEntity | null = null;
+    if (data.consultantId && data.consultantId !== 'hutty-expert-desk' && data.consultantId !== 'general-expert') {
+      consultant = await this.getConsultantById(data.consultantId);
+      if (!consultant) {
+        throw new Error('Selected consultant does not exist.');
+      }
+      if (!consultant.active) {
+        throw new Error('Selected consultant is currently unavailable for bookings.');
+      }
     }
 
     // 2. Validate optional linked project if provided
@@ -648,7 +651,7 @@ export class ConsultationService {
     // Recent duplicate request check: within 60 seconds with same consultant, slot, and pending status
     const recentDuplicate = this.findRecentPendingBooking(
       normalizedEmail,
-      consultant.id,
+      consultant ? consultant.id : 'hutty-expert-desk',
       data.preferredDate,
       data.preferredTime
     );
@@ -680,10 +683,10 @@ export class ConsultationService {
       publicReference,
       idempotencyKey: data.idempotencyKey || null,
       userId: userContext?.id || null,
-      consultantId: consultant.id,
+      consultantId: consultant ? consultant.id : null,
       consultant,
-      consultantNameSnapshot: consultant.name,
-      consultantTitleSnapshot: consultant.title,
+      consultantNameSnapshot: consultant ? consultant.name : 'Hutty Expert Desk',
+      consultantTitleSnapshot: consultant ? consultant.title : 'Senior Lead Architect / Engineer Review',
       homeownerName: data.homeownerName.trim(),
       homeownerPhone: data.homeownerPhone.trim(),
       homeownerEmail: normalizedEmail,
@@ -728,7 +731,7 @@ export class ConsultationService {
       internalNote: null,
       metadataJson: {
         publicReference,
-        consultantName: consultant.name,
+        consultantName: consultant ? consultant.name : 'Hutty Expert Desk',
         preferredDate: data.preferredDate,
         preferredTime: data.preferredTime,
         topic: data.consultationTopic,
@@ -799,10 +802,111 @@ export class ConsultationService {
     this.inMemoryPayments.unshift(paymentEntity);
     this.inMemoryEvents.unshift(eventEntity);
 
+    console.log(
+      `[OPERATIONAL_LEAD_DISPATCH] Consultation booking initiated: Reference=${publicReference}, Expert="${consultant ? consultant.name : 'Hutty Expert Desk'}", Customer="${data.homeownerName}" <${normalizedEmail}>, Topic="${data.consultationTopic}", Location="${data.projectLocation}"`
+    );
+
     return {
       request: requestEntity,
       payment: paymentEntity,
       razorpayOptions: this.buildRazorpayOptions(requestEntity, paymentEntity, consultant),
+    };
+  }
+
+  /**
+   * Homeowner general help request & consultation fallback.
+   * Captured when no specific consultant slot is available or homeowner requests direct guidance.
+   * Persisted to database/in-memory with status AWAITING_REVIEW and logged to operational lead dispatch.
+   */
+  public async createGeneralEnquiry(data: {
+    name: string;
+    phone: string;
+    email: string;
+    topic: string;
+    message: string;
+    city?: string;
+    projectType?: string;
+  }): Promise<{
+    success: boolean;
+    reference: string;
+    message: string;
+    data: any;
+  }> {
+    const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const publicReference = `HT-ENQ-${randomSuffix}`;
+    const requestId = `enq-${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
+    const now = new Date().toISOString();
+    const normalizedEmail = data.email.toLowerCase().trim();
+
+    const requestEntity: ConsultationRequestEntity = {
+      id: requestId,
+      publicReference,
+      idempotencyKey: null,
+      userId: null,
+      consultantId: null,
+      consultant: null,
+      consultantNameSnapshot: 'Hutty Expert Desk',
+      consultantTitleSnapshot: 'Technical Advisory & Review Desk',
+      homeownerName: data.name.trim(),
+      homeownerPhone: data.phone.trim(),
+      homeownerEmail: normalizedEmail,
+      projectId: null,
+      projectSnapshot: null,
+      projectLocation: (data.city || 'Bangalore').trim(),
+      projectType: (data.projectType || 'Independent Residential House').trim(),
+      consultationTopic: data.topic.trim(),
+      message: data.message.trim(),
+      preferredDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+      preferredTime: 'Anytime / Earliest Slot',
+      confirmedDateTime: null,
+      status: 'AWAITING_REVIEW',
+      amountMinorUnits: 0,
+      currency: CONSULTATION_CURRENCY,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (this.prisma) {
+      try {
+        await (this.prisma as any).consultationRequest.create({
+          data: {
+            id: requestEntity.id,
+            publicReference: requestEntity.publicReference,
+            homeownerName: requestEntity.homeownerName,
+            homeownerPhone: requestEntity.homeownerPhone,
+            homeownerEmail: requestEntity.homeownerEmail,
+            projectLocation: requestEntity.projectLocation,
+            projectType: requestEntity.projectType,
+            consultationTopic: requestEntity.consultationTopic,
+            message: requestEntity.message,
+            preferredDate: requestEntity.preferredDate,
+            preferredTime: requestEntity.preferredTime,
+            status: requestEntity.status,
+            amountMinorUnits: 0,
+            currency: requestEntity.currency,
+          },
+        });
+      } catch (err: any) {
+        console.warn('[ConsultationService] Prisma enquiry create failed, using in-memory:', err.message);
+      }
+    }
+
+    this.inMemoryRequests.unshift(requestEntity);
+
+    console.log(
+      `[OPERATIONAL_LEAD_DISPATCH] General Enquiry received: Reference=${publicReference}, Name="${data.name}", Phone="${data.phone}", Email="${data.email}", Topic="${data.topic}", City="${data.city || 'Bangalore'}"`
+    );
+
+    return {
+      success: true,
+      reference: publicReference,
+      message: 'Your enquiry has been received by our senior engineering desk. We will review your request and contact you within 24 hours.',
+      data: {
+        reference: publicReference,
+        status: 'AWAITING_REVIEW',
+        topic: data.topic,
+        createdAt: now,
+      },
     };
   }
 
@@ -1562,16 +1666,17 @@ export class ConsultationService {
   private buildRazorpayOptions(
     request: ConsultationRequestEntity,
     payment: ConsultationPaymentEntity,
-    consultant: ConsultantEntity
+    consultant: ConsultantEntity | null
   ) {
     const razorpayKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_hutty2026mock';
+    const expertName = consultant ? consultant.name : 'Hutty Expert Desk';
     return {
       orderId: payment.gatewayOrderId,
       amount: CONSULTATION_PRICE_PAISE,
       currency: CONSULTATION_CURRENCY,
       keyId: razorpayKeyId,
       name: 'Hutty Residential Planning',
-      description: `Expert Consultation with ${consultant.name} (Ref: ${request.publicReference})`,
+      description: `Expert Consultation with ${expertName} (Ref: ${request.publicReference})`,
       prefill: {
         name: request.homeownerName,
         email: request.homeownerEmail,

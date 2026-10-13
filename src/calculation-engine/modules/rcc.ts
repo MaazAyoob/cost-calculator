@@ -108,7 +108,7 @@ export function calculateRCC(input: EngineInput, area: AreaResult): RCCQuantitie
   if (concreteMethod === 'GEOMETRY_GRID') {
     // Structural geometry model based on column grid
     const floors = Math.max(1, input.floors || 1);
-    const footprintArea = area.buildableFootprintSqFt || area.buaPerFloorSqFt || (bua / floors);
+    const footprintArea = area.buaPerFloorSqFt || (bua / floors);
     const columnCount = Math.max(8, Math.round(footprintArea / 135));
     const footingVolEach = 1.5 * 1.5 * 0.45; // ~1.01 m³ each
     footingConcreteCuM = parseFloat(Math.max(minFooting, columnCount * footingVolEach).toFixed(2));
