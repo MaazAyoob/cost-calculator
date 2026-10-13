@@ -70,6 +70,22 @@ $$\text{Total Item Cost} = \text{Physical Quantity (Engine Output)} \times \text
   3. Promotes the Draft version to `status = 'ACTIVE'`.
   4. Automatically notifies the customer-facing calculation engine to sync the new active parameters.
 
+### 1.8 Accessing & Authenticating into the Admin Panel
+- **Production URL**:
+  - Render Frontend: [https://hutty-frontend.onrender.com/admin](https://hutty-frontend.onrender.com/admin)
+  - Vercel Frontend: [https://cost-calculator-ten-kappa.vercel.app/admin](https://cost-calculator-ten-kappa.vercel.app/admin)
+  - Custom Domain: [https://hutty.in/admin](https://hutty.in/admin)
+- **Local Development URL**: `http://localhost:5173/admin` (or `http://localhost:3000/admin`)
+- **Default System Admin Credentials**:
+  - **Admin Email**: `admin@hutty.in` (or `admin@costcalculator.app`)
+  - **Initial Password**: `Admin@123456`
+- **Render Static Site Routing Requirement**:
+  Because the frontend is a Single Page Application (SPA), direct navigation or page refresh on `/admin` requires an SPA rewrite rule in Render Static Site settings:
+  - **Source**: `/*`
+  - **Destination**: `/index.html`
+  - **Action**: `Rewrite`
+  This configuration is defined declaratively in `render.yaml` and can be confirmed under the Render service **Redirects/Rewrites** tab.
+
 ---
 
 ## 2. ADMIN PANEL OVERVIEW & NAVIGATION

@@ -128,6 +128,16 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'admin/*',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <AdminPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
         path: 'consult',
         element: (
           <ErrorBoundary>

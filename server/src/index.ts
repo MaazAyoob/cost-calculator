@@ -25,12 +25,14 @@ app.use(
         return callback(null, true);
       }
 
-      // Explicitly allow Hutty production domains, Vercel frontend, and configured origins
+      // Explicitly allow Hutty production domains, Vercel frontend, Render frontend, and configured origins
       const isAllowedDomain =
         origin === 'https://hutty.in' ||
         origin === 'https://www.hutty.in' ||
         origin === 'https://cost-calculator-ten-kappa.vercel.app' ||
         origin.endsWith('.vercel.app') ||
+        origin === 'https://hutty-frontend.onrender.com' ||
+        origin.endsWith('.onrender.com') ||
         configuredOrigins.includes(origin);
 
       if (isAllowedDomain) {

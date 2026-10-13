@@ -1,0 +1,19 @@
+# Render Blueprint Configuration for Hutty Cost Calculator
+# Spec: https://render.com/docs/blueprint-spec
+
+services:
+  # Hutty Frontend Single Page Application (Static Site)
+  - type: web
+    name: hutty-frontend
+    runtime: static
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://hutty-api-st46.onrender.com
+    routes:
+      # Single Page Application (SPA) client-side rewrite rule:
+      # Ensures routes such as /admin, /planner, /pricing, etc. serve /index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -4,7 +4,7 @@
 
 /**
  * Resolves the API base URL cleanly across environments:
- * - Production: Defaults to 'https://hutty-api.onrender.com' (or VITE_API_BASE_URL if set in Vercel)
+ * - Production: Defaults to 'https://hutty-api-st46.onrender.com' (or VITE_API_BASE_URL if set in Render/Vercel)
  * - Development: Defaults to '' (using Vite reverse proxy to localhost:4000) unless VITE_API_BASE_URL is specified
  */
 function resolveApiBaseUrl(): string {
@@ -19,7 +19,7 @@ function resolveApiBaseUrl(): string {
     }
     return clean;
   }
-  return metaEnv.PROD ? 'https://hutty-api.onrender.com' : (metaEnv.DEV ? '' : 'https://hutty-api.onrender.com');
+  return metaEnv.PROD ? 'https://hutty-api-st46.onrender.com' : (metaEnv.DEV ? '' : 'https://hutty-api-st46.onrender.com');
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();
@@ -29,7 +29,7 @@ export const API_BASE_URL = resolveApiBaseUrl();
  * Prevents double slashes and accidental '/api/v1/api/v1' duplications.
  *
  * @param endpoint - e.g. '/api/v1/health', '/api/v1/auth/login'
- * @returns Complete URL e.g. 'https://hutty-api.onrender.com/api/v1/health'
+ * @returns Complete URL e.g. 'https://hutty-api-st46.onrender.com/api/v1/health'
  */
 export function getApiUrl(endpoint: string): string {
   let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;

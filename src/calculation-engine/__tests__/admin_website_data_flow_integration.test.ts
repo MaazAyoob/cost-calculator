@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 import { runCalculator } from '../calculator';
 import { rateService } from '../data/rateService';
 import { configResolver } from '../config/configurationResolver';
@@ -478,5 +480,39 @@ describe('Admin Panel to Customer Website Full Data-Flow Integration Suite', () 
     expect(result.boq.length).toBeGreaterThan(0);
     expect(result.quantities.steelTonnes).toBeGreaterThan(0);
     expect(result.quantities.cementBags).toBeGreaterThan(0);
+  });
+
+  // ── 17. Production Deployment & Render Static Site SPA Routing Integrity ──
+  it('17. Verifies Render SPA rewrite rules, production backend URL, and admin route configuration', () => {
+    // A. Verify render.yaml contains the required SPA rewrite rule
+    const renderYamlPath = path.resolve(__dirname, '../../../render.yaml');
+    expect(fs.existsSync(renderYamlPath)).toBe(true);
+    const renderYamlContent = fs.readFileSync(renderYamlPath, 'utf8');
+    expect(renderYamlContent).toContain('name: hutty-frontend');
+    expect(renderYamlContent).toContain('runtime: static');
+    expect(renderYamlContent).toContain('source: /*');
+    expect(renderYamlContent).toContain('destination: /index.html');
+    expect(renderYamlContent).toContain('type: rewrite');
+    expect(renderYamlContent).toContain('https://hutty-api-st46.onrender.com');
+
+    // B. Verify .env.production targets the active backend service
+    const envProdPath = path.resolve(__dirname, '../../../.env.production');
+    expect(fs.existsSync(envProdPath)).toBe(true);
+    const envProdContent = fs.readFileSync(envProdPath, 'utf8');
+    expect(envProdContent).toContain('VITE_API_BASE_URL=https://hutty-api-st46.onrender.com');
+
+    // C. Verify router.tsx configures admin routes
+    const routerPath = path.resolve(__dirname, '../../app/router.tsx');
+    expect(fs.existsSync(routerPath)).toBe(true);
+    const routerContent = fs.readFileSync(routerPath, 'utf8');
+    expect(routerContent).toContain("path: 'admin'");
+    expect(routerContent).toContain("path: 'admin/*'");
+
+    // D. Verify server CORS allows Render frontend origin
+    const serverIndexPath = path.resolve(__dirname, '../../../server/src/index.ts');
+    expect(fs.existsSync(serverIndexPath)).toBe(true);
+    const serverIndexContent = fs.readFileSync(serverIndexPath, 'utf8');
+    expect(serverIndexContent).toContain("'https://hutty-frontend.onrender.com'");
+    expect(serverIndexContent).toContain("origin.endsWith('.onrender.com')");
   });
 });

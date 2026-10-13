@@ -153,6 +153,13 @@ export const WebsiteFooter: React.FC = () => {
               <span>Privacy Policy</span>
               <span>Terms of Service</span>
               <span>Transparent Quantity Estimation</span>
+              <button
+                onClick={() => navigate('/admin')}
+                className="hover:text-white/90 transition-colors cursor-pointer text-white/40 hover:underline"
+                aria-label="Admin Portal"
+              >
+                Admin Portal
+              </button>
             </div>
           </div>
         </div>
