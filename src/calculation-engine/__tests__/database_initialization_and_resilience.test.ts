@@ -214,6 +214,22 @@ describe('Production Database Initialization & Resilience Suite', () => {
       expect(pkg.scripts['db:seed']).toBe('ts-node prisma/seed.ts');
       expect(pkg.scripts['db:check']).toBe('ts-node prisma/checkDb.ts');
       expect(pkg.scripts['db:init']).toBe('prisma db push && ts-node prisma/seed.ts');
+      expect(pkg.scripts['db:init:verify']).toBe('ts-node prisma/initAndVerify.ts');
+
+      // Runtime dependency assurance for Render worker/job execution
+      expect(pkg.dependencies['ts-node']).toBeDefined();
+      expect(pkg.dependencies['typescript']).toBeDefined();
+      expect(pkg.dependencies['prisma']).toBeDefined();
+    });
+
+    it('verifies initAndVerify script orchestrates push, seed, and diagnostic checks non-destructively', () => {
+      const initPath = path.resolve(__dirname, '../../../server/prisma/initAndVerify.ts');
+      expect(fs.existsSync(initPath)).toBe(true);
+      const initContent = fs.readFileSync(initPath, 'utf8');
+
+      expect(initContent).toContain('npx prisma db push --skip-generate');
+      expect(initContent).toContain('runSeed(');
+      expect(initContent).toContain('checkDatabase(');
     });
 
     it('verifies seed script idempotency: handles upsert safely without destructive calls', () => {

@@ -10,7 +10,7 @@
 
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const defaultPrisma = new PrismaClient();
 
 function getSanitizedDbUrl(): string {
   const url = process.env.DATABASE_URL;
@@ -23,7 +23,9 @@ function getSanitizedDbUrl(): string {
   }
 }
 
-async function checkDatabase() {
+export async function checkDatabase(client?: PrismaClient): Promise<boolean> {
+  const prisma = client || defaultPrisma;
+
   console.log('════════════════════════════════════════════════════════════════');
   console.log(' Hutty Production Database Diagnostic Check');
   console.log('════════════════════════════════════════════════════════════════');
@@ -33,7 +35,7 @@ async function checkDatabase() {
 
   if (!process.env.DATABASE_URL) {
     console.error('❌ CRITICAL: DATABASE_URL environment variable is missing.');
-    process.exit(1);
+    return false;
   }
 
   try {
@@ -43,7 +45,7 @@ async function checkDatabase() {
   } catch (connErr: any) {
     console.error('❌ PostgreSQL Connection Failed:');
     console.error(`   Message: ${connErr.message}`);
-    process.exit(1);
+    return false;
   }
 
   let allHealthy = true;
@@ -82,21 +84,26 @@ async function checkDatabase() {
   if (allHealthy) {
     console.log('🎉 SUCCESS: All required tables exist and are accessible.');
     console.log('════════════════════════════════════════════════════════════════');
-    process.exit(0);
+    return true;
   } else {
     console.error('🚨 SCHEMA INCOMPLETE: One or more tables are missing.');
     console.error('   Action required: Run "npx prisma db push" to initialize the database schema,');
     console.error('   followed by "npm run db:seed" to populate reference records.');
     console.log('════════════════════════════════════════════════════════════════');
-    process.exit(1);
+    return false;
   }
 }
 
-checkDatabase()
-  .catch((e) => {
-    console.error('Diagnostic error:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (require.main === module) {
+  checkDatabase()
+    .then((healthy) => {
+      process.exit(healthy ? 0 : 1);
+    })
+    .catch((e) => {
+      console.error('Diagnostic error:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await defaultPrisma.$disconnect();
+    });
+}

@@ -8,7 +8,7 @@ Hutty Cost Calculator is a full-stack SaaS platform built with:
 - **Frontend**: Vite + React 19 + TypeScript + Tailwind v4 (Deployed on **Vercel** / **Netlify**)
 - **Backend API Engine**: Express.js + TypeScript + Node.js 20 + Prisma 5.22 (Deployed on **Render** / **Railway**)
 - **Database**: PostgreSQL (Provisioned on **Render PostgreSQL** / **Supabase** / **Neon**)
-- **Cache / Storage**: In-memory with durable PostgreSQL storage authority
+- **Persistence Authority**: PostgreSQL durable storage with in-memory transient fallback (which fails closed for purchases in production)
 
 **Live Backend Deployment:**
 - **Render Web Service URL:** `https://hutty-api-st46.onrender.com`
@@ -38,86 +38,95 @@ Configure these environment variables in your **Render Service Settings > Enviro
 
 ---
 
-## 🚀 Render Backend Deployment & One-Time Database Initialization
+## 🚀 Non-Interactive Production Database Initialization on Render
 
-### 1. Build and Start Commands
-In Render Dashboard under your Web Service (`hutty-api-st46`):
-- **Root Directory:** `server`
-- **Build Command:**
-  ```bash
-  npm install && npm run build
-  ```
-  *(This generates the Prisma Client and compiles TypeScript into `dist/`)*
-- **Start Command:**
-  ```bash
-  npm run start
-  ```
-  *(Runs `node dist/index.js` cleanly. `db push` is intentionally decoupled from container startup to avoid slow boots and concurrency races on autoscale).*
+Because Render Free/Starter Web Services do not provide an interactive Shell terminal, the repository provides an automated, non-interactive initialization pipeline:
 
----
-
-### 2. One-Time Database Schema Push & Seed Workflow
-
-Because this project does not maintain incremental migration history folders (`prisma/migrations`), the safest, non-destructive method to synchronize PostgreSQL with `schema.prisma` is `prisma db push`.
-
-#### Option A: Via Render Web Shell (Recommended)
-1. Go to your Render Dashboard > Select your Web Service (`hutty-api-st46`).
-2. Click the **Shell** tab in the left-hand navigation to open an interactive terminal.
-3. Push the schema to your PostgreSQL database (creates all 23 models / 31 tables non-destructively):
-   ```bash
-   npx prisma db push
-   ```
-4. Seed the initial reference records (Admin users, Material Categories, Pricing Tiers, Consultants, Baseline Config v1.0.0):
-   ```bash
-   npm run db:seed
-   ```
-5. Run the safe diagnostic check to verify table health:
-   ```bash
-   npm run db:check
-   ```
-
-#### Option B: Via Render Pre-Deploy Command
-Render supports executing a command before a new deployment goes live:
-1. In Render Dashboard > Web Service > **Settings** > **Build & Deploy**.
-2. Set **Pre-Deploy Command** to:
-   ```bash
-   npx prisma db push && npm run db:seed
-   ```
-3. Save changes. On every new commit deployment, Render will push schema updates and run the idempotent seed script before activating the new build.
-
----
-
-### 3. Verification & Acceptance Check
-
-Once the database has been pushed and seeded, verify live health:
-
-#### A. Diagnostic Script Output (via Shell)
-Running `npm run db:check` will report:
-```text
-════════════════════════════════════════════════════════════════
- Hutty Production Database Diagnostic Check
-════════════════════════════════════════════════════════════════
-1. Testing PostgreSQL TCP & authentication handshake...
-   ✅ Connection established successfully.
-2. Verifying critical schema tables and reference data:
-   ✅ Table "pricing_tiers": OK (5 records)
-   ✅ Table "consultants": OK (7 records)
-   ✅ Table "users": OK (3 records)
-   ✅ Table "material_categories": OK (8 records)
-   ✅ Table "calculation_config_versions": OK (1 records)
-   ✅ Table "calculation_config_parameters": OK (15 records)
-   ✅ Table "pricing_purchases": OK (0 records)
-   ✅ Table "user_entitlements": OK (0 records)
-----------------------------------------------------------------
-🎉 SUCCESS: All required tables exist and are accessible.
+```bash
+npm run db:init:verify
 ```
 
-#### B. Public Health Endpoint Check
-Visit the public health endpoint in your browser or curl:
+### What `npm run db:init:verify` executes automatically:
+1. **Schema Synchronization**: Runs `npx prisma db push --skip-generate` to inspect the database and add missing tables and indexes non-destructively without dropping tables or resetting data.
+2. **Idempotent Seed**: Runs `runSeed()` to populate default admin accounts (`admin@costcalculator.app`, `admin@hutty.in`), client account, 8 material categories, the 5 commercial pricing tiers, 7 expert consultants, baseline calculation config `v1.0.0`, and canonical parameters using Prisma `upsert`.
+3. **Comprehensive Diagnostic Check**: Runs `checkDatabase()` to verify that all 8 critical tables exist and have valid records. Exits with code `0` only when all checks pass.
+
+---
+
+### Method A: Via Render Pre-Deploy Command (Recommended — Zero Extra Services)
+
+Render Web Services support a **Pre-Deploy Command** on all tiers (including Free instances). The pre-deploy command runs in an ephemeral container with the service's private `DATABASE_URL` attached before traffic switches to the new build.
+
+1. Go to **[Render Dashboard](https://dashboard.render.com)**.
+2. Select your Web Service: **`hutty-api-st46`**.
+3. In the left navigation menu, click **Settings**.
+4. Scroll to **Build & Deploy** > locate **Pre-Deploy Command**.
+5. Set the **Pre-Deploy Command** to:
+   ```bash
+   npm run db:init:verify
+   ```
+6. Click **Save Changes**.
+7. In the top-right corner, click **Manual Deploy** > **Clear build cache & deploy**.
+8. In the deployment logs, you will observe the 3-step pipeline execute, print all green checkmarks, and exit with code 0. Once completed, Render automatically starts the web service!
+
+---
+
+### Method B: Via Dedicated Render One-off Job / Temporary Background Worker
+
+If you prefer to initialize the database using a dedicated standalone service:
+
+1. In Render Dashboard, click the blue **New +** button in the top navigation bar.
+2. Select **Background Worker** (or **Cron Job** with schedule `0 0 31 2 *` for manual run).
+3. Connect repository: `MaazAyoob/cost-calculator`, branch `main`.
+4. Configure the service settings:
+   - **Name**: `hutty-db-init-worker`
+   - **Root Directory**: `server`
+   - **Runtime**: `Node`
+   - **Build Command**:
+     ```bash
+     npm install && npm run build
+     ```
+   - **Start Command**:
+     ```bash
+     npm run db:init:verify
+     ```
+5. In **Environment Variables**, add:
+   - `DATABASE_URL` = *(Your Render PostgreSQL connection string, matching `hutty-api-st46`)*
+   - `NODE_ENV` = `production`
+6. Click **Create Background Worker**.
+7. Render will build the container, execute `npm run db:init:verify`, and display the diagnostic log output in the Worker's **Logs** tab:
+   ```text
+   ╔══════════════════════════════════════════════════════════════╗
+   ║  Hutty Production Database Safe Initialization & Verification ║
+   ╚══════════════════════════════════════════════════════════════╝
+   [Step 1/3] Synchronizing PostgreSQL schema via Prisma db push...
+   ✅ Schema synchronization completed successfully.
+   [Step 2/3] Seeding essential reference data idempotently...
+   ✅ Idempotent seed completed successfully.
+   [Step 3/3] Running database diagnostic verification...
+      ✅ Table "pricing_tiers": OK (5 records)
+      ✅ Table "consultants": OK (7 records)
+      ✅ Table "users": OK (3 records)
+      ✅ Table "material_categories": OK (8 records)
+      ✅ Table "calculation_config_versions": OK (1 records)
+      ✅ Table "calculation_config_parameters": OK (15 records)
+      ✅ Table "pricing_purchases": OK (0 records)
+      ✅ Table "user_entitlements": OK (0 records)
+   🎉 INITIALIZATION COMPLETE: Database is fully provisioned & verified.
+   ```
+8. **Teardown**: Once the log confirms completion, click **Settings** > **Delete Worker** (or **Suspend Worker**) so no background resources remain active.
+
+---
+
+## 3. Public Health Verification Check
+
+After running Method A or Method B, verify that the live backend recognizes the PostgreSQL persistence:
+
 ```bash
 curl https://hutty-api-st46.onrender.com/api/v1/health
 ```
-**Expected Production Response:**
+
+**Expected JSON Response:**
 ```json
 {
   "status": "online",
@@ -131,13 +140,14 @@ curl https://hutty-api-st46.onrender.com/api/v1/health
   "timestamp": "2026-10-13T..."
 }
 ```
-*(Notice `mode` transitions from `IN_MEMORY_TRANSIENT` to `POSTGRESQL_DURABLE`, and `databaseConnected` is `true`).*
+
+When `mode` is `"POSTGRESQL_DURABLE"` and `databaseConnected` is `true`, PostgreSQL persistence is active and purchases are fully protected.
 
 ---
 
-## 🛡️ Database Safety Rules
+## 🛡️ Database Safety Invariants
 
-- **Zero Data Loss**: NEVER run `npx prisma migrate reset` in production (this drops the database).
-- **Non-Destructive Operations**: `prisma db push` inspects the live schema and adds missing tables and indexes without dropping existing populated tables or records.
-- **Strict Idempotency**: `npm run db:seed` uses Prisma `upsert` exclusively. Running it multiple times will never duplicate pricing tiers, consultants, or users.
-- **Fail-Closed Security**: In `production` (`NODE_ENV=production`), payment order creation fails closed if PostgreSQL is unreachable (`DURABLE_STORAGE_UNAVAILABLE`), preventing unrecorded financial transactions.
+- **Non-Destructive**: `prisma db push` inspects the live schema and adds missing tables and indexes without dropping existing populated tables or records.
+- **Strict Idempotency**: All seed operations use Prisma `upsert`. Running the command repeatedly will never create duplicate records or alter existing IDs.
+- **Decoupled Server Boot**: `server/Dockerfile` and `npm start` execute `node dist/index.js` directly, preventing `db push` from running on every server restart or autoscale event.
+- **No In-Memory Data Loss**: In production (`NODE_ENV=production`), payment order creation fails closed if PostgreSQL is unreachable (`DURABLE_STORAGE_UNAVAILABLE`), preventing unrecorded transactions.

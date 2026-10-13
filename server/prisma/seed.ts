@@ -22,9 +22,10 @@ import {
   CANONICAL_CONFIG_PARAMETERS,
 } from '../src/constants/canonicalConfig';
 
-const prisma = new PrismaClient();
+const defaultPrisma = new PrismaClient();
 
-async function seed() {
+export async function runSeed(client?: PrismaClient) {
+  const prisma = client || defaultPrisma;
   console.log('[Seed] Starting Hutty production database seed...');
 
   // 1. Default Admin Users
@@ -251,11 +252,13 @@ async function seed() {
   console.log('[Seed] Database seed completed successfully!');
 }
 
-seed()
-  .catch((e) => {
-    console.error('[Seed Error]', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (require.main === module) {
+  runSeed()
+    .catch((e) => {
+      console.error('[Seed Error]', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await defaultPrisma.$disconnect();
+    });
+}
