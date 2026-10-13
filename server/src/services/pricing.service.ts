@@ -122,31 +122,32 @@ export class PricingService {
   private async syncSeedsToPrisma() {
     if (!this.prisma) return;
     try {
-      const count = await (this.prisma as any).pricingTier.count();
-      this.dbConnected = true;
-      if (count === 0) {
-        for (const t of this.inMemoryTiers) {
-          await (this.prisma as any).pricingTier.create({
-            data: {
-              id: t.id,
-              code: t.code,
-              name: t.name,
-              description: t.description,
-              priceMinorUnits: t.priceMinorUnits,
-              currency: t.currency,
-              active: t.active,
-              purchasable: t.purchasable,
-              sortOrder: t.sortOrder,
-              badge: t.badge,
-              features: t.features,
-            },
-          });
-        }
+      for (const t of this.inMemoryTiers) {
+        await (this.prisma as any).pricingTier.upsert({
+          where: { code: t.code },
+          update: {},
+          create: {
+            id: t.id,
+            code: t.code,
+            name: t.name,
+            description: t.description,
+            priceMinorUnits: t.priceMinorUnits,
+            currency: t.currency,
+            active: t.active,
+            purchasable: t.purchasable,
+            sortOrder: t.sortOrder,
+            badge: t.badge,
+            features: t.features,
+          },
+        });
       }
+      this.dbConnected = true;
+      console.log('[PricingService] PostgreSQL pricing tiers verified and synchronized.');
     } catch (err: any) {
       this.dbConnected = false;
       if (process.env.NODE_ENV === 'production') {
         console.error('[PricingService] CRITICAL: PostgreSQL connection failed in production:', err.message);
+        console.error('[PricingService] Ensure DATABASE_URL is reachable and database schema has been pushed via "npx prisma db push".');
       }
     }
   }

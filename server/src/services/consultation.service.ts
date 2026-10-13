@@ -103,7 +103,7 @@ export interface ConsultationEventEntity {
 }
 
 // Initial Curated Seed Consultants (Real architectural and structural profiles for Hutty Bangalore)
-const INITIAL_CONSULTANTS: ConsultantEntity[] = [
+export const INITIAL_CONSULTANTS: ConsultantEntity[] = [
   {
     id: 'cons-ar-ramesh',
     slug: 'ar-ramesh-nambiar',
@@ -793,6 +793,10 @@ export class ConsultationService {
           }),
         ]);
       } catch (err: any) {
+        if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+          console.error('[ConsultationService] CRITICAL: PostgreSQL transaction create failed in production:', err.message);
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to record consultation booking in database: ' + err.message);
+        }
         console.warn('[ConsultationService] Prisma transaction create failed, using in-memory:', err.message);
       }
     }
@@ -887,6 +891,10 @@ export class ConsultationService {
           },
         });
       } catch (err: any) {
+        if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+          console.error('[ConsultationService] CRITICAL: PostgreSQL enquiry create failed in production:', err.message);
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to record general enquiry in database: ' + err.message);
+        }
         console.warn('[ConsultationService] Prisma enquiry create failed, using in-memory:', err.message);
       }
     }
@@ -1036,6 +1044,10 @@ export class ConsultationService {
           }),
         ]);
       } catch (err: any) {
+        if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+          console.error('[ConsultationService] CRITICAL: PostgreSQL transaction verifyPayment failed in production:', err.message);
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to confirm consultation payment in database: ' + err.message);
+        }
         console.warn('[ConsultationService] Prisma transaction verifyPayment failed, updating in-memory:', err.message);
       }
     }

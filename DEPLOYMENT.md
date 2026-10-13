@@ -1,74 +1,143 @@
-# Cost Calculator – Cloud Deployment & Architecture Guide
+# Hutty Cost Calculator — Cloud Deployment & Database Initialization Guide
 
 ---
 
 ## 🏗 System Architecture Overview
 
-Cost Calculator is an enterprise-grade SaaS platform built with:
+Hutty Cost Calculator is a full-stack SaaS platform built with:
 - **Frontend**: Vite + React 19 + TypeScript + Tailwind v4 (Deployed on **Vercel** / **Netlify**)
-- **Backend API**: Express.js + TypeScript + Node.js (Deployed on **Railway** / **Render**)
-- **Database**: PostgreSQL with Prisma ORM (Provisioned on **Supabase** / **Neon**)
-- **Caching**: Redis (Provisioned on **Upstash**)
+- **Backend API Engine**: Express.js + TypeScript + Node.js 20 + Prisma 5.22 (Deployed on **Render** / **Railway**)
+- **Database**: PostgreSQL (Provisioned on **Render PostgreSQL** / **Supabase** / **Neon**)
+- **Cache / Storage**: In-memory with durable PostgreSQL storage authority
+
+**Live Backend Deployment:**
+- **Render Web Service URL:** `https://hutty-api-st46.onrender.com`
+- **Health & Diagnostic Endpoint:** `https://hutty-api-st46.onrender.com/api/v1/health`
 
 ---
 
 ## 🌐 Environment Variables Matrix
 
-### Frontend (`/.env`)
-```env
-VITE_API_URL=https://api.costcalculator.app/api/v1
-VITE_APP_NAME=Cost Calculator
-```
+### Backend (`/server` on Render)
+Configure these environment variables in your **Render Service Settings > Environment Variables**:
 
-### Backend (`/server/.env`)
-```env
-PORT=4000
-NODE_ENV=production
-DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres
-JWT_SECRET=super-secret-production-jwt-key-cost-calculator-2026
-JWT_EXPIRES_IN=7d
-CORS_ORIGIN=https://costcalculator.app
-```
+| Variable | Description | Example / Recommended Value |
+|---|---|---|
+| `NODE_ENV` | Environment mode | `production` |
+| `PORT` | HTTP Port for Express server | `4000` (or leave default on Render) |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:password@dpg-...-a.oregon-postgres.render.com/dbname` (Use internal connection string if DB is on Render) |
+| `JWT_SECRET` | Secret key for signing admin/user tokens | Secure random 64-character string |
+| `JWT_EXPIRES_IN` | Token validity duration | `7d` |
+| `CORS_ORIGIN` | Allowed web domains | `https://hutty.in,https://www.hutty.in,https://cost-calculator-ten-kappa.vercel.app` |
+| `FRONTEND_URL` | Customer portal URL | `https://hutty.in` |
+| `RAZORPAY_KEY_ID` | Razorpay API key ID | `rzp_live_...` (or test key `rzp_test_...`) |
+| `RAZORPAY_KEY_SECRET` | Razorpay secret | Kept in Render secrets |
+| `RAZORPAY_WEBHOOK_SECRET` | Razorpay webhook verification | Kept in Render secrets |
+
+> **SAFETY NOTE:** Never commit real database credentials or API secrets to Git.
 
 ---
 
-## 🚀 Step-by-Step Production Deployment
+## 🚀 Render Backend Deployment & One-Time Database Initialization
 
-### 1. Database Provisioning (Supabase / Neon)
-1. Create a new PostgreSQL instance on [Supabase](https://supabase.com) or [Neon](https://neon.tech).
-2. Copy the connection string `DATABASE_URL`.
-3. Run migrations and seed script from terminal:
+### 1. Build and Start Commands
+In Render Dashboard under your Web Service (`hutty-api-st46`):
+- **Root Directory:** `server`
+- **Build Command:**
+  ```bash
+  npm install && npm run build
+  ```
+  *(This generates the Prisma Client and compiles TypeScript into `dist/`)*
+- **Start Command:**
+  ```bash
+  npm run start
+  ```
+  *(Runs `node dist/index.js` cleanly. `db push` is intentionally decoupled from container startup to avoid slow boots and concurrency races on autoscale).*
+
+---
+
+### 2. One-Time Database Schema Push & Seed Workflow
+
+Because this project does not maintain incremental migration history folders (`prisma/migrations`), the safest, non-destructive method to synchronize PostgreSQL with `schema.prisma` is `prisma db push`.
+
+#### Option A: Via Render Web Shell (Recommended)
+1. Go to your Render Dashboard > Select your Web Service (`hutty-api-st46`).
+2. Click the **Shell** tab in the left-hand navigation to open an interactive terminal.
+3. Push the schema to your PostgreSQL database (creates all 23 models / 31 tables non-destructively):
    ```bash
-   cd server
    npx prisma db push
-   npm run prisma:seed
+   ```
+4. Seed the initial reference records (Admin users, Material Categories, Pricing Tiers, Consultants, Baseline Config v1.0.0):
+   ```bash
+   npm run db:seed
+   ```
+5. Run the safe diagnostic check to verify table health:
+   ```bash
+   npm run db:check
    ```
 
-### 2. Backend API Deployment (Railway / Render)
-1. Connect your repository to Railway or Render.
-2. Set Root Directory to `server`.
-3. Configure Build Command:
+#### Option B: Via Render Pre-Deploy Command
+Render supports executing a command before a new deployment goes live:
+1. In Render Dashboard > Web Service > **Settings** > **Build & Deploy**.
+2. Set **Pre-Deploy Command** to:
    ```bash
-   npm install && npm run build
+   npx prisma db push && npm run db:seed
    ```
-4. Configure Start Command:
-   ```bash
-   npm run start
-   ```
-5. Add environment variables: `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`, `PORT=4000`, `CORS_ORIGIN`.
-
-### 3. Frontend Web App Deployment (Vercel)
-1. Import repository into Vercel dashboard.
-2. Framework Preset: **Vite**.
-3. Build Command: `npm run build`.
-4. Output Directory: `dist`.
-5. Set `VITE_API_URL` to your live Railway API URL (e.g. `https://api.costcalculator.app/api/v1`).
+3. Save changes. On every new commit deployment, Render will push schema updates and run the idempotent seed script before activating the new build.
 
 ---
 
-## 🔒 Security Best Practices Implemented
-- **JWT Authentication**: 7-day signed JWT tokens with bearer authentication.
-- **Role-Based Access Control**: Admin routes protected via `requireAdmin` middleware.
-- **Input Validation**: Zod validation schemas on auth and project inputs.
-- **Security Headers**: Helmet & CORS configured for strict origin control.
-- **Logging**: Morgan HTTP logger + Prisma audit trail logging.
+### 3. Verification & Acceptance Check
+
+Once the database has been pushed and seeded, verify live health:
+
+#### A. Diagnostic Script Output (via Shell)
+Running `npm run db:check` will report:
+```text
+════════════════════════════════════════════════════════════════
+ Hutty Production Database Diagnostic Check
+════════════════════════════════════════════════════════════════
+1. Testing PostgreSQL TCP & authentication handshake...
+   ✅ Connection established successfully.
+2. Verifying critical schema tables and reference data:
+   ✅ Table "pricing_tiers": OK (5 records)
+   ✅ Table "consultants": OK (7 records)
+   ✅ Table "users": OK (3 records)
+   ✅ Table "material_categories": OK (8 records)
+   ✅ Table "calculation_config_versions": OK (1 records)
+   ✅ Table "calculation_config_parameters": OK (15 records)
+   ✅ Table "pricing_purchases": OK (0 records)
+   ✅ Table "user_entitlements": OK (0 records)
+----------------------------------------------------------------
+🎉 SUCCESS: All required tables exist and are accessible.
+```
+
+#### B. Public Health Endpoint Check
+Visit the public health endpoint in your browser or curl:
+```bash
+curl https://hutty-api-st46.onrender.com/api/v1/health
+```
+**Expected Production Response:**
+```json
+{
+  "status": "online",
+  "platform": "Cost Calculator API Engine v1.0.0",
+  "database": {
+    "mode": "POSTGRESQL_DURABLE",
+    "databaseConnected": true,
+    "persistenceGuaranteed": true,
+    "warning": null
+  },
+  "timestamp": "2026-10-13T..."
+}
+```
+*(Notice `mode` transitions from `IN_MEMORY_TRANSIENT` to `POSTGRESQL_DURABLE`, and `databaseConnected` is `true`).*
+
+---
+
+## 🛡️ Database Safety Rules
+
+- **Zero Data Loss**: NEVER run `npx prisma migrate reset` in production (this drops the database).
+- **Non-Destructive Operations**: `prisma db push` inspects the live schema and adds missing tables and indexes without dropping existing populated tables or records.
+- **Strict Idempotency**: `npm run db:seed` uses Prisma `upsert` exclusively. Running it multiple times will never duplicate pricing tiers, consultants, or users.
+- **Fail-Closed Security**: In `production` (`NODE_ENV=production`), payment order creation fails closed if PostgreSQL is unreachable (`DURABLE_STORAGE_UNAVAILABLE`), preventing unrecorded financial transactions.
