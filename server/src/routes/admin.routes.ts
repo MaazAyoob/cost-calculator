@@ -40,7 +40,7 @@ router.get('/config', getCalculatorConfig);
 // Publicly recordable first-party calculator analytics events (failsafe non-blocking)
 router.post('/analytics/event', recordAnalyticsEvent);
 
-// Controlled one-time database initialization endpoint (protected by x-admin-key = JWT_SECRET or Admin JWT)
+// Controlled one-time database initialization endpoint (protected by dedicated DB_INIT_SECRET via x-init-key header)
 router.post('/db-init', handleAdminDbInit);
 
 // ── ADMIN RBAC PROTECTED ENDPOINTS ──

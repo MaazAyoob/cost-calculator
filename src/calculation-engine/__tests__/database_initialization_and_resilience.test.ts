@@ -259,16 +259,100 @@ describe('Production Database Initialization & Resilience Suite', () => {
       expect(fs.existsSync(controllerPath)).toBe(true);
       const controllerContent = fs.readFileSync(controllerPath, 'utf8');
 
-      // Verifies security header check
-      expect(controllerContent).toContain("req.headers['x-admin-key']");
+      // Verifies security header check and DB_INIT_SECRET usage (NOT JWT_SECRET)
+      expect(controllerContent).toContain('DB_INIT_SECRET');
+      expect(controllerContent).not.toContain('ENV.JWT_SECRET');
+      expect(controllerContent).toContain('secureTimingSafeCompare');
+      expect(controllerContent).toContain('timingSafeEqual');
       expect(controllerContent).toContain('403');
       expect(controllerContent).toContain('reconnectDatabase(');
+    });
+
+    it('verifies secureTimingSafeCompare evaluates constant-time equality without leaking secrets', async () => {
+      const { secureTimingSafeCompare } = await import(
+        '../../../server/src/controllers/adminDbInit.controller'
+      );
+
+      // Match
+      expect(secureTimingSafeCompare('my-secret-key-123', 'my-secret-key-123')).toBe(true);
+
+      // Mismatch
+      expect(secureTimingSafeCompare('my-secret-key-123', 'wrong-key-456')).toBe(false);
+
+      // Empty values
+      expect(secureTimingSafeCompare('', 'my-secret-key-123')).toBe(false);
+      expect(secureTimingSafeCompare('my-secret-key-123', '')).toBe(false);
+
+      // Length difference
+      expect(secureTimingSafeCompare('short', 'longer-secret-key')).toBe(false);
     });
 
     it('verifies PricingService exposes reconnectDatabase for on-demand synchronization', async () => {
       const pricingService = new PricingService();
       expect(typeof pricingService.reconnectDatabase).toBe('function');
     });
+
+    it('verifies handleAdminDbInit enforces 403 for missing DB_INIT_SECRET, missing header, and invalid key', async () => {
+      const { handleAdminDbInit } = await import(
+        '../../../server/src/controllers/adminDbInit.controller'
+      );
+      const { ENV } = await import('../../../server/src/config/env');
+
+      const createMockRes = () => {
+        const res: any = {};
+        res.status = vi.fn().mockReturnValue(res);
+        res.json = vi.fn().mockReturnValue(res);
+        return res;
+      };
+
+      const savedSecret = ENV.DB_INIT_SECRET;
+      const savedEnvVar = process.env.DB_INIT_SECRET;
+
+      try {
+        // Gate 1: DB_INIT_SECRET not configured on server -> 403
+        ENV.DB_INIT_SECRET = '';
+        delete process.env.DB_INIT_SECRET;
+        const res1 = createMockRes();
+        await handleAdminDbInit({ headers: { 'x-init-key': 'some-secret' }, ip: '127.0.0.1' } as any, res1);
+        expect(res1.status).toHaveBeenCalledWith(403);
+        expect(res1.json).toHaveBeenCalledWith(
+          expect.objectContaining({ error: expect.stringContaining('DB_INIT_SECRET environment variable is not configured') })
+        );
+
+        // Gate 2: DB_INIT_SECRET configured, but client header is missing -> 403
+        ENV.DB_INIT_SECRET = 'super-secret-init-key-999';
+        const res2 = createMockRes();
+        await handleAdminDbInit({ headers: {}, ip: '127.0.0.1' } as any, res2);
+        expect(res2.status).toHaveBeenCalledWith(403);
+        expect(res2.json).toHaveBeenCalledWith(
+          expect.objectContaining({ error: expect.stringContaining('Missing required database initialization key header') })
+        );
+
+        // Gate 3: Client provides wrong key -> 403
+        const res3 = createMockRes();
+        await handleAdminDbInit({ headers: { 'x-init-key': 'wrong-key-attempt' }, ip: '127.0.0.1' } as any, res3);
+        expect(res3.status).toHaveBeenCalledWith(403);
+        expect(res3.json).toHaveBeenCalledWith(
+          expect.objectContaining({ error: expect.stringContaining('Invalid database initialization credentials') })
+        );
+
+        // Gate 3b: Client attempts to use JWT_SECRET -> 403
+        const res4 = createMockRes();
+        await handleAdminDbInit({ headers: { 'x-init-key': ENV.JWT_SECRET }, ip: '127.0.0.1' } as any, res4);
+        expect(res4.status).toHaveBeenCalledWith(403);
+        expect(res4.json).toHaveBeenCalledWith(
+          expect.objectContaining({ error: expect.stringContaining('Invalid database initialization credentials') })
+        );
+      } finally {
+        ENV.DB_INIT_SECRET = savedSecret;
+        if (savedEnvVar) {
+          process.env.DB_INIT_SECRET = savedEnvVar;
+        } else {
+          delete process.env.DB_INIT_SECRET;
+        }
+      }
+    });
   });
 });
+
 
