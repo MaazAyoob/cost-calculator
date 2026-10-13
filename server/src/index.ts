@@ -90,10 +90,27 @@ if (fs.existsSync(clientDistPath)) {
 // Global Error Handler
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(ENV.PORT, () => {
-    console.log(`[Cost Calculator API Engine] Running at http://localhost:${ENV.PORT}/api/v1/health`);
-  });
+async function startServer() {
+  if (process.env.INIT_DB_ON_STARTUP === 'true') {
+    console.log('[Server Startup] INIT_DB_ON_STARTUP=true detected. Executing one-time database initialization...');
+    try {
+      const { runInitAndVerifyPipeline } = await import('./services/initDb.service');
+      const { pricingService } = await import('./services/pricing.service');
+      const result = await runInitAndVerifyPipeline();
+      console.log('[Server Startup] Database initialization finished with status:', result.success ? 'SUCCESS' : 'FAILED');
+      await pricingService.reconnectDatabase();
+    } catch (err: any) {
+      console.error('[Server Startup] Database initialization error:', err.message);
+    }
+  }
+
+  if (process.env.NODE_ENV !== 'test') {
+    app.listen(ENV.PORT, () => {
+      console.log(`[Cost Calculator API Engine] Running at http://localhost:${ENV.PORT}/api/v1/health`);
+    });
+  }
 }
+
+startServer();
 
 export default app;

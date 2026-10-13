@@ -27,6 +27,7 @@ import {
   getSecurityAuditLogs,
 } from '../controllers/account.controller';
 import { authenticateToken, requireAdmin } from '../middlewares/auth.middleware';
+import { handleAdminDbInit } from '../controllers/adminDbInit.controller';
 import configRoutes from './config.routes';
 
 const router = Router();
@@ -38,6 +39,9 @@ router.get('/config', getCalculatorConfig);
 
 // Publicly recordable first-party calculator analytics events (failsafe non-blocking)
 router.post('/analytics/event', recordAnalyticsEvent);
+
+// Controlled one-time database initialization endpoint (protected by x-admin-key = JWT_SECRET or Admin JWT)
+router.post('/db-init', handleAdminDbInit);
 
 // ── ADMIN RBAC PROTECTED ENDPOINTS ──
 router.use(authenticateToken as any);

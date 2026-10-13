@@ -156,6 +156,19 @@ export class PricingService {
     return this.dbConnected;
   }
 
+  public async reconnectDatabase(): Promise<boolean> {
+    if (!this.prisma) {
+      try {
+        this.prisma = new PrismaClient();
+      } catch {
+        this.dbConnected = false;
+        return false;
+      }
+    }
+    await this.syncSeedsToPrisma();
+    return this.dbConnected;
+  }
+
   public getPersistenceStatus(): {
     mode: 'POSTGRESQL_DURABLE' | 'IN_MEMORY_TRANSIENT';
     databaseConnected: boolean;

@@ -10,7 +10,12 @@
     "test": "vitest run",
     "preview": "vite preview",
     "server:build": "npm --prefix server run build",
-    "server:generate": "npm --prefix server run prisma:generate"
+    "server:generate": "npm --prefix server run prisma:generate",
+    "server:db:init:verify": "npm --prefix server run db:init:verify",
+    "db:init:verify": "npm --prefix server run db:init:verify",
+    "db:push": "npm --prefix server run db:push",
+    "db:seed": "npm --prefix server run db:seed",
+    "db:check": "npm --prefix server run db:check"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",

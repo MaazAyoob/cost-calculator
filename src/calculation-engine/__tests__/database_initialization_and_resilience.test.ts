@@ -226,22 +226,49 @@ describe('Production Database Initialization & Resilience Suite', () => {
       const initPath = path.resolve(__dirname, '../../../server/prisma/initAndVerify.ts');
       expect(fs.existsSync(initPath)).toBe(true);
       const initContent = fs.readFileSync(initPath, 'utf8');
+      expect(initContent).toContain('runInitAndVerifyPipeline');
 
-      expect(initContent).toContain('npx prisma db push --skip-generate');
-      expect(initContent).toContain('runSeed(');
-      expect(initContent).toContain('checkDatabase(');
+      const servicePath = path.resolve(__dirname, '../../../server/src/services/initDb.service.ts');
+      const serviceContent = fs.readFileSync(servicePath, 'utf8');
+      expect(serviceContent).toContain('npx prisma db push');
+      expect(serviceContent).toContain('runSeed(');
+      expect(serviceContent).toContain('checkDatabase(');
     });
 
     it('verifies seed script idempotency: handles upsert safely without destructive calls', () => {
       const seedPath = path.resolve(__dirname, '../../../server/prisma/seed.ts');
-      const seedContent = fs.readFileSync(seedPath, 'utf8');
+      const seedServicePath = path.resolve(__dirname, '../../../server/src/services/seed.service.ts');
+      expect(fs.existsSync(seedPath)).toBe(true);
+      expect(fs.existsSync(seedServicePath)).toBe(true);
+
+      const seedServiceContent = fs.readFileSync(seedServicePath, 'utf8');
 
       // Must use upsert
-      expect(seedContent).toContain('.upsert(');
+      expect(seedServiceContent).toContain('.upsert(');
       // Must not drop or truncate
-      expect(seedContent).not.toContain('DROP TABLE');
-      expect(seedContent).not.toContain('TRUNCATE');
-      expect(seedContent).not.toContain('migrate reset');
+      expect(seedServiceContent).not.toContain('DROP TABLE');
+      expect(seedServiceContent).not.toContain('TRUNCATE');
+      expect(seedServiceContent).not.toContain('migrate reset');
+    });
+
+    it('verifies initDb.service and adminDbInit controller structure and security guards', async () => {
+      const initServicePath = path.resolve(__dirname, '../../../server/src/services/initDb.service.ts');
+      expect(fs.existsSync(initServicePath)).toBe(true);
+
+      const controllerPath = path.resolve(__dirname, '../../../server/src/controllers/adminDbInit.controller.ts');
+      expect(fs.existsSync(controllerPath)).toBe(true);
+      const controllerContent = fs.readFileSync(controllerPath, 'utf8');
+
+      // Verifies security header check
+      expect(controllerContent).toContain("req.headers['x-admin-key']");
+      expect(controllerContent).toContain('403');
+      expect(controllerContent).toContain('reconnectDatabase(');
+    });
+
+    it('verifies PricingService exposes reconnectDatabase for on-demand synchronization', async () => {
+      const pricingService = new PricingService();
+      expect(typeof pricingService.reconnectDatabase).toBe('function');
     });
   });
 });
+
