@@ -702,7 +702,7 @@ export class ConsultationService {
         },
         orderNote: `Hutty Consultation with ${consultant ? consultant.name : 'Expert Desk'} (${publicReference})`,
         returnUrl: `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
-        notifyUrl: `${process.env.BACKEND_URL || ''}/api/v1/cashfree/webhook`,
+        notifyUrl: `${ENV.BACKEND_URL}/api/v1/cashfree/webhook`,
       });
       gatewayOrderId = cfOrder.orderId;
       cfPaymentSessionId = cfOrder.paymentSessionId;

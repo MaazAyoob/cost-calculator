@@ -21,12 +21,29 @@ describe('Hutty Cashfree Payment Gateway Integration Suite', () => {
   const mockAppId = 'CF_TEST_APP_ID_MOCK_2026';
   const mockSecretKey = 'cf_secret_key_mock_secure_hash_2026';
 
-  beforeEach(() => {
+    beforeEach(() => {
     vi.restoreAllMocks();
     process.env.CASHFREE_APP_ID = mockAppId;
     process.env.CASHFREE_SECRET_KEY = mockSecretKey;
     process.env.CASHFREE_WEBHOOK_SECRET = mockSecretKey;
     process.env.CASHFREE_ENV = 'TEST';
+
+    vi.spyOn(cashfreeService, 'createOrder').mockImplementation(async (params) => {
+      const orderId = params.orderId;
+      const paymentSessionId = `session_cf_valid_sandbox_${Date.now()}`;
+      return {
+        orderId,
+        order_id: orderId,
+        paymentSessionId,
+        payment_session_id: paymentSessionId,
+        cfOrderId: `cf_${Date.now()}`,
+        orderStatus: 'ACTIVE',
+        orderAmount: params.orderAmount,
+        currency: params.orderCurrency || 'INR',
+        environment: 'TEST',
+        gateway: 'CASHFREE',
+      };
+    });
   });
 
   afterEach(() => {

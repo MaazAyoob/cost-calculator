@@ -28,6 +28,23 @@ describe('Project Persistence & Purchase Resilience Regression Suite', () => {
     process.env.CASHFREE_SECRET_KEY = 'cf_secret_key_mock_hash';
     process.env.CASHFREE_WEBHOOK_SECRET = 'cf_secret_key_mock_hash';
     process.env.CASHFREE_ENV = 'TEST';
+
+    vi.spyOn(cashfreeService, 'createOrder').mockImplementation(async (params) => {
+      const orderId = params.orderId;
+      const paymentSessionId = `session_cf_mock_persistence_${Date.now()}`;
+      return {
+        orderId,
+        order_id: orderId,
+        paymentSessionId,
+        payment_session_id: paymentSessionId,
+        cfOrderId: `cf_${Date.now()}`,
+        orderStatus: 'ACTIVE',
+        orderAmount: params.orderAmount,
+        currency: params.orderCurrency || 'INR',
+        environment: 'TEST',
+        gateway: 'CASHFREE',
+      };
+    });
   });
 
   afterEach(() => {

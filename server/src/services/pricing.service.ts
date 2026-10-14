@@ -393,12 +393,14 @@ export class PricingService {
     requiresPayment: boolean;
     gatewayOrder: {
       orderId: string;
+      order_id?: string;
       amountMinorUnits: number;
       amountINR: number;
       currency: string;
       keyId: string;
       gateway: string;
       paymentSessionId?: string;
+      payment_session_id?: string;
       environment?: string;
     } | null;
   }> {
@@ -530,7 +532,7 @@ export class PricingService {
           },
           orderNote: `Hutty ${tier.name}`,
           returnUrl: `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
-          notifyUrl: `${process.env.BACKEND_URL || ''}/api/v1/cashfree/webhook`,
+          notifyUrl: `${ENV.BACKEND_URL}/api/v1/cashfree/webhook`,
         });
         gatewayOrderId = cfOrder.orderId;
         paymentSessionId = cfOrder.paymentSessionId;
@@ -604,13 +606,15 @@ export class PricingService {
       gatewayOrder: authoritativeAmountMinorUnits > 0
         ? {
             orderId: gatewayOrderId || `order_demo_${randomHex}`,
+            order_id: gatewayOrderId || `order_demo_${randomHex}`,
             amountMinorUnits: authoritativeAmountMinorUnits,
             amountINR: authoritativeAmountMinorUnits / 100,
             currency: tier.currency,
             keyId: chosenGateway === 'CASHFREE' ? cashfreeService.appId : (process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder'),
             gateway: chosenGateway,
             paymentSessionId,
-            environment: 'TEST',
+            payment_session_id: paymentSessionId,
+            environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
           }
         : null,
     };

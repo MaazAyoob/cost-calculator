@@ -29,7 +29,9 @@ export interface CashfreeCreateOrderInput {
 
 export interface CashfreeOrderResult {
   orderId: string;
+  order_id?: string;
   paymentSessionId: string;
+  payment_session_id?: string;
   cfOrderId?: string;
   orderStatus: string;
   orderAmount: number;
@@ -49,27 +51,40 @@ export interface CashfreePaymentVerificationResult {
 }
 
 export class CashfreeService {
-  private readonly baseUrl: string;
   private readonly apiVersion: string;
 
   constructor() {
-    // Strictly Sandbox / Test endpoint for Hutty test integration
-    // Do not switch to live payments
-    this.baseUrl = 'https://sandbox.cashfree.com/pg';
     this.apiVersion = ENV.CASHFREE_API_VERSION || '2023-08-01';
   }
 
+  public get baseUrl(): string {
+    const env = (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase();
+    if (env === 'PROD' || env === 'PRODUCTION') {
+      return 'https://api.cashfree.com/pg';
+    }
+    return 'https://sandbox.cashfree.com/pg';
+  }
+
   public get appId(): string {
-    return process.env.CASHFREE_APP_ID || process.env.CASHFREE_CLIENT_ID || ENV.CASHFREE_APP_ID || '';
+    return (
+      process.env.CASHFREE_APP_ID ||
+      process.env.CASHFREE_CLIENT_ID ||
+      process.env.CASHFREE_KEY_ID ||
+      process.env.CASHFREE_API_KEY ||
+      ENV.CASHFREE_APP_ID ||
+      ''
+    ).trim();
   }
 
   public get secretKey(): string {
     return (
       process.env.CASHFREE_SECRET_KEY ||
       process.env.CASHFREE_CLIENT_SECRET ||
+      process.env.CASHFREE_SECRET ||
+      process.env.CASHFREE_API_SECRET ||
       ENV.CASHFREE_SECRET_KEY ||
       ''
-    );
+    ).trim();
   }
 
   public get webhookSecret(): string {
@@ -95,43 +110,53 @@ export class CashfreeService {
   }
 
   /**
-   * Sanitizes customer phone for Cashfree requirements (10 digits).
+   * Sanitizes customer phone for Cashfree requirements (strictly 10 digits).
    */
   public sanitizePhone(phone?: string): string {
     if (!phone) return '9876543210';
     const digitsOnly = phone.replace(/\D/g, '');
     if (digitsOnly.length === 10) return digitsOnly;
     if (digitsOnly.length > 10) {
-      // If starts with 91 (India) and is 12 digits: e.g. 919876543210
       if (digitsOnly.startsWith('91') && digitsOnly.length === 12) {
         return digitsOnly.substring(2);
       }
       return digitsOnly.slice(-10);
     }
-    // Pad to 10 digits if shorter (for test leads)
     return digitsOnly.padStart(10, '9');
   }
 
   /**
-   * Sanitizes customer ID (alphanumeric, underscores, hyphens).
+   * Sanitizes customer ID (alphanumeric, underscores, hyphens, min 3 chars, max 50).
    */
   public sanitizeCustomerId(id?: string, email?: string): string {
+    let clean = '';
     if (id && id.trim()) {
-      return id.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+      clean = id.replace(/[^a-zA-Z0-9_-]/g, '_');
+    } else if (email && email.trim()) {
+      clean = email.replace(/[^a-zA-Z0-9_-]/g, '_');
+    } else {
+      clean = `cust_${Date.now()}`;
     }
-    if (email && email.trim()) {
-      return email.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+    if (clean.length < 3) {
+      clean = `cust_${clean}`;
     }
-    return `cust_${Date.now()}`;
+    return clean.substring(0, 50);
   }
 
   /**
    * Server-side order creation on Cashfree Sandbox.
    * Uses authoritative Hutty pricing passed from backend services.
+   * NEVER substitutes fake or dummy payment sessions.
    */
   public async createOrder(params: CashfreeCreateOrderInput): Promise<CashfreeOrderResult> {
     if (params.orderAmount <= 0) {
       throw new Error('Order amount must be greater than zero for payment gateway creation.');
+    }
+
+    if (!this.isConfigured()) {
+      throw new Error(
+        'CASHFREE_NOT_CONFIGURED: Cashfree payment gateway credentials (CASHFREE_APP_ID / CASHFREE_SECRET_KEY) are not configured on the backend server.'
+      );
     }
 
     const sanitizedPhone = this.sanitizePhone(params.customer.phone);
@@ -140,78 +165,71 @@ export class CashfreeService {
     const customerEmail = params.customer.email.trim() || 'customer@hutty.in';
     const currency = params.orderCurrency || 'INR';
 
-    // If Cashfree sandbox credentials are configured, execute real Cashfree Sandbox API call
-    if (this.isConfigured()) {
-      try {
-        const payload = {
-          order_id: params.orderId,
-          order_amount: Number(params.orderAmount.toFixed(2)),
-          order_currency: currency,
-          customer_details: {
-            customer_id: sanitizedCustomerId,
-            customer_name: customerName,
-            customer_email: customerEmail,
-            customer_phone: sanitizedPhone,
-          },
-          order_meta: {
-            return_url: params.returnUrl || `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
-            notify_url: params.notifyUrl,
-          },
-          order_note: params.orderNote || 'Hutty Order',
-        };
+    const orderMeta: Record<string, string> = {
+      return_url: params.returnUrl || `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
+    };
 
-        const res = await fetch(`${this.baseUrl}/orders`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-version': this.apiVersion,
-            'x-client-id': this.appId,
-            'x-client-secret': this.secretKey,
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`Cashfree Order API returned status ${res.status}: ${errText}`);
-        }
-
-        const data: any = await res.json();
-
-        return {
-          orderId: data.order_id || params.orderId,
-          paymentSessionId: data.payment_session_id,
-          cfOrderId: data.cf_order_id ? String(data.cf_order_id) : undefined,
-          orderStatus: data.order_status || 'ACTIVE',
-          orderAmount: data.order_amount || params.orderAmount,
-          currency: data.order_currency || currency,
-          environment: 'TEST',
-          gateway: 'CASHFREE',
-        };
-      } catch (err: any) {
-        console.warn('[CashfreeService] Real Sandbox API call failed, generating sandbox fallback order:', err.message);
-        // Fall back to deterministic test session for resilience in offline/mock testing
-        return {
-          orderId: params.orderId,
-          paymentSessionId: `session_sandbox_${params.orderId}`,
-          cfOrderId: `cf_sandbox_${params.orderId}`,
-          orderStatus: 'ACTIVE',
-          orderAmount: params.orderAmount,
-          currency,
-          environment: 'TEST',
-          gateway: 'CASHFREE',
-        };
-      }
+    // Cashfree strictly requires notify_url to be a valid absolute HTTPS URL.
+    // If it is a relative path or missing, omit it rather than causing Cashfree to reject the order.
+    if (
+      params.notifyUrl &&
+      (params.notifyUrl.startsWith('https://') || params.notifyUrl.startsWith('http://'))
+    ) {
+      orderMeta.notify_url = params.notifyUrl;
     }
 
-    // Deterministic Sandbox Mock session when credentials are not yet set
+    const payload = {
+      order_id: params.orderId,
+      order_amount: Number(params.orderAmount.toFixed(2)),
+      order_currency: currency,
+      customer_details: {
+        customer_id: sanitizedCustomerId,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: sanitizedPhone,
+      },
+      order_meta: orderMeta,
+      order_note: params.orderNote || 'Hutty Order',
+    };
+
+    const res = await fetch(`${this.baseUrl}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-version': this.apiVersion,
+        'x-client-id': this.appId,
+        'x-client-secret': this.secretKey,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      let errMsg = errText;
+      try {
+        const parsed = JSON.parse(errText);
+        errMsg = parsed.message || parsed.error || errText;
+      } catch {}
+      throw new Error(`Cashfree order creation failed (${res.status}): ${errMsg}`);
+    }
+
+    const data: any = await res.json();
+
+    if (!data.payment_session_id) {
+      throw new Error(
+        'Cashfree order created but response is missing payment_session_id.'
+      );
+    }
+
     return {
-      orderId: params.orderId,
-      paymentSessionId: `session_sandbox_${params.orderId}`,
-      cfOrderId: `cf_sandbox_${params.orderId}`,
-      orderStatus: 'ACTIVE',
-      orderAmount: params.orderAmount,
-      currency,
+      orderId: data.order_id || params.orderId,
+      order_id: data.order_id || params.orderId,
+      paymentSessionId: data.payment_session_id,
+      payment_session_id: data.payment_session_id,
+      cfOrderId: data.cf_order_id ? String(data.cf_order_id) : undefined,
+      orderStatus: data.order_status || 'ACTIVE',
+      orderAmount: data.order_amount || params.orderAmount,
+      currency: data.order_currency || currency,
       environment: 'TEST',
       gateway: 'CASHFREE',
     };

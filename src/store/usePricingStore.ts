@@ -175,6 +175,15 @@ export const usePricingStore = create<PricingState>()(
 
           const { purchase, requiresPayment, gatewayOrder } = json.data;
 
+          const normalizedGatewayOrder = gatewayOrder
+            ? {
+                ...gatewayOrder,
+                paymentSessionId: gatewayOrder.paymentSessionId || gatewayOrder.payment_session_id,
+                payment_session_id: gatewayOrder.payment_session_id || gatewayOrder.paymentSessionId,
+                orderId: gatewayOrder.orderId || gatewayOrder.order_id,
+              }
+            : null;
+
           set((state) => ({
             purchases: [purchase, ...state.purchases.filter((p) => p.id !== purchase.id)],
             isLoading: false,
@@ -193,7 +202,7 @@ export const usePricingStore = create<PricingState>()(
             }
           }
 
-          return { purchase, requiresPayment, gatewayOrder };
+          return { purchase, requiresPayment, gatewayOrder: normalizedGatewayOrder };
         } catch (err: any) {
           set({ isLoading: false, error: err.message });
           throw err;

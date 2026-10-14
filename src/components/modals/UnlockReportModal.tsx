@@ -26,7 +26,13 @@ export const UnlockReportModal: React.FC<Props> = ({
   initialTierCode = 'DETAILED_ESTIMATE_499',
 }) => {
   const { grantReportAccess } = useEntitlementStore();
-  const { initiatePurchase, confirmPurchasePayment, grantEntitlementsDirectly } = usePricingStore();
+  const {
+    initiatePurchase,
+    confirmPurchasePayment,
+    verifyCashfreePayment,
+    failPurchasePayment,
+    grantEntitlementsDirectly,
+  } = usePricingStore();
   const { result } = useCalculationStore();
   const { specificationTier } = useWizardStore();
   const { preparedFor, saveLeadInfo } = useReportStore();
@@ -178,6 +184,83 @@ export const UnlockReportModal: React.FC<Props> = ({
 
       const targetProjectId = purchase.projectId || effectiveProjectId || projectId;
 
+      // 1. Cashfree Sandbox / Live Gateway Integration
+      if (requiresPayment && gatewayOrder?.gateway === 'CASHFREE') {
+        const paymentSessionId = gatewayOrder.paymentSessionId || (gatewayOrder as any).payment_session_id;
+
+        if (!paymentSessionId || paymentSessionId.startsWith('session_sandbox_') || paymentSessionId.includes('mock')) {
+          setIsProcessing(false);
+          setFormError('Payment gateway session could not be established. Please retry or contact support.');
+          return;
+        }
+
+        try {
+          if (!(window as any).Cashfree) {
+            await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+              script.async = true;
+              script.onload = () => resolve(true);
+              script.onerror = () => reject(new Error('Failed to load Cashfree checkout script'));
+              document.head.appendChild(script);
+            });
+          }
+
+          const mode =
+            gatewayOrder.environment === 'PROD' || gatewayOrder.environment === 'PRODUCTION'
+              ? 'production'
+              : 'sandbox';
+          const cashfree = (window as any).Cashfree({ mode });
+
+          cashfree
+            .checkout({
+              paymentSessionId,
+              redirectTarget: '_modal',
+            })
+            .then(async (cfResult: any) => {
+              if (cfResult?.error) {
+                setIsProcessing(false);
+                setFormError(cfResult.error.message || 'Payment cancelled');
+                failPurchasePayment(purchase.id, cfResult.error.message);
+                return;
+              }
+              try {
+                await verifyCashfreePayment(purchase.id, gatewayOrder.orderId);
+                setCompletedOrderRef(purchase.publicReference);
+                grantReportAccess(targetProjectId, purchase.publicReference);
+                grantEntitlementsDirectly(selectedTier, targetProjectId, leadEmail, purchase.publicReference);
+                if (projectId && projectId !== targetProjectId) {
+                  grantReportAccess(projectId, purchase.publicReference);
+                  grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
+                }
+
+                try {
+                  await generateAndDownloadDetailedReportPdf({
+                    data: result,
+                    projectName: `${result.input?.houseType || 'Residential'} Construction Dossier`,
+                    preparedFor: leadName,
+                    specificationTier: specificationTier || 'Premium',
+                  });
+                } catch (pdfErr) {
+                  console.warn('PDF auto-download notification:', pdfErr);
+                }
+
+                setIsProcessing(false);
+                setIsCompleted(true);
+                if (onSuccess) onSuccess();
+              } catch (verErr: any) {
+                setIsProcessing(false);
+                setFormError(verErr.message || 'Cashfree payment verification failed. Please contact support.');
+              }
+            });
+          return;
+        } catch (cfErr: any) {
+          setIsProcessing(false);
+          setFormError(cfErr.message || 'Cashfree checkout failed to initialize.');
+          return;
+        }
+      }
+
       const hasRazorpay = typeof (window as any).Razorpay !== 'undefined';
 
       if (requiresPayment && hasRazorpay && gatewayOrder?.keyId && !gatewayOrder.keyId.includes('placeholder')) {
@@ -241,11 +324,10 @@ export const UnlockReportModal: React.FC<Props> = ({
         return;
       }
 
-      // In Sandbox / Test environment or when payment is confirmed:
-      // Confirm with server to activate entitlements
       if (requiresPayment) {
-        const testPaymentId = `pay_sandbox_${Date.now()}`;
-        await confirmPurchasePayment(purchase.id, testPaymentId, gatewayOrder?.orderId);
+        setIsProcessing(false);
+        setFormError('Payment gateway could not be loaded. Please check your internet connection or try again.');
+        return;
       }
 
       setCompletedOrderRef(purchase.publicReference);

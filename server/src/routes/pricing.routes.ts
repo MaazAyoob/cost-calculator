@@ -28,18 +28,21 @@ pricingPublicRouter.get('/tiers', publicRateLimiter, PricingController.getPublic
 pricingPublicRouter.get('/check-access', publicRateLimiter, PricingController.checkAccess);
 
 // Initiate purchase (server resolves price authoritatively from tierCode)
-pricingPublicRouter.post(
-  '/purchases',
+const initiateMiddleware = [
   bookingRateLimiter,
-  (req, res, next) => {
+  (req: any, res: any, next: any) => {
     const authHeader = req.headers['authorization'];
     if (authHeader) {
       return (authenticateToken as any)(req, res, next);
     }
     next();
   },
-  PricingController.initiatePurchase
-);
+  PricingController.initiatePurchase,
+];
+
+pricingPublicRouter.post('/purchases', ...initiateMiddleware);
+pricingPublicRouter.post('/initiate', ...initiateMiddleware);
+pricingPublicRouter.post('/purchases/initiate', ...initiateMiddleware);
 
 // Confirm purchase payment and activate entitlements
 pricingPublicRouter.post('/purchases/confirm', paymentVerifyRateLimiter, PricingController.confirmPurchase);
