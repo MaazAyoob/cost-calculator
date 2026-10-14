@@ -55,6 +55,11 @@ interface PricingState {
     gatewayOrderId?: string,
     razorpaySignature?: string
   ) => Promise<void>;
+  verifyCashfreePayment: (
+    purchaseId: string,
+    orderId: string,
+    cfPaymentId?: string
+  ) => Promise<any>;
   failPurchasePayment: (purchaseId: string, reason?: string) => Promise<void>;
 
   // Direct local entitlement grant (e.g. for offline/dev test or instant unlocked state)
@@ -216,6 +221,38 @@ export const usePricingStore = create<PricingState>()(
             userEntitlements: [...state.userEntitlements, ...(entitlements || [])],
             isLoading: false,
           }));
+        } catch (err: any) {
+          set({ isLoading: false, error: err.message });
+          throw err;
+        }
+      },
+
+      verifyCashfreePayment: async (purchaseId, orderId, cfPaymentId) => {
+        set({ isLoading: true, error: null });
+        try {
+          const res = await fetch(getApiUrl('/cashfree/verify'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ purchaseId, orderId, cfPaymentId }),
+          });
+
+          const json = await res.json();
+          if (!res.ok || !json.success) {
+            throw new Error(json.message || 'Cashfree payment verification failed');
+          }
+
+          const { purchase, entitlements } = json.data || {};
+          if (purchase) {
+            set((state) => ({
+              purchases: state.purchases.map((p) => (p.id === purchase.id ? purchase : p)),
+              userEntitlements: [...state.userEntitlements, ...(entitlements || [])],
+              isLoading: false,
+            }));
+          } else {
+            set({ isLoading: false });
+          }
+
+          return json.data;
         } catch (err: any) {
           set({ isLoading: false, error: err.message });
           throw err;

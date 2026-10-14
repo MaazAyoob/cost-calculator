@@ -17,6 +17,8 @@ import {
 
 const router = Router();
 
+import { cashfreeRouter } from './cashfree.routes';
+
 router.use('/auth', authRoutes);
 router.use('/download', downloadRoutes);
 router.use('/admin', adminRoutes);
@@ -28,6 +30,7 @@ router.use('/catalog', catalogPublicRouter);
 router.use('/', consultationPublicRouter);
 router.use('/consultations', consultationCustomerRouter);
 router.use('/pricing', pricingPublicRouter);
+router.use('/cashfree', cashfreeRouter);
 
 import { pricingService } from '../services/pricing.service';
 

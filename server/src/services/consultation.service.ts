@@ -14,6 +14,8 @@ import {
   VALID_STATUS_TRANSITIONS,
   isValidStatusTransition,
 } from '../constants/consultation.constants';
+import { cashfreeService } from './cashfree.service';
+import { ENV } from '../config/env';
 
 export interface ConsultantEntity {
   id: string;
@@ -574,6 +576,15 @@ export class ConsultationService {
       description: string;
       prefill: { name: string; email: string; contact: string };
     };
+    cashfreeOptions?: {
+      orderId: string;
+      paymentSessionId?: string;
+      amount: number;
+      amountMinorUnits: number;
+      currency: string;
+      gateway: string;
+      environment: string;
+    };
   }> {
     // 1. Verify consultant exists and is active (if a specific consultant was chosen)
     let consultant: ConsultantEntity | null = null;
@@ -673,8 +684,31 @@ export class ConsultationService {
     const requestId = `req-${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
     const paymentId = `pay-${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
 
-    // Create real Razorpay order if API keys configured, or deterministic sandbox order ID
-    const gatewayOrderId = await this.createGatewayOrder(publicReference);
+    const targetGateway = (data as any).gateway || (cashfreeService.isConfigured() ? 'CASHFREE' : 'RAZORPAY');
+
+    let gatewayOrderId: string;
+    let cfPaymentSessionId: string | undefined = undefined;
+
+    if (targetGateway === 'CASHFREE') {
+      const cfOrder = await cashfreeService.createOrder({
+        orderId: `order_cf_con_${Date.now()}_${randomSuffix}`,
+        orderAmount: CONSULTATION_PRICE_INR,
+        orderCurrency: CONSULTATION_CURRENCY,
+        customer: {
+          id: userContext?.id || `cust_${randomSuffix}`,
+          name: data.homeownerName,
+          email: normalizedEmail,
+          phone: data.homeownerPhone,
+        },
+        orderNote: `Hutty Consultation with ${consultant ? consultant.name : 'Expert Desk'} (${publicReference})`,
+        returnUrl: `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
+        notifyUrl: `${process.env.BACKEND_URL || ''}/api/v1/cashfree/webhook`,
+      });
+      gatewayOrderId = cfOrder.orderId;
+      cfPaymentSessionId = cfOrder.paymentSessionId;
+    } else {
+      gatewayOrderId = await this.createGatewayOrder(publicReference);
+    }
 
     const now = new Date().toISOString();
 
@@ -709,7 +743,7 @@ export class ConsultationService {
     const paymentEntity: ConsultationPaymentEntity = {
       id: paymentId,
       consultationRequestId: requestId,
-      gateway: 'RAZORPAY',
+      gateway: targetGateway,
       gatewayOrderId,
       gatewayPaymentId: null,
       gatewaySignature: null,
@@ -814,6 +848,15 @@ export class ConsultationService {
       request: requestEntity,
       payment: paymentEntity,
       razorpayOptions: this.buildRazorpayOptions(requestEntity, paymentEntity, consultant),
+      cashfreeOptions: {
+        orderId: paymentEntity.gatewayOrderId,
+        paymentSessionId: cfPaymentSessionId,
+        amount: CONSULTATION_PRICE_INR,
+        amountMinorUnits: CONSULTATION_PRICE_PAISE,
+        currency: CONSULTATION_CURRENCY,
+        gateway: targetGateway,
+        environment: 'TEST',
+      },
     };
   }
 
@@ -934,9 +977,11 @@ export class ConsultationService {
       gatewayOrderId: string;
       gatewayPaymentId: string;
       gatewaySignature?: string;
+      isWebhookVerified?: boolean;
     }
   ): Promise<{ request: ConsultationRequestEntity; payment: ConsultationPaymentEntity }> {
-    const { gatewayOrderId, gatewayPaymentId, gatewaySignature } = paymentDetails;
+    const { gatewayOrderId, gatewaySignature } = paymentDetails;
+    let gatewayPaymentId = paymentDetails.gatewayPaymentId;
 
     // 1. Locate request
     const request = await this.getRequestById(requestId);
@@ -955,26 +1000,51 @@ export class ConsultationService {
       return { request, payment };
     }
 
-    // 4. Strict Cryptographic Signature Verification
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    if (keySecret) {
-      if (!gatewaySignature) {
-        await this.recordPaymentFailure(payment.id, gatewayPaymentId, 'Missing payment signature');
-        throw new Error('Payment verification failed: gateway signature is required.');
+    // 4. Gateway-specific verification:
+    if (payment.gateway === 'CASHFREE') {
+      if (paymentDetails.isWebhookVerified) {
+        // Authenticated and verified via cryptographic signed Cashfree webhook
+      } else if (cashfreeService.isConfigured()) {
+        const verification = await cashfreeService.verifyOrderPayment(
+          gatewayOrderId,
+          payment.amountMinorUnits / 100
+        );
+        if (!verification.verified) {
+          await this.recordPaymentFailure(
+            payment.id,
+            gatewayPaymentId,
+            `Cashfree verification failed: ${verification.message}`
+          );
+          throw new Error(
+            `Payment verification failed with Cashfree: ${verification.message || 'Payment not successful'}`
+          );
+        }
+        if (verification.cfPaymentId) {
+          gatewayPaymentId = verification.cfPaymentId;
+        }
       }
+    } else {
+      // Strict Cryptographic Signature Verification for Razorpay
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (keySecret) {
+        if (!gatewaySignature) {
+          await this.recordPaymentFailure(payment.id, gatewayPaymentId, 'Missing payment signature');
+          throw new Error('Payment verification failed: gateway signature is required.');
+        }
 
-      const generatedSignature = crypto
-        .createHmac('sha256', keySecret)
-        .update(`${gatewayOrderId}|${gatewayPaymentId}`)
-        .digest('hex');
+        const generatedSignature = crypto
+          .createHmac('sha256', keySecret)
+          .update(`${gatewayOrderId}|${gatewayPaymentId}`)
+          .digest('hex');
 
-      const isSignatureValid =
-        generatedSignature.length === gatewaySignature.length &&
-        crypto.timingSafeEqual(Buffer.from(generatedSignature), Buffer.from(gatewaySignature));
+        const isSignatureValid =
+          generatedSignature.length === gatewaySignature.length &&
+          crypto.timingSafeEqual(Buffer.from(generatedSignature), Buffer.from(gatewaySignature));
 
-      if (!isSignatureValid) {
-        await this.recordPaymentFailure(payment.id, gatewayPaymentId, 'Invalid payment signature');
-        throw new Error('Payment verification failed: cryptographic signature mismatch.');
+        if (!isSignatureValid) {
+          await this.recordPaymentFailure(payment.id, gatewayPaymentId, 'Invalid payment signature');
+          throw new Error('Payment verification failed: cryptographic signature mismatch.');
+        }
       }
     }
 
@@ -1730,7 +1800,7 @@ export class ConsultationService {
     return this.inMemoryRequests.find((r) => r.idempotencyKey === key) || null;
   }
 
-  private async getRequestById(id: string): Promise<ConsultationRequestEntity | null> {
+  public async getRequestById(id: string): Promise<ConsultationRequestEntity | null> {
     if (this.prisma) {
       try {
         const req = await (this.prisma as any).consultationRequest.findUnique({
@@ -1751,7 +1821,7 @@ export class ConsultationService {
     };
   }
 
-  private async getPaymentByOrderId(gatewayOrderId: string): Promise<ConsultationPaymentEntity | null> {
+  public async getPaymentByOrderId(gatewayOrderId: string): Promise<ConsultationPaymentEntity | null> {
     if (this.prisma) {
       try {
         const pay = await (this.prisma as any).consultationPayment.findUnique({
@@ -1764,7 +1834,7 @@ export class ConsultationService {
     return this.inMemoryPayments.find((p) => p.gatewayOrderId === gatewayOrderId) || null;
   }
 
-  private async getPaymentByRequestId(consultationRequestId: string): Promise<ConsultationPaymentEntity | null> {
+  public async getPaymentByRequestId(consultationRequestId: string): Promise<ConsultationPaymentEntity | null> {
     if (this.prisma) {
       try {
         const pay = await (this.prisma as any).consultationPayment.findFirst({
@@ -1778,7 +1848,7 @@ export class ConsultationService {
     return this.inMemoryPayments.find((p) => p.consultationRequestId === consultationRequestId) || null;
   }
 
-  private async recordPaymentFailure(paymentId: string, gatewayPaymentId: string, reason: string) {
+  public async recordPaymentFailure(paymentId: string, gatewayPaymentId: string, reason: string) {
     if (this.prisma) {
       try {
         await (this.prisma as any).consultationPayment.update({

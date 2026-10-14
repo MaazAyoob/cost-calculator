@@ -17,6 +17,8 @@ import {
   PricingFeatureCode,
   PricingTierCode,
 } from '../constants/pricing.constants';
+import { cashfreeService } from './cashfree.service';
+import { ENV } from '../config/env';
 
 export interface PricingTierEntity {
   id: string;
@@ -379,14 +381,19 @@ export class PricingService {
     projectId?: string | null;
     projectSnapshot?: any;
     testBypassPayment?: boolean;
+    gateway?: 'RAZORPAY' | 'CASHFREE';
   }): Promise<{
     purchase: PricingPurchaseEntity;
     requiresPayment: boolean;
     gatewayOrder: {
       orderId: string;
       amountMinorUnits: number;
+      amountINR: number;
       currency: string;
       keyId: string;
+      gateway: string;
+      paymentSessionId?: string;
+      environment?: string;
     } | null;
   }> {
     const tier = await this.getTierByCode(payload.tierCode);
@@ -415,9 +422,33 @@ export class PricingService {
     const publicReference = `HT-PUR-${randomHex}`;
 
     const purchaseId = `pur-${Date.now()}-${randomHex}`;
-    const gatewayOrderId = authoritativeAmountMinorUnits > 0
-      ? `order_rc_${Date.now()}_${randomHex}`
-      : null;
+    const chosenGateway = payload.gateway || (cashfreeService.isConfigured() ? 'CASHFREE' : 'RAZORPAY');
+
+    let gatewayOrderId: string | null = null;
+    let paymentSessionId: string | undefined = undefined;
+
+    if (authoritativeAmountMinorUnits > 0) {
+      if (chosenGateway === 'CASHFREE') {
+        const cfOrder = await cashfreeService.createOrder({
+          orderId: `order_cf_${Date.now()}_${randomHex}`,
+          orderAmount: authoritativeAmountMinorUnits / 100,
+          orderCurrency: tier.currency,
+          customer: {
+            id: payload.userId || `cust_${randomHex}`,
+            name: payload.leadName,
+            email: payload.leadEmail,
+            phone: payload.leadPhone,
+          },
+          orderNote: `Hutty ${tier.name}`,
+          returnUrl: `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
+          notifyUrl: `${process.env.BACKEND_URL || ''}/api/v1/cashfree/webhook`,
+        });
+        gatewayOrderId = cfOrder.orderId;
+        paymentSessionId = cfOrder.paymentSessionId;
+      } else {
+        gatewayOrderId = `order_rc_${Date.now()}_${randomHex}`;
+      }
+    }
 
     // Free tier purchases (amount = 0) or test mode
     const isFree = authoritativeAmountMinorUnits === 0;
@@ -433,7 +464,7 @@ export class PricingService {
       amountMinorUnits: authoritativeAmountMinorUnits, // Historical snapshot
       currency: tier.currency,
       status: initialStatus,
-      gateway: 'RAZORPAY',
+      gateway: chosenGateway,
       gatewayOrderId,
       gatewayPaymentId: initialStatus === 'PAID' ? `pay_demo_${randomHex}` : null,
       leadName: payload.leadName.trim(),
@@ -493,8 +524,12 @@ export class PricingService {
         ? {
             orderId: gatewayOrderId || `order_demo_${randomHex}`,
             amountMinorUnits: authoritativeAmountMinorUnits,
+            amountINR: authoritativeAmountMinorUnits / 100,
             currency: tier.currency,
-            keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+            keyId: chosenGateway === 'CASHFREE' ? cashfreeService.appId : (process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder'),
+            gateway: chosenGateway,
+            paymentSessionId,
+            environment: 'TEST',
           }
         : null,
     };
@@ -504,7 +539,8 @@ export class PricingService {
     purchaseId: string,
     gatewayPaymentId: string,
     gatewayOrderId?: string,
-    razorpaySignature?: string
+    razorpaySignature?: string,
+    isWebhookVerified?: boolean
   ): Promise<{ purchase: PricingPurchaseEntity; entitlements: UserEntitlementEntity[] }> {
     let purchase = this.inMemoryPurchases.find(
       (p) => p.id === purchaseId || p.gatewayOrderId === gatewayOrderId || p.publicReference === purchaseId
@@ -526,21 +562,41 @@ export class PricingService {
       throw new Error(`Purchase record not found for ID "${purchaseId}"`);
     }
 
-    // Cryptographic HMAC-SHA256 signature verification when secret is configured
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    if (keySecret) {
-      if (!razorpaySignature) {
-        throw new Error('Cryptographic signature verification failed: signature is required when gateway secret is configured.');
+    // Gateway-specific verification:
+    if (purchase.gateway === 'CASHFREE') {
+      if (isWebhookVerified) {
+        // Authenticated and verified via cryptographic signed Cashfree webhook
+      } else if (cashfreeService.isConfigured()) {
+        const verification = await cashfreeService.verifyOrderPayment(
+          gatewayOrderId || purchase.gatewayOrderId || '',
+          purchase.amountMinorUnits / 100
+        );
+        if (!verification.verified) {
+          throw new Error(
+            `Payment verification failed with Cashfree: ${verification.message || 'Payment not verified'}`
+          );
+        }
+        if (verification.cfPaymentId) {
+          gatewayPaymentId = verification.cfPaymentId;
+        }
       }
-      const orderIdToVerify = gatewayOrderId || purchase.gatewayOrderId || '';
-      const hmac = crypto.createHmac('sha256', keySecret);
-      hmac.update(`${orderIdToVerify}|${gatewayPaymentId}`);
-      const expectedSignature = hmac.digest('hex');
-      const isValid =
-        expectedSignature.length === razorpaySignature.length &&
-        crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpaySignature));
-      if (!isValid) {
-        throw new Error('Cryptographic signature verification failed: signature mismatch.');
+    } else {
+      // Cryptographic HMAC-SHA256 signature verification for Razorpay when secret is configured
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (keySecret) {
+        if (!razorpaySignature) {
+          throw new Error('Cryptographic signature verification failed: signature is required when gateway secret is configured.');
+        }
+        const orderIdToVerify = gatewayOrderId || purchase.gatewayOrderId || '';
+        const hmac = crypto.createHmac('sha256', keySecret);
+        hmac.update(`${orderIdToVerify}|${gatewayPaymentId}`);
+        const expectedSignature = hmac.digest('hex');
+        const isValid =
+          expectedSignature.length === razorpaySignature.length &&
+          crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpaySignature));
+        if (!isValid) {
+          throw new Error('Cryptographic signature verification failed: signature mismatch.');
+        }
       }
     }
 

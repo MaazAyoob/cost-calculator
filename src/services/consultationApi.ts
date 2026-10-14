@@ -10,12 +10,14 @@ import {
   ConsultationPayment,
   BookingSubmissionPayload,
   RazorpayCheckoutOptions,
+  CashfreeCheckoutOptions,
 } from '../types/consultation';
 
 export interface BookingResponse {
   request: ConsultationRequest;
   payment: ConsultationPayment;
   razorpayOptions: RazorpayCheckoutOptions;
+  cashfreeOptions?: CashfreeCheckoutOptions;
 }
 
 export interface AdminConsultationsResponse {

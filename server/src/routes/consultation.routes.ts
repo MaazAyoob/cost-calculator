@@ -38,8 +38,13 @@ consultationPublicRouter.get('/consultants/:slug', publicRateLimiter, getConsult
 // ── Customer Booking & Payment Router (Mounted at /api/v1/consultations) ──
 export const consultationCustomerRouter = Router();
 
+import { CashfreeController } from '../controllers/cashfree.controller';
+
 // Webhook endpoint (Raw body verification)
 consultationCustomerRouter.post('/webhook', webhookRateLimiter, handleWebhook as any);
+consultationCustomerRouter.post('/cashfree/webhook', webhookRateLimiter, CashfreeController.handleWebhook as any);
+consultationCustomerRouter.post('/cashfree-webhook', webhookRateLimiter, CashfreeController.handleWebhook as any);
+consultationCustomerRouter.post('/cashfree/verify', paymentVerifyRateLimiter, CashfreeController.verifyPayment as any);
 
 // Booking creation with optional auth decoding and rate limiting
 consultationCustomerRouter.post(

@@ -21,7 +21,13 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
   onSuccess,
 }) => {
   const { grantBasicPdfAccess } = useEntitlementStore();
-  const { initiatePurchase, confirmPurchasePayment, grantEntitlementsDirectly, failPurchasePayment } = usePricingStore();
+  const {
+    initiatePurchase,
+    confirmPurchasePayment,
+    verifyCashfreePayment,
+    grantEntitlementsDirectly,
+    failPurchasePayment,
+  } = usePricingStore();
   const { result } = useCalculationStore();
   const { specificationTier } = useWizardStore();
   const { preparedFor, saveLeadInfo } = useReportStore();
@@ -88,6 +94,67 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
         },
         testBypassPayment: false,
       });
+
+      // 2. Cashfree Sandbox Gateway Integration
+      if (
+        requiresPayment &&
+        gatewayOrder?.gateway === 'CASHFREE' &&
+        gatewayOrder?.paymentSessionId &&
+        !gatewayOrder.paymentSessionId.includes('mock')
+      ) {
+        try {
+          if (!(window as any).Cashfree) {
+            await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+              script.async = true;
+              script.onload = () => resolve(true);
+              script.onerror = () => reject(new Error('Failed to load Cashfree script'));
+              document.head.appendChild(script);
+            });
+          }
+
+          const cashfree = (window as any).Cashfree({ mode: 'sandbox' });
+          cashfree.checkout({
+            paymentSessionId: gatewayOrder.paymentSessionId,
+            redirectTarget: '_modal',
+          }).then(async (cfResult: any) => {
+            if (cfResult?.error) {
+              setIsProcessing(false);
+              setFormError(cfResult.error.message || 'Payment cancelled');
+              failPurchasePayment(purchase.id, cfResult.error.message);
+              return;
+            }
+            try {
+              await verifyCashfreePayment(purchase.id, gatewayOrder.orderId);
+              setCompletedOrderRef(purchase.publicReference);
+              grantBasicPdfAccess(projectId, purchase.publicReference);
+              grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+
+              try {
+                await generateAndDownloadBasicEstimatePdf({
+                  data: result,
+                  projectName: `${result.input?.houseType || 'Residential'} Estimate`,
+                  preparedFor: leadName,
+                  specificationTier: specificationTier || 'Premium',
+                });
+              } catch (pdfErr) {
+                console.warn('Basic PDF auto-download notification:', pdfErr);
+              }
+
+              setIsProcessing(false);
+              setIsCompleted(true);
+              if (onSuccess) onSuccess();
+            } catch (verErr: any) {
+              setIsProcessing(false);
+              setFormError(verErr.message || 'Cashfree payment verification failed.');
+            }
+          });
+          return;
+        } catch (cfErr: any) {
+          console.warn('[UnlockModal] Cashfree SDK modal error, fallback:', cfErr.message);
+        }
+      }
 
       const hasRazorpay = typeof (window as any).Razorpay !== 'undefined';
 

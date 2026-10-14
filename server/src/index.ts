@@ -51,7 +51,17 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Razorpay-Signature', 'X-Idempotency-Key'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Razorpay-Signature',
+      'X-Idempotency-Key',
+      'x-webhook-signature',
+      'x-webhook-timestamp',
+      'x-client-id',
+      'x-api-version',
+      'x-cashfree-signature',
+    ],
   })
 );
 app.use(

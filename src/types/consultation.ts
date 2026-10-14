@@ -138,3 +138,14 @@ export interface RazorpayCheckoutOptions {
     contact: string;
   };
 }
+
+export interface CashfreeCheckoutOptions {
+  orderId: string;
+  paymentSessionId?: string;
+  amount: number;
+  amountMinorUnits: number;
+  currency: string;
+  gateway: string;
+  environment: string;
+}
+

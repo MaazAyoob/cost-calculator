@@ -181,7 +181,47 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         preferredTime,
       });
 
-      const { request, payment, razorpayOptions } = bookingData;
+      const { request, payment, razorpayOptions, cashfreeOptions } = bookingData;
+
+      // 1. Cashfree Sandbox Checkout Flow
+      if (cashfreeOptions?.paymentSessionId && !cashfreeOptions.paymentSessionId.includes('mock')) {
+        try {
+          if (!(window as any).Cashfree) {
+            await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+              script.async = true;
+              script.onload = () => resolve(true);
+              script.onerror = () => reject(new Error('Failed to load Cashfree checkout script'));
+              document.head.appendChild(script);
+            });
+          }
+
+          const cashfree = (window as any).Cashfree({ mode: 'sandbox' });
+          cashfree.checkout({
+            paymentSessionId: cashfreeOptions.paymentSessionId,
+            redirectTarget: '_modal',
+          }).then(async (result: any) => {
+            if (result?.error) {
+              setErrorMessage(result.error.message || 'Cashfree payment was cancelled.');
+              return;
+            }
+            try {
+              const verified = await verifyPayment(request.id, {
+                gatewayOrderId: cashfreeOptions.orderId || payment.gatewayOrderId,
+                gatewayPaymentId: `cf_pay_${Date.now()}`,
+              });
+              setConfirmedRequest(verified);
+              setStep(4);
+            } catch (verErr: any) {
+              setErrorMessage(verErr.message || 'Payment verification failed with Cashfree.');
+            }
+          });
+          return;
+        } catch (cfErr: any) {
+          console.warn('[Consultation] Cashfree SDK modal error, continuing fallback:', cfErr.message);
+        }
+      }
 
       // 2. Razorpay Checkout Flow
       // Check if Razorpay client SDK is available in the window

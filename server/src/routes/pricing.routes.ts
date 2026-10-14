@@ -11,8 +11,15 @@ import { publicRateLimiter, bookingRateLimiter, paymentVerifyRateLimiter, webhoo
 // ── Public Pricing Router (Mounted at /api/v1/pricing) ──
 export const pricingPublicRouter = Router();
 
+import { CashfreeController } from '../controllers/cashfree.controller';
+
 // Webhook endpoint for Razorpay server-to-server notifications
 pricingPublicRouter.post('/webhook', webhookRateLimiter, PricingController.handleWebhook);
+// Webhook endpoint for Cashfree server-to-server notifications
+pricingPublicRouter.post('/cashfree/webhook', webhookRateLimiter, CashfreeController.handleWebhook);
+pricingPublicRouter.post('/cashfree-webhook', webhookRateLimiter, CashfreeController.handleWebhook);
+// Cashfree payment verification endpoint
+pricingPublicRouter.post('/cashfree/verify', paymentVerifyRateLimiter, CashfreeController.verifyPayment);
 
 // Get active pricing tiers for /pricing page and calculator modals
 pricingPublicRouter.get('/tiers', publicRateLimiter, PricingController.getPublicTiers);
