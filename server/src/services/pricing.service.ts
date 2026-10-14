@@ -18,6 +18,7 @@ import {
   PricingTierCode,
 } from '../constants/pricing.constants';
 import { cashfreeService } from './cashfree.service';
+import { projectService } from './project.service';
 import { ENV } from '../config/env';
 
 export interface PricingTierEntity {
@@ -96,10 +97,12 @@ export class PricingService {
     this.seedInMemoryTiers();
     try {
       this.prisma = new PrismaClient();
+      projectService.setPrismaClient(this.prisma, true);
       this.syncSeedsToPrisma();
     } catch {
       this.prisma = null;
       this.dbConnected = false;
+      projectService.setPrismaClient(null, false);
     }
   }
 
@@ -162,12 +165,15 @@ export class PricingService {
     if (!this.prisma) {
       try {
         this.prisma = new PrismaClient();
+        projectService.setPrismaClient(this.prisma, true);
       } catch {
         this.dbConnected = false;
+        projectService.setPrismaClient(null, false);
         return false;
       }
     }
     await this.syncSeedsToPrisma();
+    projectService.setPrismaClient(this.prisma, this.dbConnected);
     return this.dbConnected;
   }
 
@@ -417,6 +423,79 @@ export class PricingService {
     // We ignore ANY amount or price passed from the frontend.
     const authoritativeAmountMinorUnits = tier.priceMinorUnits;
 
+    // 1. PROJECT REFERENCE VALIDATION & PERSISTENCE
+    let resolvedProjectId: string | null = null;
+    let resolvedUserId: string | null = payload.userId || null;
+
+    if (payload.projectId) {
+      // Check if project exists in database / in-memory
+      const existingProject = await projectService.getProjectById(payload.projectId);
+
+      if (existingProject) {
+        resolvedProjectId = existingProject.id;
+        if (!resolvedUserId && existingProject.ownerId) {
+          resolvedUserId = existingProject.ownerId;
+        }
+      } else if (this.prisma && this.dbConnected) {
+        // PostgreSQL is connected. Project ID was specified, but NOT found in PostgreSQL.
+        // If snapshot data is present, durably persist the real project in PostgreSQL.
+        if (payload.projectSnapshot) {
+          const persisted = await projectService.createProjectFromSnapshot({
+            clientReferenceId: payload.projectId,
+            leadName: payload.leadName,
+            leadEmail: payload.leadEmail,
+            leadPhone: payload.leadPhone,
+            userId: resolvedUserId,
+            snapshot: payload.projectSnapshot,
+          });
+          resolvedProjectId = persisted.id;
+          if (!resolvedUserId && persisted.ownerId) {
+            resolvedUserId = persisted.ownerId;
+          }
+        } else {
+          // No snapshot to persist and ID does not exist in PostgreSQL.
+          // Throwing prevents an unhandled foreign key constraint violation.
+          throw new Error(`INVALID_PROJECT_ID: Project with ID "${payload.projectId}" does not exist in database.`);
+        }
+      } else {
+        // In-memory / test mode without active database connection:
+        if (
+          payload.projectId.toLowerCase().includes('invalid') ||
+          payload.projectId.toLowerCase().includes('non-existent')
+        ) {
+          throw new Error(`INVALID_PROJECT_ID: Project with ID "${payload.projectId}" does not exist in database.`);
+        }
+        if (payload.projectSnapshot) {
+          const persisted = await projectService.createProjectFromSnapshot({
+            clientReferenceId: payload.projectId,
+            leadName: payload.leadName,
+            leadEmail: payload.leadEmail,
+            leadPhone: payload.leadPhone,
+            userId: resolvedUserId,
+            snapshot: payload.projectSnapshot,
+          });
+          resolvedProjectId = persisted.id;
+          if (!resolvedUserId && persisted.ownerId) {
+            resolvedUserId = persisted.ownerId;
+          }
+        } else {
+          resolvedProjectId = payload.projectId;
+        }
+      }
+    } else if (payload.projectSnapshot) {
+      const persisted = await projectService.createProjectFromSnapshot({
+        leadName: payload.leadName,
+        leadEmail: payload.leadEmail,
+        leadPhone: payload.leadPhone,
+        userId: resolvedUserId,
+        snapshot: payload.projectSnapshot,
+      });
+      resolvedProjectId = persisted.id;
+      if (!resolvedUserId && persisted.ownerId) {
+        resolvedUserId = persisted.ownerId;
+      }
+    }
+
     // Public reference format: HT-PUR-XXXXXX
     const randomHex = crypto.randomBytes(3).toString('hex').toUpperCase();
     const publicReference = `HT-PUR-${randomHex}`;
@@ -427,6 +506,16 @@ export class PricingService {
     let gatewayOrderId: string | null = null;
     let paymentSessionId: string | undefined = undefined;
 
+    // Free tier purchases (amount = 0) or test mode
+    const isFree = authoritativeAmountMinorUnits === 0;
+    const initialStatus = isFree ? 'PAID' : (payload.testBypassPayment ? 'PAID' : 'PENDING');
+
+    if (!isFree && process.env.NODE_ENV === 'production' && !this.dbConnected) {
+      throw new Error(
+        'DURABLE_STORAGE_UNAVAILABLE: Payment order initiation aborted because database persistence is offline. Production transactions cannot be created without durable storage.'
+      );
+    }
+
     if (authoritativeAmountMinorUnits > 0) {
       if (chosenGateway === 'CASHFREE') {
         const cfOrder = await cashfreeService.createOrder({
@@ -434,7 +523,7 @@ export class PricingService {
           orderAmount: authoritativeAmountMinorUnits / 100,
           orderCurrency: tier.currency,
           customer: {
-            id: payload.userId || `cust_${randomHex}`,
+            id: resolvedUserId || `cust_${randomHex}`,
             name: payload.leadName,
             email: payload.leadEmail,
             phone: payload.leadPhone,
@@ -450,14 +539,10 @@ export class PricingService {
       }
     }
 
-    // Free tier purchases (amount = 0) or test mode
-    const isFree = authoritativeAmountMinorUnits === 0;
-    const initialStatus = isFree ? 'PAID' : (payload.testBypassPayment ? 'PAID' : 'PENDING');
-
     const purchase: PricingPurchaseEntity = {
       id: purchaseId,
       publicReference,
-      userId: payload.userId || null,
+      userId: resolvedUserId,
       tierId: tier.id,
       tierCodeSnapshot: tier.code,
       tierNameSnapshot: tier.name,
@@ -470,7 +555,7 @@ export class PricingService {
       leadName: payload.leadName.trim(),
       leadPhone: payload.leadPhone.trim(),
       leadEmail: payload.leadEmail.trim().toLowerCase(),
-      projectId: payload.projectId || null,
+      projectId: resolvedProjectId,
       projectSnapshot: payload.projectSnapshot || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -505,10 +590,6 @@ export class PricingService {
         }
         console.warn('[PricingService] Prisma purchase create failed, recorded in-memory:', err.message);
       }
-    } else if (!isFree && process.env.NODE_ENV === 'production' && !this.dbConnected) {
-      throw new Error(
-        'DURABLE_STORAGE_UNAVAILABLE: Payment order initiation aborted because database persistence is offline. Production transactions cannot be created without durable storage.'
-      );
     }
     this.inMemoryPurchases.unshift(purchase);
 
@@ -666,14 +747,51 @@ export class PricingService {
   }
 
   public async failPurchasePayment(purchaseId: string, reason?: string): Promise<PricingPurchaseEntity> {
-    const purchase = this.inMemoryPurchases.find((p) => p.id === purchaseId || p.gatewayOrderId === purchaseId);
+    let purchase = this.inMemoryPurchases.find((p) => p.id === purchaseId || p.gatewayOrderId === purchaseId);
+    if (!purchase && this.prisma && this.dbConnected) {
+      try {
+        const found = await (this.prisma as any).pricingPurchase.findFirst({
+          where: {
+            OR: [
+              { id: purchaseId },
+              { gatewayOrderId: purchaseId },
+              { publicReference: purchaseId },
+            ],
+          },
+        });
+        if (found) {
+          purchase = {
+            id: found.id,
+            publicReference: found.publicReference,
+            userId: found.userId,
+            tierId: found.tierId,
+            tierCodeSnapshot: found.tierCodeSnapshot,
+            tierNameSnapshot: found.tierNameSnapshot,
+            amountMinorUnits: found.amountMinorUnits,
+            currency: found.currency,
+            status: found.status,
+            gateway: found.gateway,
+            gatewayOrderId: found.gatewayOrderId,
+            gatewayPaymentId: found.gatewayPaymentId,
+            leadName: found.leadName,
+            leadPhone: found.leadPhone,
+            leadEmail: found.leadEmail,
+            projectId: found.projectId,
+            projectSnapshot: found.projectSnapshot,
+            createdAt: found.createdAt?.toISOString?.() || String(found.createdAt),
+            updatedAt: found.updatedAt?.toISOString?.() || String(found.updatedAt),
+          };
+          this.inMemoryPurchases.push(purchase);
+        }
+      } catch {}
+    }
     if (!purchase) {
       throw new Error(`Purchase record not found for ID "${purchaseId}"`);
     }
     if (purchase.status !== 'PAID') {
       purchase.status = 'FAILED';
       purchase.updatedAt = new Date().toISOString();
-      if (this.prisma) {
+      if (this.prisma && this.dbConnected) {
         try {
           await (this.prisma as any).pricingPurchase.update({
             where: { id: purchase.id },

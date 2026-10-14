@@ -10,6 +10,7 @@ import { isDevPdfTestingEnabled } from '../../config/devTesting';
 import { X, Check, Lock, Download, ShieldCheck, FileText, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { PricingTierCode } from '../../types/pricing';
 import { modalScaleVariant, backdropFadeVariant } from '../../animations/variants';
+import { persistProject, getCachedProjectId, setCachedProjectId } from '../../services/projectApi';
 
 interface Props {
   isOpen: boolean;
@@ -115,20 +116,67 @@ export const UnlockReportModal: React.FC<Props> = ({
     });
 
     try {
+      // Ensure project is persisted in PostgreSQL
+      let effectiveProjectId = getCachedProjectId();
+      if (!effectiveProjectId) {
+        try {
+          const wizard = useWizardStore.getState();
+          const persisted = await persistProject({
+            name: `${result.input?.houseType || wizard.houseType || 'Residential'} Construction Dossier`,
+            leadName,
+            leadEmail,
+            leadPhone,
+            city: wizard.city || 'Bangalore',
+            authority: wizard.authority || 'BBMP/BDA',
+            configuration: {
+              plotLength: wizard.plotLength,
+              plotWidth: wizard.plotWidth,
+              houseType: result.input?.houseType || wizard.houseType || 'Duplex',
+              floors: wizard.floors || 2,
+              parkingType: wizard.parkingType || 'Normal Ground',
+              rooms: wizard.rooms || {},
+              qualityTier: wizard.qualityTier || specificationTier || 'Premium',
+              materialBrands: wizard.materialBrands || {},
+            },
+            calculation: {
+              totalBUASqFt: result.area?.totalBUASqFt,
+              totalCostINR: result.budget?.totalProjectCost,
+              costPerSqFt: result.budget?.costPerSqFt,
+              steelTonnes: result.quantities?.steelTonnes || 0,
+              cementBags: result.quantities?.cementBags || 0,
+              concreteCuM: result.quantities?.totalStructuralConcreteCuM || result.quantities?.approxConcreteCuM || 0,
+              timelineMonths: result.timeline?.totalMonths || 12,
+              budgetBreakdown: result.budget || {},
+              quantitiesJson: result.quantities || {},
+            },
+          });
+          effectiveProjectId = persisted.id;
+          setCachedProjectId(persisted.id);
+        } catch (persistErr) {
+          console.warn('Pre-persisting project notice:', persistErr);
+        }
+      }
+
       // Initiate checkout via server API (server authoritatively resolves ₹499 or ₹1,499)
       const { purchase, requiresPayment, gatewayOrder } = await initiatePurchase({
         tierCode: selectedTier,
         leadName,
         leadPhone,
         leadEmail,
-        projectId,
+        projectId: effectiveProjectId || projectId,
         projectSnapshot: {
           buaSqFt: result.area?.totalBUASqFt,
           totalCostINR: result.budget?.totalProjectCost,
           houseType: result.input?.houseType,
+          city: useWizardStore.getState().city || 'Bangalore',
+          authority: useWizardStore.getState().authority || 'BBMP/BDA',
+          floors: useWizardStore.getState().floors || 2,
+          qualityTier: specificationTier || 'Premium',
         },
         testBypassPayment: false, // Enforce verified checkout
       });
+
+      const targetProjectId = purchase.projectId || effectiveProjectId || projectId;
 
       const hasRazorpay = typeof (window as any).Razorpay !== 'undefined';
 
@@ -156,8 +204,12 @@ export const UnlockReportModal: React.FC<Props> = ({
                 response.razorpay_signature
               );
               setCompletedOrderRef(purchase.publicReference);
-              grantReportAccess(projectId, purchase.publicReference);
-              grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
+              grantReportAccess(targetProjectId, purchase.publicReference);
+              grantEntitlementsDirectly(selectedTier, targetProjectId, leadEmail, purchase.publicReference);
+              if (projectId && projectId !== targetProjectId) {
+                grantReportAccess(projectId, purchase.publicReference);
+                grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
+              }
 
               try {
                 await generateAndDownloadDetailedReportPdf({
@@ -197,8 +249,12 @@ export const UnlockReportModal: React.FC<Props> = ({
       }
 
       setCompletedOrderRef(purchase.publicReference);
-      grantReportAccess(projectId, purchase.publicReference);
-      grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
+      grantReportAccess(targetProjectId, purchase.publicReference);
+      grantEntitlementsDirectly(selectedTier, targetProjectId, leadEmail, purchase.publicReference);
+      if (projectId && projectId !== targetProjectId) {
+        grantReportAccess(projectId, purchase.publicReference);
+        grantEntitlementsDirectly(selectedTier, projectId, leadEmail, purchase.publicReference);
+      }
 
       try {
         await generateAndDownloadDetailedReportPdf({

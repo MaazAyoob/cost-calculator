@@ -8,6 +8,7 @@ import { useWizardStore } from '../../store/useWizardStore';
 import { generateAndDownloadBasicEstimatePdf, viewBasicEstimatePdfInNewTab } from '../../features/report/pdfService';
 import { X, Check, Lock, Download, ShieldCheck, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import { modalScaleVariant } from '../../animations/variants';
+import { persistProject, getCachedProjectId, setCachedProjectId } from '../../services/projectApi';
 
 interface Props {
   isOpen: boolean;
@@ -79,21 +80,68 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
     });
 
     try {
+      // Ensure project is persisted in PostgreSQL
+      let effectiveProjectId = getCachedProjectId();
+      if (!effectiveProjectId) {
+        try {
+          const wizard = useWizardStore.getState();
+          const persisted = await persistProject({
+            name: `${result.input?.houseType || wizard.houseType || 'Residential'} Estimate`,
+            leadName,
+            leadEmail,
+            leadPhone,
+            city: wizard.city || 'Bangalore',
+            authority: wizard.authority || 'BBMP/BDA',
+            configuration: {
+              plotLength: wizard.plotLength,
+              plotWidth: wizard.plotWidth,
+              houseType: result.input?.houseType || wizard.houseType || 'Duplex',
+              floors: wizard.floors || 2,
+              parkingType: wizard.parkingType || 'Normal Ground',
+              rooms: wizard.rooms || {},
+              qualityTier: wizard.qualityTier || specificationTier || 'Premium',
+              materialBrands: wizard.materialBrands || {},
+            },
+            calculation: {
+              totalBUASqFt: result.area?.totalBUASqFt,
+              totalCostINR: result.budget?.totalProjectCost,
+              costPerSqFt: result.budget?.costPerSqFt,
+              steelTonnes: result.quantities?.steelTonnes || 0,
+              cementBags: result.quantities?.cementBags || 0,
+              concreteCuM: result.quantities?.totalStructuralConcreteCuM || result.quantities?.approxConcreteCuM || 0,
+              timelineMonths: result.timeline?.totalMonths || 12,
+              budgetBreakdown: result.budget || {},
+              quantitiesJson: result.quantities || {},
+            },
+          });
+          effectiveProjectId = persisted.id;
+          setCachedProjectId(persisted.id);
+        } catch (persistErr) {
+          console.warn('Pre-persisting project notice:', persistErr);
+        }
+      }
+
       // 1. Authoritative server purchase creation (enforces ₹99 / 9900 paise on server)
       const { purchase, requiresPayment, gatewayOrder } = await initiatePurchase({
         tierCode: 'BASIC_ESTIMATE_PDF',
         leadName,
         leadPhone,
         leadEmail,
-        projectId,
+        projectId: effectiveProjectId || projectId,
         projectSnapshot: {
           buaSqFt: result.area?.totalBUASqFt,
           totalCostINR: result.budget?.totalProjectCost,
           houseType: result.input?.houseType,
           productType: 'BASIC_ESTIMATE_PDF',
+          city: useWizardStore.getState().city || 'Bangalore',
+          authority: useWizardStore.getState().authority || 'BBMP/BDA',
+          floors: useWizardStore.getState().floors || 2,
+          qualityTier: specificationTier || 'Premium',
         },
         testBypassPayment: false,
       });
+
+      const targetProjectId = purchase.projectId || effectiveProjectId || projectId;
 
       // 2. Cashfree Sandbox Gateway Integration
       if (
@@ -128,8 +176,12 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
             try {
               await verifyCashfreePayment(purchase.id, gatewayOrder.orderId);
               setCompletedOrderRef(purchase.publicReference);
-              grantBasicPdfAccess(projectId, purchase.publicReference);
-              grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+              grantBasicPdfAccess(targetProjectId, purchase.publicReference);
+              grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', targetProjectId, leadEmail, purchase.publicReference);
+              if (projectId && projectId !== targetProjectId) {
+                grantBasicPdfAccess(projectId, purchase.publicReference);
+                grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+              }
 
               try {
                 await generateAndDownloadBasicEstimatePdf({
@@ -182,8 +234,12 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                 response.razorpay_signature
               );
               setCompletedOrderRef(purchase.publicReference);
-              grantBasicPdfAccess(projectId, purchase.publicReference);
-              grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+              grantBasicPdfAccess(targetProjectId, purchase.publicReference);
+              grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', targetProjectId, leadEmail, purchase.publicReference);
+              if (projectId && projectId !== targetProjectId) {
+                grantBasicPdfAccess(projectId, purchase.publicReference);
+                grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+              }
 
               try {
                 await generateAndDownloadBasicEstimatePdf({
@@ -223,8 +279,12 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
       }
 
       setCompletedOrderRef(purchase.publicReference);
-      grantBasicPdfAccess(projectId, purchase.publicReference);
-      grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+      grantBasicPdfAccess(targetProjectId, purchase.publicReference);
+      grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', targetProjectId, leadEmail, purchase.publicReference);
+      if (projectId && projectId !== targetProjectId) {
+        grantBasicPdfAccess(projectId, purchase.publicReference);
+        grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', projectId, leadEmail, purchase.publicReference);
+      }
 
       try {
         await generateAndDownloadBasicEstimatePdf({

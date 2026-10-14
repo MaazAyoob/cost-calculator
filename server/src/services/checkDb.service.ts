@@ -79,6 +79,7 @@ export async function checkDatabase(client?: PrismaClient): Promise<boolean> {
   await checkTable('calculation_config_parameters', () => prisma.calculationConfigParameter.count());
   await checkTable('pricing_purchases', () => prisma.pricingPurchase.count());
   await checkTable('user_entitlements', () => prisma.userEntitlement.count());
+  await checkTable('projects', () => (prisma as any).project.count());
 
   console.log('----------------------------------------------------------------');
   if (allHealthy) {

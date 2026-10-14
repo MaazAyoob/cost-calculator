@@ -76,6 +76,7 @@ async function checkDatabase(client) {
     await checkTable('calculation_config_parameters', () => prisma.calculationConfigParameter.count());
     await checkTable('pricing_purchases', () => prisma.pricingPurchase.count());
     await checkTable('user_entitlements', () => prisma.userEntitlement.count());
+    await checkTable('projects', () => prisma.project.count());
     console.log('----------------------------------------------------------------');
     if (allHealthy) {
         console.log('🎉 SUCCESS: All required tables exist and are accessible.');
