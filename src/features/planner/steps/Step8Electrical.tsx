@@ -137,48 +137,48 @@ export const Step8Electrical: React.FC = () => {
 
       {/* ── 2. WHAT AM I INSTALLING? (POINTS SCHEDULE) ── */}
       <div className="p-4 bg-white rounded-xl border border-[#E3E8E2] space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#F28C28]" />
+            <Zap className="w-4 h-4 text-[#F28C28] shrink-0" />
             <h3 className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
               What Am I Installing? (Room Point Schedule)
             </h3>
           </div>
-          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
+          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2] self-start sm:self-auto shrink-0">
             {quantities.totalElectricalPoints} Points Total
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">Light Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.lightingPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">Ceiling Fan Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.fanPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">Power Sockets</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.socketPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">AC Points (Dedicated)</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.acPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">Geyser Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.geyserPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">TV / Data Points</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.tvDataPoints}</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">Distribution Boards</span>
-            <span className="font-bold text-[#1B3D34] font-mono">{quantities.mainDBCount} Main + {quantities.floorDBCount} Sub-DBs</span>
+            <span className="font-bold text-[#1B3D34] font-mono break-words text-[11px] sm:text-xs">{quantities.mainDBCount} Main + {quantities.floorDBCount} Sub-DBs</span>
           </div>
-          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2]">
+          <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] min-w-0">
             <span className="text-[10px] text-[#4B5563] block">EV Charging Point</span>
             <span className="font-bold text-[#1B3D34] font-mono">{quantities.evPoints > 0 ? '1 (32A Provision)' : 'None'}</span>
           </div>
@@ -187,14 +187,14 @@ export const Step8Electrical: React.FC = () => {
 
       {/* ── 3. WHAT AM I CONSUMING? (PHYSICAL TAKEOFF) ── */}
       <div className="p-4 bg-white rounded-xl border border-[#E3E8E2] space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div className="flex items-center gap-2">
-            <Box className="w-4 h-4 text-[#1B3D34]" />
+            <Box className="w-4 h-4 text-[#1B3D34] shrink-0" />
             <h3 className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
               What Am I Consuming? (Wires &amp; Pipes Needed)
             </h3>
           </div>
-          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2]">
+          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E3E8E2] self-start sm:self-auto shrink-0">
             {quantities.electricalWireMetres}m Conductor Total
           </span>
         </div>

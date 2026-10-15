@@ -89,6 +89,7 @@ export type AdminTab =
   | 'cement-aggregates'
   | 'admin-consultants'
   | 'admin-consultation-requests'
+  | 'admin-professional-applications'
   | 'pricing-tiers'
   | 'pricing-purchases';
 

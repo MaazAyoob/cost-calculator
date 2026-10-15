@@ -126,10 +126,10 @@ export const Step2SpaceRequirements: React.FC = () => {
           onClick={() => setShowAncillary(!showAncillary)}
           className="w-full flex items-center justify-between text-xs font-bold text-[#1B3D34] py-1.5 cursor-pointer hover:text-[#142F28] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#1B3D34] rounded"
         >
-          <span className="flex items-center gap-2">
-            <span>Specialized Spaces (Pooja, Utility, Study, Store)</span>
+          <span className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+            <span className="truncate">Specialized Spaces (Pooja, Utility, Study, Store)</span>
             {ancillaryCountTotal > 0 && (
-              <span className="text-[10px] bg-[#EDF3ED] border border-[#CBE0CD] px-2 py-0.5 rounded-md font-mono font-bold text-[#1B3D34]">
+              <span className="text-[10px] bg-[#EDF3ED] border border-[#CBE0CD] px-2 py-0.5 rounded-md font-mono font-bold text-[#1B3D34] shrink-0">
                 {ancillaryCountTotal} Selected
               </span>
             )}

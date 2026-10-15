@@ -286,9 +286,9 @@ export const Step1BasicInfo: React.FC = () => {
 
         {/* Tactile Plot Dimensions with Synchronized Sliders & Direct Numeric Editing */}
         <div className="space-y-2 pt-1">
-          <div className="flex justify-between items-center text-xs">
-            <div className="flex items-center gap-2">
-              <label className="font-bold text-[#1B3D34] uppercase tracking-wider flex items-center gap-1.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <label className="font-bold text-[#1B3D34] uppercase tracking-wider flex items-center gap-1.5 shrink-0">
                 <Ruler className="w-3.5 h-3.5 text-[#1B3D34]" />
                 Plot Dimensions
               </label>
@@ -299,7 +299,7 @@ export const Step1BasicInfo: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center flex-wrap gap-1">
               {standardPlotPresets.map((p) => {
                 const isMatch = plotLength === p.l && plotWidth === p.w;
                 return (
@@ -324,9 +324,9 @@ export const Step1BasicInfo: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
             {/* Length (Depth) - Directly Editable Numeric Field + Synchronized Slider */}
-            <div className="hutty-number-box space-y-2">
+            <div className="hutty-number-box space-y-2 min-w-0">
               <div className="flex justify-between items-center">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
                   Length (Depth)
@@ -372,7 +372,7 @@ export const Step1BasicInfo: React.FC = () => {
             </div>
 
             {/* Width (Frontage) - Directly Editable Numeric Field + Synchronized Slider */}
-            <div className="hutty-number-box space-y-2">
+            <div className="hutty-number-box space-y-2 min-w-0">
               <div className="flex justify-between items-center">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B5563]">
                   Width (Frontage)
@@ -421,7 +421,7 @@ export const Step1BasicInfo: React.FC = () => {
 
         {/* ── 2. ROAD WIDTH (Affects planning regulations) ── */}
         <div className="space-y-1.5 pt-1">
-          <div className="flex justify-between items-baseline">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5">
             <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
               Abutting Road Width
             </label>
@@ -429,7 +429,7 @@ export const Step1BasicInfo: React.FC = () => {
               Affects planning &amp; statutory FAR limits
             </span>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {roadWidthOptions.map((rw) => {
               const isSelected = (roadWidthFt || 30) === rw.value;
               return (
@@ -455,7 +455,7 @@ export const Step1BasicInfo: React.FC = () => {
 
         {/* Plot Type & Road Frontage (Corner Plots) */}
         <div className="space-y-1.5 pt-1">
-          <div className="flex justify-between items-baseline">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5">
             <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
               Plot Type &amp; Road Frontage
             </label>
@@ -506,7 +506,7 @@ export const Step1BasicInfo: React.FC = () => {
           {isCornerPlot && (
             <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1.5 mt-1">
               <span className="text-[11px] font-bold text-[#1B3D34] block">Secondary Road-Facing Boundary:</span>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {[
                   { id: 'left' as const, label: 'Left Boundary' },
                   { id: 'right' as const, label: 'Right Boundary' },
@@ -545,7 +545,7 @@ export const Step1BasicInfo: React.FC = () => {
         <label className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider block">
           Number of Floors
         </label>
-        <div className="grid grid-cols-5 gap-1.5">
+        <div className="grid grid-cols-5 gap-1 sm:gap-1.5">
           {floorOptions.map((opt) => {
             const isSelected = (floors || 2) === opt.value;
             return (
@@ -556,14 +556,14 @@ export const Step1BasicInfo: React.FC = () => {
                   setUserSelectedBUA(null);
                 }}
                 className={cn(
-                  'hutty-tactile-card text-center p-2.5 flex flex-col items-center justify-center cursor-pointer',
+                  'hutty-tactile-card text-center p-1.5 sm:p-2.5 flex flex-col items-center justify-center cursor-pointer min-w-0',
                   isSelected && 'hutty-tactile-card-selected'
                 )}
               >
-                <span className="text-xs font-extrabold font-mono text-[#1B3D34] block">
+                <span className="text-[11px] sm:text-xs font-extrabold font-mono text-[#1B3D34] block truncate w-full">
                   {opt.title}
                 </span>
-                <span className="text-[10px] text-[#4B5563] block font-medium">
+                <span className="text-[8.5px] sm:text-[10px] text-[#4B5563] block font-medium truncate w-full">
                   {opt.sub}
                 </span>
               </div>
@@ -641,7 +641,7 @@ export const Step1BasicInfo: React.FC = () => {
           <div>
             <h3 className="text-xs font-bold text-[#1B3D34]">Total Built-Up Area (BUA)</h3>
             <p className="text-[11px] text-[#4B5563]">
-              The total constructed floor space across all floors combined (including walls and balconies).
+              The total covered floor area of your house across the included floors.
             </p>
           </div>
           <button

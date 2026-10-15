@@ -19,12 +19,14 @@ import {
 } from 'lucide-react';
 import { useConsultationStore } from '../../../store/useConsultationStore';
 import { useAdminStore } from '../../../store/useAdminStore';
+import { useCustomerAuthStore } from '../../../store/useCustomerAuthStore';
 import { ConsultationRequest, ConsultationStatus } from '../../../types/consultation';
 import { LAUNCH_CONSULTATION_PRICE_DISPLAY } from '../../../config/consultation';
 import { formatCurrency } from '../../../utils/cn';
 
 export const AdminConsultationsSection: React.FC = () => {
-  const { token } = useAdminStore();
+  const { token: adminToken } = useAdminStore() as any;
+  const { token: customerToken } = useCustomerAuthStore();
   const {
     adminRequests,
     adminStats,
@@ -56,7 +58,12 @@ export const AdminConsultationsSection: React.FC = () => {
   const [newInternalNote, setNewInternalNote] = useState('');
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
-  const effectiveToken = token || 'dev-admin-mock-token-2026';
+  const effectiveToken =
+    adminToken ||
+    customerToken ||
+    localStorage.getItem('hutty_admin_token') ||
+    localStorage.getItem('hutty_customer_token') ||
+    'dev-admin-mock-token-2026';
 
   useEffect(() => {
     fetchAdminRequests({ status: statusFilter, search }, effectiveToken);

@@ -91,6 +91,7 @@ import { TestCalculatorSection } from './sections/TestCalculatorSection';
 import { FormulaLibrarySection } from './sections/FormulaLibrarySection';
 import { AdminConsultantsSection } from './consultation/AdminConsultantsSection';
 import { AdminConsultationsSection } from './consultation/AdminConsultationsSection';
+import { AdminProfessionalApplicationsSection } from './consultation/AdminProfessionalApplicationsSection';
 import { AdminPricingTiersSection } from './pricing/AdminPricingTiersSection';
 import { AdminPricingPurchasesSection } from './pricing/AdminPricingPurchasesSection';
 
@@ -659,6 +660,7 @@ export const AdminPage: React.FC = () => {
               sections: [
                 { id: 'admin-consultants', label: 'Consultants' },
                 { id: 'admin-consultation-requests', label: 'Requests' },
+                { id: 'admin-professional-applications', label: 'Pro Applications' },
               ],
             },
             {
@@ -2299,6 +2301,7 @@ export const AdminPage: React.FC = () => {
       {/* 7. Consultation Management (Phase 1 MVP) */}
       {activeTab === 'admin-consultants' && <AdminConsultantsSection />}
       {activeTab === 'admin-consultation-requests' && <AdminConsultationsSection />}
+      {activeTab === 'admin-professional-applications' && <AdminProfessionalApplicationsSection />}
 
       {/* 8. Products & Pricing (Pricing Model V1) */}
       {activeTab === 'pricing-tiers' && <AdminPricingTiersSection />}

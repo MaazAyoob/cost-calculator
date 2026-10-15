@@ -298,6 +298,78 @@ class ConsultationApiClient {
     }
     return json.data;
   }
+
+  // ── Professional Registration & Admin Applications Queue ──
+
+  public async submitProfessionalApplication(payload: any): Promise<any> {
+    const url = getApiUrl('/api/v1/professionals/apply');
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || 'Failed to submit professional application');
+    }
+    return json.data;
+  }
+
+  public async getAdminProfessionalApplications(
+    params?: { status?: string; category?: string; search?: string },
+    token?: string
+  ): Promise<any[]> {
+    const query = new URLSearchParams();
+    if (params?.status && params.status !== 'ALL') query.set('status', params.status);
+    if (params?.category && params.category !== 'ALL') query.set('category', params.category);
+    if (params?.search && params.search.trim()) query.set('search', params.search.trim());
+
+    const url = getApiUrl(`/api/v1/admin/professionals/applications${query.toString() ? `?${query.toString()}` : ''}`);
+    const res = await fetch(url, {
+      headers: this.getHeaders(token),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || 'Failed to load professional applications');
+    }
+    return json.data || [];
+  }
+
+  public async getAdminProfessionalApplicationById(id: string, token?: string): Promise<any> {
+    const url = getApiUrl(`/api/v1/admin/professionals/applications/${encodeURIComponent(id)}`);
+    const res = await fetch(url, {
+      headers: this.getHeaders(token),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || 'Failed to load professional application');
+    }
+    return json.data;
+  }
+
+  public async reviewAdminProfessionalApplication(
+    id: string,
+    review: {
+      status: string;
+      adminReviewNotes?: string;
+      reviewerNotes?: string;
+      rejectionReason?: string;
+      reviewerEmail?: string;
+    },
+    token?: string
+  ): Promise<any> {
+    const url = getApiUrl(`/api/v1/admin/professionals/applications/${encodeURIComponent(id)}`);
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: this.getHeaders(token),
+      body: JSON.stringify(review),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error || 'Failed to review professional application');
+    }
+    return json.data;
+  }
 }
 
 export const consultationApi = new ConsultationApiClient();

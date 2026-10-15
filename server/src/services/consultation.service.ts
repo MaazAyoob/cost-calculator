@@ -13,9 +13,43 @@ import {
   ConsultationCategory,
   VALID_STATUS_TRANSITIONS,
   isValidStatusTransition,
+  mapCategoryToConsultantCategories,
+  CATEGORY_DETAILS,
+  POPULAR_SERVICES,
+  CanonicalConsultationCategory,
 } from '../constants/consultation.constants';
 import { cashfreeService } from './cashfree.service';
 import { ENV } from '../config/env';
+
+export interface ProfessionalApplicationEntity {
+  id: string;
+  fullName: string;
+  category: string;
+  email: string;
+  phone: string;
+  qualifications: string;
+  licenseNumber: string | null;
+  experienceYears: number;
+  city: string;
+  serviceAreas: string[];
+  expertise: string[];
+  portfolioLinks: string[];
+  consultationModes: string[];
+  proposedServices: string[];
+  proposedFeeINR: number;
+  documentsJson: any | null;
+  status: 'SUBMITTED' | 'UNDER_REVIEW' | 'MORE_INFO_REQUIRED' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
+  adminReviewerId: string | null;
+  adminReviewNotes: string | null;
+  reviewerNotes?: string | null;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  rejectionReason: string | null;
+  approvedConsultantId: string | null;
+  consentGiven: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface ConsultantEntity {
   id: string;
@@ -28,6 +62,7 @@ export interface ConsultantEntity {
   city: string;
   serviceAreas: string[];
   about: string;
+  description?: string;
   specializations: string[];
   services: string[];
   active: boolean;
@@ -254,14 +289,23 @@ export class ConsultationService {
   private inMemoryRequests: ConsultationRequestEntity[] = [];
   private inMemoryPayments: ConsultationPaymentEntity[] = [];
   private inMemoryEvents: ConsultationEventEntity[] = [];
+  private inMemoryApplications: ProfessionalApplicationEntity[] = [];
 
   constructor() {
-    try {
-      this.prisma = new PrismaClient();
-      this.syncSeedsToPrisma();
-    } catch {
+    if (process.env.DATABASE_URL) {
+      try {
+        this.prisma = new PrismaClient();
+        this.syncSeedsToPrisma();
+      } catch {
+        this.prisma = null;
+      }
+    } else {
       this.prisma = null;
     }
+  }
+
+  private isDbConnected(): boolean {
+    return Boolean(this.prisma && process.env.DATABASE_URL);
   }
 
   /**
@@ -303,30 +347,59 @@ export class ConsultationService {
   // PUBLIC CONSULTANTS
   // ═════════════════════════════════════════════════════════════════════════
 
-  public async getActiveConsultants(params?: {
-    category?: string;
-    search?: string;
-    city?: string;
-  }): Promise<ConsultantEntity[]> {
-    const { category, search, city } = params || {};
+  public async getActiveConsultants(
+    params?:
+      | {
+          category?: string;
+          search?: string;
+          city?: string;
+        }
+      | string,
+    searchArg?: string,
+    cityArg?: string
+  ): Promise<ConsultantEntity[]> {
+    let category: string | undefined;
+    let search: string | undefined;
+    let city: string | undefined;
+
+    if (typeof params === 'string') {
+      category = params;
+      search = typeof searchArg === 'string' ? searchArg : undefined;
+      city = typeof cityArg === 'string' ? cityArg : undefined;
+    } else if (params && typeof params === 'object') {
+      category = params.category;
+      search = params.search;
+      city = params.city;
+    }
+
+    const mappedCategories = category && category !== 'ALL' ? mapCategoryToConsultantCategories(category) : [];
 
     if (this.prisma) {
       try {
         const where: any = { active: true };
         if (category && category !== 'ALL') {
-          where.category = { equals: category, mode: 'insensitive' };
+          where.OR = [
+            { category: { equals: category, mode: 'insensitive' } },
+            ...mappedCategories.map((c) => ({ category: { equals: c, mode: 'insensitive' } })),
+          ];
         }
         if (city && city !== 'ALL') {
           where.city = { contains: city, mode: 'insensitive' };
         }
-        if (search && search.trim()) {
+        if (typeof search === 'string' && search.trim()) {
           const q = search.trim();
-          where.OR = [
+          const searchConditions = [
             { name: { contains: q, mode: 'insensitive' } },
             { title: { contains: q, mode: 'insensitive' } },
             { about: { contains: q, mode: 'insensitive' } },
             { specializations: { has: q } },
           ];
+          if (where.OR) {
+            where.AND = [{ OR: where.OR }, { OR: searchConditions }];
+            delete where.OR;
+          } else {
+            where.OR = searchConditions;
+          }
         }
 
         const consultants = await (this.prisma as any).consultant.findMany({
@@ -334,7 +407,7 @@ export class ConsultationService {
           orderBy: [{ featured: 'desc' }, { displayOrder: 'asc' }, { name: 'asc' }],
         });
 
-        if (consultants && consultants.length > 0) {
+        if (Array.isArray(consultants)) {
           return consultants.map(this.mapPrismaConsultant);
         }
       } catch {
@@ -345,8 +418,13 @@ export class ConsultationService {
     return this.inMemoryConsultants
       .filter((c) => {
         if (!c.active) return false;
-        if (category && category !== 'ALL' && c.category.toLowerCase() !== category.toLowerCase()) {
-          return false;
+        if (category && category !== 'ALL') {
+          const catLower = category.toLowerCase();
+          const mappedLowers = mappedCategories.map((m) => m.toLowerCase());
+          const matchesCategory =
+            c.category.toLowerCase() === catLower ||
+            mappedLowers.includes(c.category.toLowerCase());
+          if (!matchesCategory) return false;
         }
         if (
           city &&
@@ -356,7 +434,7 @@ export class ConsultationService {
         ) {
           return false;
         }
-        if (search && search.trim()) {
+        if (typeof search === 'string' && search.trim()) {
           const q = search.toLowerCase().trim();
           const matchName = c.name.toLowerCase().includes(q);
           const matchTitle = c.title.toLowerCase().includes(q);
@@ -418,7 +496,7 @@ export class ConsultationService {
         const consultants = await (this.prisma as any).consultant.findMany({
           orderBy: [{ featured: 'desc' }, { displayOrder: 'asc' }, { name: 'asc' }],
         });
-        if (consultants && consultants.length > 0) {
+        if (Array.isArray(consultants)) {
           return consultants.map(this.mapPrismaConsultant);
         }
       } catch {
@@ -450,7 +528,8 @@ export class ConsultationService {
       experienceYears: Number(data.experienceYears) || 5,
       city: data.city?.trim() || 'Bangalore',
       serviceAreas: Array.isArray(data.serviceAreas) ? data.serviceAreas : [],
-      about: data.about.trim(),
+      about: data.about?.trim() || data.description?.trim() || '',
+      description: data.about?.trim() || data.description?.trim() || '',
       specializations: Array.isArray(data.specializations) ? data.specializations : [],
       services: Array.isArray(data.services) ? data.services : [],
       active: data.active !== undefined ? Boolean(data.active) : true,
@@ -460,16 +539,23 @@ export class ConsultationService {
       updatedAt: new Date().toISOString(),
     };
 
-    if (this.prisma) {
+    if (this.isDbConnected()) {
       try {
+        const { description: _ignoreDesc, ...prismaCreateData } = newConsultant as any;
         const created = await (this.prisma as any).consultant.create({
           data: {
-            ...newConsultant,
+            ...prismaCreateData,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           },
         });
-        this.inMemoryConsultants.unshift(this.mapPrismaConsultant(created));
-        return this.mapPrismaConsultant(created);
+        const mapped = this.mapPrismaConsultant(created);
+        this.inMemoryConsultants.unshift(mapped);
+        return mapped;
       } catch (err: any) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to create consultant in database: ' + err.message);
+        }
         console.warn('[ConsultationService] Prisma createConsultant failed, using in-memory:', err.message);
       }
     }
@@ -484,6 +570,13 @@ export class ConsultationService {
       throw new Error(`Consultant with ID "${id}" not found`);
     }
 
+    const effectiveAbout =
+      data.about !== undefined
+        ? data.about.trim()
+        : data.description !== undefined
+        ? data.description.trim()
+        : existing.about;
+
     const updated: ConsultantEntity = {
       ...existing,
       name: data.name !== undefined ? data.name.trim() : existing.name,
@@ -493,7 +586,8 @@ export class ConsultationService {
       experienceYears: data.experienceYears !== undefined ? Number(data.experienceYears) : existing.experienceYears,
       city: data.city !== undefined ? data.city.trim() : existing.city,
       serviceAreas: data.serviceAreas !== undefined ? data.serviceAreas : existing.serviceAreas,
-      about: data.about !== undefined ? data.about.trim() : existing.about,
+      about: effectiveAbout,
+      description: effectiveAbout,
       specializations: data.specializations !== undefined ? data.specializations : existing.specializations,
       services: data.services !== undefined ? data.services : existing.services,
       active: data.active !== undefined ? Boolean(data.active) : existing.active,
@@ -502,18 +596,24 @@ export class ConsultationService {
       updatedAt: new Date().toISOString(),
     };
 
-    if (this.prisma) {
+    if (this.isDbConnected()) {
       try {
+        const { id: _ignoreId, createdAt: _ignoreCreated, description: _ignoreDesc, requests: _ignoreReq, ...prismaUpdateData } = updated as any;
         const res = await (this.prisma as any).consultant.update({
           where: { id },
           data: {
-            ...updated,
+            ...prismaUpdateData,
+            updatedAt: new Date(),
           },
         });
+        const mapped = this.mapPrismaConsultant(res);
         const index = this.inMemoryConsultants.findIndex((c) => c.id === id);
-        if (index !== -1) this.inMemoryConsultants[index] = this.mapPrismaConsultant(res);
-        return this.mapPrismaConsultant(res);
+        if (index !== -1) this.inMemoryConsultants[index] = mapped;
+        return mapped;
       } catch (err: any) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to update consultant in database: ' + err.message);
+        }
         console.warn('[ConsultationService] Prisma updateConsultant failed, using in-memory:', err.message);
       }
     }
@@ -534,6 +634,22 @@ export class ConsultationService {
     const updateData: any = { active };
     if (featured !== undefined) updateData.featured = featured;
     return this.updateConsultant(id, updateData, adminEmail);
+  }
+
+  public async updateConsultantAdmin(
+    id: string,
+    data: any,
+    adminEmail = 'admin@hutty.in'
+  ): Promise<ConsultantEntity> {
+    return this.updateConsultant(id, data, adminEmail);
+  }
+
+  public async setConsultantActiveStatus(
+    id: string,
+    active: boolean,
+    adminEmail = 'admin@hutty.in'
+  ): Promise<ConsultantEntity> {
+    return this.setConsultantStatus(id, active, undefined, adminEmail);
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -726,12 +842,12 @@ export class ConsultationService {
       homeownerEmail: normalizedEmail,
       projectId: data.projectId || null,
       projectSnapshot,
-      projectLocation: data.projectLocation.trim(),
-      projectType: data.projectType.trim(),
-      consultationTopic: data.consultationTopic.trim(),
+      projectLocation: (data.projectLocation || 'Bangalore').trim(),
+      projectType: (data.projectType || 'Independent Residential House').trim(),
+      consultationTopic: (data.consultationTopic || 'General Consultation').trim(),
       message: data.message?.trim() || null,
-      preferredDate: data.preferredDate.trim(),
-      preferredTime: data.preferredTime.trim(),
+      preferredDate: (data.preferredDate || new Date().toISOString().split('T')[0]).trim(),
+      preferredTime: (data.preferredTime || '10:00 AM').trim(),
       confirmedDateTime: null,
       status: 'AWAITING_REVIEW',
       amountMinorUnits: CONSULTATION_PRICE_PAISE, // Strict ₹1,499 source of truth
@@ -845,8 +961,16 @@ export class ConsultationService {
     );
 
     return {
-      request: requestEntity,
-      payment: paymentEntity,
+      request: {
+        ...requestEntity,
+        amountINR: requestEntity.amountMinorUnits / 100,
+        amountPaise: requestEntity.amountMinorUnits,
+      },
+      payment: {
+        ...paymentEntity,
+        amountINR: paymentEntity.amountMinorUnits / 100,
+        amountPaise: paymentEntity.amountMinorUnits,
+      },
       razorpayOptions: this.buildRazorpayOptions(requestEntity, paymentEntity, consultant),
       cashfreeOptions: {
         orderId: paymentEntity.gatewayOrderId,
@@ -951,8 +1075,12 @@ export class ConsultationService {
     return {
       success: true,
       reference: publicReference,
+      id: requestId,
+      status: 'RECEIVED',
+      topic: data.topic,
       message: 'Your enquiry has been received by our senior engineering desk. We will review your request and contact you within 24 hours.',
       data: {
+        id: requestId,
         reference: publicReference,
         status: 'AWAITING_REVIEW',
         topic: data.topic,
@@ -1929,6 +2057,270 @@ export class ConsultationService {
       updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : new Date().toISOString(),
       payments: r.payments ? r.payments.map(this.mapPrismaPayment) : [],
       events: r.events ? r.events.map(this.mapPrismaEvent) : [],
+    };
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // PROFESSIONAL APPLICATION & VERIFICATION
+  // ═════════════════════════════════════════════════════════════════════════
+
+  public async submitProfessionalApplication(data: any): Promise<ProfessionalApplicationEntity> {
+    const id = `app-${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
+    const now = new Date().toISOString();
+
+    const application: ProfessionalApplicationEntity = {
+      id,
+      fullName: data.fullName.trim(),
+      category: data.category.trim(),
+      email: data.email.toLowerCase().trim(),
+      phone: data.phone.trim(),
+      qualifications: data.qualifications.trim(),
+      licenseNumber: data.licenseNumber ? data.licenseNumber.trim() : null,
+      experienceYears: Number(data.experienceYears) || 0,
+      city: (data.city || 'Bangalore').trim(),
+      serviceAreas: Array.isArray(data.serviceAreas) ? data.serviceAreas : [],
+      expertise: Array.isArray(data.expertise) ? data.expertise : [],
+      portfolioLinks: Array.isArray(data.portfolioLinks) ? data.portfolioLinks : [],
+      consultationModes: Array.isArray(data.consultationModes) ? data.consultationModes : ['VIDEO', 'AUDIO'],
+      proposedServices: Array.isArray(data.proposedServices) ? data.proposedServices : [],
+      proposedFeeINR: Number(data.proposedFeeINR) || 1499,
+      documentsJson: data.documents || null,
+      status: 'SUBMITTED',
+      adminReviewerId: null,
+      adminReviewNotes: null,
+      rejectionReason: null,
+      approvedConsultantId: null,
+      consentGiven: data.consentGiven !== false,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (this.prisma) {
+      try {
+        const created = await (this.prisma as any).professionalApplication.create({
+          data: {
+            id: application.id,
+            fullName: application.fullName,
+            category: application.category,
+            email: application.email,
+            phone: application.phone,
+            qualifications: application.qualifications,
+            licenseNumber: application.licenseNumber,
+            experienceYears: application.experienceYears,
+            city: application.city,
+            serviceAreas: application.serviceAreas,
+            expertise: application.expertise,
+            portfolioLinks: application.portfolioLinks,
+            consultationModes: application.consultationModes,
+            proposedServices: application.proposedServices,
+            proposedFeeINR: application.proposedFeeINR,
+            documentsJson: application.documentsJson,
+            status: application.status,
+            consentGiven: application.consentGiven,
+          },
+        });
+        if (created) {
+          return this.mapPrismaApplication(created);
+        }
+      } catch {
+        // Fallback to in-memory
+      }
+    }
+
+    this.inMemoryApplications.push(application);
+    return application;
+  }
+
+  public async getProfessionalApplications(params?: {
+    status?: string;
+    category?: string;
+    search?: string;
+  }): Promise<ProfessionalApplicationEntity[]> {
+    const { status, category, search } = params || {};
+
+    if (this.prisma) {
+      try {
+        const where: any = {};
+        if (status && status !== 'ALL') {
+          where.status = status;
+        }
+        if (category && category !== 'ALL') {
+          where.category = { contains: category, mode: 'insensitive' };
+        }
+        if (search && search.trim()) {
+          const q = search.trim();
+          where.OR = [
+            { fullName: { contains: q, mode: 'insensitive' } },
+            { email: { contains: q, mode: 'insensitive' } },
+            { phone: { contains: q, mode: 'insensitive' } },
+            { qualifications: { contains: q, mode: 'insensitive' } },
+            { licenseNumber: { contains: q, mode: 'insensitive' } },
+          ];
+        }
+
+        const apps = await (this.prisma as any).professionalApplication.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+        });
+
+        if (apps && apps.length > 0) {
+          return apps.map(this.mapPrismaApplication);
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    return this.inMemoryApplications
+      .filter((app) => {
+        if (status && status !== 'ALL' && app.status !== status) return false;
+        if (category && category !== 'ALL' && !app.category.toLowerCase().includes(category.toLowerCase())) {
+          return false;
+        }
+        if (search && search.trim()) {
+          const q = search.toLowerCase().trim();
+          const matchName = app.fullName.toLowerCase().includes(q);
+          const matchEmail = app.email.toLowerCase().includes(q);
+          const matchPhone = app.phone.includes(q);
+          const matchQual = app.qualifications.toLowerCase().includes(q);
+          const matchLic = app.licenseNumber ? app.licenseNumber.toLowerCase().includes(q) : false;
+          if (!matchName && !matchEmail && !matchPhone && !matchQual && !matchLic) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public async getProfessionalApplicationById(id: string): Promise<ProfessionalApplicationEntity | null> {
+    if (this.prisma) {
+      try {
+        const app = await (this.prisma as any).professionalApplication.findUnique({
+          where: { id },
+        });
+        if (app) return this.mapPrismaApplication(app);
+      } catch {
+        // Fallback
+      }
+    }
+
+    return this.inMemoryApplications.find((a) => a.id === id) || null;
+  }
+
+  public async reviewProfessionalApplication(
+    id: string,
+    review: {
+      status: 'SUBMITTED' | 'UNDER_REVIEW' | 'MORE_INFO_REQUIRED' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
+      adminReviewNotes?: string;
+      reviewerNotes?: string;
+      rejectionReason?: string;
+      reviewerEmail?: string;
+    },
+    reviewerId = 'admin@hutty.in'
+  ): Promise<ProfessionalApplicationEntity> {
+    const existing = await this.getProfessionalApplicationById(id);
+    if (!existing) {
+      throw new Error(`Professional application with ID ${id} not found.`);
+    }
+
+    const now = new Date().toISOString();
+    let approvedConsultantId = existing.approvedConsultantId;
+    const effectiveReviewer = review.reviewerEmail || reviewerId;
+    const effectiveNotes = review.reviewerNotes || review.adminReviewNotes || existing.adminReviewNotes || null;
+
+    // If approving, provision active Consultant profile if not already created
+    if (review.status === 'APPROVED' && !approvedConsultantId) {
+      const mappedCat = mapCategoryToConsultantCategories(existing.category)[0] || existing.category;
+      const createdConsultant = await this.createConsultant({
+        name: existing.fullName,
+        title: `${existing.qualifications} • ${existing.category}`,
+        category: mappedCat,
+        experienceYears: existing.experienceYears,
+        city: existing.city,
+        serviceAreas: existing.serviceAreas.length > 0 ? existing.serviceAreas : ['All Bangalore'],
+        about: `Verified professional registered with Hutty. Specializes in ${existing.category}. Experience: ${existing.experienceYears} years. Qualifications: ${existing.qualifications}. ${existing.licenseNumber ? `License / Reg: ${existing.licenseNumber}.` : ''}`,
+        specializations: existing.expertise.length > 0 ? existing.expertise : [existing.category],
+        services: existing.proposedServices.length > 0 ? existing.proposedServices : ['Initial Review & Assessment', 'Technical Consultation'],
+        active: true,
+        featured: false,
+      }, effectiveReviewer);
+
+      approvedConsultantId = createdConsultant.id;
+    } else if (review.status === 'APPROVED' && approvedConsultantId) {
+      // Ensure consultant is set to active
+      await this.setConsultantStatus(approvedConsultantId, { active: true }, effectiveReviewer);
+    } else if (review.status === 'SUSPENDED' && approvedConsultantId) {
+      // Inactivate consultant
+      await this.setConsultantStatus(approvedConsultantId, { active: false }, effectiveReviewer);
+    }
+
+    const updatedApp: ProfessionalApplicationEntity = {
+      ...existing,
+      status: review.status,
+      adminReviewerId: effectiveReviewer,
+      adminReviewNotes: effectiveNotes,
+      reviewerNotes: effectiveNotes,
+      reviewedBy: effectiveReviewer,
+      reviewedAt: now,
+      rejectionReason: review.status === 'REJECTED' ? review.rejectionReason || effectiveNotes : null,
+      approvedConsultantId,
+      updatedAt: now,
+    };
+
+    if (this.prisma) {
+      try {
+        const saved = await (this.prisma as any).professionalApplication.update({
+          where: { id },
+          data: {
+            status: updatedApp.status,
+            adminReviewerId: updatedApp.adminReviewerId,
+            adminReviewNotes: updatedApp.adminReviewNotes,
+            rejectionReason: updatedApp.rejectionReason,
+            approvedConsultantId: updatedApp.approvedConsultantId,
+            updatedAt: new Date(now),
+          },
+        });
+        if (saved) return this.mapPrismaApplication(saved);
+      } catch {
+        // Fallback
+      }
+    }
+
+    const idx = this.inMemoryApplications.findIndex((a) => a.id === id);
+    if (idx >= 0) {
+      this.inMemoryApplications[idx] = updatedApp;
+    } else {
+      this.inMemoryApplications.push(updatedApp);
+    }
+
+    return updatedApp;
+  }
+
+  private mapPrismaApplication(a: any): ProfessionalApplicationEntity {
+    return {
+      id: a.id,
+      fullName: a.fullName,
+      category: a.category,
+      email: a.email,
+      phone: a.phone,
+      qualifications: a.qualifications,
+      licenseNumber: a.licenseNumber || null,
+      experienceYears: a.experienceYears,
+      city: a.city,
+      serviceAreas: a.serviceAreas || [],
+      expertise: a.expertise || [],
+      portfolioLinks: a.portfolioLinks || [],
+      consultationModes: a.consultationModes || ['VIDEO', 'AUDIO'],
+      proposedServices: a.proposedServices || [],
+      proposedFeeINR: a.proposedFeeINR || 1499,
+      documentsJson: a.documentsJson || null,
+      status: a.status,
+      adminReviewerId: a.adminReviewerId || null,
+      adminReviewNotes: a.adminReviewNotes || null,
+      rejectionReason: a.rejectionReason || null,
+      approvedConsultantId: a.approvedConsultantId || null,
+      consentGiven: a.consentGiven,
+      createdAt: a.createdAt ? new Date(a.createdAt).toISOString() : new Date().toISOString(),
+      updatedAt: a.updatedAt ? new Date(a.updatedAt).toISOString() : new Date().toISOString(),
     };
   }
 

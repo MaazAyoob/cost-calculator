@@ -16,15 +16,15 @@ export const Step3CoreMaterials: React.FC = () => {
   const cementBags = quantities.cementBags || 0;
 
   const steelOptions: { brand: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT'; grade: string; ratePerKg: number; desc: string }[] = [
-    { brand: 'Tata Tiscon', grade: 'Fe 550D Super Ductile', ratePerKg: 78, desc: 'Primary structural steel with superior earthquake ductility.' },
-    { brand: 'JSW Neosteel', grade: 'Fe 550D High Strength', ratePerKg: 74, desc: 'High-yield thermo-mechanically treated primary rebars.' },
-    { brand: 'Indus TMT', grade: 'Fe 500D Premium', ratePerKg: 68, desc: 'Cost-effective high-durability ribbed TMT bars.' },
+    { brand: 'Tata Tiscon', grade: 'Fe 550D Super Ductile', ratePerKg: 78, desc: 'Primary structural steel with superior earthquake ductility (Fe 550D grade absorbs ground movement safely).' },
+    { brand: 'JSW Neosteel', grade: 'Fe 550D High Strength', ratePerKg: 74, desc: 'High-strength thermo-mechanically treated rebars engineered for resilient residential RCC frames.' },
+    { brand: 'Indus TMT', grade: 'Fe 500D Premium', ratePerKg: 68, desc: 'Cost-effective high-durability ribbed TMT bars suitable for standard residential loading.' },
   ];
 
   const cementOptions: { brand: 'UltraTech' | 'ACC Cement' | 'Dalmia Bharat'; grade: string; ratePerBag: number; desc: string }[] = [
-    { brand: 'UltraTech', grade: 'Super / Weather Plus (OPC 53)', ratePerBag: 420, desc: "India's #1 structural cement with water-repellent micro-particles." },
-    { brand: 'ACC Cement', grade: 'Gold Water Shield / Concrete Plus', ratePerBag: 395, desc: 'High initial compressive strength for slab casting.' },
-    { brand: 'Dalmia Bharat', grade: 'DSP / PPC Heavy Structure', ratePerBag: 375, desc: 'High slump retention for heavy reinforced concrete.' },
+    { brand: 'UltraTech', grade: 'Super / Weather Plus (OPC 53)', ratePerBag: 420, desc: "India's #1 structural cement with 53-grade high early strength for fast, reliable slab and column casting." },
+    { brand: 'ACC Cement', grade: 'Gold Water Shield / Concrete Plus', ratePerBag: 395, desc: 'High compressive strength cement with water shield additives for reinforced concrete foundations and slabs.' },
+    { brand: 'Dalmia Bharat', grade: 'DSP / PPC Heavy Structure', ratePerBag: 375, desc: 'Heavy-structure blended cement engineered for high slump retention and reduced thermal cracking.' },
   ];
 
   const masonryOptions = [
@@ -36,7 +36,7 @@ export const Step3CoreMaterials: React.FC = () => {
       wastage: '5%',
       rate: 85,
       unit: 'Block',
-      desc: 'IS 2185 Part 3 lightweight thermal insulating blocks with polymer jointing.',
+      desc: 'Lightweight thermal insulating blocks that keep rooms cooler and lessen dead weight on foundation columns.',
     },
     {
       type: 'Clay Bricks',
@@ -46,7 +46,7 @@ export const Step3CoreMaterials: React.FC = () => {
       wastage: '7%',
       rate: 12,
       unit: 'Brick',
-      desc: 'IS 1077 high compressive strength modular kiln-burnt red clay bricks.',
+      desc: 'Traditional kiln-burnt red clay bricks with proven thermal mass, acoustics, and high compressive strength.',
     },
     {
       type: 'Concrete Blocks',
@@ -56,7 +56,7 @@ export const Step3CoreMaterials: React.FC = () => {
       wastage: '5%',
       rate: 52,
       unit: 'Block',
-      desc: 'IS 2185 Part 1 heavy-duty hydraulic pressed solid concrete blocks.',
+      desc: 'High-density hydraulic pressed concrete blocks providing robust wall stability and sound dampening.',
     },
   ];
 
@@ -96,7 +96,7 @@ export const Step3CoreMaterials: React.FC = () => {
                   isSelected && 'hutty-tactile-card-selected'
                 )}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
@@ -105,7 +105,7 @@ export const Step3CoreMaterials: React.FC = () => {
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#172722]">{item.brand}</h4>
                       <span className="text-[10px] font-mono text-[#687770] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E3E8E2]">
@@ -159,7 +159,7 @@ export const Step3CoreMaterials: React.FC = () => {
                   isSelected && 'hutty-tactile-card-selected'
                 )}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
@@ -168,7 +168,7 @@ export const Step3CoreMaterials: React.FC = () => {
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.brand}</h4>
                       <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">
@@ -220,7 +220,7 @@ export const Step3CoreMaterials: React.FC = () => {
             <span className="text-[11px] font-bold text-[#1B3D34] uppercase tracking-wider block">
               Block Consumption
             </span>
-            <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 text-xs">
               <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
                 <span className="text-[10px] text-[#4B5563] block font-medium">Net Wall Area</span>
                 <span className="font-mono font-bold text-[#1B3D34] text-xs sm:text-sm">
@@ -265,7 +265,7 @@ export const Step3CoreMaterials: React.FC = () => {
                   isSelected && 'hutty-tactile-card-selected'
                 )}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div
                     className={cn(
                       'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
@@ -274,7 +274,7 @@ export const Step3CoreMaterials: React.FC = () => {
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-extrabold text-[#1B3D34]">{item.name}</h4>
                       <span className="text-[10px] font-mono text-[#4B5563] bg-[#F8F8F6] px-1.5 py-0.5 rounded border border-[#E5E7EB]">

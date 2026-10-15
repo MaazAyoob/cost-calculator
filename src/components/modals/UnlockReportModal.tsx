@@ -388,7 +388,7 @@ export const UnlockReportModal: React.FC<Props> = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative z-10 bg-white rounded-2xl border border-[#E3E8E2] max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
+            className="relative z-10 bg-white rounded-2xl border border-[#E3E8E2] max-w-lg w-full p-4 sm:p-7 space-y-5 sm:space-y-6 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
           >
         
         {/* Close Button */}
@@ -417,7 +417,7 @@ export const UnlockReportModal: React.FC<Props> = ({
             </div>
 
             {/* Plan Tier Selector */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedTier('DETAILED_ESTIMATE_499')}

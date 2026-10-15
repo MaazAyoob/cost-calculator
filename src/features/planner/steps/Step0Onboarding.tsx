@@ -5,7 +5,17 @@ import {
   CONSTRUCTION_PACKAGES,
   ConstructionPackageId,
 } from '../../../calculation-engine/data/packageConfig';
-import { Check, Shield, Award, Sparkles, Play } from 'lucide-react';
+import {
+  Check,
+  Shield,
+  Award,
+  Sparkles,
+  Play,
+  Layers,
+  Sliders,
+  ClipboardList,
+  HelpCircle,
+} from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
 export const Step0Onboarding: React.FC = () => {
@@ -82,6 +92,97 @@ export const Step0Onboarding: React.FC = () => {
         </span>
       </div>
 
+      {/* ── BEGINNER TUTORIAL: HOW IT WORKS ── */}
+      <section className="bg-white rounded-2xl border border-[#E3E8E2] p-4 sm:p-5 shadow-2xs space-y-3 text-left">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#E3E8E2]/70 pb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28]" />
+              <h2 className="text-sm sm:text-base font-extrabold text-[#1B3D34] font-heading">
+                First time here? Here's how it works.
+              </h2>
+            </div>
+            <p className="text-xs text-[#52605B] mt-0.5">
+              Choose a starting package for your home. You can customize your materials and finishes in the next steps.
+            </p>
+          </div>
+          <span className="self-start sm:self-auto text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.06)] px-2.5 py-1 rounded-full border border-[#1B3D34]/10 shrink-0">
+            3 Simple Steps
+          </span>
+        </div>
+
+        {/* 3 Step Cards in Compact Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Step 1 */}
+          <div className="p-3.5 rounded-xl bg-[#FAFBF9] border border-[#E3E8E2]/80 space-y-1.5 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="w-7 h-7 rounded-lg bg-[rgba(27,61,52,0.08)] text-[#1B3D34] flex items-center justify-center shrink-0">
+                  <Layers className="w-4 h-4 text-[#1B3D34]" />
+                </div>
+                <span className="text-[10px] font-mono font-bold text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-1.5 py-0.5 rounded">
+                  01
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-[#1B3D34]">
+                Choose a starting package
+              </h3>
+              <p className="text-[11px] text-[#52605B] leading-relaxed">
+                Pick Standard, Premium or Luxury based on the finish and budget you're considering.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="p-3.5 rounded-xl bg-[#FAFBF9] border border-[#E3E8E2]/80 space-y-1.5 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="w-7 h-7 rounded-lg bg-[rgba(27,61,52,0.08)] text-[#1B3D34] flex items-center justify-center shrink-0">
+                  <Sliders className="w-4 h-4 text-[#1B3D34]" />
+                </div>
+                <span className="text-[10px] font-mono font-bold text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-1.5 py-0.5 rounded">
+                  02
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-[#1B3D34]">
+                Make it your own
+              </h3>
+              <p className="text-[11px] text-[#52605B] leading-relaxed">
+                Choose your materials, flooring, doors and other finishes in the next steps.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="p-3.5 rounded-xl bg-[#FAFBF9] border border-[#E3E8E2]/80 space-y-1.5 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="w-7 h-7 rounded-lg bg-[rgba(27,61,52,0.08)] text-[#1B3D34] flex items-center justify-center shrink-0">
+                  <ClipboardList className="w-4 h-4 text-[#1B3D34]" />
+                </div>
+                <span className="text-[10px] font-mono font-bold text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-1.5 py-0.5 rounded">
+                  03
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-[#1B3D34]">
+                Review your estimate
+              </h3>
+              <p className="text-[11px] text-[#52605B] leading-relaxed">
+                Check your choices and see your estimated construction cost before continuing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Reassurance Line Immediately Above Package Cards */}
+      <div className="flex items-center gap-2.5 p-3 bg-[#FAFBF9] rounded-xl border border-[#E3E8E2] text-xs text-[#52605B] text-left">
+        <HelpCircle className="w-4 h-4 text-[#F28C28] shrink-0" />
+        <span>
+          <strong className="text-[#1B3D34] font-semibold">Not sure which to choose?</strong> Start with the option that suits you best. You can adjust individual choices in the following steps.
+        </span>
+      </div>
+
       {/* Construction Package Specification Cards (3 Architectural Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 text-left">
         {packagesList.map(({ id, icon: Icon, badgeTag, swatches }) => {
@@ -94,7 +195,7 @@ export const Step0Onboarding: React.FC = () => {
               key={id}
               whileHover={{ y: -2 }}
               transition={{ duration: 0.15 }}
-              onClick={(e) => handleSelectPackageAndAdvance(id, e)}
+              onClick={() => setSelectedPackage(id, true)}
               className={cn(
                 'relative p-5 sm:p-6 rounded-[14px] border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 bg-white',
                 isSelected

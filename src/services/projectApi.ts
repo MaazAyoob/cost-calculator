@@ -1,14 +1,16 @@
 // ==============================================================================
 // Hutty Project API Client
-// Handles durable server-side project persistence and retrieval
+// Handles durable server-side project persistence, listing, auto-saving,
+// renaming, and deletion with authentication headers.
 // ==============================================================================
 
 import { getApiUrl } from '../config/api';
+import { useCustomerAuthStore } from '../store/useCustomerAuthStore';
 
 export interface PersistProjectPayload {
   name?: string;
   leadName?: string;
-  leadEmail: string;
+  leadEmail?: string;
   leadPhone?: string;
   city?: string;
   authority?: string;
@@ -56,12 +58,32 @@ export interface PersistedProject {
 
 let cachedPersistedProjectId: string | null = null;
 
+function getAuthHeaders(): HeadersInit {
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  const token = useCustomerAuthStore.getState().token;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+/**
+ * Creates or persists a project to the backend database.
+ */
 export async function persistProject(payload: PersistProjectPayload): Promise<PersistedProject> {
   const url = getApiUrl('/projects');
+  const user = useCustomerAuthStore.getState().user;
+
+  const bodyPayload = {
+    ...payload,
+    leadEmail: payload.leadEmail || user?.email,
+    leadName: payload.leadName || user?.name,
+  };
+
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: getAuthHeaders(),
+    body: JSON.stringify(bodyPayload),
   });
 
   const json = await res.json();
@@ -75,6 +97,91 @@ export async function persistProject(payload: PersistProjectPayload): Promise<Pe
   } catch {}
 
   return json.data;
+}
+
+/**
+ * Retrieves all projects owned by the authenticated customer.
+ */
+export async function fetchUserProjects(): Promise<PersistedProject[]> {
+  const url = getApiUrl('/projects');
+  const res = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || 'Failed to load projects');
+  }
+  return json.data || [];
+}
+
+/**
+ * Retrieves a single project by ID.
+ */
+export async function fetchProjectById(id: string): Promise<PersistedProject> {
+  const url = getApiUrl(`/projects/${id}`);
+  const res = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || 'Failed to load project');
+  }
+  return json.data;
+}
+
+/**
+ * Auto-saves updated configuration and calculation snapshots for a project.
+ */
+export async function updateProject(id: string, payload: Partial<PersistProjectPayload>): Promise<PersistedProject> {
+  const url = getApiUrl(`/projects/${id}`);
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || 'Failed to auto-save project');
+  }
+  return json.data;
+}
+
+/**
+ * Renames a project owned by the customer.
+ */
+export async function renameProject(id: string, name: string): Promise<PersistedProject> {
+  const url = getApiUrl(`/projects/${id}/rename`);
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ name }),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || 'Failed to rename project');
+  }
+  return json.data;
+}
+
+/**
+ * Deletes or archives a project owned by the customer.
+ */
+export async function deleteProject(id: string): Promise<{ success: boolean; message: string }> {
+  const url = getApiUrl(`/projects/${id}`);
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || 'Failed to delete project');
+  }
+  return json;
 }
 
 export function getCachedProjectId(): string | null {

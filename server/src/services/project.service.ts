@@ -11,10 +11,12 @@ import crypto from 'crypto';
 export interface ProjectEntity {
   id: string;
   name: string;
+  title?: string;
   ownerId: string;
+  userId?: string;
   city: string;
   authority: string;
-  status: 'DRAFT' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED';
+  status: 'DRAFT' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED' | string;
   configuration?: ProjectConfigurationEntity | null;
   calculation?: CalculationResultEntity | null;
   createdAt: string;
@@ -94,12 +96,13 @@ export class ProjectService {
   private prisma: PrismaClient | null = null;
   private dbConnected: boolean = false;
   private inMemoryProjects: ProjectEntity[] = [];
+  private inMemoryUsers?: Map<string, any>;
 
   constructor(client?: PrismaClient) {
     if (client) {
       this.prisma = client;
       this.dbConnected = true;
-    } else {
+    } else if (process.env.DATABASE_URL) {
       try {
         this.prisma = new PrismaClient();
         this.dbConnected = true;
@@ -107,6 +110,9 @@ export class ProjectService {
         this.prisma = null;
         this.dbConnected = false;
       }
+    } else {
+      this.prisma = null;
+      this.dbConnected = false;
     }
   }
 
@@ -168,12 +174,21 @@ export class ProjectService {
       }
     }
 
-    // In-memory fallback
-    return {
+    // In-memory fallback: preserve consistent user identity by email
+    if (!this.inMemoryUsers) {
+      this.inMemoryUsers = new Map();
+    }
+    const existingMemoryUser = this.inMemoryUsers.get(normalizedEmail);
+    if (existingMemoryUser) {
+      return existingMemoryUser;
+    }
+    const memoryUser = {
       id: params.userId || `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
       name: params.name?.trim() || 'Homeowner',
       email: normalizedEmail,
     };
+    this.inMemoryUsers.set(normalizedEmail, memoryUser);
+    return memoryUser;
   }
 
   /**
@@ -365,6 +380,93 @@ export class ProjectService {
   }
 
   /**
+   * Saves or updates a project with support for title, userId, and snapshot data.
+   */
+  public async saveProject(input: {
+    id?: string;
+    userId?: string;
+    ownerId?: string;
+    title?: string;
+    name?: string;
+    city?: string;
+    plotLength?: number;
+    plotWidth?: number;
+    builtUpArea?: number;
+    packageType?: string;
+    status?: string;
+    leadEmail?: string;
+    configuration?: any;
+    calculation?: any;
+  }): Promise<ProjectEntity> {
+    const ownerId = input.userId || input.ownerId || `usr-${Date.now()}`;
+    const title = input.title || input.name || 'Custom Home Project';
+
+    const project: ProjectEntity = {
+      id: input.id || crypto.randomUUID(),
+      name: title,
+      title: title,
+      ownerId: ownerId,
+      userId: ownerId,
+      city: input.city || 'Bangalore',
+      authority: 'BBMP/BDA',
+      status: (input.status as any) || 'PLANNED',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      configuration: input.configuration ? {
+        id: crypto.randomUUID(),
+        projectId: input.id || crypto.randomUUID(),
+        plotLength: input.plotLength || 30,
+        plotWidth: input.plotWidth || 40,
+        houseType: 'Residential',
+        floors: 2,
+        parkingType: 'Normal Ground',
+        carCount: 1,
+        bikeCount: 2,
+        evCharging: false,
+        liftRequired: false,
+        roomsJson: {},
+        qualityTier: (input.packageType as any) || 'Premium',
+        materialBrands: {},
+      } : undefined,
+      calculation: input.calculation || undefined,
+    };
+
+    if (this.prisma && this.dbConnected && process.env.DATABASE_URL) {
+      try {
+        await (this.prisma as any).project.upsert({
+          where: { id: project.id },
+          update: {
+            name: project.name,
+            city: project.city,
+            status: project.status,
+            updatedAt: new Date(),
+          },
+          create: {
+            id: project.id,
+            name: project.name,
+            ownerId: project.ownerId,
+            city: project.city,
+            authority: project.authority,
+            status: project.status,
+          },
+        });
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to save project: ' + err.message);
+        }
+      }
+    }
+
+    const existingIdx = this.inMemoryProjects.findIndex((p) => p.id === project.id);
+    if (existingIdx >= 0) {
+      this.inMemoryProjects[existingIdx] = project;
+    } else {
+      this.inMemoryProjects.unshift(project);
+    }
+    return project;
+  }
+
+  /**
    * Retrieves a project by its database ID.
    */
   public async getProjectById(id: string): Promise<ProjectEntity | null> {
@@ -381,7 +483,9 @@ export class ProjectService {
           return {
             id: found.id,
             name: found.name,
+            title: found.name,
             ownerId: found.ownerId,
+            userId: found.ownerId,
             city: found.city,
             authority: found.authority,
             status: found.status,
@@ -396,15 +500,254 @@ export class ProjectService {
       }
     }
 
-    return this.inMemoryProjects.find((p) => p.id === id) || null;
+    const foundMem = this.inMemoryProjects.find((p) => p.id === id);
+    if (foundMem) {
+      return {
+        ...foundMem,
+        title: foundMem.title || foundMem.name,
+        userId: foundMem.userId || foundMem.ownerId,
+      };
+    }
+    return null;
   }
 
   /**
-   * Fast verification check whether a project exists in PostgreSQL.
+   * Retrieves all projects owned by a specific authenticated customer.
    */
-  public async validateProjectExists(id: string): Promise<boolean> {
-    const project = await this.getProjectById(id);
-    return project !== null;
+  public async getUserProjects(userId: string): Promise<ProjectEntity[]> {
+    if (!userId) return [];
+
+    if (this.prisma && this.dbConnected) {
+      try {
+        const found = await (this.prisma as any).project.findMany({
+          where: {
+            ownerId: userId,
+            status: { not: 'ARCHIVED' },
+          },
+          include: {
+            configuration: true,
+            calculation: true,
+          },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+        });
+
+        return found.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          title: p.name,
+          ownerId: p.ownerId,
+          userId: p.ownerId,
+          city: p.city,
+          authority: p.authority,
+          status: p.status,
+          configuration: p.configuration,
+          calculation: p.calculation,
+          createdAt: p.createdAt?.toISOString?.() || String(p.createdAt),
+          updatedAt: p.updatedAt?.toISOString?.() || String(p.updatedAt),
+        }));
+      } catch (err: any) {
+        console.warn('[ProjectService] Error querying user projects:', err.message);
+      }
+    }
+
+    return this.inMemoryProjects
+      .filter((p) => (p.ownerId === userId || p.userId === userId) && p.status !== 'ARCHIVED')
+      .map((p) => ({
+        ...p,
+        title: p.title || p.name,
+        userId: p.userId || p.ownerId,
+      }));
+  }
+
+  /**
+   * Alias for getUserProjects used by consumer accounts and integration test suites.
+   */
+  public async listProjectsByUser(userId: string): Promise<ProjectEntity[]> {
+    return this.getUserProjects(userId);
+  }
+
+  /**
+   * Updates an existing project with auto-saved inputs and calculation snapshots.
+   * Strictly enforces that the caller owns the project.
+   */
+  public async updateProject(
+    id: string,
+    userId: string,
+    updateData: {
+      name?: string;
+      city?: string;
+      authority?: string;
+      configuration?: any;
+      calculation?: any;
+    }
+  ): Promise<ProjectEntity> {
+    const existing = await this.getProjectById(id);
+    if (!existing) {
+      throw new Error(`Project with ID "${id}" not found.`);
+    }
+
+    if (existing.ownerId !== userId) {
+      throw new Error(`FORBIDDEN: You do not have permission to modify this project.`);
+    }
+
+    const now = new Date().toISOString();
+
+    if (this.prisma && this.dbConnected) {
+      try {
+        const updatePayload: any = {
+          updatedAt: new Date(),
+        };
+        if (updateData.name) updatePayload.name = updateData.name.trim();
+        if (updateData.city) updatePayload.city = updateData.city;
+        if (updateData.authority) updatePayload.authority = updateData.authority;
+
+        if (updateData.configuration) {
+          const cfg = updateData.configuration;
+          updatePayload.configuration = {
+            upsert: {
+              create: {
+                id: crypto.randomUUID(),
+                plotLength: Number(cfg.plotLength) || 30,
+                plotWidth: Number(cfg.plotWidth) || 40,
+                houseType: cfg.houseType || 'Duplex',
+                floors: Number(cfg.floors) || 2,
+                parkingType: cfg.parkingType || 'Normal Ground',
+                carCount: Number(cfg.carCount) || 1,
+                bikeCount: Number(cfg.bikeCount) || 2,
+                evCharging: Boolean(cfg.evCharging),
+                liftRequired: Boolean(cfg.liftRequired),
+                roomsJson: cfg.rooms || cfg.roomsJson || {},
+                qualityTier: this.normalizeQualityTier(cfg.qualityTier),
+                materialBrands: cfg.materialBrands || {},
+              },
+              update: {
+                plotLength: cfg.plotLength !== undefined ? Number(cfg.plotLength) : undefined,
+                plotWidth: cfg.plotWidth !== undefined ? Number(cfg.plotWidth) : undefined,
+                houseType: cfg.houseType || undefined,
+                floors: cfg.floors !== undefined ? Number(cfg.floors) : undefined,
+                parkingType: cfg.parkingType || undefined,
+                carCount: cfg.carCount !== undefined ? Number(cfg.carCount) : undefined,
+                bikeCount: cfg.bikeCount !== undefined ? Number(cfg.bikeCount) : undefined,
+                evCharging: cfg.evCharging !== undefined ? Boolean(cfg.evCharging) : undefined,
+                liftRequired: cfg.liftRequired !== undefined ? Boolean(cfg.liftRequired) : undefined,
+                roomsJson: cfg.rooms || cfg.roomsJson || undefined,
+                qualityTier: cfg.qualityTier ? this.normalizeQualityTier(cfg.qualityTier) : undefined,
+                materialBrands: cfg.materialBrands || undefined,
+              },
+            },
+          };
+        }
+
+        if (updateData.calculation) {
+          const calc = updateData.calculation;
+          updatePayload.calculation = {
+            upsert: {
+              create: {
+                id: crypto.randomUUID(),
+                totalBUASqFt: Number(calc.totalBUASqFt) || 2400,
+                totalCostINR: Number(calc.totalCostINR) || 4800000,
+                costPerSqFt: Number(calc.costPerSqFt) || 2000,
+                steelTonnes: Number(calc.steelTonnes) || 0,
+                cementBags: Number(calc.cementBags) || 0,
+                concreteCuM: Number(calc.concreteCuM) || 0,
+                timelineMonths: Number(calc.timelineMonths) || 12,
+                budgetBreakdown: calc.budgetBreakdown || {},
+                quantitiesJson: calc.quantitiesJson || {},
+                configSnapshot: calc.configSnapshot || null,
+              },
+              update: {
+                totalBUASqFt: calc.totalBUASqFt !== undefined ? Number(calc.totalBUASqFt) : undefined,
+                totalCostINR: calc.totalCostINR !== undefined ? Number(calc.totalCostINR) : undefined,
+                costPerSqFt: calc.costPerSqFt !== undefined ? Number(calc.costPerSqFt) : undefined,
+                steelTonnes: calc.steelTonnes !== undefined ? Number(calc.steelTonnes) : undefined,
+                cementBags: calc.cementBags !== undefined ? Number(calc.cementBags) : undefined,
+                concreteCuM: calc.concreteCuM !== undefined ? Number(calc.concreteCuM) : undefined,
+                timelineMonths: calc.timelineMonths !== undefined ? Number(calc.timelineMonths) : undefined,
+                budgetBreakdown: calc.budgetBreakdown || undefined,
+                quantitiesJson: calc.quantitiesJson || undefined,
+                configSnapshot: calc.configSnapshot || undefined,
+                calculatedAt: new Date(),
+              },
+            },
+          };
+        }
+
+        const updated = await (this.prisma as any).project.update({
+          where: { id },
+          data: updatePayload,
+          include: { configuration: true, calculation: true },
+        });
+
+        return {
+          id: updated.id,
+          name: updated.name,
+          ownerId: updated.ownerId,
+          city: updated.city,
+          authority: updated.authority,
+          status: updated.status,
+          configuration: updated.configuration,
+          calculation: updated.calculation,
+          createdAt: updated.createdAt?.toISOString?.() || String(updated.createdAt),
+          updatedAt: updated.updatedAt?.toISOString?.() || String(updated.updatedAt),
+        };
+      } catch (err: any) {
+        console.warn('[ProjectService] Prisma project update failed:', err.message);
+      }
+    }
+
+    // In-memory fallback
+    if (updateData.name) existing.name = updateData.name.trim();
+    if (updateData.city) existing.city = updateData.city;
+    if (updateData.authority) existing.authority = updateData.authority;
+    if (updateData.configuration) {
+      existing.configuration = { ...existing.configuration, ...updateData.configuration };
+    }
+    if (updateData.calculation) {
+      existing.calculation = { ...existing.calculation, ...updateData.calculation, calculatedAt: now };
+    }
+    existing.updatedAt = now;
+    return existing;
+  }
+
+  /**
+   * Renames a project owned by the authenticated customer.
+   */
+  public async renameProject(id: string, userId: string, newName: string): Promise<ProjectEntity> {
+    if (!newName || !newName.trim()) {
+      throw new Error('Project name cannot be empty.');
+    }
+    return this.updateProject(id, userId, { name: newName.trim() });
+  }
+
+  /**
+   * Safely archives/deletes a project owned by the authenticated customer.
+   */
+  public async deleteProject(id: string, userId: string): Promise<{ success: boolean; message: string }> {
+    const existing = await this.getProjectById(id);
+    if (!existing) {
+      throw new Error(`Project with ID "${id}" not found.`);
+    }
+
+    if (existing.ownerId !== userId) {
+      throw new Error(`FORBIDDEN: You do not have permission to delete this project.`);
+    }
+
+    if (this.prisma && this.dbConnected) {
+      try {
+        await (this.prisma as any).project.update({
+          where: { id },
+          data: { status: 'ARCHIVED' },
+        });
+        return { success: true, message: 'Project archived successfully.' };
+      } catch (err: any) {
+        console.warn('[ProjectService] Prisma archive failed, using memory:', err.message);
+      }
+    }
+
+    existing.status = 'ARCHIVED';
+    return { success: true, message: 'Project archived successfully.' };
   }
 
   /**
@@ -412,6 +755,9 @@ export class ProjectService {
    */
   public clearInMemory() {
     this.inMemoryProjects = [];
+    if (this.inMemoryUsers) {
+      this.inMemoryUsers.clear();
+    }
   }
 }
 

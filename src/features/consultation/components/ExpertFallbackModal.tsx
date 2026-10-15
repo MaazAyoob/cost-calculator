@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, AlertCircle, Loader2, HelpCircle, Phone, Mail, User, MapPin } from 'lucide-react';
 import { getApiUrl } from '../../../config/api';
 import { modalScaleVariant } from '../../../animations/variants';
+import { consultationAnalytics } from '../../../utils/consultationAnalytics';
 
 interface ExpertFallbackModalProps {
   isOpen: boolean;
@@ -90,7 +91,13 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
         throw new Error(json.error || json.message || 'Failed to submit enquiry.');
       }
 
-      setConfirmationRef(json.reference || json.data?.reference || 'HT-ENQ-SUBMITTED');
+      const refId = json.reference || json.data?.reference || 'HT-ENQ-SUBMITTED';
+      setConfirmationRef(refId);
+      consultationAnalytics.track({
+        eventName: 'consultation_fallback_submitted',
+        category: topic,
+        referenceId: refId,
+      });
     } catch (err: any) {
       setErrorMessage(err.message || 'Could not connect to Hutty enquiry desk. Please try again.');
     } finally {

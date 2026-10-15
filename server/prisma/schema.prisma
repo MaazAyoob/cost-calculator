@@ -744,3 +744,49 @@ model PricingAuditLog {
   @@map("pricing_audit_logs")
 }
 
+// ============================================================
+// PROFESSIONAL APPLICATION & VERIFICATION (PHASE 1 EXPANSION)
+// ============================================================
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  MORE_INFO_REQUIRED
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model ProfessionalApplication {
+  id                    String            @id @default(uuid())
+  fullName              String
+  category              String            // Canonical Category: "Architectural Design", "Structural Engineering", etc.
+  email                 String
+  phone                 String
+  qualifications        String
+  licenseNumber         String?           // COA Reg No., structural license, etc.
+  experienceYears       Int
+  city                  String            @default("Bangalore")
+  serviceAreas          String[]
+  expertise             String[]
+  portfolioLinks        String[]
+  consultationModes     String[]          // ["VIDEO", "AUDIO", "IN_PERSON"]
+  proposedServices      String[]
+  proposedFeeINR        Int               @default(1499)
+  documentsJson         Json?             // Private verification document records
+  status                ApplicationStatus @default(SUBMITTED)
+  adminReviewerId       String?
+  adminReviewNotes      String?
+  rejectionReason       String?
+  approvedConsultantId  String?
+  consentGiven          Boolean           @default(true)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([email])
+  @@index([createdAt])
+  @@map("professional_applications")
+}
+

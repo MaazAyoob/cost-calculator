@@ -149,3 +149,91 @@ export interface CashfreeCheckoutOptions {
   environment: string;
 }
 
+export type CanonicalConsultationCategory =
+  | 'Architectural Design'
+  | 'Structural Engineering'
+  | 'Construction & Site Issues'
+  | 'Cost Estimation & BOQ'
+  | 'Approvals & Regulations'
+  | 'Interiors & Materials';
+
+export interface CategoryDetail {
+  id: string;
+  name: CanonicalConsultationCategory;
+  description: string;
+  examples: string[];
+  icon: string;
+  mappedConsultantCategories: string[];
+}
+
+export interface PopularService {
+  id: string;
+  title: string;
+  description: string;
+  category: CanonicalConsultationCategory;
+  priceINR: number;
+}
+
+export type ApplicationStatus =
+  | 'SUBMITTED'
+  | 'UNDER_REVIEW'
+  | 'MORE_INFO_REQUIRED'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'SUSPENDED';
+
+export interface ProfessionalApplication {
+  id: string;
+  fullName: string;
+  category: string;
+  categories?: string[];
+  email: string;
+  phone: string;
+  qualifications: string;
+  licenseNumber: string | null;
+  experienceYears: number;
+  city: string;
+  serviceAreas?: string[] | string;
+  expertise?: string[];
+  specializations?: string[];
+  about?: string;
+  portfolioLinks?: string[];
+  portfolioUrl?: string;
+  consultationModes?: string[];
+  proposedServices?: string[];
+  proposedFeeINR?: number;
+  proposedFee?: number;
+  documentsJson?: any | null;
+  documentsUrl?: string | null;
+  status: ApplicationStatus;
+  adminReviewerId?: string | null;
+  adminReviewNotes?: string | null;
+  reviewerNotes?: string | null;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  rejectionReason?: string | null;
+  approvedConsultantId?: string | null;
+  consentGiven: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProfessionalApplicationInput {
+  fullName: string;
+  category: string;
+  email: string;
+  phone: string;
+  qualifications: string;
+  licenseNumber?: string | null;
+  experienceYears: number;
+  city?: string;
+  serviceAreas?: string[];
+  expertise?: string[];
+  portfolioLinks?: string[];
+  consultationModes?: string[];
+  proposedServices?: string[];
+  proposedFeeINR?: number;
+  documents?: any;
+  consentGiven: boolean;
+}
+

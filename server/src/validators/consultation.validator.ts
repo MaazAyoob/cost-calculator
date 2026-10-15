@@ -12,7 +12,8 @@ export const createConsultantSchema = z.object({
   experienceYears: z.coerce.number().int().min(1, 'Experience must be at least 1 year').max(60),
   city: z.string().min(2).max(100).default('Bangalore'),
   serviceAreas: z.array(z.string()).default([]),
-  about: z.string().min(10, 'About section must be at least 10 characters').max(2000),
+  about: z.string().max(2000).optional(),
+  description: z.string().max(2000).optional(),
   specializations: z.array(z.string()).default([]),
   services: z.array(z.string()).default([]),
   active: z.boolean().default(true),
@@ -112,5 +113,37 @@ export const razorpayWebhookSchema = z.object({
       })
       .optional(),
   }),
+});
+
+export const createProfessionalApplicationSchema = z.object({
+  fullName: z.string().min(2, 'Full name must be at least 2 characters').max(100),
+  category: z.string().min(2, 'Category is required').max(100),
+  email: z.string().email('Valid email address is required'),
+  phone: z.string().min(10, 'Valid 10-digit phone number is required').max(15),
+  qualifications: z.string().min(2, 'Qualifications are required').max(200),
+  licenseNumber: z.string().max(100).optional().nullable(),
+  experienceYears: z.coerce.number().int().min(0, 'Experience years must be positive').max(60),
+  city: z.string().min(2).max(100).default('Bangalore'),
+  serviceAreas: z.array(z.string()).default([]),
+  expertise: z.array(z.string()).default([]),
+  portfolioLinks: z.array(z.string()).default([]),
+  consultationModes: z.array(z.string()).default(['VIDEO', 'AUDIO']),
+  proposedServices: z.array(z.string()).default([]),
+  proposedFeeINR: z.coerce.number().int().min(0).default(1499),
+  documents: z.any().optional(),
+  consentGiven: z.boolean().default(true),
+});
+
+export const reviewApplicationSchema = z.object({
+  status: z.enum([
+    'SUBMITTED',
+    'UNDER_REVIEW',
+    'MORE_INFO_REQUIRED',
+    'APPROVED',
+    'REJECTED',
+    'SUSPENDED',
+  ]),
+  adminReviewNotes: z.string().max(2000).optional().nullable(),
+  rejectionReason: z.string().max(1000).optional().nullable(),
 });
 

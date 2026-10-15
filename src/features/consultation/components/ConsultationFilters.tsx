@@ -1,9 +1,10 @@
 import React from 'react';
 import { Search, MapPin, Tag, X, Filter } from 'lucide-react';
 import {
-  LAUNCH_CONSULTATION_CATEGORIES,
+  CANONICAL_CONSULTATION_CATEGORIES,
   LAUNCH_CONSULTATION_PRICE_DISPLAY,
   POPULAR_LOCATIONS,
+  mapCategoryToConsultantCategories,
 } from '../../../config/consultation';
 
 interface ConsultationFiltersProps {
@@ -25,7 +26,7 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
   onSelectCity,
   totalResults,
 }) => {
-  const categories = ['ALL', ...LAUNCH_CONSULTATION_CATEGORIES];
+  const categories = ['ALL', ...CANONICAL_CONSULTATION_CATEGORIES];
 
   const hasActiveFilters = selectedCategory !== 'ALL' || searchQuery.trim().length > 0 || selectedCity !== 'ALL';
 
@@ -91,7 +92,8 @@ export const ConsultationFilters: React.FC<ConsultationFiltersProps> = ({
       <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between gap-4">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none max-w-full">
           {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
+            const mapped = cat !== 'ALL' ? mapCategoryToConsultantCategories(cat) : [];
+            const isSelected = selectedCategory === cat || mapped.includes(selectedCategory);
             return (
               <button
                 key={cat}

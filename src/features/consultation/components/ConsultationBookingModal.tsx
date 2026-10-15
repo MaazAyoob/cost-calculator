@@ -31,17 +31,20 @@ import { useCalculationStore } from '../../../store/useCalculationStore';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { formatCurrency } from '../../../utils/cn';
 import { modalScaleVariant, backdropFadeVariant } from '../../../animations/variants';
+import { consultationAnalytics } from '../../../utils/consultationAnalytics';
 
 interface ConsultationBookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   consultant: Consultant | null;
+  initialTopic?: string;
 }
 
 export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> = ({
   isOpen,
   onClose,
   consultant,
+  initialTopic,
 }) => {
   const { submitBooking, verifyPayment, isSubmittingBooking } = useConsultationStore();
   const { savedEstimations } = useSavedEstimationsStore();
@@ -56,7 +59,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   const [homeownerName, setHomeownerName] = useState('');
   const [homeownerPhone, setHomeownerPhone] = useState('');
   const [homeownerEmail, setHomeownerEmail] = useState('');
-  const [consultationTopic, setConsultationTopic] = useState<string>(LAUNCH_CONSULTATION_TOPICS[0]);
+  const [consultationTopic, setConsultationTopic] = useState<string>(initialTopic || LAUNCH_CONSULTATION_TOPICS[0]);
   const [projectLocation, setProjectLocation] = useState('Bangalore');
   const [projectType, setProjectType] = useState('Independent Villa / House');
   const [preferredDate, setPreferredDate] = useState('');
@@ -82,10 +85,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
       setStep(1);
       setErrorMessage(null);
       setPreferredDate(tomorrowStr);
+      if (initialTopic) setConsultationTopic(initialTopic);
       // Pre-fill location from consultant city or wizard
       if (wizard.city) setProjectLocation(wizard.city);
     }
-  }, [isOpen, tomorrowStr, wizard.city]);
+  }, [isOpen, tomorrowStr, wizard.city, initialTopic]);
 
   useEffect(() => {
     if (isOpen) {
@@ -158,6 +162,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   const handleProceedToStep2 = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep1()) return;
+    consultationAnalytics.track({
+      eventName: 'consultation_slot_selected',
+      consultantId: consultant?.id,
+      slotPreference: `${preferredDate} ${preferredTime}`,
+    });
     setStep(2);
   };
 
@@ -165,6 +174,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   const handleInitiatePaymentAndSubmit = async () => {
     if (!consultant) return;
     setErrorMessage(null);
+    consultationAnalytics.track({
+      eventName: 'consultation_checkout_started',
+      consultantId: consultant.id,
+      amount: LAUNCH_CONSULTATION_PRICE_INR,
+    });
     try {
       // 1. Submit booking details to backend (Strictly resolves to ₹1,499)
       const bookingData = await submitBooking({
@@ -204,6 +218,10 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
           }).then(async (result: any) => {
             if (result?.error) {
               setErrorMessage(result.error.message || 'Cashfree payment was cancelled.');
+              consultationAnalytics.track({
+                eventName: 'consultation_payment_failed',
+                metadata: { error: result.error.message },
+              });
               return;
             }
             try {
@@ -211,10 +229,23 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 gatewayOrderId: cashfreeOptions.orderId || payment.gatewayOrderId,
                 gatewayPaymentId: `cf_pay_${Date.now()}`,
               });
+              consultationAnalytics.track({
+                eventName: 'consultation_payment_succeeded',
+                referenceId: verified.publicReference,
+                amount: LAUNCH_CONSULTATION_PRICE_INR,
+              });
+              consultationAnalytics.track({
+                eventName: 'consultation_booking_confirmed',
+                referenceId: verified.publicReference,
+              });
               setConfirmedRequest(verified);
               setStep(4);
             } catch (verErr: any) {
               setErrorMessage(verErr.message || 'Payment verification failed with Cashfree.');
+              consultationAnalytics.track({
+                eventName: 'consultation_payment_failed',
+                metadata: { error: verErr.message },
+              });
             }
           });
           return;
@@ -244,15 +275,32 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 gatewayPaymentId: response.razorpay_payment_id,
                 gatewaySignature: response.razorpay_signature,
               });
+              consultationAnalytics.track({
+                eventName: 'consultation_payment_succeeded',
+                referenceId: verified.publicReference,
+                amount: LAUNCH_CONSULTATION_PRICE_INR,
+              });
+              consultationAnalytics.track({
+                eventName: 'consultation_booking_confirmed',
+                referenceId: verified.publicReference,
+              });
               setConfirmedRequest(verified);
               setStep(4);
             } catch (err: any) {
               setErrorMessage(err.message || 'Payment verification failed.');
+              consultationAnalytics.track({
+                eventName: 'consultation_payment_failed',
+                metadata: { error: err.message },
+              });
             }
           },
           modal: {
             ondismiss: () => {
               setErrorMessage('Payment was cancelled. You can retry whenever ready.');
+              consultationAnalytics.track({
+                eventName: 'consultation_payment_failed',
+                metadata: { reason: 'User dismissed modal' },
+              });
             },
           },
         });
@@ -265,11 +313,24 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
           gatewayOrderId: payment.gatewayOrderId,
           gatewayPaymentId: simulatedPaymentId,
         });
+        consultationAnalytics.track({
+          eventName: 'consultation_payment_succeeded',
+          referenceId: verified.publicReference,
+          amount: LAUNCH_CONSULTATION_PRICE_INR,
+        });
+        consultationAnalytics.track({
+          eventName: 'consultation_booking_confirmed',
+          referenceId: verified.publicReference,
+        });
         setConfirmedRequest(verified);
         setStep(4);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'An error occurred while booking. Please try again.');
+      consultationAnalytics.track({
+        eventName: 'consultation_payment_failed',
+        metadata: { error: err.message },
+      });
     }
   };
 
@@ -298,7 +359,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative z-10 bg-white rounded-3xl p-5 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E3E8E2] my-8 text-left space-y-6 max-h-[92vh] overflow-y-auto"
+            className="relative z-10 bg-white rounded-3xl p-4 sm:p-7 max-w-2xl w-full shadow-2xl border border-[#E3E8E2] my-8 text-left space-y-6 max-h-[92vh] overflow-y-auto"
           >
         {/* Header */}
         <div className="flex items-start justify-between pb-4 border-b border-[#E3E8E2]">

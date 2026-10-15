@@ -9,6 +9,7 @@
     "lint": "tsc -b",
     "test": "vitest run",
     "preview": "vite preview",
+    "server:dev": "npm --prefix server run dev",
     "server:build": "npm --prefix server run build",
     "server:generate": "npm --prefix server run prisma:generate",
     "server:db:init:verify": "npm --prefix server run db:init:verify",

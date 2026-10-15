@@ -18,6 +18,10 @@ import {
   scheduleConsultation,
   updateRequestStatus,
   addInternalNote,
+  submitProfessionalApplication,
+  getProfessionalApplications,
+  getProfessionalApplicationById,
+  reviewProfessionalApplication,
 } from '../controllers/consultation.controller';
 import { authenticateToken, requireAdmin } from '../middlewares/auth.middleware';
 
@@ -34,6 +38,7 @@ export const consultationPublicRouter = Router();
 consultationPublicRouter.get('/consultants', publicRateLimiter, getActiveConsultants);
 consultationPublicRouter.get('/consultants/categories', publicRateLimiter, getConsultationCategories);
 consultationPublicRouter.get('/consultants/:slug', publicRateLimiter, getConsultantBySlug);
+consultationPublicRouter.post('/professionals/apply', bookingRateLimiter, submitProfessionalApplication as any);
 
 // ── Customer Booking & Payment Router (Mounted at /api/v1/consultations) ──
 export const consultationCustomerRouter = Router();
@@ -65,6 +70,9 @@ consultationCustomerRouter.post('/:id/verify-payment', paymentVerifyRateLimiter,
 // General Expert Enquiry & Fallback lead endpoint (Rate limited)
 consultationCustomerRouter.post('/enquiries', bookingRateLimiter, createGeneralEnquiry as any);
 
+// Professional self-registration application endpoint
+consultationCustomerRouter.post('/professionals/apply', bookingRateLimiter, submitProfessionalApplication as any);
+
 // Optional auth: if token present, populated via header, otherwise email query param checked
 consultationCustomerRouter.get('/my', (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -91,6 +99,7 @@ consultationAdminRouter.use(requireAdmin as any);
 consultationAdminRouter.get('/consultants', getAllConsultantsAdmin as any);
 consultationAdminRouter.post('/consultants', createConsultant as any);
 consultationAdminRouter.put('/consultants/:id', updateConsultant as any);
+consultationAdminRouter.patch('/consultants/:id', updateConsultant as any);
 consultationAdminRouter.patch('/consultants/:id/status', setConsultantStatus as any);
 
 // Consultation Request Management
@@ -100,3 +109,8 @@ consultationAdminRouter.patch('/consultations/:id/assign', assignConsultant as a
 consultationAdminRouter.patch('/consultations/:id/schedule', scheduleConsultation as any);
 consultationAdminRouter.patch('/consultations/:id/status', updateRequestStatus as any);
 consultationAdminRouter.post('/consultations/:id/notes', addInternalNote as any);
+
+// Professional Applications & Verification Queue Management
+consultationAdminRouter.get('/professionals/applications', getProfessionalApplications as any);
+consultationAdminRouter.get('/professionals/applications/:id', getProfessionalApplicationById as any);
+consultationAdminRouter.patch('/professionals/applications/:id', reviewProfessionalApplication as any);

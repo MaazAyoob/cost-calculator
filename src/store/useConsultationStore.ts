@@ -9,6 +9,8 @@ import {
   ConsultationRequest,
   ConsultationPayment,
   BookingSubmissionPayload,
+  ProfessionalApplication,
+  ProfessionalApplicationInput,
 } from '../types/consultation';
 import { consultationApi, BookingResponse, AdminConsultationsResponse } from '../services/consultationApi';
 
@@ -35,6 +37,7 @@ interface ConsultationState {
   // Admin State
   adminConsultants: Consultant[];
   adminRequests: ConsultationRequest[];
+  adminApplications: ProfessionalApplication[];
   adminStats: AdminConsultationsResponse['stats'];
   adminSelectedRequest: ConsultationRequest | null;
   isAdminLoading: boolean;
@@ -80,6 +83,21 @@ interface ConsultationState {
   ) => Promise<void>;
   addInternalNote: (requestId: string, note: string, token: string) => Promise<void>;
   clearAdminMessages: () => void;
+
+  // Actions — Professional Applications
+  submitProfessionalApplication: (payload: ProfessionalApplicationInput) => Promise<any>;
+  fetchAdminApplications: (params?: { status?: string; category?: string; search?: string }, token?: string) => Promise<void>;
+  reviewAdminApplication: (
+    id: string,
+    review: {
+      status: string;
+      adminReviewNotes?: string;
+      reviewerNotes?: string;
+      rejectionReason?: string;
+      reviewerEmail?: string;
+    },
+    token?: string
+  ) => Promise<void>;
 }
 
 import { CURATED_INITIAL_CONSULTANTS } from '../config/consultation';
@@ -107,6 +125,7 @@ export const useConsultationStore = create<ConsultationState>((set, get) => ({
   // Admin
   adminConsultants: CURATED_INITIAL_CONSULTANTS as unknown as Consultant[],
   adminRequests: [],
+  adminApplications: [],
   adminStats: {
     total: 0,
     paid: 0,
@@ -143,7 +162,7 @@ export const useConsultationStore = create<ConsultationState>((set, get) => ({
         search: searchQuery,
         city: selectedCity,
       });
-      set({ consultants: data && data.length > 0 ? data : (CURATED_INITIAL_CONSULTANTS as unknown as Consultant[]), isLoading: false });
+      set({ consultants: Array.isArray(data) ? data : (CURATED_INITIAL_CONSULTANTS as unknown as Consultant[]), isLoading: false });
     } catch {
       // Graceful fallback to client-side curated catalog filtering
       const { activeCategory, searchQuery, selectedCity } = get();
@@ -363,5 +382,41 @@ export const useConsultationStore = create<ConsultationState>((set, get) => ({
 
   clearAdminMessages: () => {
     set({ adminError: null, adminSuccessMessage: null });
+  },
+
+  submitProfessionalApplication: async (payload: ProfessionalApplicationInput) => {
+    try {
+      const result = await consultationApi.submitProfessionalApplication(payload);
+      return result;
+    } catch (err: any) {
+      throw err;
+    }
+  },
+
+  fetchAdminApplications: async (params, token = 'dev-admin-mock-token-2026') => {
+    set({ isAdminLoading: true, adminError: null });
+    try {
+      const applications = await consultationApi.getAdminProfessionalApplications(params, token);
+      set({ adminApplications: applications, isAdminLoading: false });
+    } catch (err: any) {
+      set({ adminError: err.message, isAdminLoading: false });
+    }
+  },
+
+  reviewAdminApplication: async (id, review, token = 'dev-admin-mock-token-2026') => {
+    set({ isAdminLoading: true, adminError: null });
+    try {
+      const updated = await consultationApi.reviewAdminProfessionalApplication(id, review, token);
+      set({
+        adminSuccessMessage: `Application status updated to ${updated.status}`,
+        isAdminLoading: false,
+      });
+      await get().fetchAdminApplications(undefined, token);
+      await get().fetchAdminConsultants(token);
+      await get().fetchConsultants();
+    } catch (err: any) {
+      set({ adminError: err.message, isAdminLoading: false });
+      throw err;
+    }
   },
 }));

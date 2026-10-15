@@ -23,10 +23,13 @@ import {
   CURATED_INITIAL_CONSULTANTS,
 } from '../../config/consultation';
 import { ConsultationBookingModal } from './components/ConsultationBookingModal';
+import { consultationAnalytics } from '../../utils/consultationAnalytics';
+import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 
 export const ConsultantProfilePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useCustomerAuthStore();
 
   const [consultant, setConsultant] = useState<Consultant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,23 +52,31 @@ export const ConsultantProfilePage: React.FC = () => {
       .then((data) => {
         if (!isMounted) return;
         if (!data || !data.active) {
-          const fallback = CURATED_INITIAL_CONSULTANTS.find((c) => c.slug === slug);
-          if (fallback) {
-            setConsultant(fallback as unknown as Consultant);
-          } else {
-            setNotFound(true);
-          }
+          setNotFound(true);
+          setConsultant(null);
         } else {
           setConsultant(data);
+          consultationAnalytics.track({
+            eventName: 'consultation_profile_viewed',
+            consultantId: data.id,
+            consultantCategory: data.category,
+          });
         }
       })
-      .catch(() => {
+      .catch((err: any) => {
         if (isMounted) {
-          const fallback = CURATED_INITIAL_CONSULTANTS.find((c) => c.slug === slug);
-          if (fallback) {
-            setConsultant(fallback as unknown as Consultant);
-          } else {
+          // If explicitly 404 or inactive, show not found
+          if (err?.message?.includes('404') || err?.message?.includes('not found') || err?.message?.includes('inactive')) {
             setNotFound(true);
+            setConsultant(null);
+          } else {
+            // Offline fallback only when backend is completely unreachable
+            const fallback = CURATED_INITIAL_CONSULTANTS.find((c) => c.slug === slug);
+            if (fallback && fallback.active) {
+              setConsultant(fallback as unknown as Consultant);
+            } else {
+              setNotFound(true);
+            }
           }
         }
       })
@@ -292,7 +303,13 @@ export const ConsultantProfilePage: React.FC = () => {
               {/* Booking CTA */}
               <button
                 type="button"
-                onClick={() => setIsBookingModalOpen(true)}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+                    return;
+                  }
+                  setIsBookingModalOpen(true);
+                }}
                 className="w-full hutty-btn-primary py-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <span>Book Consultation</span>

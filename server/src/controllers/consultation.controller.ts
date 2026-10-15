@@ -11,8 +11,16 @@ import {
   scheduleConsultationSchema,
   updateStatusSchema,
   addNoteSchema,
+  createProfessionalApplicationSchema,
+  reviewApplicationSchema,
 } from '../validators/consultation.validator';
-import { CONSULTATION_CATEGORIES, CONSULTATION_PRICE_INR } from '../constants/consultation.constants';
+import {
+  CONSULTATION_CATEGORIES,
+  CONSULTATION_PRICE_INR,
+  CANONICAL_CONSULTATION_CATEGORIES,
+  CATEGORY_DETAILS,
+  POPULAR_SERVICES,
+} from '../constants/consultation.constants';
 
 // ═════════════════════════════════════════════════════════════════════════
 // PUBLIC CONSULTATION CONTROLLERS
@@ -47,7 +55,7 @@ export async function getConsultantBySlug(req: Request, res: Response): Promise<
     const { slug } = req.params;
     const consultant = await consultationService.getConsultantBySlug(slug);
 
-    if (!consultant) {
+    if (!consultant || !consultant.active) {
       res.status(404).json({
         success: false,
         error: 'Consultant not found or currently unavailable',
@@ -73,6 +81,9 @@ export async function getConsultationCategories(req: Request, res: Response): Pr
   res.json({
     success: true,
     data: CONSULTATION_CATEGORIES,
+    canonicalCategories: CANONICAL_CONSULTATION_CATEGORIES,
+    categoryDetails: CATEGORY_DETAILS,
+    popularServices: POPULAR_SERVICES,
     feeINR: CONSULTATION_PRICE_INR,
   });
 }
@@ -504,6 +515,119 @@ export async function handleWebhook(req: Request, res: Response): Promise<void> 
     res.status(400).json({
       success: false,
       error: err.message || 'Webhook processing failed',
+    });
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// PROFESSIONAL REGISTRATION & VERIFICATION CONTROLLERS
+// ═════════════════════════════════════════════════════════════════════════
+
+export async function submitProfessionalApplication(req: Request, res: Response): Promise<void> {
+  try {
+    const parsed = createProfessionalApplicationSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const application = await consultationService.submitProfessionalApplication(parsed.data);
+    res.status(201).json({
+      success: true,
+      message: 'Application submitted successfully. It will be reviewed by the Hutty verification team before public listing.',
+      data: {
+        id: application.id,
+        fullName: application.fullName,
+        category: application.category,
+        status: application.status,
+        createdAt: application.createdAt,
+      },
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Failed to submit application',
+    });
+  }
+}
+
+export async function getProfessionalApplications(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const { status, category, search } = req.query as {
+      status?: string;
+      category?: string;
+      search?: string;
+    };
+
+    const applications = await consultationService.getProfessionalApplications({ status, category, search });
+    res.json({
+      success: true,
+      count: applications.length,
+      data: applications,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve applications',
+      message: err.message,
+    });
+  }
+}
+
+export async function getProfessionalApplicationById(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const application = await consultationService.getProfessionalApplicationById(id);
+    if (!application) {
+      res.status(404).json({
+        success: false,
+        error: 'Application not found',
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: application,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve application',
+      message: err.message,
+    });
+  }
+}
+
+export async function reviewProfessionalApplication(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const parsed = reviewApplicationSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const adminEmail = req.user?.email || 'admin@hutty.in';
+    const updated = await consultationService.reviewProfessionalApplication(id, parsed.data, adminEmail);
+
+    res.json({
+      success: true,
+      message: `Application status transitioned to ${updated.status}`,
+      data: updated,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Failed to update application review status',
     });
   }
 }

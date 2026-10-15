@@ -19,8 +19,10 @@ const router = Router();
 
 import { cashfreeRouter } from './cashfree.routes';
 import projectRoutes from './project.routes';
+import customerAccountRoutes from './customerAccount.routes';
 
 router.use('/auth', authRoutes);
+router.use('/account', customerAccountRoutes);
 router.use('/download', downloadRoutes);
 router.use('/admin', adminRoutes);
 router.use('/admin', consultationAdminRouter);

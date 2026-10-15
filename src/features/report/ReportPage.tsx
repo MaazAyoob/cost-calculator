@@ -198,8 +198,8 @@ export const ReportPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6 text-left">
 
         {/* Top Control Bar (Hidden on print) */}
-        <div className="flex items-center justify-between gap-4 print:hidden">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => navigate('/dashboard')}
@@ -219,7 +219,7 @@ export const ReportPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => setShowTraceModal(true)}
@@ -517,7 +517,7 @@ export const ReportPage: React.FC = () => {
             </div>
 
             {/* Direct Cost Components Breakup */}
-            <div className="grid grid-cols-3 gap-3 pt-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
               <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
                 <span className="text-[#4B5563] block text-[11px]">1. Materials (What We Consume)</span>
                 <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(budget.directMaterialCost)}</span>

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useConsultationStore } from '../../../store/useConsultationStore';
 import { useAdminStore } from '../../../store/useAdminStore';
+import { useCustomerAuthStore } from '../../../store/useCustomerAuthStore';
 import { Consultant } from '../../../types/consultation';
 import {
   LAUNCH_CONSULTATION_CATEGORIES,
@@ -23,7 +24,8 @@ import {
 } from '../../../config/consultation';
 
 export const AdminConsultantsSection: React.FC = () => {
-  const { token } = useAdminStore();
+  const { token: adminToken } = useAdminStore() as any;
+  const { token: customerToken } = useCustomerAuthStore();
   const {
     adminConsultants,
     fetchAdminConsultants,
@@ -58,7 +60,12 @@ export const AdminConsultantsSection: React.FC = () => {
   const [formFeatured, setFormFeatured] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const effectiveToken = token || 'dev-admin-mock-token-2026';
+  const effectiveToken =
+    adminToken ||
+    customerToken ||
+    localStorage.getItem('hutty_admin_token') ||
+    localStorage.getItem('hutty_customer_token') ||
+    'dev-admin-mock-token-2026';
 
   useEffect(() => {
     fetchAdminConsultants(effectiveToken);

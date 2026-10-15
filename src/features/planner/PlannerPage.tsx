@@ -46,6 +46,8 @@ import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsM
 import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
 import { Modal } from '../../components/ui/Modal';
 import { analytics } from '../../utils/analytics';
+import { useProjectAutoSave } from '../../hooks/useProjectAutoSave';
+import { ProjectSaveStatusBadge } from '../../components/common/ProjectSaveStatusBadge';
 
 const STEP_METADATA = [
   {
@@ -167,6 +169,9 @@ export const PlannerPage: React.FC = () => {
 
   // Mobile View Switcher: 'form' | 'preview'
   const [mobileActiveTab, setMobileActiveTab] = useState<'form' | 'preview'>('form');
+
+  // Customer Persistent Project Auto-Save
+  const { status: autoSaveStatus, lastSaved, triggerAutoSave } = useProjectAutoSave();
 
   const totalCost = budget.totalProjectCost || 0;
   const buaSqFt = area.totalBUASqFt || 0;
@@ -314,9 +319,9 @@ export const PlannerPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Active Package Badge (when step > 0) */}
-        {currentStep > 0 && (
-          <div className="hidden md:flex items-center gap-2">
+        {/* Center: Active Package Badge & Auto-Save Status */}
+        <div className="hidden md:flex items-center gap-3">
+          {currentStep > 0 && (
             <button
               type="button"
               onClick={() => setShowCompareModal(true)}
@@ -331,8 +336,14 @@ export const PlannerPage: React.FC = () => {
                 <span className="text-[#687770] font-normal">· Standard</span>
               )}
             </button>
-          </div>
-        )}
+          )}
+
+          <ProjectSaveStatusBadge
+            status={autoSaveStatus}
+            lastSaved={lastSaved}
+            onRetry={triggerAutoSave}
+          />
+        </div>
 
         {/* Right: Actions (Compare, Save, Reset, Share, Help, Close) */}
         <div className="flex items-center gap-1.5 shrink-0">
@@ -535,7 +546,7 @@ export const PlannerPage: React.FC = () => {
                 {/* Scrollable Form Body */}
                 <div
                   id="step-content-scroll-container"
-                  className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-7 pb-20 lg:pb-12 space-y-4 sm:space-y-5 scrollbar-thin"
+                  className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-7 pb-28 sm:pb-24 lg:pb-12 space-y-4 sm:space-y-5 scrollbar-thin"
                 >
                   {/* Step Subtitle & Plain-Language Help Guidance */}
                   {currentStep > 0 && !showReviewSummary && (
@@ -590,9 +601,9 @@ export const PlannerPage: React.FC = () => {
                               { label: 'Paint & Finishes', value: `${painting?.brand || 'Asian Paints'} · ${painting?.internalPaint || 'Premium Emulsion'}`, step: 10 },
                             ].map((row, idx) => (
                               <div key={idx} className="p-3.5 flex items-center justify-between gap-3 text-xs hover:bg-[#F8F8F6] transition-colors">
-                                <div>
+                                <div className="min-w-0 flex-1 pr-2">
                                   <b className="text-[#172722] block font-semibold">{row.label}</b>
-                                  <span className="text-[#687770] text-[11px] block mt-0.5">{row.value}</span>
+                                  <span className="text-[#687770] text-[11px] block mt-0.5 break-words">{row.value}</span>
                                 </div>
                                 <button
                                   type="button"
@@ -600,7 +611,7 @@ export const PlannerPage: React.FC = () => {
                                     setShowReviewSummary(false);
                                     setStep(row.step);
                                   }}
-                                  className="text-xs font-bold text-[#1B3D34] hover:text-[#142F28] flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EDF3ED] hover:bg-[#DDF4E7] transition-colors cursor-pointer"
+                                  className="text-xs font-bold text-[#1B3D34] hover:text-[#142F28] flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EDF3ED] hover:bg-[#DDF4E7] transition-colors cursor-pointer shrink-0"
                                 >
                                   <Edit2 className="w-3 h-3" />
                                   <span>Edit</span>
