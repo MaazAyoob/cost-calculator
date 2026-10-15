@@ -57,6 +57,8 @@ export interface ConsultationPayment {
   gatewayPaymentId: string | null;
   gatewaySignature: string | null;
   amountMinorUnits: number;
+  amountINR?: number;
+  amountPaise?: number;
   currency: string;
   status: PaymentStatus;
   verifiedAt: string | null;
@@ -104,6 +106,8 @@ export interface ConsultationRequest {
   confirmedDateTime: string | null;
   status: ConsultationStatus;
   amountMinorUnits: number;
+  amountINR?: number;
+  amountPaise?: number;
   currency: string;
   createdAt: string;
   updatedAt: string;

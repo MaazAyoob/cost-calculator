@@ -617,7 +617,15 @@ export async function reviewProfessionalApplication(req: AuthenticatedRequest, r
     }
 
     const adminEmail = req.user?.email || 'admin@hutty.in';
-    const updated = await consultationService.reviewProfessionalApplication(id, parsed.data, adminEmail);
+    const updated = await consultationService.reviewProfessionalApplication(
+      id,
+      {
+        status: parsed.data.status,
+        adminReviewNotes: parsed.data.adminReviewNotes,
+        rejectionReason: parsed.data.rejectionReason,
+      },
+      adminEmail
+    );
 
     res.json({
       success: true,

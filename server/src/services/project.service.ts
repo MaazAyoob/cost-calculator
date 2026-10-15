@@ -121,6 +121,10 @@ export class ProjectService {
     this.dbConnected = connected;
   }
 
+  private isDbConnected(): boolean {
+    return Boolean(this.prisma && this.dbConnected && process.env.DATABASE_URL);
+  }
+
   /**
    * Resolves or provisions a User record for the homeowner/lead.
    * If a user with the given email exists, returns it.
@@ -134,7 +138,7 @@ export class ProjectService {
   }): Promise<{ id: string; name: string; email: string }> {
     const normalizedEmail = params.email.trim().toLowerCase();
 
-    if (this.prisma && this.dbConnected) {
+    if (this.isDbConnected()) {
       try {
         // 1. If explicit userId provided, check if exists
         if (params.userId) {
@@ -273,7 +277,7 @@ export class ProjectService {
       updatedAt: new Date().toISOString(),
     };
 
-    if (this.prisma && this.dbConnected) {
+    if (this.isDbConnected()) {
       try {
         await (this.prisma as any).project.create({
           data: {
@@ -470,7 +474,7 @@ export class ProjectService {
    * Retrieves a project by its database ID.
    */
   public async getProjectById(id: string): Promise<ProjectEntity | null> {
-    if (this.prisma && this.dbConnected) {
+    if (this.isDbConnected()) {
       try {
         const found = await (this.prisma as any).project.findUnique({
           where: { id },
@@ -517,7 +521,7 @@ export class ProjectService {
   public async getUserProjects(userId: string): Promise<ProjectEntity[]> {
     if (!userId) return [];
 
-    if (this.prisma && this.dbConnected) {
+    if (this.isDbConnected()) {
       try {
         const found = await (this.prisma as any).project.findMany({
           where: {
@@ -594,7 +598,7 @@ export class ProjectService {
 
     const now = new Date().toISOString();
 
-    if (this.prisma && this.dbConnected) {
+    if (this.isDbConnected()) {
       try {
         const updatePayload: any = {
           updatedAt: new Date(),
@@ -698,17 +702,27 @@ export class ProjectService {
     }
 
     // In-memory fallback
-    if (updateData.name) existing.name = updateData.name.trim();
-    if (updateData.city) existing.city = updateData.city;
-    if (updateData.authority) existing.authority = updateData.authority;
+    const memIdx = this.inMemoryProjects.findIndex((p) => p.id === id);
+    const target = memIdx >= 0 ? this.inMemoryProjects[memIdx] : existing;
+
+    if (updateData.name) target.name = updateData.name.trim();
+    if (updateData.city) target.city = updateData.city;
+    if (updateData.authority) target.authority = updateData.authority;
     if (updateData.configuration) {
-      existing.configuration = { ...existing.configuration, ...updateData.configuration };
+      target.configuration = { ...target.configuration, ...updateData.configuration };
     }
     if (updateData.calculation) {
-      existing.calculation = { ...existing.calculation, ...updateData.calculation, calculatedAt: now };
+      target.calculation = { ...target.calculation, ...updateData.calculation, calculatedAt: now };
     }
-    existing.updatedAt = now;
-    return existing;
+    target.updatedAt = now;
+    if (memIdx >= 0) {
+      this.inMemoryProjects[memIdx] = target;
+    }
+    return {
+      ...target,
+      title: target.title || target.name,
+      userId: target.userId || target.ownerId,
+    };
   }
 
   /**
@@ -734,18 +748,26 @@ export class ProjectService {
       throw new Error(`FORBIDDEN: You do not have permission to delete this project.`);
     }
 
-    if (this.prisma && this.dbConnected) {
+    if (this.isDbConnected()) {
       try {
         await (this.prisma as any).project.update({
           where: { id },
           data: { status: 'ARCHIVED' },
         });
+        const memIdx = this.inMemoryProjects.findIndex((p) => p.id === id);
+        if (memIdx >= 0) {
+          this.inMemoryProjects[memIdx].status = 'ARCHIVED';
+        }
         return { success: true, message: 'Project archived successfully.' };
       } catch (err: any) {
         console.warn('[ProjectService] Prisma archive failed, using memory:', err.message);
       }
     }
 
+    const memIdx = this.inMemoryProjects.findIndex((p) => p.id === id);
+    if (memIdx >= 0) {
+      this.inMemoryProjects[memIdx].status = 'ARCHIVED';
+    }
     existing.status = 'ARCHIVED';
     return { success: true, message: 'Project archived successfully.' };
   }

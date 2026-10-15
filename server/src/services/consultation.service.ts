@@ -104,6 +104,8 @@ export interface ConsultationRequestEntity {
     | 'REJECTED'
     | 'CANCELLED';
   amountMinorUnits: number;
+  amountINR?: number;
+  amountPaise?: number;
   currency: string;
   createdAt: string;
   updatedAt: string;
@@ -119,6 +121,8 @@ export interface ConsultationPaymentEntity {
   gatewayPaymentId: string | null;
   gatewaySignature: string | null;
   amountMinorUnits: number;
+  amountINR?: number;
+  amountPaise?: number;
   currency: string;
   status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUND_PENDING' | 'REFUNDED';
   verifiedAt: string | null;
@@ -450,15 +454,17 @@ export class ConsultationService {
       });
   }
 
-  public async getConsultantBySlug(slug: string): Promise<ConsultantEntity | null> {
+  public async getConsultantBySlug(slug: string, publicOnly = true): Promise<ConsultantEntity | null> {
     const cleanSlug = slug.toLowerCase().trim();
-    if (this.prisma) {
+    if (this.prisma && process.env.DATABASE_URL) {
       try {
         const consultant = await (this.prisma as any).consultant.findUnique({
           where: { slug: cleanSlug },
         });
         if (consultant) {
-          return this.mapPrismaConsultant(consultant);
+          const mapped = this.mapPrismaConsultant(consultant);
+          if (publicOnly && !mapped.active) return null;
+          return mapped;
         }
       } catch {
         // Fallback
@@ -466,7 +472,9 @@ export class ConsultationService {
     }
 
     const found = this.inMemoryConsultants.find((c) => c.slug.toLowerCase() === cleanSlug);
-    return found || null;
+    if (!found) return null;
+    if (publicOnly && !found.active) return null;
+    return found;
   }
 
   public async getConsultantById(id: string): Promise<ConsultantEntity | null> {
@@ -627,13 +635,32 @@ export class ConsultationService {
 
   public async setConsultantStatus(
     id: string,
-    active: boolean,
-    featured?: boolean,
+    statusOrActive: boolean | { active: boolean; featured?: boolean },
+    featuredOrAdminEmail?: boolean | string,
     adminEmail = 'admin@hutty.in'
   ): Promise<ConsultantEntity> {
+    let active: boolean;
+    let featured: boolean | undefined;
+    let effectiveAdminEmail = adminEmail;
+
+    if (typeof statusOrActive === 'object' && statusOrActive !== null) {
+      active = Boolean(statusOrActive.active);
+      featured = statusOrActive.featured;
+      if (typeof featuredOrAdminEmail === 'string') {
+        effectiveAdminEmail = featuredOrAdminEmail;
+      }
+    } else {
+      active = Boolean(statusOrActive);
+      if (typeof featuredOrAdminEmail === 'boolean') {
+        featured = featuredOrAdminEmail;
+      } else if (typeof featuredOrAdminEmail === 'string') {
+        effectiveAdminEmail = featuredOrAdminEmail;
+      }
+    }
+
     const updateData: any = { active };
     if (featured !== undefined) updateData.featured = featured;
-    return this.updateConsultant(id, updateData, adminEmail);
+    return this.updateConsultant(id, updateData, effectiveAdminEmail);
   }
 
   public async updateConsultantAdmin(
@@ -1000,6 +1027,9 @@ export class ConsultationService {
   }): Promise<{
     success: boolean;
     reference: string;
+    id?: string;
+    status?: string;
+    topic?: string;
     message: string;
     data: any;
   }> {
@@ -2210,10 +2240,10 @@ export class ConsultationService {
     id: string,
     review: {
       status: 'SUBMITTED' | 'UNDER_REVIEW' | 'MORE_INFO_REQUIRED' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
-      adminReviewNotes?: string;
-      reviewerNotes?: string;
-      rejectionReason?: string;
-      reviewerEmail?: string;
+      adminReviewNotes?: string | null;
+      reviewerNotes?: string | null;
+      rejectionReason?: string | null;
+      reviewerEmail?: string | null;
     },
     reviewerId = 'admin@hutty.in'
   ): Promise<ProfessionalApplicationEntity> {
@@ -2247,10 +2277,10 @@ export class ConsultationService {
       approvedConsultantId = createdConsultant.id;
     } else if (review.status === 'APPROVED' && approvedConsultantId) {
       // Ensure consultant is set to active
-      await this.setConsultantStatus(approvedConsultantId, { active: true }, effectiveReviewer);
+      await this.setConsultantStatus(approvedConsultantId, true, undefined, effectiveReviewer);
     } else if (review.status === 'SUSPENDED' && approvedConsultantId) {
       // Inactivate consultant
-      await this.setConsultantStatus(approvedConsultantId, { active: false }, effectiveReviewer);
+      await this.setConsultantStatus(approvedConsultantId, false, undefined, effectiveReviewer);
     }
 
     const updatedApp: ProfessionalApplicationEntity = {

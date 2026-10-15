@@ -33,11 +33,19 @@ export function calculateSteel(input: EngineInput, area: AreaResult): {
     };
   }
 
-  const baseFactor = configResolver.resolveParameter(
-    'config.rcc.steel_base_factor_kg_sqft',
+  const materialSteel = configResolver.resolveParameter(
+    'material.steel.consumption_kg_per_sqft',
     undefined,
-    configResolver.resolveParameter('rcc.steel_base_factor_kg_sqft', undefined, STEEL_BASE_FACTOR_KG_PER_SQFT)
+    0
   );
+
+  const baseFactor = materialSteel > 0
+    ? materialSteel
+    : configResolver.resolveParameter(
+        'config.rcc.steel_base_factor_kg_sqft',
+        undefined,
+        configResolver.resolveParameter('rcc.steel_base_factor_kg_sqft', undefined, STEEL_BASE_FACTOR_KG_PER_SQFT)
+      );
   const floorIncrement = configResolver.resolveParameter(
     'config.rcc.steel_additional_floor_factor',
     undefined,

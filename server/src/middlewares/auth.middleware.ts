@@ -2,12 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/env';
 
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: string;
+  name?: string;
+}
+
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
+  user?: AuthenticatedUser;
 }
 
 export function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -22,6 +25,7 @@ export function authenticateToken(req: AuthenticatedRequest, res: Response, next
   if (ENV.NODE_ENV !== 'production' && token === 'dev-admin-mock-token-2026') {
     req.user = {
       id: 'admin-1',
+      name: 'Hutty Admin',
       email: 'admin@hutty.in',
       role: 'ADMIN',
     };
@@ -29,7 +33,7 @@ export function authenticateToken(req: AuthenticatedRequest, res: Response, next
   }
 
   try {
-    const decoded = jwt.verify(token, ENV.JWT_SECRET) as { id: string; email: string; role: string };
+    const decoded = jwt.verify(token, ENV.JWT_SECRET) as AuthenticatedUser;
     req.user = decoded;
     next();
   } catch (err) {
