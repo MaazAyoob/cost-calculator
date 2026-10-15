@@ -18,6 +18,7 @@ import {
   POPULAR_SERVICES,
   CanonicalConsultationCategory,
 } from '../constants/consultation.constants';
+import { CreateBookingRequestInput } from '../validators/consultation.validator';
 import { cashfreeService } from './cashfree.service';
 import { projectService } from './project.service';
 import { ENV } from '../config/env';
@@ -691,22 +692,7 @@ export class ConsultationService {
    * Project ownership is strictly verified if projectId is provided.
    */
   public async createBookingRequest(
-    data: {
-      consultantId?: string | null;
-      homeownerName: string;
-      homeownerPhone: string;
-      homeownerEmail: string;
-      projectId?: string | null;
-      projectLocation: string;
-      projectType: string;
-      consultationTopic: string;
-      message?: string | null;
-      preferredDate: string;
-      preferredTime: string;
-      idempotencyKey?: string | null;
-      amount?: any; // Ignored maliciously sent client value
-      fee?: any;    // Ignored maliciously sent client value
-    },
+    data: CreateBookingRequestInput,
     userContext?: { id?: string; email?: string }
   ): Promise<{
     request: ConsultationRequestEntity;

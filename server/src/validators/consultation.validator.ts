@@ -37,10 +37,13 @@ export const createBookingRequestSchema = z.object({
   preferredDate: z.string().min(8, 'Preferred date is required'),
   preferredTime: z.string().min(2, 'Preferred time slot is required'),
   idempotencyKey: z.string().max(100).optional().nullable(),
+  gateway: z.string().optional(),
   // Explicitly capture any tampering attempt so it can be discarded by service
   amount: z.any().optional(),
   fee: z.any().optional(),
 });
+
+export type CreateBookingRequestInput = z.infer<typeof createBookingRequestSchema>;
 
 export const createGeneralEnquirySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
