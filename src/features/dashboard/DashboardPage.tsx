@@ -238,43 +238,45 @@ export const DashboardPage: React.FC = () => {
           {hasProject ? (
             <div className="space-y-6">
               {/* Primary Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                <div className="md:col-span-2 space-y-1">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+                <div className="md:col-span-6 lg:col-span-6 space-y-1.5 min-w-0">
                   <span className="font-mono text-xs text-[#4B5563] block uppercase tracking-wider">
                     TOTAL ESTIMATED CONSTRUCTION BUDGET
                   </span>
                   <div className="arch-stat-hero text-[#1B3D34]">
                     {totalCost > 0 ? formatCurrency(totalCost) : '₹0'}
                   </div>
-                  <p className="text-xs text-[#4B5563]">
+                  <p className="text-xs text-[#4B5563] max-w-lg">
                     Includes civil frame, materials, MEP conduit, and contractor execution schedules.
                   </p>
                 </div>
 
-                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
-                    TOTAL BUILT-UP AREA
-                  </span>
-                  <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
-                    {buaSqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
-                  </span>
-                  <span className="text-[11px] font-mono text-[#1B3D34]">
-                    Effective: ₹{ratePerSqFt.toLocaleString()} / sq.ft
-                  </span>
-                </div>
-
-                <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
-                    SITE &amp; FLOORS
-                  </span>
-                  <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
-                    {plotLength > 0 ? `${plotLength}' × ${plotWidth}'` : 'Custom'}
-                  </span>
-                  <span className="text-[11px] font-mono text-[#F28C28] font-bold">
-                    {floors ? `G+${floors - 1} Floors` : 'G+1 Floors'} &bull; {city || 'Bangalore'}
-                  </span>
-                </div>
+                <div className="md:col-span-6 lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                  <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] min-w-0">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                  TOTAL BUILT-UP AREA
+                </span>
+                <span className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                  {buaSqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+                </span>
+                <span className="text-[11px] font-mono text-[#1B3D34] block whitespace-nowrap">
+                  Effective: ₹{ratePerSqFt.toLocaleString()} / sq.ft
+                </span>
               </div>
+
+              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] min-w-0">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                  SITE &amp; FLOORS
+                </span>
+                <span className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                  {plotLength > 0 ? `${plotLength}' × ${plotWidth}'` : 'Custom'}
+                </span>
+                <span className="text-[11px] font-mono text-[#F28C28] font-bold block whitespace-nowrap">
+                  {floors ? `G+${floors - 1} Floors` : 'G+1 Floors'} &bull; {city || 'Bangalore'}
+                </span>
+              </div>
+            </div>
+          </div>
 
               {/* Physical Materials Needed Takeoff Strip */}
               <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-3">

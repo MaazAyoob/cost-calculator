@@ -29,6 +29,7 @@ export const createBookingRequestSchema = z.object({
   homeownerPhone: z.string().min(10, 'Valid 10-digit mobile number required').max(15),
   homeownerEmail: z.string().email('Valid email address required'),
   projectId: z.string().optional().nullable(),
+  projectSnapshot: z.any().optional().nullable(),
   projectLocation: z.string().min(2, 'Project location / city is required').max(150),
   projectType: z.string().min(2, 'Project type is required').max(100),
   consultationTopic: z.string().min(2, 'Consultation topic is required').max(150),

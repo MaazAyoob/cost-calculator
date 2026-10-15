@@ -421,41 +421,43 @@ export const ReportPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-            <div className="md:col-span-2 space-y-1">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+            <div className="md:col-span-6 lg:col-span-6 space-y-1.5 min-w-0">
               <span className="font-mono text-xs text-[#4B5563] block uppercase tracking-wider">
                 TOTAL ESTIMATED CONSTRUCTION BUDGET
               </span>
               <div className="arch-stat-hero text-[#1B3D34]">
                 {formatCurrency(budget.totalProjectCost || budget.directConstructionBudget)}
               </div>
-              <p className="text-xs text-[#4B5563]">
+              <p className="text-xs text-[#4B5563] max-w-lg">
                 Includes civil structural frame, material finishes, MEP services, and verified statutory margins.
               </p>
             </div>
 
-            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
-                GROSS BUILT-UP AREA
-              </span>
-              <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
-                {area.totalBUASqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
-              </span>
-              <span className="text-[11px] font-mono text-[#1B3D34]">
-                Effective: ₹{(budget.costPerSqFt || budget.directCostPerSqFt).toLocaleString()} / sq.ft
-              </span>
-            </div>
+            <div className="md:col-span-6 lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] min-w-0">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                  GROSS BUILT-UP AREA
+                </span>
+                <span className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                  {area.totalBUASqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+                </span>
+                <span className="text-[11px] font-mono text-[#1B3D34] block whitespace-nowrap">
+                  Effective: ₹{(budget.costPerSqFt || budget.directCostPerSqFt).toLocaleString()} / sq.ft
+                </span>
+              </div>
 
-            <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
-                ESTIMATED TIMELINE
-              </span>
-              <span className="text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
-                {timeline.totalMonths} <span className="text-xs font-normal text-[#4B5563]">Months</span>
-              </span>
-              <span className="text-[11px] font-mono text-[#F28C28] font-bold">
-                {specificationTier?.toUpperCase() || 'PREMIUM'} STANDARDS
-              </span>
+              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] min-w-0">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+                  ESTIMATED TIMELINE
+                </span>
+                <span className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
+                  {timeline.totalMonths} <span className="text-xs font-normal text-[#4B5563]">Months</span>
+                </span>
+                <span className="text-[11px] font-mono text-[#F28C28] font-bold block whitespace-nowrap">
+                  {specificationTier?.toUpperCase() || 'PREMIUM'} STANDARDS
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -1110,7 +1112,8 @@ export const ReportPage: React.FC = () => {
                 </div>
 
                 <div className="border border-[#E3E8E2] rounded-2xl overflow-hidden bg-white shadow-2xs">
-                  <table className="w-full text-left text-xs font-mono">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs font-mono min-w-[560px]">
                     <thead className="bg-[#F8F8F6] border-b border-[#E3E8E2] text-[10px] text-[#4B5563] uppercase">
                       <tr>
                         <th className="py-2.5 px-4">Finish Package</th>
@@ -1148,7 +1151,8 @@ export const ReportPage: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-              </section>
+              </div>
+            </section>
 
               {/* 07. Multi-Scenario Layout Comparison */}
               <section className="space-y-4">

@@ -18,6 +18,8 @@ import {
   Lock,
   Sparkles,
   ExternalLink,
+  RefreshCw,
+  CreditCard,
 } from 'lucide-react';
 import { Consultant, ConsultationRequest } from '../../../types/consultation';
 import {
@@ -29,6 +31,7 @@ import { useConsultationStore } from '../../../store/useConsultationStore';
 import { useSavedEstimationsStore } from '../../../store/useSavedEstimationsStore';
 import { useCalculationStore } from '../../../store/useCalculationStore';
 import { useWizardStore } from '../../../store/useWizardStore';
+import { useCustomerAuthStore } from '../../../store/useCustomerAuthStore';
 import { formatCurrency } from '../../../utils/cn';
 import { modalScaleVariant, backdropFadeVariant } from '../../../animations/variants';
 import { consultationAnalytics } from '../../../utils/consultationAnalytics';
@@ -51,6 +54,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   const { result } = useCalculationStore();
   const wizard = useWizardStore();
 
+  const { user, isAuthenticated } = useCustomerAuthStore();
+
   // Wizard Steps: 1: Details, 2: Project Link (Optional), 3: Review & Pay, 4: Confirmed
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -68,7 +73,24 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
   // Project Linking
   const [linkedProjectId, setLinkedProjectId] = useState<string | null>(null);
+  const [attachedSnapshot, setAttachedSnapshot] = useState<{
+    source?: string;
+    houseType?: string;
+    floors?: number | null;
+    totalBUASqFt?: number | null;
+    estimatedTotalCostINR?: number | null;
+    city?: string;
+  } | null>(null);
   const [linkProjectChoice, setLinkProjectChoice] = useState<'none' | 'saved' | 'current'>('none');
+
+  // Cashfree Pending Payment State
+  const [paymentPendingState, setPaymentPendingState] = useState<{
+    requestId: string;
+    orderId: string;
+    paymentSessionId: string;
+    message: string;
+  } | null>(null);
+  const [isCheckingPaymentStatus, setIsCheckingPaymentStatus] = useState(false);
 
   // Confirmation result
   const [confirmedRequest, setConfirmedRequest] = useState<ConsultationRequest | null>(null);
@@ -84,12 +106,19 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     if (isOpen) {
       setStep(1);
       setErrorMessage(null);
+      setPaymentPendingState(null);
       setPreferredDate(tomorrowStr);
       if (initialTopic) setConsultationTopic(initialTopic);
+      // Pre-fill from customer account if logged in and fields not yet filled
+      if (user) {
+        if (!homeownerName && user.name) setHomeownerName(user.name);
+        if (!homeownerEmail && user.email) setHomeownerEmail(user.email);
+        if (!homeownerPhone && user.phone) setHomeownerPhone(user.phone);
+      }
       // Pre-fill location from consultant city or wizard
       if (wizard.city) setProjectLocation(wizard.city);
     }
-  }, [isOpen, tomorrowStr, wizard.city, initialTopic]);
+  }, [isOpen, tomorrowStr, wizard.city, initialTopic, user]);
 
   useEffect(() => {
     if (isOpen) {
@@ -114,7 +143,15 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
   // Handle Project Linking selection
   const handleSelectSavedProject = (projectId: string) => {
+    if (!isAuthenticated) {
+      setErrorMessage(
+        'Please sign in to your Hutty customer account to link a saved project. Your consultation form entries will be saved.'
+      );
+      return;
+    }
+    setErrorMessage(null);
     setLinkedProjectId(projectId);
+    setAttachedSnapshot(null);
     setLinkProjectChoice('saved');
     const selected = savedEstimations.find((e) => e.id === projectId);
     if (selected) {
@@ -124,14 +161,25 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   };
 
   const handleSelectCurrentProject = () => {
-    setLinkedProjectId(result.report?.projectId || 'current-workspace-project');
+    setErrorMessage(null);
+    setLinkedProjectId(null); // Snapshot does not link to a saved database project
+    setAttachedSnapshot({
+      source: 'calculator_snapshot',
+      houseType: wizard.houseType || 'Independent Villa / House',
+      totalBUASqFt: result.area?.totalBUASqFt || null,
+      estimatedTotalCostINR: result.budget?.totalProjectCost || null,
+      floors: wizard.floors || 2,
+      city: wizard.city || projectLocation || 'Bangalore',
+    });
     setLinkProjectChoice('current');
     if (wizard.city) setProjectLocation(wizard.city);
     if (wizard.houseType) setProjectType(wizard.houseType);
   };
 
   const handleClearProjectLink = () => {
+    setErrorMessage(null);
     setLinkedProjectId(null);
+    setAttachedSnapshot(null);
     setLinkProjectChoice('none');
   };
 
@@ -170,10 +218,114 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     setStep(2);
   };
 
+  // Launch Cashfree modal checkout helper
+  const launchCashfreeModal = async (
+    paymentSessionId: string,
+    orderId: string,
+    reqId: string
+  ) => {
+    if (!(window as any).Cashfree) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+        script.async = true;
+        script.onload = () => resolve(true);
+        script.onerror = () => reject(new Error('Failed to load Cashfree checkout script'));
+        document.head.appendChild(script);
+      });
+    }
+
+    const cashfree = (window as any).Cashfree({ mode: 'sandbox' });
+    cashfree
+      .checkout({
+        paymentSessionId,
+        redirectTarget: '_modal',
+      })
+      .then(async (result: any) => {
+        if (result?.error) {
+          setErrorMessage(result.error.message || 'Cashfree payment was cancelled.');
+          consultationAnalytics.track({
+            eventName: 'consultation_payment_failed',
+            metadata: { error: result.error.message },
+          });
+          return;
+        }
+        await handleCheckPaymentStatus(reqId, orderId, paymentSessionId);
+      });
+  };
+
+  // Safe payment verification check: handles PAID, PENDING, and errors separately
+  const handleCheckPaymentStatus = async (
+    reqId: string,
+    orderId: string,
+    paymentSessionId: string
+  ) => {
+    setIsCheckingPaymentStatus(true);
+    setErrorMessage(null);
+    try {
+      const verified: any = await verifyPayment(reqId, {
+        gatewayOrderId: orderId,
+        gatewayPaymentId: `cf_pay_${Date.now()}`,
+      });
+
+      if (verified?.isPending || verified?.paymentStatus === 'PENDING') {
+        // Payment is awaiting confirmation: Do NOT mark as failed! Do NOT show red error!
+        setPaymentPendingState({
+          requestId: reqId,
+          orderId,
+          paymentSessionId,
+          message:
+            verified.message ||
+            'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
+        });
+        return;
+      }
+
+      // Verified PAID
+      consultationAnalytics.track({
+        eventName: 'consultation_payment_succeeded',
+        referenceId: verified.publicReference,
+        amount: LAUNCH_CONSULTATION_PRICE_INR,
+      });
+      consultationAnalytics.track({
+        eventName: 'consultation_booking_confirmed',
+        referenceId: verified.publicReference,
+      });
+      setPaymentPendingState(null);
+      setConfirmedRequest(verified);
+      setStep(4);
+    } catch (verErr: any) {
+      setErrorMessage(verErr.message || 'Payment verification failed with Cashfree.');
+      consultationAnalytics.track({
+        eventName: 'consultation_payment_failed',
+        metadata: { error: verErr.message },
+      });
+    } finally {
+      setIsCheckingPaymentStatus(false);
+    }
+  };
+
+  const handleResumePayment = async () => {
+    if (!paymentPendingState) return;
+    setErrorMessage(null);
+    await launchCashfreeModal(
+      paymentPendingState.paymentSessionId,
+      paymentPendingState.orderId,
+      paymentPendingState.requestId
+    );
+  };
+
   // Handle Final Payment & Request Submission
   const handleInitiatePaymentAndSubmit = async () => {
     if (!consultant) return;
     setErrorMessage(null);
+
+    // If an order is already pending, resume payment instead of creating a duplicate order
+    if (paymentPendingState) {
+      await handleResumePayment();
+      return;
+    }
+
     consultationAnalytics.track({
       eventName: 'consultation_checkout_started',
       consultantId: consultant.id,
@@ -186,7 +338,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         homeownerName: homeownerName.trim(),
         homeownerPhone: homeownerPhone.trim(),
         homeownerEmail: homeownerEmail.toLowerCase().trim(),
-        projectId: linkedProjectId,
+        projectId: linkProjectChoice === 'saved' ? linkedProjectId : null,
+        projectSnapshot: linkProjectChoice === 'current' ? attachedSnapshot : null,
         projectLocation: projectLocation.trim(),
         projectType: projectType.trim(),
         consultationTopic,
@@ -200,54 +353,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
       // 1. Cashfree Sandbox Checkout Flow
       if (cashfreeOptions?.paymentSessionId && !cashfreeOptions.paymentSessionId.includes('mock')) {
         try {
-          if (!(window as any).Cashfree) {
-            await new Promise((resolve, reject) => {
-              const script = document.createElement('script');
-              script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
-              script.async = true;
-              script.onload = () => resolve(true);
-              script.onerror = () => reject(new Error('Failed to load Cashfree checkout script'));
-              document.head.appendChild(script);
-            });
-          }
-
-          const cashfree = (window as any).Cashfree({ mode: 'sandbox' });
-          cashfree.checkout({
-            paymentSessionId: cashfreeOptions.paymentSessionId,
-            redirectTarget: '_modal',
-          }).then(async (result: any) => {
-            if (result?.error) {
-              setErrorMessage(result.error.message || 'Cashfree payment was cancelled.');
-              consultationAnalytics.track({
-                eventName: 'consultation_payment_failed',
-                metadata: { error: result.error.message },
-              });
-              return;
-            }
-            try {
-              const verified = await verifyPayment(request.id, {
-                gatewayOrderId: cashfreeOptions.orderId || payment.gatewayOrderId,
-                gatewayPaymentId: `cf_pay_${Date.now()}`,
-              });
-              consultationAnalytics.track({
-                eventName: 'consultation_payment_succeeded',
-                referenceId: verified.publicReference,
-                amount: LAUNCH_CONSULTATION_PRICE_INR,
-              });
-              consultationAnalytics.track({
-                eventName: 'consultation_booking_confirmed',
-                referenceId: verified.publicReference,
-              });
-              setConfirmedRequest(verified);
-              setStep(4);
-            } catch (verErr: any) {
-              setErrorMessage(verErr.message || 'Payment verification failed with Cashfree.');
-              consultationAnalytics.track({
-                eventName: 'consultation_payment_failed',
-                metadata: { error: verErr.message },
-              });
-            }
-          });
+          await launchCashfreeModal(
+            cashfreeOptions.paymentSessionId,
+            cashfreeOptions.orderId || payment.gatewayOrderId,
+            request.id
+          );
           return;
         } catch (cfErr: any) {
           console.warn('[Consultation] Cashfree SDK modal error, continuing fallback:', cfErr.message);
@@ -284,6 +394,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 eventName: 'consultation_booking_confirmed',
                 referenceId: verified.publicReference,
               });
+              setPaymentPendingState(null);
               setConfirmedRequest(verified);
               setStep(4);
             } catch (err: any) {
@@ -309,10 +420,21 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         // Development Sandbox / Direct Verification
         // In local development or test environment, simulate the verified gateway callback with real backend signature validation
         const simulatedPaymentId = `pay_sim_${Date.now()}`;
-        const verified = await verifyPayment(request.id, {
+        const verified: any = await verifyPayment(request.id, {
           gatewayOrderId: payment.gatewayOrderId,
           gatewayPaymentId: simulatedPaymentId,
         });
+        if (verified?.isPending || verified?.paymentStatus === 'PENDING') {
+          setPaymentPendingState({
+            requestId: request.id,
+            orderId: payment.gatewayOrderId,
+            paymentSessionId: cashfreeOptions?.paymentSessionId || '',
+            message:
+              verified.message ||
+              'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
+          });
+          return;
+        }
         consultationAnalytics.track({
           eventName: 'consultation_payment_succeeded',
           referenceId: verified.publicReference,
@@ -322,11 +444,18 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
           eventName: 'consultation_booking_confirmed',
           referenceId: verified.publicReference,
         });
+        setPaymentPendingState(null);
         setConfirmedRequest(verified);
         setStep(4);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'An error occurred while booking. Please try again.');
+      if (err.message?.includes('Authentication required')) {
+        setErrorMessage(
+          'Authentication required to link your saved account project. Please sign in to your Hutty account, or select "Continue without linking a project" to proceed as a standalone consultation. Your filled consultation details have been preserved.'
+        );
+      } else {
+        setErrorMessage(err.message || 'An error occurred while booking. Please try again.');
+      }
       consultationAnalytics.track({
         eventName: 'consultation_payment_failed',
         metadata: { error: err.message },
@@ -392,12 +521,12 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
         {/* Step Progress Indicators */}
         {step !== 4 && (
-          <div className="flex items-center justify-between text-xs font-bold text-[#4B5563] bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E3E8E2]">
-            <span className={step === 1 ? 'text-[#1B3D34]' : ''}>1. Consultation Details</span>
-            <span>→</span>
-            <span className={step === 2 ? 'text-[#1B3D34]' : ''}>2. Optional Project Link</span>
-            <span>→</span>
-            <span className={step === 3 ? 'text-[#1B3D34]' : ''}>3. Review &amp; Pay {LAUNCH_CONSULTATION_PRICE_DISPLAY}</span>
+          <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-[#4B5563] bg-[#F8F8F6] p-2.5 rounded-xl border border-[#E3E8E2] gap-1 overflow-x-auto">
+            <span className={`shrink-0 ${step === 1 ? 'text-[#1B3D34]' : ''}`}>1. Details</span>
+            <span className="shrink-0 text-[#E3E8E2]">→</span>
+            <span className={`shrink-0 ${step === 2 ? 'text-[#1B3D34]' : ''}`}>2. Project Link</span>
+            <span className="shrink-0 text-[#E3E8E2]">→</span>
+            <span className={`shrink-0 ${step === 3 ? 'text-[#1B3D34]' : ''}`}>3. Pay {LAUNCH_CONSULTATION_PRICE_DISPLAY}</span>
           </div>
         )}
 
@@ -658,7 +787,14 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
             {/* Saved Estimations List Option */}
             {savedEstimations && savedEstimations.length > 0 && (
               <div className="space-y-2">
-                <span className="text-xs font-bold text-[#1B3D34] block">Saved Estimations:</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#1B3D34] block">Saved Estimations:</span>
+                  {!isAuthenticated && (
+                    <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      Sign in required to link
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                   {savedEstimations.map((est) => {
                     const isSelected = linkProjectChoice === 'saved' && linkedProjectId === est.id;
@@ -763,7 +899,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
               <div className="flex items-center justify-between">
                 <span className="text-[#4B5563]">Linked Project:</span>
                 <span className="font-semibold text-[#1B3D34]">
-                  {linkedProjectId ? 'Hutty Project Snapshot Attached' : 'None (Standalone Consultation)'}
+                  {linkProjectChoice === 'saved' && linkedProjectId
+                    ? `${savedEstimations.find((e) => e.id === linkedProjectId)?.name || 'Saved Project'} (Account Linked)`
+                    : linkProjectChoice === 'current' && attachedSnapshot
+                    ? `Hutty Project Snapshot Attached (${attachedSnapshot.totalBUASqFt ? `${attachedSnapshot.totalBUASqFt} sq.ft` : 'Workspace'})`
+                    : 'None (Standalone Consultation)'}
                 </span>
               </div>
 
@@ -775,6 +915,49 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
                 </span>
               </div>
             </div>
+
+            {/* Cashfree Payment Awaiting Confirmation Banner */}
+            {paymentPendingState && (
+              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-300 text-xs text-amber-900 space-y-3 animate-in fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-amber-950">
+                    <Clock className="w-4 h-4 text-amber-700 shrink-0 animate-pulse" />
+                    <span>Payment Awaiting Confirmation</span>
+                  </div>
+                  <span className="text-[10px] uppercase font-mono font-bold bg-amber-200/60 px-2 py-0.5 rounded text-amber-900">
+                    Order Active
+                  </span>
+                </div>
+                <p className="leading-relaxed">
+                  {paymentPendingState.message}
+                </p>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleResumePayment}
+                    className="hutty-btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Resume Payment in Cashfree</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCheckPaymentStatus(
+                        paymentPendingState.requestId,
+                        paymentPendingState.orderId,
+                        paymentPendingState.paymentSessionId
+                      )
+                    }
+                    disabled={isCheckingPaymentStatus}
+                    className="px-4 py-2 rounded-xl text-xs font-bold border border-amber-400 bg-white hover:bg-amber-100 text-amber-900 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isCheckingPaymentStatus ? 'animate-spin' : ''}`} />
+                    <span>{isCheckingPaymentStatus ? 'Checking Status...' : 'Check Payment Status'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* MANDATORY DISCLAIMER AS REQUESTED */}
             <div className="p-4 bg-amber-50/80 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-2">
@@ -794,7 +977,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                disabled={isSubmittingBooking}
+                disabled={isSubmittingBooking || isCheckingPaymentStatus}
                 className="px-4 py-2 rounded-xl text-xs font-bold text-[#4B5563] hover:text-[#1B3D34] transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
@@ -804,11 +987,20 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
               <button
                 type="button"
                 onClick={handleInitiatePaymentAndSubmit}
-                disabled={isSubmittingBooking}
+                disabled={isSubmittingBooking || isCheckingPaymentStatus}
                 className="hutty-btn-primary px-6 py-3 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg disabled:opacity-50"
               >
-                <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                <span>{isSubmittingBooking ? 'Securing Request...' : `Pay ${LAUNCH_CONSULTATION_PRICE_DISPLAY} Online`}</span>
+                {paymentPendingState ? (
+                  <>
+                    <CreditCard className="w-3.5 h-3.5 text-[#F28C28]" />
+                    <span>Resume Payment</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
+                    <span>{isSubmittingBooking ? 'Securing Request...' : `Pay ${LAUNCH_CONSULTATION_PRICE_DISPLAY} Online`}</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

@@ -193,8 +193,14 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
                     <span className="font-semibold block">{req.preferredDate} ({req.preferredTime})</span>
                   </div>
                   <div>
-                    <span className="text-[#4B5563] block">Fee Paid</span>
-                    <span className="font-mono font-bold text-emerald-800">{LAUNCH_CONSULTATION_PRICE_DISPLAY}</span>
+                    <span className="text-[#4B5563] block">Payment</span>
+                    {req.payments?.some((p) => p.status === 'PAID') ? (
+                      <span className="font-mono font-bold text-emerald-800">{LAUNCH_CONSULTATION_PRICE_DISPLAY} (Paid)</span>
+                    ) : req.payments?.some((p) => p.status === 'FAILED') ? (
+                      <span className="font-mono font-bold text-red-700">Payment Failed</span>
+                    ) : (
+                      <span className="font-mono font-bold text-amber-700">Payment Pending</span>
+                    )}
                   </div>
                 </div>
 

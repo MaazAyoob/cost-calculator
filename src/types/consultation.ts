@@ -121,6 +121,14 @@ export interface BookingSubmissionPayload {
   homeownerPhone: string;
   homeownerEmail: string;
   projectId?: string | null;
+  projectSnapshot?: {
+    source?: string;
+    houseType?: string;
+    floors?: number | null;
+    totalBUASqFt?: number | null;
+    estimatedTotalCostINR?: number | null;
+    city?: string;
+  } | null;
   projectLocation: string;
   projectType: string;
   consultationTopic: string;

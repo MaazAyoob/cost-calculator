@@ -283,6 +283,10 @@ describe('Hutty Consultation Feature MVP (Phase 1) Test Suite', () => {
         preferredTime: '10:00 AM - 12:00 PM',
       });
 
+      // Simulate verified payment before admin assignment
+      const pay = await consultationService.getPaymentByOrderId(booking.payment.gatewayOrderId);
+      if (pay) pay.status = 'PAID';
+
       // Admin reassigns to consultant 2
       const reassigned = await consultationService.assignConsultant(
         booking.request.id,
@@ -308,6 +312,10 @@ describe('Hutty Consultation Feature MVP (Phase 1) Test Suite', () => {
         preferredDate: '2026-10-28',
         preferredTime: '02:00 PM - 04:00 PM',
       });
+
+      // Simulate verified payment before admin scheduling
+      const pay = await consultationService.getPaymentByOrderId(booking.payment.gatewayOrderId);
+      if (pay) pay.status = 'PAID';
 
       const confirmedTime = '2026-10-28T14:30:00.000Z';
       const scheduled = await consultationService.scheduleConsultation(
@@ -616,6 +624,10 @@ describe('Hutty Consultation Feature MVP (Phase 1) Test Suite', () => {
         preferredDate: '2026-11-18',
         preferredTime: '10:00 AM - 12:00 PM',
       });
+
+      // Simulate verified payment before advancing to active service delivery statuses
+      const pay = await consultationService.getPaymentByOrderId(booking.payment.gatewayOrderId);
+      if (pay) pay.status = 'PAID';
 
       // Complete the request
       await consultationService.updateRequestStatus(booking.request.id, 'UNDER_REVIEW');

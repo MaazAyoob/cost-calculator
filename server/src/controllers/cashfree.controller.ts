@@ -180,6 +180,21 @@ export class CashfreeController {
 
         const verification = await cashfreeService.verifyOrderPayment(targetOrderId, expectedINR);
 
+        if (verification.paymentStatus === 'PENDING') {
+          res.json({
+            success: true,
+            isPending: true,
+            status: 'PENDING',
+            message: 'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
+            data: {
+              request,
+              payment,
+              statusText: 'Payment Awaiting Confirmation',
+            },
+          });
+          return;
+        }
+
         if (!verification.verified) {
           res.status(400).json({
             success: false,

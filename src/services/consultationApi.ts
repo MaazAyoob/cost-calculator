@@ -101,12 +101,20 @@ class ConsultationApiClient {
       gatewayOrderId: string;
       gatewayPaymentId: string;
       gatewaySignature?: string;
-    }
-  ): Promise<{ request: ConsultationRequest; payment: ConsultationPayment; statusText: string }> {
+    },
+    userToken?: string | null
+  ): Promise<{
+    request: ConsultationRequest;
+    payment: ConsultationPayment;
+    statusText: string;
+    isPending?: boolean;
+    paymentStatus?: string;
+    message?: string;
+  }> {
     const url = getApiUrl(`/api/v1/consultations/${encodeURIComponent(requestId)}/verify-payment`);
     const res = await fetch(url, {
       method: 'POST',
-      headers: this.getHeaders(),
+      headers: this.getHeaders(userToken),
       body: JSON.stringify(paymentDetails),
     });
 
@@ -114,7 +122,14 @@ class ConsultationApiClient {
     if (!res.ok || !json.success) {
       throw new Error(json.error || 'Payment verification failed');
     }
-    return json.data;
+    return {
+      request: json.data?.request,
+      payment: json.data?.payment,
+      statusText: json.data?.statusText || (json.isPending ? 'Payment Awaiting Confirmation' : 'Paid — Awaiting Admin Review'),
+      isPending: Boolean(json.isPending),
+      paymentStatus: json.data?.paymentStatus || (json.isPending ? 'PENDING' : 'PAID'),
+      message: json.message,
+    };
   }
 
   public async getMyConsultations(userEmail?: string, userToken?: string | null): Promise<ConsultationRequest[]> {

@@ -19,6 +19,7 @@ import {
   CanonicalConsultationCategory,
 } from '../constants/consultation.constants';
 import { cashfreeService } from './cashfree.service';
+import { projectService } from './project.service';
 import { ENV } from '../config/env';
 
 export interface ProfessionalApplicationEntity {
@@ -741,49 +742,57 @@ export class ConsultationService {
       }
     }
 
-    // 2. Validate optional linked project if provided
+    // 2. Validate optional linked project or snapshot if provided
     let projectSnapshot: any = null;
     if (data.projectId) {
       if (!userContext?.id) {
         throw new Error('Authentication required to link an existing project.');
       }
 
+      let project: any = null;
       if (this.prisma) {
-        const project = await (this.prisma as any).project.findUnique({
-          where: { id: data.projectId },
-          include: { configuration: true, calculation: true },
-        });
-
-        if (!project) {
-          throw new Error('Linked project not found.');
+        try {
+          project = await (this.prisma as any).project.findUnique({
+            where: { id: data.projectId },
+            include: { configuration: true, calculation: true },
+          });
+        } catch {
+          project = null;
         }
-
-        if (project.ownerId !== userContext.id) {
-          throw new Error('Forbidden: You do not have permission to link this project.');
-        }
-
-        // Strict whitelist of public summary project attributes (never leak formulas/financial markups)
-        projectSnapshot = {
-          projectId: project.id,
-          projectName: project.name,
-          city: project.city,
-          houseType: project.configuration?.houseType || data.projectType,
-          floors: project.configuration?.floors || null,
-          totalBUASqFt: project.calculation?.totalBUASqFt || null,
-          estimatedTotalCostINR: project.calculation?.totalCostINR || null,
-        };
-      } else {
-        // In-memory fallback check
-        projectSnapshot = {
-          projectId: data.projectId,
-          projectName: 'My Residence',
-          city: data.projectLocation,
-          houseType: data.projectType,
-          floors: 2,
-          totalBUASqFt: null,
-          estimatedTotalCostINR: null,
-        };
       }
+
+      if (!project) {
+        project = await projectService.getProjectById(data.projectId);
+      }
+
+      if (!project) {
+        throw new Error('Linked project not found.');
+      }
+
+      if (project.ownerId !== userContext.id && project.userId !== userContext.id) {
+        throw new Error('Forbidden: You do not have permission to link this project.');
+      }
+
+      // Strict whitelist of public summary project attributes (never leak formulas/financial markups)
+      projectSnapshot = {
+        projectId: project.id,
+        projectName: project.name || project.title || 'My Project',
+        city: project.city || data.projectLocation,
+        houseType: project.configuration?.houseType || data.projectType,
+        floors: project.configuration?.floors || null,
+        totalBUASqFt: project.calculation?.totalBUASqFt || null,
+        estimatedTotalCostINR: project.calculation?.totalCostINR || null,
+      };
+    } else if (data.projectSnapshot) {
+      // Attached calculator workspace snapshot (not a saved database project; no auth required)
+      projectSnapshot = {
+        source: 'calculator_snapshot',
+        houseType: typeof data.projectSnapshot.houseType === 'string' ? data.projectSnapshot.houseType : data.projectType,
+        floors: typeof data.projectSnapshot.floors === 'number' ? data.projectSnapshot.floors : null,
+        totalBUASqFt: typeof data.projectSnapshot.totalBUASqFt === 'number' ? data.projectSnapshot.totalBUASqFt : null,
+        estimatedTotalCostINR: typeof data.projectSnapshot.estimatedTotalCostINR === 'number' ? data.projectSnapshot.estimatedTotalCostINR : null,
+        city: typeof data.projectSnapshot.city === 'string' ? data.projectSnapshot.city : data.projectLocation,
+      };
     }
 
     // 3. Idempotency Check (double-click protection)
@@ -793,10 +802,26 @@ export class ConsultationService {
       if (existingReq) {
         const existingPayment = await this.getPaymentByRequestId(existingReq.id);
         if (existingPayment) {
+          let cfPaymentSessionId: string | undefined = undefined;
+          if (existingPayment.gateway === 'CASHFREE' && cashfreeService.isConfigured()) {
+            try {
+              const order = await cashfreeService.getOrder(existingPayment.gatewayOrderId);
+              cfPaymentSessionId = order?.payment_session_id;
+            } catch {}
+          }
           return {
             request: existingReq,
             payment: existingPayment,
             razorpayOptions: this.buildRazorpayOptions(existingReq, existingPayment, consultant),
+            cashfreeOptions: existingPayment.gateway === 'CASHFREE' ? {
+              orderId: existingPayment.gatewayOrderId,
+              paymentSessionId: cfPaymentSessionId,
+              amount: CONSULTATION_PRICE_INR,
+              amountMinorUnits: CONSULTATION_PRICE_PAISE,
+              currency: CONSULTATION_CURRENCY,
+              gateway: 'CASHFREE',
+              environment: 'TEST',
+            } : undefined,
           };
         }
       }
@@ -805,17 +830,33 @@ export class ConsultationService {
     // Recent duplicate request check: within 60 seconds with same consultant, slot, and pending status
     const recentDuplicate = this.findRecentPendingBooking(
       normalizedEmail,
-      consultant ? consultant.id : 'hutty-expert-desk',
+      consultant ? consultant.id : null,
       data.preferredDate,
       data.preferredTime
     );
     if (recentDuplicate) {
       const payment = await this.getPaymentByRequestId(recentDuplicate.id);
       if (payment && payment.status === 'PENDING') {
+        let cfPaymentSessionId: string | undefined = undefined;
+        if (payment.gateway === 'CASHFREE' && cashfreeService.isConfigured()) {
+          try {
+            const order = await cashfreeService.getOrder(payment.gatewayOrderId);
+            cfPaymentSessionId = order?.payment_session_id;
+          } catch {}
+        }
         return {
           request: recentDuplicate,
           payment,
           razorpayOptions: this.buildRazorpayOptions(recentDuplicate, payment, consultant),
+          cashfreeOptions: payment.gateway === 'CASHFREE' ? {
+            orderId: payment.gatewayOrderId,
+            paymentSessionId: cfPaymentSessionId,
+            amount: CONSULTATION_PRICE_INR,
+            amountMinorUnits: CONSULTATION_PRICE_PAISE,
+            currency: CONSULTATION_CURRENCY,
+            gateway: 'CASHFREE',
+            environment: 'TEST',
+          } : undefined,
         };
       }
     }
@@ -1137,7 +1178,13 @@ export class ConsultationService {
       gatewaySignature?: string;
       isWebhookVerified?: boolean;
     }
-  ): Promise<{ request: ConsultationRequestEntity; payment: ConsultationPaymentEntity }> {
+  ): Promise<{
+    request: ConsultationRequestEntity;
+    payment: ConsultationPaymentEntity;
+    isPending?: boolean;
+    paymentStatus?: 'PAID' | 'PENDING' | 'FAILED' | 'AMOUNT_MISMATCH';
+    message?: string;
+  }> {
     const { gatewayOrderId, gatewaySignature } = paymentDetails;
     let gatewayPaymentId = paymentDetails.gatewayPaymentId;
 
@@ -1155,7 +1202,7 @@ export class ConsultationService {
 
     // 3. Idempotent check: if already verified as PAID, return immediately without duplicate side-effects
     if (payment.status === 'PAID') {
-      return { request, payment };
+      return { request, payment, isPending: false, paymentStatus: 'PAID' };
     }
 
     // 4. Gateway-specific verification:
@@ -1167,6 +1214,19 @@ export class ConsultationService {
           gatewayOrderId,
           payment.amountMinorUnits / 100
         );
+
+        if (verification.paymentStatus === 'PENDING') {
+          // Cashfree order status is ACTIVE / payment is awaiting confirmation
+          // Do NOT mark as failed. Do NOT throw an error. Do NOT mark as paid.
+          return {
+            request,
+            payment,
+            isPending: true,
+            paymentStatus: 'PENDING',
+            message: 'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
+          };
+        }
+
         if (!verification.verified) {
           await this.recordPaymentFailure(
             payment.id,
@@ -1289,7 +1349,7 @@ export class ConsultationService {
 
     this.inMemoryEvents.unshift(event);
 
-    return { request: updatedRequest, payment: updatedPayment };
+    return { request: updatedRequest, payment: updatedPayment, isPending: false, paymentStatus: 'PAID' };
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -1553,7 +1613,7 @@ export class ConsultationService {
     const pool = this.inMemoryRequests.length > allRequests.length ? this.inMemoryRequests : allRequests;
     const stats = {
       total: pool.length,
-      paid: pool.filter((r) => r.payments?.some((p) => p.status === 'PAID') || r.status !== 'CANCELLED').length,
+      paid: pool.filter((r) => r.payments?.some((p) => p.status === 'PAID')).length,
       awaitingReview: pool.filter((r) => r.status === 'AWAITING_REVIEW').length,
       assigned: pool.filter((r) => r.status === 'ASSIGNED' || r.status === 'UNDER_REVIEW').length,
       scheduled: pool.filter((r) => r.status === 'SCHEDULED').length,
@@ -1600,6 +1660,9 @@ export class ConsultationService {
   ): Promise<ConsultationRequestEntity> {
     const request = await this.getRequestById(requestId);
     if (!request) throw new Error(`Request "${requestId}" not found.`);
+
+    // Authoritative backend payment guard: verified payment required before consultant assignment
+    await this.assertConsultationPaymentVerified(requestId, 'assign a consultant to');
 
     const consultant = await this.getConsultantById(consultantId);
     if (!consultant) throw new Error(`Consultant "${consultantId}" not found.`);
@@ -1678,6 +1741,9 @@ export class ConsultationService {
   ): Promise<ConsultationRequestEntity> {
     const request = await this.getRequestById(requestId);
     if (!request) throw new Error(`Request "${requestId}" not found.`);
+
+    // Authoritative backend payment guard: verified payment required before scheduling appointment
+    await this.assertConsultationPaymentVerified(requestId, 'schedule an appointment for');
 
     const now = new Date().toISOString();
     const formattedSchedule = new Date(confirmedDateTime).toLocaleString('en-IN', {
@@ -1758,6 +1824,12 @@ export class ConsultationService {
       throw new Error(
         `Invalid status transition: cannot change from "${prevStatus}" to "${status}". Allowed transitions: [${allowed.join(', ')}]`
       );
+    }
+
+    // Authoritative backend payment guard: verified payment required before advancing into paid-service delivery states.
+    // Non-paid administrative cleanup operations (CANCELLED, REJECTED) do not require payment.
+    if (status !== 'CANCELLED' && status !== 'REJECTED') {
+      await this.assertConsultationPaymentVerified(requestId, `transition status to "${status}" for`);
     }
 
     const now = new Date().toISOString();
@@ -1927,7 +1999,7 @@ export class ConsultationService {
 
   private findRecentPendingBooking(
     email: string,
-    consultantId: string,
+    consultantId: string | null,
     preferredDate: string,
     preferredTime: string
   ): ConsultationRequestEntity | null {
@@ -1936,7 +2008,7 @@ export class ConsultationService {
       this.inMemoryRequests.find(
         (r) =>
           r.homeownerEmail.toLowerCase() === email &&
-          r.consultantId === consultantId &&
+          (r.consultantId || null) === (consultantId || null) &&
           r.preferredDate === preferredDate &&
           r.preferredTime === preferredTime &&
           r.status === 'AWAITING_REVIEW' &&
@@ -1986,7 +2058,12 @@ export class ConsultationService {
           where: { gatewayOrderId },
         });
         if (pay) return this.mapPrismaPayment(pay);
-      } catch {}
+        return null;
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL) {
+          throw new Error('AUTHORITATIVE_STORAGE_UNAVAILABLE: Failed to query payment from database: ' + err.message);
+        }
+      }
     }
 
     return this.inMemoryPayments.find((p) => p.gatewayOrderId === gatewayOrderId) || null;
@@ -2000,10 +2077,84 @@ export class ConsultationService {
           orderBy: { createdAt: 'desc' },
         });
         if (pay) return this.mapPrismaPayment(pay);
-      } catch {}
+        return null;
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL) {
+          throw new Error('AUTHORITATIVE_STORAGE_UNAVAILABLE: Failed to query payment from database: ' + err.message);
+        }
+      }
     }
 
     return this.inMemoryPayments.find((p) => p.consultationRequestId === consultationRequestId) || null;
+  }
+
+  /**
+   * Retrieves all payment attempts for a consultation request.
+   * If Prisma is configured:
+   * 1. Returns database records (even if empty, i.e. zero payment attempts).
+   * 2. In production or when DATABASE_URL is configured, fails closed on query errors
+   *    rather than silently falling back to stale in-memory records.
+   * In unsupported/development environments where database persistence is not configured,
+   * falls back cleanly to the in-memory store.
+   */
+  public async getPaymentsByRequestId(consultationRequestId: string): Promise<ConsultationPaymentEntity[]> {
+    if (this.prisma) {
+      try {
+        const payments = await (this.prisma as any).consultationPayment.findMany({
+          where: { consultationRequestId },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (Array.isArray(payments)) {
+          return payments.map(this.mapPrismaPayment);
+        }
+      } catch (err: any) {
+        if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL) {
+          console.error('[ConsultationService] CRITICAL: Authoritative database payment lookup failed:', err.message);
+          throw new Error(
+            'AUTHORITATIVE_STORAGE_UNAVAILABLE: Failed to query payment records from database: ' + err.message
+          );
+        }
+        console.warn('[ConsultationService] Database payment lookup failed in non-production, using in-memory:', err.message);
+      }
+    }
+
+    return this.inMemoryPayments.filter((p) => p.consultationRequestId === consultationRequestId);
+  }
+
+  /**
+   * Authoritative backend payment guard.
+   * Ensures that a consultation has a verified, persisted payment record with status PAID
+   * before allowing assignment, scheduling, or advancing into paid-service delivery states.
+   * Fails closed if payment is missing, PENDING, FAILED, or REFUNDED.
+   */
+  public async assertConsultationPaymentVerified(
+    requestId: string,
+    actionDescription = 'advance'
+  ): Promise<ConsultationPaymentEntity> {
+    const payments = await this.getPaymentsByRequestId(requestId);
+
+    if (!payments || payments.length === 0) {
+      throw new Error(
+        `Cannot ${actionDescription} consultation: no payment record found. Verified payment of ₹${CONSULTATION_PRICE_INR} is required.`
+      );
+    }
+
+    const verifiedPayment = payments.find((p) => p.status === 'PAID');
+    if (!verifiedPayment) {
+      const latest = payments[0];
+      const status = latest ? latest.status : 'UNPAID';
+      throw new Error(
+        `Cannot ${actionDescription} consultation: payment has not been verified (current payment status: ${status}). Verified payment of ₹${CONSULTATION_PRICE_INR} is required.`
+      );
+    }
+
+    if (verifiedPayment.amountMinorUnits !== CONSULTATION_PRICE_PAISE) {
+      throw new Error(
+        `Cannot ${actionDescription} consultation: payment amount mismatch (expected ₹${CONSULTATION_PRICE_INR}, found ₹${verifiedPayment.amountMinorUnits / 100}).`
+      );
+    }
+
+    return verifiedPayment;
   }
 
   public async recordPaymentFailure(paymentId: string, gatewayPaymentId: string, reason: string) {

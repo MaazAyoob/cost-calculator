@@ -13,6 +13,7 @@ import {
   ProfessionalApplicationInput,
 } from '../types/consultation';
 import { consultationApi, BookingResponse, AdminConsultationsResponse } from '../services/consultationApi';
+import { useCustomerAuthStore } from './useCustomerAuthStore';
 
 interface ConsultationState {
   // Discovery & Public Catalog
@@ -201,7 +202,8 @@ export const useConsultationStore = create<ConsultationState>((set, get) => ({
   submitBooking: async (payload) => {
     set({ isSubmittingBooking: true, error: null });
     try {
-      const response = await consultationApi.createBooking(payload);
+      const userToken = useCustomerAuthStore.getState().token;
+      const response = await consultationApi.createBooking(payload, userToken);
       set({
         activeBookingResponse: response,
         isSubmittingBooking: false,
@@ -216,7 +218,17 @@ export const useConsultationStore = create<ConsultationState>((set, get) => ({
   verifyPayment: async (requestId, paymentDetails) => {
     set({ isSubmittingBooking: true, error: null });
     try {
-      const res = await consultationApi.verifyPayment(requestId, paymentDetails);
+      const userToken = useCustomerAuthStore.getState().token;
+      const res = await consultationApi.verifyPayment(requestId, paymentDetails, userToken);
+      if (res.isPending || res.paymentStatus === 'PENDING') {
+        set({ isSubmittingBooking: false });
+        return {
+          ...res.request,
+          isPending: true,
+          paymentStatus: 'PENDING',
+          message: res.message,
+        } as any;
+      }
       set({
         confirmedRequest: res.request,
         isSubmittingBooking: false,
@@ -242,7 +254,8 @@ export const useConsultationStore = create<ConsultationState>((set, get) => ({
   fetchMyConsultations: async (email?: string) => {
     set({ isLoadingMyConsultations: true });
     try {
-      const data = await consultationApi.getMyConsultations(email);
+      const userToken = useCustomerAuthStore.getState().token;
+      const data = await consultationApi.getMyConsultations(email, userToken);
       set({ myConsultations: data, isLoadingMyConsultations: false });
     } catch {
       set({ isLoadingMyConsultations: false });

@@ -389,6 +389,121 @@ function viteDevApiPlugin() {
         if (pathOnly === '/api/v1/account/consultations' && method === 'GET') {
           return sendJson(res, 200, { success: true, data: consultations });
         }
+
+        // 10. Consultation Booking Creation & Payment Verification Fallback
+        if (pathOnly === '/api/v1/consultations' && method === 'POST') {
+          const body = await parseJsonBody(req);
+          const authHeader = req.headers['authorization'];
+          // Issue 1: If linking an existing saved project, authentication is strictly required
+          if (body.projectId) {
+            if (!authHeader) {
+              return sendJson(res, 400, {
+                success: false,
+                error: 'Authentication required to link an existing project.',
+              });
+            }
+          }
+          const reqId = `req_${Date.now()}`;
+          const orderId = `order_cf_con_${Date.now()}`;
+          const bookingResp = {
+            request: {
+              id: reqId,
+              publicReference: `HT-CON-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+              consultantId: body.consultantId || 'con_1',
+              consultantNameSnapshot: 'Ar. Ramesh Nambiar',
+              homeownerName: body.homeownerName,
+              homeownerEmail: body.homeownerEmail,
+              homeownerPhone: body.homeownerPhone,
+              projectLocation: body.projectLocation || 'Bangalore',
+              projectType: body.projectType || 'Independent Villa',
+              consultationTopic: body.consultationTopic || 'Plan & Layout Review',
+              preferredDate: body.preferredDate,
+              preferredTime: body.preferredTime,
+              projectId: body.projectId || null,
+              projectSnapshot: body.projectSnapshot || null,
+              status: 'AWAITING_REVIEW',
+              amountMinorUnits: 149900,
+              amountINR: 1499,
+              currency: 'INR',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+            payment: {
+              id: `pay_${Date.now()}`,
+              consultationRequestId: reqId,
+              gateway: 'CASHFREE',
+              gatewayOrderId: orderId,
+              amountMinorUnits: 149900,
+              amountINR: 1499,
+              currency: 'INR',
+              status: 'PENDING',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+            cashfreeOptions: {
+              orderId,
+              paymentSessionId: `session_cf_sandbox_${Date.now()}`,
+              amount: 1499,
+              amountMinorUnits: 149900,
+              currency: 'INR',
+              gateway: 'CASHFREE',
+              environment: 'TEST',
+            },
+            razorpayOptions: {
+              orderId,
+              amount: 149900,
+              currency: 'INR',
+              keyId: 'mock_key',
+              name: 'Hutty Consultation',
+              description: 'Expert Review',
+              prefill: {
+                name: body.homeownerName,
+                email: body.homeownerEmail,
+                contact: body.homeownerPhone,
+              },
+            },
+          };
+          return sendJson(res, 201, { success: true, data: bookingResp });
+        }
+
+        const verifyMatch = pathOnly.match(/^\/api\/v1\/consultations\/([^/]+)\/verify-payment$/);
+        if (verifyMatch && method === 'POST') {
+          const id = verifyMatch[1];
+          const body = await parseJsonBody(req);
+          const isPending = body.gatewayPaymentId?.startsWith('cf_chk_pending');
+          if (isPending) {
+            return sendJson(res, 200, {
+              success: true,
+              isPending: true,
+              message: 'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
+              data: {
+                request: { id, status: 'AWAITING_REVIEW', publicReference: 'HT-CON-TEST' },
+                payment: { id: 'pay_1', status: 'PENDING' },
+                paymentStatus: 'PENDING',
+                statusText: 'Payment Awaiting Confirmation',
+              },
+            });
+          }
+          return sendJson(res, 200, {
+            success: true,
+            isPending: false,
+            message: 'Payment verified successfully. Your consultation request is now awaiting admin review.',
+            data: {
+              request: {
+                id,
+                publicReference: `HT-CON-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                status: 'AWAITING_REVIEW',
+                consultantNameSnapshot: 'Ar. Ramesh Nambiar',
+                homeownerName: 'Aarav Patel',
+                amountINR: 1499,
+              },
+              payment: { id: `pay_${Date.now()}`, status: 'PAID', gatewayPaymentId: body.gatewayPaymentId },
+              paymentStatus: 'PAID',
+              statusText: 'Paid — Awaiting Admin Review',
+            },
+          });
+        }
+
         // Default pass-through to proxy for other routes
         next();
       });

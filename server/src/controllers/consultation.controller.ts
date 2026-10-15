@@ -161,12 +161,29 @@ export async function verifyPayment(req: Request, res: Response): Promise<void> 
 
     const result = await consultationService.verifyPayment(id, parsed.data);
 
+    if (result.isPending) {
+      res.json({
+        success: true,
+        isPending: true,
+        message: result.message || 'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
+        data: {
+          request: result.request,
+          payment: result.payment,
+          paymentStatus: 'PENDING',
+          statusText: 'Payment Awaiting Confirmation',
+        },
+      });
+      return;
+    }
+
     res.json({
       success: true,
+      isPending: false,
       message: 'Payment verified successfully. Your consultation request is now awaiting admin review.',
       data: {
         request: result.request,
         payment: result.payment,
+        paymentStatus: 'PAID',
         statusText: 'Paid — Awaiting Admin Review',
       },
     });

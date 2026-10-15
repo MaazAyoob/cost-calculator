@@ -57,6 +57,7 @@ export const AdminConsultationsSection: React.FC = () => {
   const [newStatusInput, setNewStatusInput] = useState<ConsultationStatus>('AWAITING_REVIEW');
   const [newInternalNote, setNewInternalNote] = useState('');
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const effectiveToken =
     adminToken ||
@@ -73,6 +74,7 @@ export const AdminConsultationsSection: React.FC = () => {
   const handleOpenManageModal = async (req: ConsultationRequest) => {
     setSelectedRequestId(req.id);
     setActionFeedback(null);
+    setActionError(null);
     setNewConsultantId(req.consultantId || '');
     setNewStatusInput(req.status);
     if (req.confirmedDateTime) {
@@ -93,9 +95,11 @@ export const AdminConsultationsSection: React.FC = () => {
     try {
       await assignConsultant(selectedRequestId, newConsultantId, effectiveToken);
       setActionFeedback('Consultant assigned successfully.');
+      setActionError(null);
       await fetchAdminRequestDetail(selectedRequestId, effectiveToken);
     } catch (err: any) {
-      setActionFeedback(err.message);
+      setActionError(err.message || 'Failed to assign consultant.');
+      setActionFeedback(null);
     }
   };
 
@@ -106,9 +110,11 @@ export const AdminConsultationsSection: React.FC = () => {
       const iso = new Date(confirmedScheduleInput).toISOString();
       await scheduleConsultation(selectedRequestId, iso, effectiveToken);
       setActionFeedback('Appointment schedule confirmed successfully.');
+      setActionError(null);
       await fetchAdminRequestDetail(selectedRequestId, effectiveToken);
     } catch (err: any) {
-      setActionFeedback(err.message);
+      setActionError(err.message || 'Failed to schedule appointment.');
+      setActionFeedback(null);
     }
   };
 
@@ -118,9 +124,11 @@ export const AdminConsultationsSection: React.FC = () => {
     try {
       await updateRequestStatus(selectedRequestId, newStatusInput, effectiveToken);
       setActionFeedback(`Status updated to ${newStatusInput}.`);
+      setActionError(null);
       await fetchAdminRequestDetail(selectedRequestId, effectiveToken);
     } catch (err: any) {
-      setActionFeedback(err.message);
+      setActionError(err.message || 'Failed to update request status.');
+      setActionFeedback(null);
     }
   };
 
@@ -131,9 +139,11 @@ export const AdminConsultationsSection: React.FC = () => {
       await addInternalNote(selectedRequestId, newInternalNote.trim(), effectiveToken);
       setNewInternalNote('');
       setActionFeedback('Internal note recorded.');
+      setActionError(null);
       await fetchAdminRequestDetail(selectedRequestId, effectiveToken);
     } catch (err: any) {
-      setActionFeedback(err.message);
+      setActionError(err.message || 'Failed to record internal note.');
+      setActionFeedback(null);
     }
   };
 
@@ -321,7 +331,13 @@ export const AdminConsultationsSection: React.FC = () => {
                       <span className="font-mono font-bold text-emerald-800 block">
                         {LAUNCH_CONSULTATION_PRICE_DISPLAY}
                       </span>
-                      <span className="text-[10px] text-emerald-700 font-semibold uppercase">Verified Paid</span>
+                      {req.payments?.some((p) => p.status === 'PAID') ? (
+                        <span className="text-[10px] text-emerald-700 font-semibold uppercase">Verified Paid</span>
+                      ) : req.payments?.some((p) => p.status === 'FAILED') ? (
+                        <span className="text-[10px] text-red-700 font-semibold uppercase">Payment Failed</span>
+                      ) : (
+                        <span className="text-[10px] text-amber-700 font-semibold uppercase">Payment Pending</span>
+                      )}
                     </td>
 
                     <td className="py-3 px-4">
@@ -353,11 +369,24 @@ export const AdminConsultationsSection: React.FC = () => {
             {/* Modal Header */}
             <div className="flex items-start justify-between pb-3 border-b border-slate-200">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                     {adminSelectedRequest.publicReference}
                   </span>
                   {getStatusBadge(adminSelectedRequest.status)}
+                  {adminSelectedRequest.payments?.some((p) => p.status === 'PAID') ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      Verified Paid
+                    </span>
+                  ) : adminSelectedRequest.payments?.some((p) => p.status === 'FAILED') ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 border border-red-300">
+                      Payment Failed
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                      Payment Pending
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mt-1 font-heading">
                   Consultation Request Review
@@ -373,10 +402,34 @@ export const AdminConsultationsSection: React.FC = () => {
               </button>
             </div>
 
+            {actionError && (
+              <div className="p-3 bg-red-50 text-red-800 text-xs rounded-xl border border-red-200 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>{actionError}</span>
+                </div>
+                <button onClick={() => setActionError(null)} className="text-red-500 font-bold ml-2">×</button>
+              </div>
+            )}
+
             {actionFeedback && (
               <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 flex items-center justify-between">
                 <span>{actionFeedback}</span>
-                <button onClick={() => setActionFeedback(null)} className="text-emerald-500 font-bold">×</button>
+                <button onClick={() => setActionFeedback(null)} className="text-emerald-500 font-bold ml-2">×</button>
+              </div>
+            )}
+
+            {!adminSelectedRequest.payments?.some((p) => p.status === 'PAID') && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <strong className="block">
+                    Payment Not Verified ({adminSelectedRequest.payments?.some((p) => p.status === 'FAILED') ? 'Payment Failed' : 'Payment Pending'})
+                  </strong>
+                  <p className="text-amber-800 text-[11px] leading-relaxed">
+                    This consultation booking requires verified payment of {LAUNCH_CONSULTATION_PRICE_DISPLAY} before consultant assignment or appointment scheduling can proceed. Unpaid bookings may only be cancelled or rejected.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -499,11 +552,16 @@ export const AdminConsultationsSection: React.FC = () => {
                 </select>
                 <button
                   type="submit"
-                  disabled={!newConsultantId || isAdminLoading}
-                  className="w-full hutty-btn-primary py-2 rounded-xl text-xs font-bold cursor-pointer disabled:opacity-50"
+                  disabled={!newConsultantId || isAdminLoading || !adminSelectedRequest.payments?.some((p) => p.status === 'PAID')}
+                  className="w-full hutty-btn-primary py-2 rounded-xl text-xs font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Save Assignment
                 </button>
+                {!adminSelectedRequest.payments?.some((p) => p.status === 'PAID') && (
+                  <p className="text-[10px] text-amber-700 italic text-center">
+                    Payment required to assign
+                  </p>
+                )}
               </form>
 
               {/* Action 2: Confirm Appointment Schedule */}
@@ -518,11 +576,16 @@ export const AdminConsultationsSection: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  disabled={!confirmedScheduleInput || isAdminLoading}
-                  className="w-full bg-emerald-800 hover:bg-emerald-900 text-white py-2 rounded-xl text-xs font-bold cursor-pointer shadow-xs disabled:opacity-50"
+                  disabled={!confirmedScheduleInput || isAdminLoading || !adminSelectedRequest.payments?.some((p) => p.status === 'PAID')}
+                  className="w-full bg-emerald-800 hover:bg-emerald-900 text-white py-2 rounded-xl text-xs font-bold cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Confirm &amp; Schedule
                 </button>
+                {!adminSelectedRequest.payments?.some((p) => p.status === 'PAID') && (
+                  <p className="text-[10px] text-amber-700 italic text-center">
+                    Payment required to schedule
+                  </p>
+                )}
               </form>
 
               {/* Action 3: Transition Status */}
@@ -542,11 +605,23 @@ export const AdminConsultationsSection: React.FC = () => {
                 </select>
                 <button
                   type="submit"
-                  disabled={isAdminLoading}
-                  className="w-full bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-xl text-xs font-bold cursor-pointer disabled:opacity-50"
+                  disabled={
+                    isAdminLoading ||
+                    (!adminSelectedRequest.payments?.some((p) => p.status === 'PAID') &&
+                      newStatusInput !== 'CANCELLED' &&
+                      newStatusInput !== 'REJECTED')
+                  }
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-xl text-xs font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Update Status
                 </button>
+                {!adminSelectedRequest.payments?.some((p) => p.status === 'PAID') &&
+                  newStatusInput !== 'CANCELLED' &&
+                  newStatusInput !== 'REJECTED' && (
+                    <p className="text-[10px] text-amber-700 italic text-center">
+                      Payment required for active service
+                    </p>
+                  )}
               </form>
             </div>
 
