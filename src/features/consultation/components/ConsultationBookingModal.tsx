@@ -224,6 +224,16 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     orderId: string,
     reqId: string
   ) => {
+    const cleanSessionId = typeof paymentSessionId === 'string' ? paymentSessionId.trim() : '';
+    if (!cleanSessionId) {
+      setErrorMessage('Cashfree payment session is missing or expired. Please retry initiating your booking.');
+      consultationAnalytics.track({
+        eventName: 'consultation_payment_failed',
+        metadata: { error: 'Empty or invalid paymentSessionId passed to launchCashfreeModal' },
+      });
+      return;
+    }
+
     if (!(window as any).Cashfree) {
       await new Promise((resolve, reject) => {
         const script = document.createElement('script');
@@ -238,7 +248,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     const cashfree = (window as any).Cashfree({ mode: 'sandbox' });
     cashfree
       .checkout({
-        paymentSessionId,
+        paymentSessionId: cleanSessionId,
         redirectTarget: '_modal',
       })
       .then(async (result: any) => {
@@ -250,7 +260,15 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
           });
           return;
         }
-        await handleCheckPaymentStatus(reqId, orderId, paymentSessionId);
+        await handleCheckPaymentStatus(reqId, orderId, cleanSessionId);
+      })
+      .catch((cfErr: any) => {
+        const msg = cfErr?.message || 'Cashfree checkout error';
+        setErrorMessage(msg);
+        consultationAnalytics.track({
+          eventName: 'consultation_payment_failed',
+          metadata: { error: msg },
+        });
       });
   };
 
@@ -273,7 +291,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         setPaymentPendingState({
           requestId: reqId,
           orderId,
-          paymentSessionId,
+          paymentSessionId: (paymentSessionId || '').trim(),
           message:
             verified.message ||
             'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',
@@ -307,9 +325,17 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
   const handleResumePayment = async () => {
     if (!paymentPendingState) return;
+    const sessionToResume = paymentPendingState.paymentSessionId?.trim();
+    if (!sessionToResume) {
+      setPaymentPendingState(null);
+      setErrorMessage(
+        'Previous payment session is unavailable or expired. You can now start a fresh payment attempt.'
+      );
+      return;
+    }
     setErrorMessage(null);
     await launchCashfreeModal(
-      paymentPendingState.paymentSessionId,
+      sessionToResume,
       paymentPendingState.orderId,
       paymentPendingState.requestId
     );
@@ -350,17 +376,42 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
       const { request, payment, razorpayOptions, cashfreeOptions } = bookingData;
 
-      // 1. Cashfree Sandbox Checkout Flow
-      if (cashfreeOptions?.paymentSessionId && !cashfreeOptions.paymentSessionId.includes('mock')) {
+      const cfSessionId =
+        (cashfreeOptions?.paymentSessionId || cashfreeOptions?.payment_session_id || '')
+          .toString()
+          .trim();
+
+      // 1. Cashfree Checkout Flow
+      if (payment.gateway === 'CASHFREE' || cashfreeOptions) {
+        if (!cfSessionId) {
+          setErrorMessage('Unable to initialize Cashfree payment session. Please retry or contact support.');
+          consultationAnalytics.track({
+            eventName: 'consultation_payment_failed',
+            metadata: { error: 'Missing Cashfree paymentSessionId in booking response' },
+          });
+          return;
+        }
+
+        // Store pending state so user can resume without generating duplicate booking
+        setPaymentPendingState({
+          requestId: request.id,
+          orderId: cashfreeOptions?.orderId || payment.gatewayOrderId,
+          paymentSessionId: cfSessionId,
+          message:
+            'Payment has been initiated. Complete checkout in Cashfree or check your payment status.',
+        });
+
         try {
           await launchCashfreeModal(
-            cashfreeOptions.paymentSessionId,
-            cashfreeOptions.orderId || payment.gatewayOrderId,
+            cfSessionId,
+            cashfreeOptions?.orderId || payment.gatewayOrderId,
             request.id
           );
           return;
         } catch (cfErr: any) {
-          console.warn('[Consultation] Cashfree SDK modal error, continuing fallback:', cfErr.message);
+          console.warn('[Consultation] Cashfree SDK modal error:', cfErr.message);
+          setErrorMessage(cfErr.message || 'Failed to open Cashfree checkout modal. Please try again.');
+          return;
         }
       }
 
@@ -428,7 +479,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
           setPaymentPendingState({
             requestId: request.id,
             orderId: payment.gatewayOrderId,
-            paymentSessionId: cashfreeOptions?.paymentSessionId || '',
+            paymentSessionId: '',
             message:
               verified.message ||
               'Payment is awaiting confirmation. Complete payment in Cashfree or check your payment status.',

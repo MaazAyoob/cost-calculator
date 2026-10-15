@@ -709,6 +709,7 @@ export class ConsultationService {
     cashfreeOptions?: {
       orderId: string;
       paymentSessionId?: string;
+      payment_session_id?: string;
       amount: number;
       amountMinorUnits: number;
       currency: string;
@@ -792,7 +793,7 @@ export class ConsultationService {
           if (existingPayment.gateway === 'CASHFREE' && cashfreeService.isConfigured()) {
             try {
               const order = await cashfreeService.getOrder(existingPayment.gatewayOrderId);
-              cfPaymentSessionId = order?.payment_session_id;
+              cfPaymentSessionId = order?.payment_session_id || order?.paymentSessionId;
             } catch {}
           }
           return {
@@ -802,6 +803,7 @@ export class ConsultationService {
             cashfreeOptions: existingPayment.gateway === 'CASHFREE' ? {
               orderId: existingPayment.gatewayOrderId,
               paymentSessionId: cfPaymentSessionId,
+              payment_session_id: cfPaymentSessionId,
               amount: CONSULTATION_PRICE_INR,
               amountMinorUnits: CONSULTATION_PRICE_PAISE,
               currency: CONSULTATION_CURRENCY,
@@ -827,7 +829,7 @@ export class ConsultationService {
         if (payment.gateway === 'CASHFREE' && cashfreeService.isConfigured()) {
           try {
             const order = await cashfreeService.getOrder(payment.gatewayOrderId);
-            cfPaymentSessionId = order?.payment_session_id;
+            cfPaymentSessionId = order?.payment_session_id || order?.paymentSessionId;
           } catch {}
         }
         return {
@@ -837,6 +839,7 @@ export class ConsultationService {
           cashfreeOptions: payment.gateway === 'CASHFREE' ? {
             orderId: payment.gatewayOrderId,
             paymentSessionId: cfPaymentSessionId,
+            payment_session_id: cfPaymentSessionId,
             amount: CONSULTATION_PRICE_INR,
             amountMinorUnits: CONSULTATION_PRICE_PAISE,
             currency: CONSULTATION_CURRENCY,
@@ -1029,6 +1032,7 @@ export class ConsultationService {
       cashfreeOptions: {
         orderId: paymentEntity.gatewayOrderId,
         paymentSessionId: cfPaymentSessionId,
+        payment_session_id: cfPaymentSessionId,
         amount: CONSULTATION_PRICE_INR,
         amountMinorUnits: CONSULTATION_PRICE_PAISE,
         currency: CONSULTATION_CURRENCY,

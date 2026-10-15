@@ -154,6 +154,7 @@ export interface RazorpayCheckoutOptions {
 export interface CashfreeCheckoutOptions {
   orderId: string;
   paymentSessionId?: string;
+  payment_session_id?: string;
   amount: number;
   amountMinorUnits: number;
   currency: string;

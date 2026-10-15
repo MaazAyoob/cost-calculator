@@ -443,6 +443,7 @@ function viteDevApiPlugin() {
             cashfreeOptions: {
               orderId,
               paymentSessionId: `session_cf_sandbox_${Date.now()}`,
+              payment_session_id: `session_cf_sandbox_${Date.now()}`,
               amount: 1499,
               amountMinorUnits: 149900,
               currency: 'INR',

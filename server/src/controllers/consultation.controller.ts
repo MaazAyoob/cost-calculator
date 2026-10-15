@@ -114,6 +114,7 @@ export async function createBookingRequest(req: AuthenticatedRequest, res: Respo
         request: result.request,
         payment: result.payment,
         razorpayOptions: result.razorpayOptions,
+        cashfreeOptions: result.cashfreeOptions,
       },
     });
   } catch (err: any) {
