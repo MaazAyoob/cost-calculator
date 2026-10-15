@@ -42,8 +42,9 @@ export async function generateBasicEstimatePdfBlob(options: GeneratePdfOptions):
 
   const blob = await pdf(docElement).toBlob();
   const url = URL.createObjectURL(blob);
-  const sanitizedId = (data.report?.projectId || 'HUTTY-REPORT').replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `${sanitizedId}_Basic_Estimate_Summary.pdf`;
+  const rawId = data.report?.projectId || 'HT-ESTIMATE';
+  const sanitizedId = rawId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `Hutty_Basic_Estimate_${sanitizedId}.pdf`;
 
   return { blob, url, filename };
 }
@@ -110,8 +111,11 @@ export async function generateDetailedReportPdfBlob(options: GeneratePdfOptions)
 
   const blob = await pdf(docElement).toBlob();
   const url = URL.createObjectURL(blob);
-  const sanitizedId = (data.report?.projectId || 'HUTTY-REPORT').replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `${sanitizedId}_Detailed_BOQ_Report.pdf`;
+  const rawId = data.report?.projectId || 'HT-ESTIMATE';
+  const sanitizedId = rawId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = isPremium
+    ? `Hutty_Premium_BOQ_${sanitizedId}.pdf`
+    : `Hutty_Detailed_BOQ_${sanitizedId}.pdf`;
 
   return { blob, url, filename };
 }

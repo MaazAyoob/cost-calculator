@@ -23,9 +23,9 @@ const C = {
 const styles = StyleSheet.create({
   // ── Pages ──
   page: {
-    paddingTop: 24,
-    paddingBottom: 28,
-    paddingHorizontal: 26,
+    paddingTop: 28,
+    paddingBottom: 38,
+    paddingHorizontal: 28,
     fontFamily: 'Helvetica',
     fontSize: 7.2,
     color: C.green,
@@ -308,15 +308,15 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 10,
-    left: 26,
-    right: 26,
+    bottom: 12,
+    left: 28,
+    right: 28,
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderTopWidth: 0.5,
     borderTopColor: C.border,
-    paddingTop: 3,
-    fontSize: 5.5,
+    paddingTop: 4,
+    fontSize: 5.8,
     color: C.greyLt,
   },
 });
@@ -349,11 +349,11 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
   const refId = report?.projectId || 'HUTTY-2026';
 
   // Column widths
-  const W = { sl: '5%', desc: '51%', qty: '15%', rate: '14%', amt: '15%' };
-  const WD = { cat: '56%', amt: '24%', pct: '20%' };
+  const W = { sl: '6%', desc: '48%', qty: '15%', rate: '14%', amt: '17%' };
+  const WD = { cat: '52%', amt: '28%', pct: '20%' };
 
   const RunHeader = ({ section }: { section: string }) => (
-    <View style={styles.runningHeader}>
+    <View style={styles.runningHeader} fixed>
       <View>
         <Text style={styles.runningHeaderLogo}>HUTTY</Text>
         <Text style={styles.runningHeaderSection}>{section}</Text>
@@ -363,6 +363,13 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         <Text style={styles.runningHeaderMeta}>Date: {dateStr}</Text>
         <Text style={styles.runningHeaderMeta}>Prepared for: {preparedFor}</Text>
       </View>
+    </View>
+  );
+
+  const DocFooter = ({ section }: { section: string }) => (
+    <View style={styles.footer} fixed>
+      <Text>Hutty QS Dossier &bull; Ref: {refId} &bull; {section}</Text>
+      <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
     </View>
   );
 
@@ -409,7 +416,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
             Subtotal: {fmt(subTotal)}
           </Text>
         </View>
-        <View style={styles.tableHeaderRow}>
+        <View style={styles.tableHeaderRow} fixed>
           <Text style={[styles.th, { width: W.sl }]}>Sl</Text>
           <Text style={[styles.th, { width: W.desc }]}>Item / Specification</Text>
           <Text style={[styles.th, styles.tdRight, { width: W.qty }]}>Qty / Unit</Text>
@@ -417,7 +424,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           <Text style={[styles.th, styles.tdRight, { width: W.amt }]}>Amount</Text>
         </View>
         {items.map((item, idx) => (
-          <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+          <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
             <Text style={[styles.tdMuted, { width: W.sl }]}>{item.slNo}</Text>
             <View style={{ width: W.desc }}>
               <Text style={styles.td}>{item.item}</Text>
@@ -597,7 +604,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           Section A — What We Build · Comprehensive Works BOQ
         </Text>
         <View>
-          <View style={styles.tableHeaderRow}>
+          <View style={styles.tableHeaderRow} fixed>
             <Text style={[styles.th, { width: W.sl }]}>Sl</Text>
             <Text style={[styles.th, { width: W.desc }]}>Trade Activity &amp; Description</Text>
             <Text style={[styles.th, styles.tdRight, { width: W.qty }]}>Qty / Unit</Text>
@@ -606,7 +613,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           </View>
 
           {(boq || []).map((item, idx) => (
-            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
               <Text style={[styles.tdMuted, { width: W.sl }]}>{item.slNo}</Text>
               <View style={{ width: W.desc }}>
                 <Text style={styles.td}>
@@ -625,16 +632,13 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
             </View>
           ))}
 
-          <View style={styles.totalRow}>
+          <View style={styles.totalRow} wrap={false}>
             <Text style={[styles.totalLabel, { width: '70%' }]}>Section A Total — What We Build (Works BOQ)</Text>
             <Text style={[styles.totalValue, { width: '30%' }]}>{fmt(budget?.baseConstructionCost)}</Text>
           </View>
         </View>
 
-        <View style={styles.footer}>
-          <Text>Hutty QS Dossier · {refId}</Text>
-          <Text>Section A: What We Build · Works BOQ · Page 2</Text>
-        </View>
+        <DocFooter section="Section A: What We Build · Works BOQ" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
@@ -673,7 +677,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           Section B — What We Consume · Itemized Materials Needed
         </Text>
         <View>
-          <View style={styles.tableHeaderRow}>
+          <View style={styles.tableHeaderRow} fixed>
             <Text style={[styles.th, { width: W.sl }]}>Sl</Text>
             <Text style={[styles.th, { width: W.desc }]}>Material &amp; Brand Specification</Text>
             <Text style={[styles.th, styles.tdRight, { width: W.qty }]}>Quantity</Text>
@@ -681,7 +685,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
             <Text style={[styles.th, styles.tdRight, { width: W.amt }]}>Total</Text>
           </View>
           {(materialSchedule || []).map((mat, idx) => (
-            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
               <Text style={[styles.tdMuted, { width: W.sl }]}>{mat.slNo}</Text>
               <View style={{ width: W.desc }}>
                 <Text style={styles.td}>{mat.material}</Text>
@@ -698,7 +702,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
               <Text style={[styles.tdBold, styles.tdRight, { width: W.amt }]}>{fmt(mat.amount)}</Text>
             </View>
           ))}
-          <View style={styles.totalRow}>
+          <View style={styles.totalRow} wrap={false}>
             <Text style={[styles.totalLabel, { width: '70%' }]}>Section B Total — Physical Materials</Text>
             <Text style={[styles.totalValue, { width: '30%' }]}>
               {fmt((materialSchedule || []).reduce((s, m) => s + (m.amount || 0), 0))}
@@ -707,7 +711,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         {/* Material Invariance Note */}
-        <View style={styles.noticeBox}>
+        <View style={styles.noticeBox} wrap={false}>
           <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
             MATERIAL CONSUMPTION &amp; RATE INVARIANCE NOTICE
           </Text>
@@ -716,10 +720,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           </Text>
         </View>
 
-        <View style={styles.footer}>
-          <Text>Hutty QS Dossier · {refId}</Text>
-          <Text>Section B: What We Consume · Physical Materials · Page 3</Text>
-        </View>
+        <DocFooter section="Section B: What We Consume · Physical Materials" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
@@ -782,7 +783,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         {renderInstallationSubSection('5. Special Equipment & Other Installations', otherInstallations)}
 
         {/* Section C Reconciled Grand Total */}
-        <View style={styles.totalRow}>
+        <View style={styles.totalRow} wrap={false}>
           <Text style={[styles.totalLabel, { width: '70%' }]}>Section C Total — What We Install (Fixtures &amp; Services)</Text>
           <Text style={[styles.totalValue, { width: '30%' }]}>
             {fmt(allFixtures.reduce((s, f) => s + (f.amount || 0), 0))}
@@ -790,7 +791,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         {/* Services & Engineering Notice */}
-        <View style={styles.noticeBox}>
+        <View style={styles.noticeBox} wrap={false}>
           <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
             SERVICES &amp; MEP ENGINEERING DISCLAIMER
           </Text>
@@ -799,10 +800,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           </Text>
         </View>
 
-        <View style={styles.footer}>
-          <Text>Hutty QS Dossier · {refId}</Text>
-          <Text>Section C: What We Install · Services &amp; Fixtures · Page 4</Text>
-        </View>
+        <DocFooter section="Section C: What We Install · Services & Fixtures" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
@@ -814,19 +812,19 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         {/* Section D */}
         <Text style={styles.sectionTitle}>Section D — What It Costs · Cost Summary &amp; Commercial Details</Text>
         <View>
-          <View style={styles.tableHeaderRow}>
+          <View style={styles.tableHeaderRow} fixed>
             <Text style={[styles.th, { width: WD.cat }]}>Trade Category</Text>
             <Text style={[styles.th, styles.tdRight, { width: WD.amt }]}>Amount (INR)</Text>
             <Text style={[styles.th, styles.tdRight, { width: WD.pct }]}>% of Total</Text>
           </View>
           {(budget?.heads || []).map((head, idx) => (
-            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
               <Text style={[styles.td, { width: WD.cat }]}>{head.name}</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: WD.amt }]}>{fmt(head.allocatedAmount)}</Text>
               <Text style={[styles.tdMuted, styles.tdRight, { width: WD.pct }]}>{head.percentage}%</Text>
             </View>
           ))}
-          <View style={styles.totalRow}>
+          <View style={styles.totalRow} wrap={false}>
             <Text style={[styles.totalLabel, { width: WD.cat }]}>Total Estimated Project Cost (All-Inclusive)</Text>
             <Text style={[styles.totalValue, { width: WD.amt }]}>{fmt(budget?.totalProjectCost)}</Text>
             <Text style={[styles.totalValue, { width: WD.pct }]}>100.0%</Text>
@@ -834,7 +832,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         {/* Commercial summary cards */}
-        <View style={[styles.kpiRow, { marginTop: 6 }]}>
+        <View style={[styles.kpiRow, { marginTop: 6 }]} wrap={false}>
           {[
             ['Base Construction', fmt(budget?.baseConstructionCost)],
             ['Contractor Margin', fmt(budget?.contractorMargin)],
@@ -851,18 +849,18 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
 
         {/* Milestone roadmap */}
         {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
-          <>
+          <View wrap={false}>
             <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
               Payment Plan — Milestone Disbursement Schedule
             </Text>
             <View>
-              <View style={styles.tableHeaderRow}>
+              <View style={styles.tableHeaderRow} fixed>
                 <Text style={[styles.th, { width: WD.cat }]}>Stage / Construction Milestone</Text>
                 <Text style={[styles.th, styles.tdRight, { width: WD.amt }]}>Disbursement</Text>
                 <Text style={[styles.th, styles.tdRight, { width: WD.pct }]}>Stage %</Text>
               </View>
               {paymentPlan.map((stage, idx) => (
-                <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+                <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
                   <View style={{ width: WD.cat }}>
                     <Text style={styles.td}>
                       Stage {stage.stage}: {stage.title}
@@ -873,17 +871,17 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
                   <Text style={[styles.tdMuted, styles.tdRight, { width: WD.pct }]}>{stage.percentage}%</Text>
                 </View>
               ))}
-              <View style={styles.totalRow}>
+              <View style={styles.totalRow} wrap={false}>
                 <Text style={[styles.totalLabel, { width: WD.cat }]}>Total — All Milestones</Text>
                 <Text style={[styles.totalValue, { width: WD.amt }]}>{fmt(budget?.totalProjectCost)}</Text>
                 <Text style={[styles.totalValue, { width: WD.pct }]}>100.0%</Text>
               </View>
             </View>
-          </>
+          </View>
         )}
 
         {/* Mandatory Early Estimate Note Box */}
-        <View style={{ marginTop: 6, backgroundColor: '#FEF3C7', borderWidth: 0.8, borderColor: '#F59E0B', borderRadius: 4, padding: 6 }}>
+        <View style={{ marginTop: 6, backgroundColor: '#FEF3C7', borderWidth: 0.8, borderColor: '#F59E0B', borderRadius: 4, padding: 6 }} wrap={false}>
           <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: '#92400E', textTransform: 'uppercase', marginBottom: 2 }}>
             IMPORTANT ESTIMATE NOTE
           </Text>
@@ -893,7 +891,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         {/* Rate master metadata */}
-        <View style={[styles.disclaimerBox, { marginTop: 6 }]}>
+        <View style={[styles.disclaimerBox, { marginTop: 6 }]} wrap={false}>
           <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
             RATE MASTER SOURCE &amp; ENGINE METADATA
           </Text>
@@ -903,7 +901,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
         </View>
 
         {/* Disclaimers */}
-        <View style={styles.noticeBox}>
+        <View style={styles.noticeBox} wrap={false}>
           <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
             IMPORTANT — PRELIMINARY ESTIMATE &amp; ENGINEERING NOTICE
           </Text>
@@ -913,10 +911,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           </Text>
         </View>
 
-        <View style={styles.footer}>
-          <Text>Hutty QS Dossier · {refId}</Text>
-          <Text>Section D: What It Costs · Commercial Breakdown · Page 5</Text>
-        </View>
+        <DocFooter section="Section D: What It Costs · Commercial Breakdown" />
       </Page>
 
       {/* ────────────────────────────────────────────────────────── */}
@@ -939,43 +934,43 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           {/* 1. Market Rate Tolerance Benchmarks */}
           <Text style={styles.sectionTitle}>1. Key Trade Market Tolerances (Bangalore Q1 2026)</Text>
           <View style={{ borderWidth: 0.5, borderColor: C.border, marginTop: 2, marginBottom: 6 }}>
-            <View style={styles.tableHeaderRow}>
+            <View style={styles.tableHeaderRow} fixed>
               <Text style={[styles.th, { width: '35%' }]}>Material / Trade Description</Text>
               <Text style={[styles.th, { width: '20%' }]}>Unit</Text>
               <Text style={[styles.th, styles.tdRight, { width: '25%' }]}>Market Benchmark</Text>
               <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Allowable Variance</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '35%' }]}>Structural TMT Steel (Fe 550D)</Text>
               <Text style={[styles.td, { width: '20%' }]}>Per Kg</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹68 – ₹76</Text>
               <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±5% tolerance</Text>
             </View>
-            <View style={[styles.tableRow, styles.tableRowAlt]}>
+            <View style={[styles.tableRow, styles.tableRowAlt]} wrap={false}>
               <Text style={[styles.tdBold, { width: '35%' }]}>53-Grade Portland Cement</Text>
               <Text style={[styles.td, { width: '20%' }]}>50kg Bag</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹380 – ₹420</Text>
               <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±4% tolerance</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '35%' }]}>Solid Concrete Masonry Blocks (6")</Text>
               <Text style={[styles.td, { width: '20%' }]}>Per Block</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹42 – ₹48</Text>
               <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±5% tolerance</Text>
             </View>
-            <View style={[styles.tableRow, styles.tableRowAlt]}>
+            <View style={[styles.tableRow, styles.tableRowAlt]} wrap={false}>
               <Text style={[styles.tdBold, { width: '35%' }]}>Civil RCC Labour (Framed Structure)</Text>
               <Text style={[styles.td, { width: '20%' }]}>Per sq.ft BUA</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹240 – ₹280</Text>
               <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±6% tolerance</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '35%' }]}>Tile Laying &amp; Grouting Labour</Text>
               <Text style={[styles.td, { width: '20%' }]}>Per sq.ft</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹35 – ₹45</Text>
               <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±8% tolerance</Text>
             </View>
-            <View style={[styles.tableRow, styles.tableRowAlt]}>
+            <View style={[styles.tableRow, styles.tableRowAlt]} wrap={false}>
               <Text style={[styles.tdBold, { width: '35%' }]}>Interior Emulsion Painting (2 Coats + Putty)</Text>
               <Text style={[styles.td, { width: '20%' }]}>Per sq.ft</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹18 – ₹26</Text>
@@ -1019,25 +1014,25 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           {/* 3. Finish Package Sensitivity Matrix */}
           <Text style={styles.sectionTitle}>3. Finish Specification Sensitivity Matrix ({num(area.totalBUASqFt)} sq.ft BUA)</Text>
           <View style={{ borderWidth: 0.5, borderColor: C.border, marginTop: 2, marginBottom: 6 }}>
-            <View style={styles.tableHeaderRow}>
+            <View style={styles.tableHeaderRow} fixed>
               <Text style={[styles.th, { width: '30%' }]}>Specification Package</Text>
               <Text style={[styles.th, { width: '40%' }]}>Material Standards &amp; Fittings</Text>
               <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Est. Rate/sqft</Text>
               <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Project Variance</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '30%' }]}>Standard Specification</Text>
               <Text style={[styles.tdMuted, { width: '40%' }]}>Vitrified 2x2, standard UPVC, OBD paint, baseline CP</Text>
               <Text style={[styles.tdRight, { width: '15%' }]}>₹1,950</Text>
               <Text style={[styles.tdRight, { width: '15%', color: '#047857' }]}>- {fmt(Math.max(0, (budget.costPerSqFt || 2250) - 1950) * area.totalBUASqFt)}</Text>
             </View>
-            <View style={[styles.tableRow, { backgroundColor: C.bgAccent }]}>
+            <View style={[styles.tableRow, { backgroundColor: C.bgAccent }]} wrap={false}>
               <Text style={[styles.tdBold, { width: '30%', color: C.green }]}>Premium (Current Baseline)</Text>
               <Text style={[styles.td, { width: '40%' }]}>GVT 4x2, Schuco UPVC, Royal luxury emulsion, Jaguar fittings</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '15%' }]}>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '15%', color: C.amber }]}>Baseline</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '30%' }]}>Luxury Specification</Text>
               <Text style={[styles.tdMuted, { width: '40%' }]}>Italian marble, thermal-break aluminium, Grohe/Kohler, smart automation</Text>
               <Text style={[styles.tdRight, { width: '15%' }]}>₹2,850</Text>
@@ -1048,25 +1043,25 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           {/* 4. Multi-Scenario Comparison */}
           <Text style={styles.sectionTitle}>4. Multi-Scenario Layout Comparison on Plot ({num(input?.plotLength || 30)}' × {num(input?.plotWidth || 40)}')</Text>
           <View style={{ borderWidth: 0.5, borderColor: C.border, marginTop: 2, marginBottom: 6 }}>
-            <View style={styles.tableHeaderRow}>
+            <View style={styles.tableHeaderRow} fixed>
               <Text style={[styles.th, { width: '30%' }]}>Layout Scenario</Text>
               <Text style={[styles.th, { width: '30%' }]}>Built-Up Area (BUA)</Text>
               <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Estimated Budget</Text>
               <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Effective Rate</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '30%' }]}>Scenario A: Single Floor (Compact)</Text>
               <Text style={[styles.td, { width: '30%' }]}>{num(area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (input?.floors || 1)))} sq.ft</Text>
               <Text style={[styles.tdRight, { width: '20%' }]}>{fmt((area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (input?.floors || 1))) * (budget.costPerSqFt || 2250))}</Text>
               <Text style={[styles.tdRight, { width: '20%' }]}>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}/sqft</Text>
             </View>
-            <View style={[styles.tableRow, { backgroundColor: C.bgAccent }]}>
+            <View style={[styles.tableRow, { backgroundColor: C.bgAccent }]} wrap={false}>
               <Text style={[styles.tdBold, { width: '30%', color: C.green }]}>Scenario B: Current Plan (G+{Math.max(0, (input?.floors || 1) - 1)})</Text>
               <Text style={[styles.tdBold, { width: '30%' }]}>{num(area.totalBUASqFt)} sq.ft</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '20%' }]}>{fmt(budget.totalProjectCost)}</Text>
               <Text style={[styles.tdBold, styles.tdRight, { width: '20%' }]}>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}/sqft</Text>
             </View>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <Text style={[styles.tdBold, { width: '30%' }]}>Scenario C: +1 Floor (Rental Unit)</Text>
               <Text style={[styles.td, { width: '30%' }]}>{num(area.totalBUASqFt + Math.round(area.totalBUASqFt / (input?.floors || 1)))} sq.ft</Text>
               <Text style={[styles.tdRight, { width: '20%' }]}>{fmt(budget.totalProjectCost + (Math.round(area.totalBUASqFt / (input?.floors || 1)) * (budget.costPerSqFt || 2250) * 0.88))}</Text>
@@ -1084,10 +1079,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
             </Text>
           </View>
 
-          <View style={styles.footer}>
-            <Text>Hutty QS Dossier · {refId}</Text>
-            <Text>Section E: Contractor Audit &amp; Sensitivity (Premium) · Page 6</Text>
-          </View>
+          <DocFooter section="Section E: Contractor Audit & Sensitivity (Premium)" />
         </Page>
       )}
 

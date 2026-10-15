@@ -21,7 +21,7 @@ const C = {
 const styles = StyleSheet.create({
   page: {
     paddingTop: 32,
-    paddingBottom: 32,
+    paddingBottom: 40,
     paddingHorizontal: 36,
     fontFamily: 'Helvetica',
     fontSize: 8,
@@ -274,12 +274,12 @@ const styles = StyleSheet.create({
   // Footer
   footer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 16,
     left: 36,
     right: 36,
     borderTopWidth: 0.5,
     borderTopColor: C.border,
-    paddingTop: 8,
+    paddingTop: 6,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -460,9 +460,9 @@ export const BasicEstimatePdfDocument: React.FC<BasicEstimatePdfDocumentProps> =
         </View>
 
         {/* Footer */}
-        <View style={styles.footer}>
+        <View style={styles.footer} fixed>
           <Text style={styles.footerText}>Hutty Pre-Construction Platform &bull; www.hutty.in &bull; Bangalore, Karnataka</Text>
-          <Text style={styles.footerText}>Basic Estimate Dossier &bull; Page 1 of 1</Text>
+          <Text style={styles.footerText}>Ref: {projectId} &bull; Basic Estimate Dossier &bull; Page 1 of 1</Text>
         </View>
       </Page>
     </Document>
