@@ -56,6 +56,9 @@ export interface ConsultationPayment {
   gatewayOrderId: string;
   gatewayPaymentId: string | null;
   gatewaySignature: string | null;
+  paymentSessionId?: string | null;
+  payment_session_id?: string | null;
+  environment?: string;
   amountMinorUnits: number;
   amountINR?: number;
   amountPaise?: number;

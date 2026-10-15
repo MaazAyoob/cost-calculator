@@ -116,6 +116,8 @@ describe('Cashfree Checkout Session Flow & Option Validation', () => {
     // Verify normalized snake_case property also present
     expect(cashfreeOptions.payment_session_id).toBe(cashfreeOptions.paymentSessionId);
     expect(cashfreeOptions.orderId).toBe(payment.gatewayOrderId);
+    expect(payment.paymentSessionId).toBe(cashfreeOptions.paymentSessionId);
+    expect(payment.payment_session_id).toBe(cashfreeOptions.paymentSessionId);
     expect(request.status).toBe('AWAITING_REVIEW');
     expect(payment.status).toBe('PENDING');
   });
@@ -370,5 +372,58 @@ describe('Cashfree Checkout Session Flow & Option Validation', () => {
     expect(successResult.isPending).toBe(false);
     expect(successResult.payment.status).toBe('PAID');
     expect(successResult.payment.gatewayPaymentId).toBe('cf_pay_confirmed_12345');
+  });
+
+  it('7. When gateway is RAZORPAY, cashfreeOptions is strictly undefined so Cashfree validation is not triggered', async () => {
+    // When Cashfree is unconfigured, or explicit Razorpay gateway is passed
+    const booking = await consultationService.createBookingRequest({
+      homeownerName: 'Razorpay User',
+      homeownerPhone: '9876543212',
+      homeownerEmail: 'razorpay.user@example.com',
+      projectLocation: 'Indiranagar, Bangalore',
+      projectType: 'Independent Villa',
+      consultationTopic: 'Plan & Layout Review',
+      preferredDate: '2026-11-25',
+      preferredTime: '10:00 AM - 12:00 PM',
+      gateway: 'RAZORPAY',
+    });
+
+    expect(booking.payment.gateway).toBe('RAZORPAY');
+    expect(booking.cashfreeOptions).toBeUndefined();
+    expect(booking.razorpayOptions).toBeDefined();
+    expect(booking.razorpayOptions.orderId).toBe(booking.payment.gatewayOrderId);
+  });
+
+  it('8. Resilient session extraction extracts session from cashfreeOptions, payment, or direct response', () => {
+    const extractSession = (bookingData: any): string => {
+      const { payment, cashfreeOptions } = bookingData;
+      return (
+        cashfreeOptions?.paymentSessionId ||
+        cashfreeOptions?.payment_session_id ||
+        payment?.paymentSessionId ||
+        payment?.payment_session_id ||
+        bookingData?.paymentSessionId ||
+        bookingData?.payment_session_id ||
+        ''
+      ).toString().trim();
+    };
+
+    // Case 1: Standard cashfreeOptions.paymentSessionId
+    expect(extractSession({ cashfreeOptions: { paymentSessionId: 'sess_1' } })).toBe('sess_1');
+
+    // Case 2: Snake_case cashfreeOptions.payment_session_id
+    expect(extractSession({ cashfreeOptions: { payment_session_id: 'sess_2' } })).toBe('sess_2');
+
+    // Case 3: payment.paymentSessionId (when cashfreeOptions is missing/stripped)
+    expect(extractSession({ payment: { paymentSessionId: 'sess_3' } })).toBe('sess_3');
+
+    // Case 4: payment.payment_session_id
+    expect(extractSession({ payment: { payment_session_id: 'sess_4' } })).toBe('sess_4');
+
+    // Case 5: direct top-level session ID
+    expect(extractSession({ paymentSessionId: 'sess_5' })).toBe('sess_5');
+
+    // Case 6: all empty/missing
+    expect(extractSession({})).toBe('');
   });
 });

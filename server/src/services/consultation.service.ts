@@ -122,6 +122,9 @@ export interface ConsultationPaymentEntity {
   gatewayOrderId: string;
   gatewayPaymentId: string | null;
   gatewaySignature: string | null;
+  paymentSessionId?: string | null;
+  payment_session_id?: string | null;
+  environment?: string;
   amountMinorUnits: number;
   amountINR?: number;
   amountPaise?: number;
@@ -798,7 +801,12 @@ export class ConsultationService {
           }
           return {
             request: existingReq,
-            payment: existingPayment,
+            payment: {
+              ...existingPayment,
+              paymentSessionId: cfPaymentSessionId,
+              payment_session_id: cfPaymentSessionId,
+              environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
+            },
             razorpayOptions: this.buildRazorpayOptions(existingReq, existingPayment, consultant),
             cashfreeOptions: existingPayment.gateway === 'CASHFREE' ? {
               orderId: existingPayment.gatewayOrderId,
@@ -808,7 +816,7 @@ export class ConsultationService {
               amountMinorUnits: CONSULTATION_PRICE_PAISE,
               currency: CONSULTATION_CURRENCY,
               gateway: 'CASHFREE',
-              environment: 'TEST',
+              environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
             } : undefined,
           };
         }
@@ -834,7 +842,12 @@ export class ConsultationService {
         }
         return {
           request: recentDuplicate,
-          payment,
+          payment: {
+            ...payment,
+            paymentSessionId: cfPaymentSessionId,
+            payment_session_id: cfPaymentSessionId,
+            environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
+          },
           razorpayOptions: this.buildRazorpayOptions(recentDuplicate, payment, consultant),
           cashfreeOptions: payment.gateway === 'CASHFREE' ? {
             orderId: payment.gatewayOrderId,
@@ -844,7 +857,7 @@ export class ConsultationService {
             amountMinorUnits: CONSULTATION_PRICE_PAISE,
             currency: CONSULTATION_CURRENCY,
             gateway: 'CASHFREE',
-            environment: 'TEST',
+            environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
           } : undefined,
         };
       }
@@ -920,6 +933,9 @@ export class ConsultationService {
       gatewayOrderId,
       gatewayPaymentId: null,
       gatewaySignature: null,
+      paymentSessionId: cfPaymentSessionId,
+      payment_session_id: cfPaymentSessionId,
+      environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
       amountMinorUnits: CONSULTATION_PRICE_PAISE,
       currency: CONSULTATION_CURRENCY,
       status: 'PENDING',
@@ -1027,9 +1043,12 @@ export class ConsultationService {
         ...paymentEntity,
         amountINR: paymentEntity.amountMinorUnits / 100,
         amountPaise: paymentEntity.amountMinorUnits,
+        paymentSessionId: cfPaymentSessionId,
+        payment_session_id: cfPaymentSessionId,
+        environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
       },
       razorpayOptions: this.buildRazorpayOptions(requestEntity, paymentEntity, consultant),
-      cashfreeOptions: {
+      cashfreeOptions: targetGateway === 'CASHFREE' ? {
         orderId: paymentEntity.gatewayOrderId,
         paymentSessionId: cfPaymentSessionId,
         payment_session_id: cfPaymentSessionId,
@@ -1037,8 +1056,8 @@ export class ConsultationService {
         amountMinorUnits: CONSULTATION_PRICE_PAISE,
         currency: CONSULTATION_CURRENCY,
         gateway: targetGateway,
-        environment: 'TEST',
-      },
+        environment: (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase(),
+      } : undefined,
     };
   }
 

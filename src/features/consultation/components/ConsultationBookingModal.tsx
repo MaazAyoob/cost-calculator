@@ -35,6 +35,7 @@ import { useCustomerAuthStore } from '../../../store/useCustomerAuthStore';
 import { formatCurrency } from '../../../utils/cn';
 import { modalScaleVariant, backdropFadeVariant } from '../../../animations/variants';
 import { consultationAnalytics } from '../../../utils/consultationAnalytics';
+import { getApiUrl } from '../../../config/api';
 
 interface ConsultationBookingModalProps {
   isOpen: boolean;
@@ -88,6 +89,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     requestId: string;
     orderId: string;
     paymentSessionId: string;
+    environment?: string;
     message: string;
   } | null>(null);
   const [isCheckingPaymentStatus, setIsCheckingPaymentStatus] = useState(false);
@@ -222,7 +224,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   const launchCashfreeModal = async (
     paymentSessionId: string,
     orderId: string,
-    reqId: string
+    reqId: string,
+    environment?: string
   ) => {
     const cleanSessionId = typeof paymentSessionId === 'string' ? paymentSessionId.trim() : '';
     if (!cleanSessionId) {
@@ -245,7 +248,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
       });
     }
 
-    const cashfree = (window as any).Cashfree({ mode: 'sandbox' });
+    const mode =
+      environment === 'PROD' || environment === 'PRODUCTION'
+        ? 'production'
+        : 'sandbox';
+    const cashfree = (window as any).Cashfree({ mode });
     cashfree
       .checkout({
         paymentSessionId: cleanSessionId,
@@ -325,7 +332,19 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
   const handleResumePayment = async () => {
     if (!paymentPendingState) return;
-    const sessionToResume = paymentPendingState.paymentSessionId?.trim();
+    let sessionToResume = paymentPendingState.paymentSessionId?.trim();
+    if (!sessionToResume && paymentPendingState.orderId) {
+      try {
+        const statusRes = await fetch(getApiUrl(`/api/v1/cashfree/status/${encodeURIComponent(paymentPendingState.orderId)}`));
+        if (statusRes.ok) {
+          const statusJson = await statusRes.json();
+          const orderData = statusJson?.data?.order;
+          sessionToResume = (orderData?.payment_session_id || orderData?.paymentSessionId || '').trim();
+        }
+      } catch (err) {
+        console.warn('[Consultation] Failed to query order status to resume payment:', err);
+      }
+    }
     if (!sessionToResume) {
       setPaymentPendingState(null);
       setErrorMessage(
@@ -337,7 +356,8 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
     await launchCashfreeModal(
       sessionToResume,
       paymentPendingState.orderId,
-      paymentPendingState.requestId
+      paymentPendingState.requestId,
+      paymentPendingState.environment
     );
   };
 
@@ -376,18 +396,55 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
       const { request, payment, razorpayOptions, cashfreeOptions } = bookingData;
 
-      const cfSessionId =
-        (cashfreeOptions?.paymentSessionId || cashfreeOptions?.payment_session_id || '')
-          .toString()
-          .trim();
+      const isCashfree =
+        payment.gateway === 'CASHFREE' ||
+        cashfreeOptions?.gateway === 'CASHFREE' ||
+        Boolean(cashfreeOptions?.paymentSessionId || cashfreeOptions?.payment_session_id);
+
+      let cfSessionId = (
+        cashfreeOptions?.paymentSessionId ||
+        cashfreeOptions?.payment_session_id ||
+        payment?.paymentSessionId ||
+        (payment as any)?.payment_session_id ||
+        (bookingData as any)?.paymentSessionId ||
+        (bookingData as any)?.payment_session_id ||
+        ''
+      )
+        .toString()
+        .trim();
+
+      const cfOrderId = cashfreeOptions?.orderId || payment.gatewayOrderId;
+      const cfEnv =
+        cashfreeOptions?.environment ||
+        (payment as any)?.environment ||
+        'TEST';
 
       // 1. Cashfree Checkout Flow
-      if (payment.gateway === 'CASHFREE' || cashfreeOptions) {
+      if (isCashfree) {
+        // Fallback: If session ID was omitted in the booking response (e.g. deployed backend version mismatch),
+        // query Cashfree order status directly using orderId to retrieve active payment session ID
+        if (!cfSessionId && cfOrderId) {
+          try {
+            const statusRes = await fetch(getApiUrl(`/api/v1/cashfree/status/${encodeURIComponent(cfOrderId)}`));
+            if (statusRes.ok) {
+              const statusJson = await statusRes.json();
+              const orderData = statusJson?.data?.order;
+              cfSessionId = (
+                orderData?.payment_session_id ||
+                orderData?.paymentSessionId ||
+                ''
+              ).toString().trim();
+            }
+          } catch (statusErr) {
+            console.warn('[Consultation] Fallback order status query failed:', statusErr);
+          }
+        }
+
         if (!cfSessionId) {
           setErrorMessage('Unable to initialize Cashfree payment session. Please retry or contact support.');
           consultationAnalytics.track({
             eventName: 'consultation_payment_failed',
-            metadata: { error: 'Missing Cashfree paymentSessionId in booking response' },
+            metadata: { error: 'Missing Cashfree paymentSessionId in booking response and status query' },
           });
           return;
         }
@@ -395,8 +452,9 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         // Store pending state so user can resume without generating duplicate booking
         setPaymentPendingState({
           requestId: request.id,
-          orderId: cashfreeOptions?.orderId || payment.gatewayOrderId,
+          orderId: cfOrderId,
           paymentSessionId: cfSessionId,
+          environment: cfEnv,
           message:
             'Payment has been initiated. Complete checkout in Cashfree or check your payment status.',
         });
@@ -404,8 +462,9 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         try {
           await launchCashfreeModal(
             cfSessionId,
-            cashfreeOptions?.orderId || payment.gatewayOrderId,
-            request.id
+            cfOrderId,
+            request.id,
+            cfEnv
           );
           return;
         } catch (cfErr: any) {
