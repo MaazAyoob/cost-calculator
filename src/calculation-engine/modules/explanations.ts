@@ -520,7 +520,7 @@ export function generateStepExplanations(
   // ============================================================
   // STEP 6: DOORS & FRAMES (stepKey: 'doors')
   // ============================================================
-  const doorBOQ = findBOQItems((i) => i.category === 'Doors, Windows & Fabrication' && (i.description.toLowerCase().includes('door') || i.unit === 'Nos'));
+  const doorBOQ = findBOQItems((i) => (i.category === 'Doors & Joinery' || i.category === 'Doors, Windows & Fabrication') && (i.description.toLowerCase().includes('door') || i.unit === 'Nos' || i.unit === 'Sets' || i.unit === 'RM'));
   const doorTotal = sumCost(doorBOQ);
 
   explanations['doors'] = {
@@ -539,6 +539,7 @@ export function generateStepExplanations(
       { label: 'Bathrooms', value: (input?.rooms?.bathrooms || 0) + (input?.rooms?.commonToilets || 0) },
       { label: 'Main Door Specification', value: input?.doors?.mainDoor || 'Teak Wood Frame & Shutter' },
       { label: 'Internal Door Specification', value: input?.doors?.internalDoor || 'Flush Door with Laminate' },
+      { label: 'Bathroom Door Specification', value: input?.doors?.bathroomDoor || 'WPC / FRP Waterproof Door' },
     ],
     derivedQuantities: [
       { label: 'Grand Main Door (3.5 × 7.0 ft)', quantity: quantities?.mainDoorsCount || 1, unit: 'Nos' },
@@ -569,7 +570,7 @@ export function generateStepExplanations(
   // ============================================================
   // STEP 7: WINDOWS & GLAZING (stepKey: 'windows')
   // ============================================================
-  const windowBOQ = findBOQItems((i) => i.category === 'Doors, Windows & Fabrication' && (i.description.toLowerCase().includes('window') || i.description.toLowerCase().includes('ventilator') || i.description.toLowerCase().includes('upvc')));
+  const windowBOQ = findBOQItems((i) => i.category === 'Windows & Glazing' || i.category === 'Doors, Windows & Fabrication');
   const windowTotal = sumCost(windowBOQ);
 
   explanations['windows'] = {

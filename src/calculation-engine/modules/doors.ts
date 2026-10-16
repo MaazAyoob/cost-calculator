@@ -65,24 +65,50 @@ export function calculateDoors(input: EngineInput): {
 
   const mainDoorChoice = (doors?.mainDoor || materialBrands?.doors || 'Premium Teak') as string;
   let defaultMainRate = 65000;
-  if (mainDoorChoice.includes('Burma')) defaultMainRate = 145000;
-  else if (mainDoorChoice === 'Premium Teak') defaultMainRate = 65000;
-  else if (mainDoorChoice === 'Normal Teak') defaultMainRate = 42000;
-  else if (mainDoorChoice.includes('Flush')) defaultMainRate = 18500;
-  else if (materialBrands?.doors) defaultMainRate = getBrandRate('doors', materialBrands.doors) || defaultMainRate;
-  const mainDoorRate = rateService.getEffectiveRate('doors.main_teak_african', { ...ctx, brand: mainDoorChoice }, defaultMainRate);
+  let targetMainRateId = 'doors.main_teak_african';
+  if (mainDoorChoice.includes('Burma')) {
+    defaultMainRate = 145000;
+    targetMainRateId = 'doors.burma_teak_main';
+  } else if (mainDoorChoice === 'Premium Teak') {
+    defaultMainRate = 65000;
+    targetMainRateId = 'doors.main_teak_african';
+  } else if (mainDoorChoice === 'Normal Teak') {
+    defaultMainRate = 42000;
+    targetMainRateId = 'doors.normal_teak_main';
+  } else if (mainDoorChoice.includes('Flush')) {
+    defaultMainRate = 18500;
+    targetMainRateId = 'doors.internal_flush';
+  } else if (materialBrands?.doors) {
+    defaultMainRate = getBrandRate('doors', materialBrands.doors) || defaultMainRate;
+  }
+  const mainDoorRate = rateService.getEffectiveRate(targetMainRateId, { ...ctx, brand: mainDoorChoice }, defaultMainRate);
 
   const internalChoice = (doors?.internalDoor || 'Flush Door') as string;
   let defaultInternalRate = 12500;
-  if (internalChoice.includes('Laminate')) defaultInternalRate = 16500;
-  else if (internalChoice.includes('Flush')) defaultInternalRate = 12500;
-  const internalDoorRate = rateService.getEffectiveRate('doors.internal_flush', { ...ctx, brand: internalChoice }, defaultInternalRate);
+  let targetInternalRateId = 'doors.internal_flush';
+  if (internalChoice.includes('Laminate')) {
+    defaultInternalRate = 16500;
+    targetInternalRateId = 'doors.internal_laminate';
+  } else if (internalChoice.includes('Flush')) {
+    defaultInternalRate = 12500;
+    targetInternalRateId = 'doors.internal_flush';
+  }
+  const internalDoorRate = rateService.getEffectiveRate(targetInternalRateId, { ...ctx, brand: internalChoice }, defaultInternalRate);
 
   const bathChoice = (doors?.bathroomDoor || 'WPC Door') as string;
   let defaultBathRate = 11000;
-  if (bathChoice.includes('FRP') || bathChoice.includes('ERP')) defaultBathRate = 8500;
-  else if (bathChoice.includes('WPC')) defaultBathRate = 11000;
-  const bathDoorRate = rateService.getEffectiveRate('doors.bath_frp_wpc', { ...ctx, brand: bathChoice }, defaultBathRate);
+  let targetBathRateId = 'doors.bathroom_wpc';
+  if (bathChoice.includes('Laminated') || bathChoice.includes('FRP / WPC Laminated')) {
+    defaultBathRate = 13500;
+    targetBathRateId = 'doors.bathroom_laminated';
+  } else if (bathChoice.includes('FRP') || bathChoice.includes('ERP')) {
+    defaultBathRate = 8500;
+    targetBathRateId = 'doors.bathroom_frp';
+  } else if (bathChoice.includes('WPC')) {
+    defaultBathRate = 11000;
+    targetBathRateId = 'doors.bathroom_wpc';
+  }
+  const bathDoorRate = rateService.getEffectiveRate(targetBathRateId, { ...ctx, brand: bathChoice }, defaultBathRate);
 
   if (mainDoorsCount > 0) {
     schedule.push({

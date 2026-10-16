@@ -54,26 +54,32 @@ export function calculateWindows(input: EngineInput): {
 
   // 2. Resolve Rate
   const prim = windows?.primaryMaterial || 'uPVC';
-  const sub = windows?.subGrade || 'Standard uPVC';
+  const sub = windows?.subGrade || (prim === 'uPVC' ? 'Standard uPVC' : prim === 'Wood' ? 'Teak Wood Frame' : 'Anodized Aluminium');
   let defaultWindowRate = 650;
-  let targetRateId = 'windows.upvc_slider';
+  let targetRateId = 'windows.standard_upvc';
 
   if (prim === 'uPVC') {
     if (sub === 'Luxury / Fenesta uPVC' || materialBrands?.windows === 'Fenesta uPVC') {
       targetRateId = 'windows.fenesta_upvc';
       defaultWindowRate = 850;
     } else if (sub === 'Standard uPVC') {
-      targetRateId = 'windows.upvc_slider';
+      targetRateId = 'windows.standard_upvc';
       defaultWindowRate = 550;
     } else {
       targetRateId = 'windows.upvc_slider';
       defaultWindowRate = 650;
     }
   } else if (prim === 'Wood') {
-    targetRateId = 'windows.teak_wood';
-    if (sub === 'Teak Wood Frame') defaultWindowRate = 950;
-    else if (sub === 'Sal Frame / Honne Shutter') defaultWindowRate = 680;
-    else defaultWindowRate = 850;
+    if (sub === 'Teak Wood Frame') {
+      targetRateId = 'windows.teak_wood';
+      defaultWindowRate = 950;
+    } else if (sub === 'Sal Frame / Honne Shutter') {
+      targetRateId = 'windows.sal_wood';
+      defaultWindowRate = 680;
+    } else {
+      targetRateId = 'windows.teak_wood';
+      defaultWindowRate = 850;
+    }
   } else if (prim === 'Aluminium') {
     if (sub === 'Powder Coated Jindal Aluminium') {
       targetRateId = 'windows.powder_coated_aluminium';
@@ -89,7 +95,7 @@ export function calculateWindows(input: EngineInput): {
     defaultWindowRate = getBrandRate('windows', materialBrands.windows) || defaultWindowRate;
   }
 
-  const winBrand = materialBrands?.windows || sub;
+  const winBrand = sub || materialBrands?.windows || prim;
   const windowRate = rateService.getEffectiveRate(
     targetRateId,
     { packageTier: input.qualityTier, location: input.city, brand: winBrand },

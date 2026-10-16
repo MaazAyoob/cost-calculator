@@ -49,8 +49,8 @@ export function useProjectAutoSave() {
           if (remoteProj && isMounted) {
             setProjectId(remoteProj.id);
 
-            // Hydrate wizard if remote configuration exists and local state hasn't started
             const cfg = remoteProj.configuration;
+            const mb = (cfg.materialBrands || {}) as any;
             if (cfg && !wizard.hasStartedSelection) {
               useProjectStore.getState().updateProjectDetails({ name: remoteProj.name });
               useWizardStore.setState({
@@ -65,9 +65,16 @@ export function useProjectAutoSave() {
                 bikeCount: cfg.bikeCount || 2,
                 evCharging: Boolean(cfg.evCharging),
                 liftRequired: Boolean(cfg.liftRequired),
-                rooms: cfg.roomsJson || {},
+                rooms: cfg.roomsJson || cfg.rooms || {},
                 qualityTier: cfg.qualityTier || 'Premium',
                 materialBrands: cfg.materialBrands || {},
+                ...(mb.doorsDetail ? { doors: mb.doorsDetail } : {}),
+                ...(mb.windowsDetail ? { windows: mb.windowsDetail } : {}),
+                ...(mb.flooringZones ? { flooringZones: mb.flooringZones } : {}),
+                ...(mb.wallCladding ? { wallCladding: mb.wallCladding } : {}),
+                ...(mb.electricalDetail ? { electrical: mb.electricalDetail } : {}),
+                ...(mb.bathroomFittings ? { bathroomFittings: mb.bathroomFittings } : {}),
+                ...(mb.paintingDetail ? { painting: mb.paintingDetail } : {}),
                 hasStartedSelection: true,
               });
             }
@@ -103,7 +110,16 @@ export function useProjectAutoSave() {
             liftRequired: Boolean(wizard.liftRequired),
             rooms: wizard.rooms || {},
             qualityTier: wizard.qualityTier || 'Premium',
-            materialBrands: wizard.materialBrands || {},
+            materialBrands: {
+              ...(wizard.materialBrands || {}),
+              doorsDetail: wizard.doors,
+              windowsDetail: wizard.windows,
+              flooringZones: wizard.flooringZones,
+              wallCladding: wizard.wallCladding,
+              electricalDetail: wizard.electrical,
+              bathroomFittings: wizard.bathroomFittings,
+              paintingDetail: wizard.painting,
+            },
           },
         });
 
@@ -150,7 +166,16 @@ export function useProjectAutoSave() {
         liftRequired: wizard.liftRequired,
         rooms: wizard.rooms,
         qualityTier: wizard.qualityTier,
-        materialBrands: wizard.materialBrands,
+        materialBrands: {
+          ...(wizard.materialBrands || {}),
+          doorsDetail: wizard.doors,
+          windowsDetail: wizard.windows,
+          flooringZones: wizard.flooringZones,
+          wallCladding: wizard.wallCladding,
+          electricalDetail: wizard.electrical,
+          bathroomFittings: wizard.bathroomFittings,
+          paintingDetail: wizard.painting,
+        },
       },
       calculation: {
         totalBUASqFt: area.totalBUASqFt,
@@ -198,6 +223,13 @@ export function useProjectAutoSave() {
     wizard.rooms,
     wizard.qualityTier,
     wizard.materialBrands,
+    wizard.doors,
+    wizard.windows,
+    wizard.flooringZones,
+    wizard.wallCladding,
+    wizard.electrical,
+    wizard.bathroomFittings,
+    wizard.painting,
     area.totalBUASqFt,
     budget.totalProjectCost,
     quantities,

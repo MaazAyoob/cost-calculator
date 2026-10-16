@@ -483,6 +483,10 @@ export const useWizardStore = create<ConfiguratorState>()(
             ...state.doors,
             [category]: choice,
           },
+          materialBrands: {
+            ...state.materialBrands,
+            ...(category === 'mainDoor' ? { doors: choice } : {}),
+          },
         }));
       },
 
@@ -494,10 +498,14 @@ export const useWizardStore = create<ConfiguratorState>()(
           else if (primaryMaterial === 'Wood') subGrade = 'Teak Wood Frame';
           else subGrade = 'Anodized Aluminium';
         }
-        set({
+        set((state) => ({
           hasStartedSelection: true,
           windows: { primaryMaterial, subGrade },
-        });
+          materialBrands: {
+            ...state.materialBrands,
+            windows: subGrade || primaryMaterial,
+          },
+        }));
       },
 
       setElectricalSelection: (wireTier) => {

@@ -119,8 +119,14 @@ export const CANONICAL_RATE_ALIASES: Record<string, string[]> = {
   'aggregate.20mm': ['aggregate.coarse_granite', 'aggregate.coarse_20mm'],
   'doors.flush_door': ['doors.internal_flush'],
   'doors.internal_flush': ['doors.flush_door'],
-  'doors.teak_wood': ['doors.main_teak_african'],
-  'doors.main_teak_african': ['doors.teak_wood'],
+  'doors.teak_wood': ['doors.main_teak_african', 'doors.premium_teak_main'],
+  'doors.main_teak_african': ['doors.teak_wood', 'doors.premium_teak_main'],
+  'doors.premium_teak_main': ['doors.main_teak_african', 'doors.teak_wood'],
+  'doors.bath_frp_wpc': ['doors.bathroom_wpc', 'doors.bathroom_frp', 'doors.bathroom_laminated'],
+  'doors.bathroom_laminated': ['doors.bath_frp_wpc'],
+  'doors.bathroom_wpc': ['doors.bath_frp_wpc'],
+  'doors.bathroom_frp': ['doors.bath_frp_wpc'],
+  'windows.sal_wood': ['windows.teak_wood'],
 
   // ── Visual Catalog Brand & Material Product Canonical Aliases ──
   'st-tata': ['steel.tata_tiscon', 'steel.fe550d_tmt'],
@@ -448,7 +454,8 @@ class RateService {
       const genericWords = new Set([
         'and', 'the', 'set', 'sets', 'grade', 'wood', 'door', 'doors',
         'window', 'windows', 'pipe', 'pipes', 'tile', 'tiles', 'paint',
-        'cement', 'steel', 'teak', 'wire', 'wires', 'wall', 'block', 'blocks'
+        'cement', 'steel', 'teak', 'wire', 'wires', 'wall', 'block', 'blocks',
+        'upvc', 'pvc', 'aluminium'
       ]);
       const specificTokens = brandStr
         .toLowerCase()
@@ -460,9 +467,10 @@ class RateService {
         let bestScore = 0;
         for (const r of domainCandidates) {
           const haystack = `${r.name} ${r.id} ${r.packageTier} ${r.specification || ''}`.toLowerCase();
+          const haystackWords = new Set(haystack.split(/[^a-z0-9]+/));
           let score = 0;
           for (const token of specificTokens) {
-            if (haystack.includes(token)) score++;
+            if (haystackWords.has(token)) score++;
           }
           if (score > bestScore) {
             bestScore = score;
@@ -472,12 +480,17 @@ class RateService {
         if (bestCandidate && bestScore > 0) return bestCandidate;
       }
 
-      // 3. Fallback: match any token of length >= 3
-      const allTokens = brandStr.toLowerCase().split(/[\s/(),-]+/).filter((t) => t.length >= 3);
-      return domainCandidates.find((r) => {
-        const haystack = `${r.name} ${r.id}`.toLowerCase();
-        return allTokens.some((t) => haystack.includes(t));
-      });
+      // 3. Fallback: match any specific token of length >= 3 using word boundaries
+      const allTokens = brandStr.toLowerCase().split(/[\s/(),-]+/).filter((t) => t.length >= 3 && !genericWords.has(t));
+      if (allTokens.length > 0) {
+        const tokenMatch = domainCandidates.find((r) => {
+          const haystack = `${r.name} ${r.id}`.toLowerCase();
+          const haystackWords = new Set(haystack.split(/[^a-z0-9]+/));
+          return allTokens.some((t) => haystackWords.has(t));
+        });
+        if (tokenMatch) return tokenMatch;
+      }
+      return undefined;
     };
 
     const brandItem = findBrandItem();
@@ -595,12 +608,34 @@ class RateService {
 
     // 2c. Contextual Package / Location baseline item in HUTTY_BASELINE_RATES
     if (pkg !== 'ALL' || loc !== 'ALL') {
-      const contextualBaseline = HUTTY_BASELINE_RATES.find(
-        (r) =>
-          r.id === rateId &&
-          (r.packageTier === pkg || r.packageTier === 'ALL') &&
-          (r.location === loc || r.location === 'ALL')
-      );
+      const findContextual = (targetId: string) => {
+        // Specificity 1: exact pkg & exact loc
+        let match = HUTTY_BASELINE_RATES.find(
+          (r) => r.id === targetId && r.packageTier === pkg && r.location === loc
+        );
+        if (match) return match;
+        // Specificity 2: exact pkg & loc ALL
+        match = HUTTY_BASELINE_RATES.find(
+          (r) => r.id === targetId && r.packageTier === pkg && r.location === 'ALL'
+        );
+        if (match) return match;
+        // Specificity 3: pkg ALL & exact loc
+        match = HUTTY_BASELINE_RATES.find(
+          (r) => r.id === targetId && r.packageTier === 'ALL' && r.location === loc
+        );
+        if (match) return match;
+        return undefined;
+      };
+
+      let contextualBaseline = findContextual(rateId);
+      if (!contextualBaseline) {
+        const aliases = CANONICAL_RATE_ALIASES[rateId] || [];
+        for (const alias of aliases) {
+          contextualBaseline = findContextual(alias);
+          if (contextualBaseline) break;
+        }
+      }
+
       if (contextualBaseline && contextualBaseline.rate > 0) {
         return {
           rateId,
