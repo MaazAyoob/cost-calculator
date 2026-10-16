@@ -96,7 +96,7 @@ export function calculateArea(input: EngineInput): AreaResult {
     rearSetbackFt: input.rearSetback,
     leftSetbackFt: input.leftSetback,
     rightSetbackFt: input.rightSetback,
-  } : undefined;
+  } : ((input as any).customSetbacks || undefined);
 
   const activeSetbackRules = configResolver.resolveParameter<PlotSetbackRule[] | undefined>(
     'config.setbacks.rules',
@@ -164,6 +164,8 @@ export function calculateArea(input: EngineInput): AreaResult {
   let totalBUASqFt = 0;
   if (typeof input.userSelectedBUA === 'number' && input.userSelectedBUA > 0) {
     totalBUASqFt = Math.round(input.userSelectedBUA);
+  } else if (typeof (input as any).builtUpArea === 'number' && (input as any).builtUpArea > 0) {
+    totalBUASqFt = Math.round((input as any).builtUpArea);
   } else if (typeof input.builtUpAreaPerFloor === 'number' && input.builtUpAreaPerFloor > 0) {
     totalBUASqFt = Math.round(input.builtUpAreaPerFloor * floors);
   } else {
@@ -179,13 +181,33 @@ export function calculateArea(input: EngineInput): AreaResult {
   let validationState: 'valid' | 'above_recommended' | 'exceeds_permissible' | 'verification_required' = 'valid';
   let confirmationMessage: string | undefined;
 
+  const coverageLimitSqFt = authEval.coverageLimitSqFt ?? Math.round(plotAreaSqFt * (authEval.maxGroundCoveragePct / 100));
+  const maxFarBUASqFt = authEval.maxFarBUASqFt ?? Math.round(plotAreaSqFt * authEval.permissibleFAR);
+  const exceedsFootprint = buildableFootprintSqFt > 0 && buaPerFloorSqFt > buildableFootprintSqFt;
+  const exceedsCoverage = coverageLimitSqFt > 0 && buaPerFloorSqFt > coverageLimitSqFt;
+  const exceedsFar = maxFarBUASqFt > 0 && proposedBUASqFt > maxFarBUASqFt;
+
   // When authority regulations cannot be definitively determined
   if (authEval.requiresClientConfirmation && roadWidthFt < 30) {
     validationState = 'verification_required';
     confirmationMessage = `Road width (${roadWidthFt} ft) is below standard 9m (30ft) residential minimum. Regulatory verification required for permissible FAR and height.`;
   } else if (permissibleBUASqFt > 0 && proposedBUASqFt > permissibleBUASqFt) {
     validationState = 'exceeds_permissible';
-    confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}) by ${excessBUASqFt.toLocaleString()} sq.ft.`;
+    const violations: string[] = [];
+    if (exceedsFootprint) {
+      violations.push(`Ground-floor footprint (${buaPerFloorSqFt.toLocaleString()} sq.ft) exceeds buildable envelope after setbacks (${buildableFootprintSqFt.toLocaleString()} sq.ft)`);
+    }
+    if (exceedsCoverage) {
+      violations.push(`Ground coverage (${buaPerFloorSqFt.toLocaleString()} sq.ft) exceeds permissible plot coverage (${coverageLimitSqFt.toLocaleString()} sq.ft, ${authEval.maxGroundCoveragePct}%)`);
+    }
+    if (exceedsFar) {
+      violations.push(`Total BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds permissible FAR limit (${maxFarBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR})`);
+    }
+    if (violations.length > 0) {
+      confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}) by ${excessBUASqFt.toLocaleString()} sq.ft: ${violations.join('; ')}.`;
+    } else {
+      confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}) by ${excessBUASqFt.toLocaleString()} sq.ft.`;
+    }
   } else if (proposedBUASqFt > recommendedBUATotalSqFt && recommendedBUATotalSqFt > 0) {
     validationState = 'above_recommended';
     confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) is above the authority recommended baseline (${recommendedBUATotalSqFt.toLocaleString()} sq.ft). Verify your floor-to-floor setbacks.`;
@@ -230,8 +252,10 @@ export function calculateArea(input: EngineInput): AreaResult {
     minimumBUASqFt,
     userSelectedBUASqFt,
     maxPermissibleCoveragePct: authEval.maxGroundCoveragePct,
+    coverageLimitSqFt,
     maxPermissibleCoverageSqFt: authEval.maxPermissibleCoverageSqFt,
     permissibleFAR: authEval.permissibleFAR,
+    maxFarBUASqFt,
     validationState,
     buildableAreaSqFt,
     remainingGroundAreaSqFt,

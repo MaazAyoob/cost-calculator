@@ -16,6 +16,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
+import { getFloorDisplayName } from '../../../utils/floorNames';
 import { HowWeCalculatedThis } from '../../../components/common/HowWeCalculatedThis';
 
 export const Step1BasicInfo: React.FC = () => {
@@ -845,7 +846,11 @@ export const Step1BasicInfo: React.FC = () => {
                       ⚠ Proposed BUA exceeds the calculated permissible limit by {excessBUA.toLocaleString()} sq.ft.
                     </span>
                     <p className="text-[11px] text-amber-900 leading-relaxed">
-                      Your proposed BUA is <strong>{activeBUA.toLocaleString()} sq.ft</strong>, while the calculated permissible limit for this plot &amp; road is <strong>{maxBUA.toLocaleString()} sq.ft</strong> (FAR {area.permissibleFAR || 1.75}). The calculator will compute costs for your proposed amount, but statutory municipal approval or premium FAR purchase is required.
+                      {area.confirmationMessage ? (
+                        <span>{area.confirmationMessage}</span>
+                      ) : (
+                        <span>Your proposed BUA is <strong>{activeBUA.toLocaleString()} sq.ft</strong>, while the calculated permissible limit for this plot &amp; road is <strong>{maxBUA.toLocaleString()} sq.ft</strong> (FAR {area.permissibleFAR || 1.75}). The calculator will compute costs for your proposed amount, but statutory municipal approval or premium FAR purchase is required.</span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -892,7 +897,7 @@ export const Step1BasicInfo: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
               {Array.from({ length: numFloors }).map((_, idx) => (
                 <div key={idx} className="bg-white p-2 rounded-lg border border-[#E3E8E2] flex justify-between">
-                  <span className="text-[#4B5563]">{idx === 0 ? 'Ground Floor' : `Floor ${idx + 1}`}:</span>
+                  <span className="text-[#4B5563]">{getFloorDisplayName(idx)}:</span>
                   <span className="font-bold text-[#1B3D34] font-mono">{buaPerFloor.toLocaleString()} sq.ft</span>
                 </div>
               ))}
@@ -1007,7 +1012,7 @@ export const Step1BasicInfo: React.FC = () => {
                   <div className="text-[11px] text-[#4B5563] flex justify-between items-center pt-1">
                     <span>Buildable Envelope:</span>
                     <span className="font-bold text-[#1B3D34] font-mono">
-                      {area.buildableLengthFt} ft (length) × {area.buildableWidthFt} ft (width)
+                      {area.buildableWidthFt} ft (width) × {area.buildableLengthFt} ft (depth)
                     </span>
                   </div>
                 </div>

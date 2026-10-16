@@ -6,6 +6,7 @@
 // ============================================================
 
 import { EngineInput, AreaResult, SpaceModelItem, BuildingFloorModel, BuildingModel } from '../types';
+import { getFloorDisplayName } from '../../utils/floorNames';
 import { ROOM_SIZE_ASSUMPTIONS } from '../data/engineeringAssumptions';
 import {
   WALL_HEIGHT_FT,
@@ -226,7 +227,7 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
         type,
         name: `${def.name} #${i + 1}`,
         floorIndex,
-        floorName: floorIndex === 0 ? 'Ground Floor' : `Floor ${floorIndex + 1}`,
+        floorName: getFloorDisplayName(floorIndex),
         length,
         width,
         area: spaceArea,
@@ -288,7 +289,7 @@ export function generateBuildingModel(input: EngineInput, area: AreaResult): Bui
 
     floors.push({
       floorIndex: f,
-      floorName: f === 0 ? 'Ground Floor' : `Floor ${f + 1}`,
+      floorName: getFloorDisplayName(f),
       floorAreaSqFt,
       spaces: floorSpaces,
       totalFloorWallAreaSqFt: floorWallArea,

@@ -131,8 +131,8 @@ export function generateStepExplanations(
     }))),
     {
       title: 'Buildable Footprint',
-      formula: '(Plot Length - Front - Rear) × (Plot Width - Left - Right)',
-      substitutions: `${area?.buildableLengthFt || 0} ft × ${area?.buildableWidthFt || 0} ft`,
+      formula: '(Plot Width - Left - Right) × (Plot Depth - Front - Rear)',
+      substitutions: `${area?.buildableWidthFt || 0} ft (width) × ${area?.buildableLengthFt || 0} ft (depth)`,
       resultText: `${formatNumber(area?.buildableFootprintSqFt)} sq.ft`,
     },
     {

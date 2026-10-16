@@ -290,8 +290,10 @@ export interface AreaResult {
   minimumBUASqFt: number;
   userSelectedBUASqFt: number;
   maxPermissibleCoveragePct: number;
+  coverageLimitSqFt?: number;
   maxPermissibleCoverageSqFt: number;
   permissibleFAR: number;
+  maxFarBUASqFt?: number;
   validationState: 'valid' | 'above_recommended' | 'exceeds_permissible' | 'verification_required';
   buildableAreaSqFt: number;
   remainingGroundAreaSqFt: number;

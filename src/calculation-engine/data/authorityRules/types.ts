@@ -136,8 +136,10 @@ export interface AuthorityCalculationResult {
   statutoryLeftSetbackFt: number;
   statutoryRightSetbackFt: number;
   maxGroundCoveragePct: number;
+  coverageLimitSqFt?: number;
   maxPermissibleCoverageSqFt: number;
   permissibleFAR: number;
+  maxFarBUASqFt?: number;
   maxPermissibleBUASqFt: number;
   recommendedBUAPerFloorSqFt: number;
   recommendedBUATotalSqFt: number;

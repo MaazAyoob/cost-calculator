@@ -99,10 +99,11 @@ export const PlotSetbacksSection: React.FC = () => {
   const [testCustomRight, setTestCustomRight] = useState<number | null>(null);
   const [testOverrideReason, setTestOverrideReason] = useState('');
 
-  // 6 Common Regression Plot Sizes from the PDF
+  // Common Regression Plot Sizes from the Gazette & Reference Rules
   const commonPresets = [
     { label: '20 × 30 ft', l: 30, w: 20, area: 600, tag: 'Micro Plot' },
     { label: '30 × 40 ft', l: 40, w: 30, area: 1200, tag: 'Standard Bangalore' },
+    { label: '40 × 30 ft (Wide Frontage)', l: 30, w: 40, area: 1200, tag: 'Wide Frontage' },
     { label: '30 × 50 ft', l: 50, w: 30, area: 1500, tag: 'Standard Bangalore' },
     { label: '40 × 60 ft', l: 60, w: 40, area: 2400, tag: 'Medium Villa' },
     { label: '50 × 80 ft', l: 80, w: 50, area: 4000, tag: 'Large Residence' },
@@ -439,7 +440,23 @@ export const PlotSetbacksSection: React.FC = () => {
 
           {/* Dimension Controls & Conditions Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
-            {/* Length / Depth */}
+            {/* Width (Frontage) */}
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 flex items-center justify-between">
+                <span>Plot Width (Frontage)</span>
+                <span className="font-mono text-[#1B3D34]">{testWidth} ft</span>
+              </label>
+              <input
+                type="number"
+                value={testWidth}
+                onChange={(e) => setTestWidth(Math.max(1, parseFloat(e.target.value) || 0))}
+                min="10"
+                max="500"
+                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
+              />
+            </div>
+
+            {/* Depth / Length */}
             <div className="space-y-1">
               <label className="font-bold text-slate-700 flex items-center justify-between">
                 <span>Plot Depth / Length</span>
@@ -449,22 +466,6 @@ export const PlotSetbacksSection: React.FC = () => {
                 type="number"
                 value={testLength}
                 onChange={(e) => setTestLength(Math.max(1, parseFloat(e.target.value) || 0))}
-                min="10"
-                max="500"
-                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
-              />
-            </div>
-
-            {/* Width */}
-            <div className="space-y-1">
-              <label className="font-bold text-slate-700 flex items-center justify-between">
-                <span>Plot Width</span>
-                <span className="font-mono text-[#1B3D34]">{testWidth} ft</span>
-              </label>
-              <input
-                type="number"
-                value={testWidth}
-                onChange={(e) => setTestWidth(Math.max(1, parseFloat(e.target.value) || 0))}
                 min="10"
                 max="500"
                 className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
@@ -623,6 +624,32 @@ export const PlotSetbacksSection: React.FC = () => {
                         MAIN ROAD FRONTAGE
                       </text>
 
+                      {/* Optional Secondary Road Frontages for Corner Plots */}
+                      {testRoadFacingBoundaries.includes('rear') && (
+                        <>
+                          <rect x={plotX - 10} y={plotY + plotH + 4} width={plotW + 20} height={10} fill="#1e3a5f" rx="3" />
+                          <text x={svgW / 2} y={plotY + plotH + 12} fill="#60a5fa" fontSize="7" fontWeight="bold" textAnchor="middle" letterSpacing="1">
+                            REAR ROAD
+                          </text>
+                        </>
+                      )}
+                      {testRoadFacingBoundaries.includes('left') && (
+                        <>
+                          <rect x={plotX - 14} y={plotY - 10} width={10} height={plotH + 20} fill="#1e3a5f" rx="3" />
+                          <text x={plotX - 9} y={plotY + plotH / 2} fill="#60a5fa" fontSize="6" fontWeight="bold" textAnchor="middle" transform={`rotate(-90 ${plotX - 9} ${plotY + plotH / 2})`}>
+                            SIDE ROAD (L)
+                          </text>
+                        </>
+                      )}
+                      {testRoadFacingBoundaries.includes('right') && (
+                        <>
+                          <rect x={plotX + plotW + 4} y={plotY - 10} width={10} height={plotH + 20} fill="#1e3a5f" rx="3" />
+                          <text x={plotX + plotW + 9} y={plotY + plotH / 2} fill="#60a5fa" fontSize="6" fontWeight="bold" textAnchor="middle" transform={`rotate(90 ${plotX + plotW + 9} ${plotY + plotH / 2})`}>
+                            SIDE ROAD (R)
+                          </text>
+                        </>
+                      )}
+
                       {/* Site Plot Boundary */}
                       <rect
                         x={plotX}
@@ -685,7 +712,7 @@ export const PlotSetbacksSection: React.FC = () => {
                       {/* Envelope Center Label */}
                       {envW > 25 && envH > 25 && (
                         <text x={envX + envW / 2} y={envY + envH / 2 + 2} fill="#ecfdf5" fontSize="8" fontWeight="bold" textAnchor="middle">
-                          {draftSimulation.buildableLengthFt.toFixed(1)}' × {draftSimulation.buildableWidthFt.toFixed(1)}'
+                          {draftSimulation.buildableWidthFt.toFixed(1)}' W × {draftSimulation.buildableLengthFt.toFixed(1)}' D
                         </text>
                       )}
                     </svg>
@@ -696,12 +723,12 @@ export const PlotSetbacksSection: React.FC = () => {
               <div className="text-[11px] text-slate-400 space-y-1 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                 <div className="flex justify-between">
                   <span>Site Dimensions:</span>
-                  <span className="font-mono text-slate-200">{testLength} ft × {testWidth} ft</span>
+                  <span className="font-mono text-slate-200">{testWidth} ft (W) × {testLength} ft (D)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Buildable Dimensions:</span>
                   <span className="font-mono text-emerald-400 font-bold">
-                    {draftSimulation.buildableLengthFt} ft × {draftSimulation.buildableWidthFt} ft
+                    {draftSimulation.buildableWidthFt} ft (W) × {draftSimulation.buildableLengthFt} ft (D)
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -765,7 +792,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     <div className="flex justify-between">
                       <span className="text-slate-500">Buildable Envelope:</span>
                       <span className="font-mono font-bold text-slate-800">
-                        {activeSimulation.buildableLengthFt} × {activeSimulation.buildableWidthFt} ft
+                        {activeSimulation.buildableWidthFt} × {activeSimulation.buildableLengthFt} ft (Width × Depth)
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -871,7 +898,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     <div className="flex justify-between">
                       <span className="text-slate-500">Buildable Envelope:</span>
                       <span className="font-mono font-bold text-emerald-900">
-                        {draftSimulation.buildableLengthFt} × {draftSimulation.buildableWidthFt} ft
+                        {draftSimulation.buildableWidthFt} × {draftSimulation.buildableLengthFt} ft (Width × Depth)
                       </span>
                     </div>
                     <div className="flex justify-between">
