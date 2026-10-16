@@ -922,18 +922,22 @@ export const Step1BasicInfo: React.FC = () => {
 
             {showHowCalculated && (
               <div className="p-4 bg-white border-t border-[#E3E8E2] space-y-3 text-xs">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   <div>
                     <span className="text-[#4B5563] block text-[10px] uppercase">Plot Area</span>
                     <span className="font-bold text-[#1B3D34] font-mono">{plotArea.toLocaleString()} sq.ft</span>
                   </div>
                   <div>
-                    <span className="text-[#4B5563] block text-[10px] uppercase">Buildable Footprint</span>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Buildable Envelope (Setbacks)</span>
                     <span className="font-bold text-[#1B3D34] font-mono">{area.buildableFootprintSqFt?.toLocaleString() || 0} sq.ft</span>
                   </div>
                   <div>
+                    <span className="text-[#4B5563] block text-[10px] uppercase">Max Permitted Footprint</span>
+                    <span className="font-bold text-[#10b981] font-mono">{area.maxPermissibleCoverageSqFt?.toLocaleString() || 0} sq.ft</span>
+                  </div>
+                  <div>
                     <span className="text-[#4B5563] block text-[10px] uppercase">Applicable Coverage</span>
-                    <span className="font-bold text-[#1B3D34] font-mono">{area.maxPermissibleCoveragePct || 70}%</span>
+                    <span className="font-bold text-[#1B3D34] font-mono">{area.maxPermissibleCoveragePct || 70}% ({area.coverageLimitSqFt?.toLocaleString() || Math.round(plotArea * ((area.maxPermissibleCoveragePct || 70) / 100))} sq.ft)</span>
                   </div>
                   <div>
                     <span className="text-[#4B5563] block text-[10px] uppercase">Permissible FAR</span>
@@ -1009,10 +1013,16 @@ export const Step1BasicInfo: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="text-[11px] text-[#4B5563] flex justify-between items-center pt-1">
-                    <span>Buildable Envelope:</span>
+                  <div className="text-[11px] text-[#4B5563] flex justify-between items-center pt-1 border-t border-[#E3E8E2]">
+                    <span>Buildable Envelope (after setbacks):</span>
                     <span className="font-bold text-[#1B3D34] font-mono">
-                      {area.buildableWidthFt} ft (width) × {area.buildableLengthFt} ft (depth)
+                      {area.buildableWidthFt} ft (width) × {area.buildableLengthFt} ft (depth) &bull; ~{area.buildableFootprintSqFt?.toLocaleString() || 0} sq.ft
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-[#4B5563] flex justify-between items-center">
+                    <span>Max Permitted Ground Footprint (after {area.maxPermissibleCoveragePct || 70}% coverage):</span>
+                    <span className="font-bold text-[#10b981] font-mono">
+                      {area.maxPermissibleCoverageSqFt?.toLocaleString() || 0} sq.ft
                     </span>
                   </div>
                 </div>

@@ -112,7 +112,8 @@ export function generateStepExplanations(
     { label: 'Front Setback', quantity: area?.setbacks?.frontSetbackFt || 0, unit: 'ft', description: 'Statutory setback requirement' },
     { label: 'Rear Setback', quantity: area?.setbacks?.rearSetbackFt || 0, unit: 'ft' },
     { label: 'Side Setbacks (L / R)', quantity: `${area?.setbacks?.leftSetbackFt || 0} / ${area?.setbacks?.rightSetbackFt || 0}`, unit: 'ft' },
-    { label: 'Buildable Footprint', quantity: formatNumber(area?.buildableFootprintSqFt), unit: 'sq.ft', description: 'Ground floor maximum footprint' },
+    { label: 'Buildable Envelope (Setbacks)', quantity: formatNumber(area?.buildableFootprintSqFt), unit: 'sq.ft', description: 'Geometric envelope after setbacks' },
+    { label: 'Max Permitted Footprint', quantity: formatNumber(area?.maxPermissibleCoverageSqFt), unit: 'sq.ft', description: 'Ground floor limit after applicable coverage' },
     { label: 'Total Built-Up Area (BUA)', quantity: formatNumber(area?.totalBUASqFt), unit: 'sq.ft', description: 'Sum across all configured floors' },
   ];
 
@@ -130,10 +131,16 @@ export function generateStepExplanations(
       resultText: `${step.valueFt} ft`,
     }))),
     {
-      title: 'Buildable Footprint',
+      title: 'Buildable Envelope (after setbacks)',
       formula: '(Plot Width - Left - Right) × (Plot Depth - Front - Rear)',
       substitutions: `${area?.buildableWidthFt || 0} ft (width) × ${area?.buildableLengthFt || 0} ft (depth)`,
       resultText: `${formatNumber(area?.buildableFootprintSqFt)} sq.ft`,
+    },
+    {
+      title: 'Maximum Permitted Ground Footprint',
+      formula: 'min(Buildable Envelope, Plot Area × Max Coverage %)',
+      substitutions: `min(${formatNumber(area?.buildableFootprintSqFt)} sq.ft, ${formatNumber(area?.plotAreaSqFt)} sq.ft × ${area?.maxPermissibleCoveragePct || 70}%)`,
+      resultText: `${formatNumber(area?.maxPermissibleCoverageSqFt)} sq.ft`,
     },
     {
       title: 'Total Built-Up Area',

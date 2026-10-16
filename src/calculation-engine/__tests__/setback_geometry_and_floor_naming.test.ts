@@ -194,6 +194,61 @@ describe('Setback Geometry, Buildable Envelope & Floor Naming Suite', () => {
       expect(result.confirmationMessage).toBeUndefined();
     });
 
+    it('distinguishes between buildable envelope (963 sq.ft) and max permitted ground footprint (840 sq.ft) on 30x40 plot', () => {
+      const input30x40 = {
+        city: 'Bangalore',
+        plotLength: 40, // Depth = 40 ft
+        plotWidth: 30,  // Width = 30 ft (Area = 1200 sq.ft)
+        floors: 2,
+        userSelectedBUA: 1440, // 720 sq.ft per floor
+        frontSetback: 2.95,
+        rearSetback: 2.30,
+        leftSetback: 2.30,
+        rightSetback: 0.00,
+        customSetbacks: {
+          frontSetbackFt: 2.95,
+          rearSetbackFt: 2.30,
+          leftSetbackFt: 2.30,
+          rightSetbackFt: 0.00,
+        },
+      } as unknown as EngineInput;
+
+      const result = calculateArea(input30x40);
+
+      // Plot Area = 1200 sq.ft
+      expect(result.plotAreaSqFt).toBe(1200);
+
+      // 1. Buildable width = 30 - 2.30 - 0 = 27.70 ft
+      expect(result.buildableWidthFt).toBeCloseTo(27.70, 2);
+
+      // 2. Buildable depth = 40 - 2.95 - 2.30 = 34.75 ft
+      expect(result.buildableLengthFt).toBeCloseTo(34.75, 2);
+
+      // 3. Buildable envelope after setbacks = 27.70 * 34.75 = 962.58 sq.ft -> rounded to 963 sq.ft
+      expect(result.buildableWidthFt * result.buildableLengthFt).toBeCloseTo(962.58, 1);
+      expect(result.buildableFootprintSqFt).toBe(963);
+
+      // 4. Configured coverage limit = 70% of 1200 = 840 sq.ft
+      expect(result.maxPermissibleCoveragePct).toBe(70);
+      expect(result.coverageLimitSqFt).toBe(840);
+
+      // 5. Maximum permitted ground-floor footprint = min(geometric envelope 963, coverage limit 840) = 840 sq.ft
+      expect(result.maxPermissibleCoverageSqFt).toBe(840);
+
+      // 6. Proposed ground floor footprint = 720 sq.ft <= 840 sq.ft and <= 963 sq.ft
+      expect(result.buaPerFloorSqFt).toBe(720);
+
+      // 7. Permissible total BUA under configured FAR (1.75): min(1200 * 1.75 = 2100, 840 * 2 = 1680) = 1680 sq.ft
+      expect(result.permissibleFAR).toBe(1.75);
+      expect(result.permissibleBUASqFt).toBe(1680);
+
+      // 8. Proposed total BUA = 1440 sq.ft <= 1680 sq.ft -> valid!
+      expect(result.totalBUASqFt).toBe(1440);
+      expect(result.isWithinPermissibleLimit).toBe(true);
+      expect(result.validationState).toBe('valid');
+      expect(result.confirmationMessage).toBeUndefined();
+    });
+
     it('flags an explanatory violation when proposed ground footprint exceeds buildable envelope', () => {
       // Create a scenario where envelope is small: width 20 ft, depth 20 ft, plot area 400 sq.ft
       // Front setback 5, Rear 5 -> depth 10; Left 5, Right 5 -> width 10; envelope = 100 sq.ft

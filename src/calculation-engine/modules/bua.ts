@@ -191,7 +191,7 @@ export function calculateArea(input: EngineInput): AreaResult {
   if (authEval.requiresClientConfirmation && roadWidthFt < 30) {
     validationState = 'verification_required';
     confirmationMessage = `Road width (${roadWidthFt} ft) is below standard 9m (30ft) residential minimum. Regulatory verification required for permissible FAR and height.`;
-  } else if (permissibleBUASqFt > 0 && proposedBUASqFt > permissibleBUASqFt) {
+  } else if ((permissibleBUASqFt > 0 && proposedBUASqFt > permissibleBUASqFt) || exceedsFootprint || exceedsCoverage || exceedsFar) {
     validationState = 'exceeds_permissible';
     const violations: string[] = [];
     if (exceedsFootprint) {
@@ -204,7 +204,7 @@ export function calculateArea(input: EngineInput): AreaResult {
       violations.push(`Total BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds permissible FAR limit (${maxFarBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR})`);
     }
     if (violations.length > 0) {
-      confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}) by ${excessBUASqFt.toLocaleString()} sq.ft: ${violations.join('; ')}.`;
+      confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR})${excessBUASqFt > 0 ? ` by ${excessBUASqFt.toLocaleString()} sq.ft` : ''}: ${violations.join('; ')}.`;
     } else {
       confirmationMessage = `Proposed BUA (${proposedBUASqFt.toLocaleString()} sq.ft) exceeds calculated permissible limit (${permissibleBUASqFt.toLocaleString()} sq.ft, FAR ${authEval.permissibleFAR}) by ${excessBUASqFt.toLocaleString()} sq.ft.`;
     }
