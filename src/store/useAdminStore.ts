@@ -91,7 +91,8 @@ export type AdminTab =
   | 'admin-consultation-requests'
   | 'admin-professional-applications'
   | 'pricing-tiers'
-  | 'pricing-purchases';
+  | 'pricing-purchases'
+  | 'leads';
 
 interface AdminStoreState {
   // Phase 2E Mode Toggle
@@ -292,7 +293,7 @@ const getStoredToken = (): string | null => {
   try {
     const t = localStorage.getItem('hutty_admin_token');
     if (t) return t;
-    // Allow dev preview token strictly in local development environments
+    // Allow dev preview token strictly in Vite dev server (import.meta.env.DEV)
     if (import.meta.env.DEV) {
       return 'dev-admin-mock-token-2026';
     }

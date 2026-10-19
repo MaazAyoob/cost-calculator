@@ -21,12 +21,17 @@ import { cashfreeRouter } from './cashfree.routes';
 import projectRoutes from './project.routes';
 import customerAccountRoutes from './customerAccount.routes';
 
+import otpRoutes from './otp.routes';
+import leadsRoutes from './leads.routes';
+
 router.use('/auth', authRoutes);
+router.use('/otp', otpRoutes);
 router.use('/account', customerAccountRoutes);
 router.use('/download', downloadRoutes);
 router.use('/admin', adminRoutes);
 router.use('/admin', consultationAdminRouter);
 router.use('/admin/pricing', pricingAdminRouter);
+router.use('/admin/leads', leadsRoutes);
 router.use('/rates', ratesRoutes);
 router.use('/config', configRoutes);
 router.use('/catalog', catalogPublicRouter);

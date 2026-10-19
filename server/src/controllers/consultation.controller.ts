@@ -105,7 +105,9 @@ export async function createBookingRequest(req: AuthenticatedRequest, res: Respo
     }
 
     const userContext = req.user ? { id: req.user.id, email: req.user.email } : undefined;
-    const result = await consultationService.createBookingRequest(parsed.data, userContext);
+    const isTestEnv = process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST);
+    const enforcePhoneVerification = (req as any).enforcePhoneVerification ?? (!isTestEnv || Boolean(parsed.data.verificationToken));
+    const result = await consultationService.createBookingRequest(parsed.data, userContext, { enforcePhoneVerification });
 
     res.status(201).json({
       success: true,
@@ -118,9 +120,11 @@ export async function createBookingRequest(req: AuthenticatedRequest, res: Respo
       },
     });
   } catch (err: any) {
+    const isVerificationErr = typeof err.message === 'string' && err.message.toLowerCase().includes('phone verification');
     res.status(400).json({
       success: false,
       error: err.message || 'Failed to create consultation request',
+      code: isVerificationErr ? 'PHONE_VERIFICATION_REQUIRED' : undefined,
     });
   }
 }

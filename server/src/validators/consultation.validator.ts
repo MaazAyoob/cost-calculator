@@ -38,6 +38,7 @@ export const createBookingRequestSchema = z.object({
   preferredTime: z.string().min(2, 'Preferred time slot is required'),
   idempotencyKey: z.string().max(100).optional().nullable(),
   gateway: z.string().optional(),
+  verificationToken: z.string().optional().nullable(),
   // Explicitly capture any tampering attempt so it can be discarded by service
   amount: z.any().optional(),
   fee: z.any().optional(),

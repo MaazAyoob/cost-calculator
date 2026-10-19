@@ -19,4 +19,8 @@ export const ENV = {
   CASHFREE_ENV: (process.env.CASHFREE_ENV || 'TEST').toUpperCase(),
   CASHFREE_API_VERSION: process.env.CASHFREE_API_VERSION || '2023-08-01',
   DB_INIT_SECRET: process.env.DB_INIT_SECRET || '',
+  MSG91_AUTH_KEY: (process.env.MSG91_AUTH_KEY || '').trim(),
+  MSG91_TEMPLATE_ID: (process.env.MSG91_TEMPLATE_ID || '').trim(),
+  MSG91_OTP_EXPIRY_MINUTES: Number(process.env.MSG91_OTP_EXPIRY_MINUTES) || 5,
+  MSG91_OTP_LENGTH: Number(process.env.MSG91_OTP_LENGTH) || 6,
 };

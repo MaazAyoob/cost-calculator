@@ -6,6 +6,8 @@ import { ENV } from '../config/env';
 import { inMemoryAdminUser, recordSecurityEvent } from './account.controller';
 import { PrismaClient } from '@prisma/client';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { otpService } from '../services/otp.service';
+import { normalizeIndianPhoneNumber } from '../utils/phone';
 
 let prisma: PrismaClient | null = null;
 try {
@@ -20,6 +22,7 @@ export interface CustomerUserRecord {
   name: string;
   email: string;
   phone?: string | null;
+  phoneVerifiedAt?: Date | null;
   role: string;
   passwordHash: string;
   createdAt: Date;
@@ -135,6 +138,8 @@ export async function login(req: Request, res: Response) {
               email: dbUser.email,
               phone: dbUser.phone,
               role: dbUser.role,
+              phoneVerified: Boolean(dbUser.phoneVerifiedAt),
+              phoneVerifiedAt: dbUser.phoneVerifiedAt || null,
             },
           });
         }
@@ -163,6 +168,8 @@ export async function login(req: Request, res: Response) {
           email: memUser.email,
           phone: memUser.phone,
           role: memUser.role,
+          phoneVerified: Boolean(memUser.phoneVerifiedAt),
+          phoneVerifiedAt: memUser.phoneVerifiedAt || null,
         },
       });
     }
@@ -180,7 +187,7 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function register(req: Request, res: Response) {
-  const { email, password, name, phone } = req.body;
+  const { email, password, name, phone, verificationToken } = req.body;
 
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'Full name, email address, and password are required.' });
@@ -199,8 +206,41 @@ export async function register(req: Request, res: Response) {
     return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
   }
 
+  // Enforce phone number and phone OTP verification
+  if (!phone || typeof phone !== 'string' || !phone.trim()) {
+    return res.status(400).json({
+      error: 'A valid Indian mobile phone number is required.',
+      code: 'PHONE_REQUIRED',
+    });
+  }
+
+  const normPhone = normalizeIndianPhoneNumber(phone);
+  if (!normPhone.isValid) {
+    return res.status(400).json({
+      error: normPhone.error || 'Please enter a valid 10-digit Indian mobile number.',
+      code: 'INVALID_PHONE',
+    });
+  }
+
+  if (!verificationToken || typeof verificationToken !== 'string') {
+    return res.status(400).json({
+      error: 'Phone verification is required before account creation. Please verify your phone number with an SMS OTP.',
+      code: 'PHONE_VERIFICATION_REQUIRED',
+    });
+  }
+
+  // Atomically validate and consume the single-use verification grant
+  const grantResult = await otpService.consumeGrant(verificationToken, normPhone.e164, 'SIGNUP');
+  if (!grantResult.valid) {
+    return res.status(400).json({
+      error: grantResult.error || 'Phone verification failed or expired. Please verify your phone number again.',
+      code: 'PHONE_VERIFICATION_INVALID',
+    });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
+  const now = new Date();
 
   // 1. Attempt PostgreSQL creation
   if (prisma && (prisma as any).user) {
@@ -215,7 +255,8 @@ export async function register(req: Request, res: Response) {
           id: userId,
           email: normalizedEmail,
           name: trimmedName,
-          phone: phone ? phone.trim() : null,
+          phone: normPhone.e164,
+          phoneVerifiedAt: now,
           password: hashedPassword,
           role: 'USER',
         },
@@ -255,6 +296,8 @@ export async function register(req: Request, res: Response) {
           email: created.email,
           phone: created.phone,
           role: created.role,
+          phoneVerified: true,
+          phoneVerifiedAt: created.phoneVerifiedAt,
         },
       });
     } catch (err: any) {
@@ -274,11 +317,12 @@ export async function register(req: Request, res: Response) {
     id: userId,
     name: trimmedName,
     email: normalizedEmail,
-    phone: phone ? phone.trim() : null,
+    phone: normPhone.e164,
+    phoneVerifiedAt: now,
     role: 'USER',
     passwordHash: hashedPassword,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: now,
+    updatedAt: now,
   };
 
   inMemoryCustomerUsers.set(normalizedEmail, newRecord);
@@ -299,6 +343,8 @@ export async function register(req: Request, res: Response) {
       email: newRecord.email,
       phone: newRecord.phone,
       role: newRecord.role,
+      phoneVerified: true,
+      phoneVerifiedAt: newRecord.phoneVerifiedAt,
     },
   });
 }
@@ -329,10 +375,17 @@ export async function getMe(req: AuthenticatedRequest, res: Response) {
     try {
       const dbUser = await (prisma as any).user.findUnique({
         where: { id: req.user.id },
-        select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true },
+        select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true, phoneVerifiedAt: true },
       });
       if (dbUser) {
-        return res.json({ success: true, user: dbUser });
+        return res.json({
+          success: true,
+          user: {
+            ...dbUser,
+            phoneVerified: Boolean(dbUser.phoneVerifiedAt),
+            phoneVerifiedAt: dbUser.phoneVerifiedAt || null,
+          },
+        });
       }
     } catch {}
   }
@@ -349,6 +402,8 @@ export async function getMe(req: AuthenticatedRequest, res: Response) {
         phone: memUser.phone,
         role: memUser.role,
         createdAt: memUser.createdAt,
+        phoneVerified: Boolean(memUser.phoneVerifiedAt),
+        phoneVerifiedAt: memUser.phoneVerifiedAt || null,
       },
     });
   }
@@ -360,53 +415,141 @@ export async function getMe(req: AuthenticatedRequest, res: Response) {
       email: req.user.email,
       name: (req.user as any).name || 'Homeowner',
       role: req.user.role,
+      phoneVerified: false,
+      phoneVerifiedAt: null,
     },
   });
 }
 
 /**
  * Updates profile fields (name, phone) for the current authenticated customer.
+ * If the phone number is modified, clears previous verification state unless
+ * a valid OTP verification grant for the new number is provided.
  */
 export async function updateProfile(req: AuthenticatedRequest, res: Response) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const { name, phone } = req.body;
+  const { name, phone, verificationToken } = req.body;
   if (!name || !name.trim()) {
     return res.status(400).json({ error: 'Name cannot be empty.' });
   }
 
   const trimmedName = name.trim();
-  const trimmedPhone = phone ? phone.trim() : null;
+  let normalizedPhone: string | null = null;
+
+  if (phone && phone.trim()) {
+    const norm = normalizeIndianPhoneNumber(phone);
+    if (!norm.isValid) {
+      return res.status(400).json({ error: norm.error || 'Invalid Indian mobile number.' });
+    }
+    normalizedPhone = norm.e164;
+  }
+
+  // Determine current phone number & verification state
+  let currentPhone: string | null = null;
+  let currentPhoneVerifiedAt: Date | null = null;
+
+  if (prisma && (prisma as any).user) {
+    try {
+      const u = await (prisma as any).user.findUnique({
+        where: { id: req.user.id },
+        select: { phone: true, phoneVerifiedAt: true },
+      });
+      if (u) {
+        currentPhone = u.phone;
+        currentPhoneVerifiedAt = u.phoneVerifiedAt;
+      }
+    } catch {}
+  }
+  if (!currentPhone && inMemoryCustomerUsers.has(req.user.email)) {
+    const mu = inMemoryCustomerUsers.get(req.user.email);
+    if (mu) {
+      currentPhone = mu.phone || null;
+      currentPhoneVerifiedAt = mu.phoneVerifiedAt || null;
+    }
+  }
+
+  let newPhoneVerifiedAt: Date | null = currentPhoneVerifiedAt;
+
+  // If phone number is changed:
+  if (normalizedPhone !== currentPhone) {
+    if (normalizedPhone) {
+      if (verificationToken) {
+        const grant = await otpService.consumeGrant(verificationToken, normalizedPhone, 'SIGNUP');
+        if (grant.valid) {
+          newPhoneVerifiedAt = new Date();
+        } else {
+          return res.status(400).json({
+            error: grant.error || 'Verification grant is invalid for this phone number.',
+            code: 'PHONE_VERIFICATION_INVALID',
+          });
+        }
+      } else {
+        // Clear previous verification state for the changed number
+        newPhoneVerifiedAt = null;
+      }
+    } else {
+      newPhoneVerifiedAt = null;
+    }
+  }
 
   if (prisma && (prisma as any).user) {
     try {
       const updated = await (prisma as any).user.update({
         where: { id: req.user.id },
-        data: { name: trimmedName, phone: trimmedPhone },
-        select: { id: true, name: true, email: true, phone: true, role: true },
+        data: {
+          name: trimmedName,
+          phone: normalizedPhone,
+          phoneVerifiedAt: newPhoneVerifiedAt,
+        },
+        select: { id: true, name: true, email: true, phone: true, role: true, phoneVerifiedAt: true },
       });
-      return res.json({ success: true, message: 'Profile updated successfully', user: updated });
+      return res.json({
+        success: true,
+        message: 'Profile updated successfully',
+        user: {
+          ...updated,
+          phoneVerified: Boolean(updated.phoneVerifiedAt),
+        },
+      });
     } catch {}
   }
 
   const memUser = inMemoryCustomerUsers.get(req.user.email);
   if (memUser) {
     memUser.name = trimmedName;
-    memUser.phone = trimmedPhone;
+    memUser.phone = normalizedPhone;
+    memUser.phoneVerifiedAt = newPhoneVerifiedAt;
     memUser.updatedAt = new Date();
     return res.json({
       success: true,
       message: 'Profile updated successfully',
-      user: { id: memUser.id, name: memUser.name, email: memUser.email, phone: memUser.phone, role: memUser.role },
+      user: {
+        id: memUser.id,
+        name: memUser.name,
+        email: memUser.email,
+        phone: memUser.phone,
+        role: memUser.role,
+        phoneVerified: Boolean(memUser.phoneVerifiedAt),
+        phoneVerifiedAt: memUser.phoneVerifiedAt || null,
+      },
     });
   }
 
   return res.json({
     success: true,
     message: 'Profile updated',
-    user: { id: req.user.id, email: req.user.email, name: trimmedName, phone: trimmedPhone, role: req.user.role },
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+      name: trimmedName,
+      phone: normalizedPhone,
+      role: req.user.role,
+      phoneVerified: Boolean(newPhoneVerifiedAt),
+      phoneVerifiedAt: newPhoneVerifiedAt,
+    },
   });
 }
 

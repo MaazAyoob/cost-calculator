@@ -138,6 +138,7 @@ export interface BookingSubmissionPayload {
   message?: string | null;
   preferredDate: string;
   preferredTime: string;
+  verificationToken?: string | null;
 }
 
 export interface RazorpayCheckoutOptions {

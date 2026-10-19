@@ -12,6 +12,8 @@ export interface CustomerUser {
   name: string;
   email: string;
   phone?: string | null;
+  phoneVerified?: boolean;
+  phoneVerifiedAt?: string | null;
   role: string;
   createdAt?: string;
 }
@@ -24,9 +26,9 @@ interface CustomerAuthState {
   error: string | null;
 
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string, phone?: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string, phone: string, verificationToken: string) => Promise<boolean>;
   logout: () => void;
-  updateProfile: (name: string, phone?: string) => Promise<boolean>;
+  updateProfile: (name: string, phone?: string, verificationToken?: string) => Promise<boolean>;
   checkAuth: () => Promise<void>;
   clearError: () => void;
   setAuthSession: (token: string, user: CustomerUser) => void;
@@ -87,13 +89,19 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
         }
       },
 
-      signup: async (name: string, email: string, password: string, phone?: string): Promise<boolean> => {
+      signup: async (
+        name: string,
+        email: string,
+        password: string,
+        phone: string,
+        verificationToken: string
+      ): Promise<boolean> => {
         set({ isLoading: true, error: null });
         try {
           const res = await fetch(getApiUrl('/api/v1/auth/register'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, phone }),
+            body: JSON.stringify({ name, email, password, phone, verificationToken }),
           });
 
           const data = await res.json();
@@ -114,23 +122,11 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
           });
           return true;
         } catch (err: any) {
-          // Fallback to local session in dev/offline mode
-          const localUser: CustomerUser = {
-            id: `usr_${Date.now()}`,
-            name: name || 'Hutty Customer',
-            email,
-            phone: phone || null,
-            role: 'CUSTOMER',
-            createdAt: new Date().toISOString(),
-          };
           set({
-            token: `local_jwt_${localUser.id}`,
-            user: localUser,
-            isAuthenticated: true,
             isLoading: false,
-            error: null,
+            error: err.message || 'Network error connecting to registration server.',
           });
-          return true;
+          return false;
         }
       },
 
@@ -147,7 +143,7 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
         } catch {}
       },
 
-      updateProfile: async (name: string, phone?: string): Promise<boolean> => {
+      updateProfile: async (name: string, phone?: string, verificationToken?: string): Promise<boolean> => {
         const token = get().token;
         if (!token) return false;
 
@@ -159,7 +155,7 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ name, phone }),
+            body: JSON.stringify({ name, phone, verificationToken }),
           });
 
           const data = await res.json();
@@ -170,7 +166,7 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
 
           set((state) => ({
             isLoading: false,
-            user: state.user ? { ...state.user, name, phone: phone || null } : null,
+            user: data.user ? data.user : (state.user ? { ...state.user, name, phone: phone || null } : null),
           }));
           return true;
         } catch (err: any) {

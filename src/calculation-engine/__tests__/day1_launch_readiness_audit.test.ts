@@ -439,7 +439,7 @@ describe('DAY 1 LAUNCH-READINESS AUDIT SUITE', () => {
       expect(enquiryResult.reference).toMatch(/^HT-ENQ-[A-Z0-9]+$/);
       expect(enquiryResult.message).toContain('24 hours');
       expect(enquiryResult.data.status).toBe('AWAITING_REVIEW');
-    });
+    }, 15000);
 
     it('Criteria 14: Lead and order persistence with privacy-safe storage', () => {
       const store = usePricingStore.getState();

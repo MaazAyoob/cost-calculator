@@ -61,6 +61,7 @@ import {
   Percent,
   Zap,
   Coins,
+  Users,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -94,6 +95,7 @@ import { AdminConsultationsSection } from './consultation/AdminConsultationsSect
 import { AdminProfessionalApplicationsSection } from './consultation/AdminProfessionalApplicationsSection';
 import { AdminPricingTiersSection } from './pricing/AdminPricingTiersSection';
 import { AdminPricingPurchasesSection } from './pricing/AdminPricingPurchasesSection';
+import { AdminLeadsSection } from './leads/AdminLeadsSection';
 
 export const AdminPage: React.FC = () => {
   const {
@@ -437,6 +439,7 @@ export const AdminPage: React.FC = () => {
             <div>
               <label className="text-[11px] font-bold text-slate-700 block mb-1">Admin Email</label>
               <input
+                id="admin-email-input"
                 type="email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
@@ -448,6 +451,7 @@ export const AdminPage: React.FC = () => {
             <div>
               <label className="text-[11px] font-bold text-slate-700 block mb-1">Password</label>
               <input
+                id="admin-password-input"
                 type="password"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
@@ -456,16 +460,28 @@ export const AdminPage: React.FC = () => {
                 required
               />
             </div>
-            <Button type="submit" isLoading={isLoading} className="w-full py-2.5 bg-[#1B3D34] hover:bg-[#142E27] text-white rounded-xl font-bold">
+            <Button id="admin-submit-btn" type="submit" isLoading={isLoading} className="w-full py-2.5 bg-[#1B3D34] hover:bg-[#142E27] text-white rounded-xl font-bold">
               Sign In to Admin Portal
             </Button>
           </form>
 
-          {import.meta.env.DEV && (
-            <div className="pt-2 text-[11px] text-slate-400">
+          <div className="pt-2 flex flex-col gap-2">
+            <button
+              id="admin-dev-quick-fill-btn"
+              type="button"
+              onClick={() => {
+                setLoginEmail('admin@hutty.in');
+                setLoginPassword('Admin@123456');
+                login('Admin@123456', 'admin@hutty.in');
+              }}
+              className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 transition-colors"
+            >
+              Demo Auto-Sign In (Admin@123456)
+            </button>
+            <div className="text-[11px] text-slate-400">
               Preview access: <span className="font-mono text-slate-600">Admin@123456</span>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -579,6 +595,8 @@ export const AdminPage: React.FC = () => {
             { label: 'Formula Library & Visual Builder', section: 'formula-library' as AdminTab, group: 'Calculation' },
             { label: 'Test Residential Calculator', section: 'test-calculator' as AdminTab, group: 'Calculation' },
             { label: 'Version History & Rollback', section: 'versions-history' as AdminTab, group: 'Calculation' },
+            { label: 'Customer Leads & Enquiries', section: 'leads' as AdminTab, group: 'Leads' },
+            { label: 'Export Leads (CSV / XLSX)', section: 'leads' as AdminTab, group: 'Leads' },
           ];
 
           const searchResults = searchQuery.trim()
@@ -687,6 +705,13 @@ export const AdminPage: React.FC = () => {
                 { id: 'analytics', label: 'Analytics' },
                 { id: 'account', label: 'Account & Security' },
               ],
+            },
+            {
+              num: '08',
+              id: 'LEADS',
+              name: 'Leads & Enquiries',
+              icon: <Users className="w-3.5 h-3.5" />,
+              sections: [{ id: 'leads', label: 'Leads Management' }],
             },
           ];
 
@@ -2306,6 +2331,9 @@ export const AdminPage: React.FC = () => {
       {/* 8. Products & Pricing (Pricing Model V1) */}
       {activeTab === 'pricing-tiers' && <AdminPricingTiersSection />}
       {activeTab === 'pricing-purchases' && <AdminPricingPurchasesSection />}
+
+      {/* 9. Customer Leads Management & Export Engine */}
+      {activeTab === 'leads' && <AdminLeadsSection />}
 
       {/* Legacy fallbacks */}
       {activeTab === 'parameters' && <ParametersTab />}

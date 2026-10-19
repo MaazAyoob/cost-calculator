@@ -19,6 +19,10 @@ function resolveApiBaseUrl(): string {
     }
     return clean;
   }
+  // When running in a browser on localhost or 127.0.0.1, use relative path to hit local backend
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return '';
+  }
   return metaEnv.PROD ? 'https://hutty-api-st46.onrender.com' : (metaEnv.DEV ? '' : 'https://hutty-api-st46.onrender.com');
 }
 
@@ -39,6 +43,17 @@ export function getApiUrl(endpoint: string): string {
     cleanEndpoint = `/api/v1${cleanEndpoint}`;
   } else if (!cleanEndpoint.startsWith('/api/v1/')) {
     cleanEndpoint = `/api/v1${cleanEndpoint.slice(4)}`;
+  }
+
+  // When running inside a browser on localhost / 127.0.0.1, ALWAYS use relative path
+  // so requests hit the local backend (port 4000) instead of remote Render
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '0.0.0.0')
+  ) {
+    return cleanEndpoint;
   }
 
   if (!API_BASE_URL) {

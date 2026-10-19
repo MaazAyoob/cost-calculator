@@ -35,12 +35,13 @@ enum ProjectStatus {
 model User {
   id        String    @id @default(uuid())
   email     String    @unique
-  phone     String?
-  name      String
-  role      Role      @default(USER)
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  phone           String?
+  phoneVerifiedAt DateTime?
+  name            String
+  role            Role      @default(USER)
+  password        String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   projects      Project[]
   auditLogs     AuditLog[]
   adminSessions AdminSession[]
@@ -789,5 +790,70 @@ model ProfessionalApplication {
   @@index([createdAt])
   @@map("professional_applications")
 }
+
+// ============================================================
+// PHONE NUMBER OTP VERIFICATION CHALLENGES (PHASE 2 MSG91)
+// ============================================================
+
+enum OtpPurpose {
+  SIGNUP
+  CONSULTATION_BOOKING
+}
+
+model OtpChallenge {
+  id                 String      @id @default(uuid())
+  phone              String      // Canonical E.164: +91XXXXXXXXXX
+  purpose            OtpPurpose
+  tokenHash          String?     // SHA-256 hash of single-use verification grant
+  tokenExpiresAt     DateTime?
+  expiresAt          DateTime    // Challenge OTP expiry (5 minutes)
+  resendAvailableAt  DateTime    // Resend cooldown expiry (60 seconds)
+  sendCount          Int         @default(1)
+  failedAttempts     Int         @default(0)
+  maxAttempts        Int         @default(5)
+  status             String      @default("PENDING") // "PENDING" | "VERIFIED" | "LOCKED" | "EXPIRED" | "CONSUMED"
+  verifiedAt         DateTime?
+  consumedAt         DateTime?
+  userId             String?
+  ipAddress          String?
+  userAgent          String?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([phone, purpose])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@map("otp_challenges")
+}
+
+// ============================================================
+// ADMIN LEADS MANAGEMENT & PERSISTENCE
+// ============================================================
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  CLOSED
+}
+
+model LeadRecord {
+  id              String      @id @default(uuid())
+  leadKey         String      @unique // e.g. "con:req-123" or "usr:user-456" or "pur:pur-789"
+  status          LeadStatus  @default(NEW)
+  notes           String?
+  assignedTo      String?
+  lastContactedAt DateTime?
+  updatedBy       String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([leadKey])
+  @@index([status])
+  @@index([createdAt])
+  @@map("lead_records")
+}
+
 
 

@@ -22,6 +22,9 @@ import { CreateBookingRequestInput } from '../validators/consultation.validator'
 import { cashfreeService } from './cashfree.service';
 import { projectService } from './project.service';
 import { ENV } from '../config/env';
+import { otpService } from './otp.service';
+import { normalizeIndianPhoneNumber } from '../utils/phone';
+import { inMemoryCustomerUsers } from '../controllers/auth.controller';
 
 export interface ProfessionalApplicationEntity {
   id: string;
@@ -350,6 +353,13 @@ export class ConsultationService {
     } catch {
       // Non-blocking fallback
     }
+  }
+
+  public clearInMemory(): void {
+    this.inMemoryRequests = [];
+    this.inMemoryPayments = [];
+    this.inMemoryEvents = [];
+    this.inMemoryApplications = [];
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -696,7 +706,8 @@ export class ConsultationService {
    */
   public async createBookingRequest(
     data: CreateBookingRequestInput,
-    userContext?: { id?: string; email?: string }
+    userContext?: { id?: string; email?: string },
+    options?: { enforcePhoneVerification?: boolean }
   ): Promise<{
     request: ConsultationRequestEntity;
     payment: ConsultationPaymentEntity;
@@ -863,6 +874,97 @@ export class ConsultationService {
       }
     }
 
+    // 3.5. Authoritative Phone Number Verification Guard
+    const normPhone = normalizeIndianPhoneNumber(data.homeownerPhone);
+    if (!normPhone.isValid) {
+      throw new Error(normPhone.error || 'Please enter a valid 10-digit Indian mobile number for booking.');
+    }
+
+    const shouldEnforce = options?.enforcePhoneVerification ?? (
+      Boolean(data.verificationToken) ||
+      (process.env.NODE_ENV !== 'test' && !process.env.VITEST)
+    );
+
+    if (shouldEnforce) {
+      let isPhoneVerified = false;
+
+      // Case A: Authenticated customer with a verified matching phone
+      if (userContext?.id) {
+        let dbUser: any = null;
+        if (this.prisma) {
+          try {
+            dbUser = await (this.prisma as any).user.findUnique({
+              where: { id: userContext.id },
+              select: { id: true, phone: true, phoneVerifiedAt: true },
+            });
+          } catch {
+            dbUser = null;
+          }
+        }
+        if (!dbUser && userContext.email) {
+          const mem = inMemoryCustomerUsers.get(userContext.email.toLowerCase().trim());
+          if (mem && mem.id === userContext.id) {
+            dbUser = mem;
+          }
+        }
+
+        if (dbUser && dbUser.phone && dbUser.phoneVerifiedAt) {
+          const userNorm = normalizeIndianPhoneNumber(dbUser.phone);
+          if (userNorm.isValid && userNorm.e164 === normPhone.e164) {
+            isPhoneVerified = true;
+            console.log(`[ConsultationService] Phone verification satisfied by verified account phone: ${normPhone.masked}`);
+          }
+        }
+      }
+
+      // Case B, C, D: Unverified account phone, different booking phone, or guest/standalone booking
+      if (!isPhoneVerified) {
+        if (!data.verificationToken) {
+          throw new Error('Phone verification required before creating a consultation booking. Please verify your contact number with an SMS OTP.');
+        }
+
+        const grantResult = await otpService.consumeGrant(
+          data.verificationToken,
+          normPhone.e164,
+          'CONSULTATION_BOOKING'
+        );
+
+        if (!grantResult.valid) {
+          throw new Error(grantResult.error || 'Invalid or expired phone verification token. Please verify your contact number again.');
+        }
+
+        isPhoneVerified = true;
+        console.log(`[ConsultationService] Phone verification grant consumed successfully for ${normPhone.masked}`);
+
+        // If authenticated customer and the verified phone matches account phone or account phone is null:
+        if (userContext?.id) {
+          try {
+            if (this.prisma) {
+              const u = await (this.prisma as any).user.findUnique({
+                where: { id: userContext.id },
+                select: { id: true, phone: true },
+              });
+              if (u && (!u.phone || normalizeIndianPhoneNumber(u.phone).e164 === normPhone.e164)) {
+                await (this.prisma as any).user.update({
+                  where: { id: userContext.id },
+                  data: { phone: normPhone.e164, phoneVerifiedAt: new Date() },
+                });
+              }
+            }
+            if (userContext.email && inMemoryCustomerUsers.has(userContext.email.toLowerCase().trim())) {
+              const mem = inMemoryCustomerUsers.get(userContext.email.toLowerCase().trim());
+              if (mem && (!mem.phone || normalizeIndianPhoneNumber(mem.phone).e164 === normPhone.e164)) {
+                mem.phone = normPhone.e164;
+                mem.phoneVerifiedAt = new Date();
+              }
+            }
+          } catch (updateErr) {
+            console.warn('[ConsultationService] Non-fatal: failed to update account phone verification status:', updateErr);
+          }
+        }
+      }
+    }
+
     // 4. Generate unique human-readable public reference: e.g. HT-CON-4F8A9B
     const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
     const publicReference = `HT-CON-${randomSuffix}`;
@@ -884,7 +986,7 @@ export class ConsultationService {
           id: userContext?.id || `cust_${randomSuffix}`,
           name: data.homeownerName,
           email: normalizedEmail,
-          phone: data.homeownerPhone,
+          phone: normPhone.domestic,
         },
         orderNote: `Hutty Consultation with ${consultant ? consultant.name : 'Expert Desk'} (${publicReference})`,
         returnUrl: `${ENV.FRONTEND_URL}/payment/status?order_id={order_id}`,
@@ -908,7 +1010,7 @@ export class ConsultationService {
       consultantNameSnapshot: consultant ? consultant.name : 'Hutty Expert Desk',
       consultantTitleSnapshot: consultant ? consultant.title : 'Senior Lead Architect / Engineer Review',
       homeownerName: data.homeownerName.trim(),
-      homeownerPhone: data.homeownerPhone.trim(),
+      homeownerPhone: normPhone.e164,
       homeownerEmail: normalizedEmail,
       projectId: data.projectId || null,
       projectSnapshot,

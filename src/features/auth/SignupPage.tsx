@@ -1,14 +1,30 @@
 // ==============================================================================
 // Hutty Customer Sign-Up Page
 // Friendly, straightforward onboarding for homeowners with project persistence
+// Includes secure phone number OTP verification via server-side MSG91 integration
 // ==============================================================================
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { User, Mail, Lock, Phone, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Lock,
+  Phone,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
+  Smartphone,
+  Edit2,
+} from 'lucide-react';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 import { HuttyLogo } from '../../components/brand/HuttyLogo';
 import { sanitizeRedirectUrl } from '../../components/auth/AuthGuard';
+import { normalizeIndianPhoneNumber, formatDomesticPhone } from '../../utils/phone';
+import { PhoneOtpModal } from '../../components/auth/PhoneOtpModal';
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,6 +42,52 @@ export const SignupPage: React.FC = () => {
   const [consent, setConsent] = useState(true);
   const [clientError, setClientError] = useState<string | null>(null);
 
+  // OTP Verification State
+  const [verificationToken, setVerificationToken] = useState<string | null>(null);
+  const [verifiedPhoneE164, setVerifiedPhoneE164] = useState<string | null>(null);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+
+  const normPhone = normalizeIndianPhoneNumber(phone);
+  const isPhoneVerified = Boolean(
+    verificationToken &&
+    verifiedPhoneE164 &&
+    normPhone.isValid &&
+    verifiedPhoneE164 === normPhone.e164
+  );
+
+  const handlePhoneChange = (val: string) => {
+    setPhone(val);
+    setClientError(null);
+    // Invalidate previous verification token if phone is edited
+    if (verificationToken) {
+      setVerificationToken(null);
+      setVerifiedPhoneE164(null);
+    }
+  };
+
+  const handleInitiateOtp = () => {
+    setClientError(null);
+    clearError();
+
+    if (!phone.trim()) {
+      setClientError('Please enter your 10-digit mobile number first.');
+      return;
+    }
+
+    if (!normPhone.isValid) {
+      setClientError(normPhone.error || 'Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+
+    setIsOtpModalOpen(true);
+  };
+
+  const handleOtpVerified = (token: string, normalizedPhone: string) => {
+    setVerificationToken(token);
+    setVerifiedPhoneE164(normalizedPhone);
+    setClientError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -39,6 +101,23 @@ export const SignupPage: React.FC = () => {
       setClientError('Please enter your email address.');
       return;
     }
+
+    if (!phone.trim()) {
+      setClientError('Mobile number is required for account creation.');
+      return;
+    }
+
+    if (!normPhone.isValid) {
+      setClientError(normPhone.error || 'Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+
+    if (!isPhoneVerified || !verificationToken) {
+      setClientError('Please verify your mobile number with an SMS OTP before creating your account.');
+      setIsOtpModalOpen(true);
+      return;
+    }
+
     if (!password || password.length < 6) {
       setClientError('Password must be at least 6 characters long.');
       return;
@@ -48,7 +127,14 @@ export const SignupPage: React.FC = () => {
       return;
     }
 
-    const success = await signup(name.trim(), email.trim(), password, phone.trim() || undefined);
+    const success = await signup(
+      name.trim(),
+      email.trim(),
+      password,
+      normPhone.e164,
+      verificationToken
+    );
+
     if (success) {
       navigate(redirectDestination, { replace: true });
     }
@@ -129,25 +215,70 @@ export const SignupPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Phone Number (Optional) */}
+            {/* Phone Number Field with OTP Verification */}
             <div>
-              <label htmlFor="phone" className="block text-xs font-bold text-[#1B3D34] uppercase tracking-wider mb-1.5">
-                Phone Number <span className="text-gray-400 font-normal lowercase">(optional)</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="phone" className="block text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
+                {isPhoneVerified && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    Verified
+                  </span>
+                )}
+              </div>
+
               <div className="relative rounded-xl shadow-2xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#687770]">
                   <Phone className="w-4 h-4" />
+                  <span className="text-xs font-bold font-mono text-[#52605B] ml-1 border-r border-[#D5E1D8] pr-2">
+                    +91
+                  </span>
                 </div>
                 <input
                   id="phone"
                   type="tel"
+                  required
                   autoComplete="tel"
+                  disabled={isPhoneVerified}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
                   placeholder="98765 43210"
-                  className="block w-full pl-10 pr-3.5 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9]"
+                  className="block w-full pl-20 pr-24 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9] disabled:bg-gray-100 disabled:text-[#52605B]"
                 />
+
+                <div className="absolute inset-y-0 right-1.5 flex items-center">
+                  {isPhoneVerified ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVerificationToken(null);
+                        setVerifiedPhoneE164(null);
+                      }}
+                      className="px-2.5 py-1.5 text-xs font-bold text-[#687770] hover:text-[#1B3D34] hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                      <span>Change</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleInitiateOtp}
+                      disabled={!normPhone.isValid}
+                      className="px-3 py-1.5 bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold rounded-lg shadow-2xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Verify
+                    </button>
+                  )}
+                </div>
               </div>
+
+              {!isPhoneVerified && (
+                <p className="mt-1.5 text-[11px] text-[#687770]">
+                  We will send a 6-digit SMS verification code to confirm this number.
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -235,11 +366,23 @@ export const SignupPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#1B3D34]" />
-            <span>100% Free estimates</span>
+            <span>Verified Phone Security</span>
           </div>
         </div>
 
       </div>
+
+      {/* Phone OTP Verification Modal */}
+      <PhoneOtpModal
+        isOpen={isOtpModalOpen}
+        onClose={() => setIsOtpModalOpen(false)}
+        phone={phone}
+        purpose="SIGNUP"
+        onVerified={handleOtpVerified}
+        onEditPhone={() => {
+          setIsOtpModalOpen(false);
+        }}
+      />
     </div>
   );
 };
