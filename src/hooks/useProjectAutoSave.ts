@@ -15,6 +15,7 @@ import {
   fetchProjectById,
   getCachedProjectId,
   setCachedProjectId,
+  clearCachedProjectId,
 } from '../services/projectApi';
 
 export type AutoSaveStatus = 'IDLE' | 'SAVING' | 'SAVED' | 'ERROR';
@@ -93,7 +94,7 @@ export function useProjectAutoSave() {
         } catch (err) {
           console.warn('[AutoSave] Failed to recover cached project, provisioning fresh project:', err);
           setProjectId(null);
-          setCachedProjectId(null);
+          clearCachedProjectId();
         }
       }
 
@@ -244,7 +245,7 @@ export function useProjectAutoSave() {
           if (msg.includes('not found') || msg.includes('404')) {
             console.warn('[AutoSave] Stale project ID not found on server, provisioning fresh project:', projectId);
             setProjectId(null);
-            setCachedProjectId(null);
+            clearCachedProjectId();
             const created = await persistProject({
               name: payload.name,
               leadEmail: user?.email,

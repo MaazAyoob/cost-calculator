@@ -65,7 +65,7 @@ export function isValidEmail(email: string): boolean {
 // Seed initial test customer account
 const testCustomerHash = bcrypt.hashSync('Customer@123', 10);
 inMemoryCustomerUsers.set('customer@hutty.in', {
-  id: 'c0000000-0000-4000-8000-000000000003',
+  id: 'usr-customer-test',
   name: 'Ananya Sharma',
   email: 'customer@hutty.in',
   phone: '9876543210',

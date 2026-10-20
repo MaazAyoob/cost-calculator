@@ -193,9 +193,17 @@ export function getCachedProjectId(): string | null {
   }
 }
 
-export function setCachedProjectId(id: string): void {
+export function setCachedProjectId(id: string | null): void {
   cachedPersistedProjectId = id;
   try {
-    sessionStorage.setItem('hutty_persisted_project_id', id);
+    if (id) {
+      sessionStorage.setItem('hutty_persisted_project_id', id);
+    } else {
+      sessionStorage.removeItem('hutty_persisted_project_id');
+    }
   } catch {}
+}
+
+export function clearCachedProjectId(): void {
+  setCachedProjectId(null);
 }
