@@ -33,6 +33,14 @@ Configure these environment variables in your **Render Service Settings > Enviro
 | `RAZORPAY_KEY_ID` | Razorpay API key ID | `rzp_live_...` (or test key `rzp_test_...`) |
 | `RAZORPAY_KEY_SECRET` | Razorpay secret | Kept in Render secrets |
 | `RAZORPAY_WEBHOOK_SECRET` | Razorpay webhook verification | Kept in Render secrets |
+| `CASHFREE_APP_ID` | Cashfree Client App ID | Kept in Render secrets |
+| `CASHFREE_SECRET_KEY` | Cashfree Secret Key | Kept in Render secrets |
+| `CASHFREE_WEBHOOK_SECRET` | Cashfree Webhook Secret | Kept in Render secrets |
+| `CASHFREE_ENV` | Cashfree environment | `TEST` (or `PROD` for live) |
+| `FAST2SMS_API_KEY` | Fast2SMS API Authorization Key | Kept in Render secrets (from Fast2SMS Dev API) |
+| `FAST2SMS_OTP_ID` | Fast2SMS Smart OTP Template ID | DLT-approved OTP template ID (e.g. `11111111`) |
+| `FAST2SMS_OTP_EXPIRY_MINUTES` | OTP expiry duration in minutes | `5` (Default: 5 minutes) |
+| `FAST2SMS_OTP_LENGTH` | Number of digits in verification code | `6` (Default: 6 digits) |
 
 > **SAFETY NOTE:** Never commit real database credentials or API secrets to Git.
 

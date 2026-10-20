@@ -9,7 +9,14 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { otpService } from '../../../server/src/services/otp.service';
-import { setOtpProvider, resetOtpProvider, IOtpProvider, OtpProviderResponse } from '../../../server/src/services/msg91.service';
+import {
+  setOtpProvider,
+  resetOtpProvider,
+  IOtpProvider,
+  OtpProviderResponse,
+  Fast2SmsProvider,
+} from '../../../server/src/services/fast2sms.service';
+import { ENV } from '../../../server/src/config/env';
 import { normalizeIndianPhoneNumber } from '../../../server/src/utils/phone';
 import { consultationService } from '../../../server/src/services/consultation.service';
 import {
@@ -40,7 +47,7 @@ class TestMockOtpProvider implements IOtpProvider {
       return {
         success: false,
         code: 'PROVIDER_NOT_CONFIGURED',
-        message: 'MSG91 SMS provider is not configured.',
+        message: 'Fast2SMS provider is not configured.',
       };
     }
     if (this.shouldFailSend) {
@@ -54,7 +61,7 @@ class TestMockOtpProvider implements IOtpProvider {
     return {
       success: true,
       message: 'OTP sent successfully',
-      providerRef: 'msg91_ref_test_001',
+      providerRef: 'fast2sms_ref_test_001',
     };
   }
 
@@ -63,7 +70,7 @@ class TestMockOtpProvider implements IOtpProvider {
       return {
         success: false,
         code: 'PROVIDER_NOT_CONFIGURED',
-        message: 'MSG91 SMS provider is not configured.',
+        message: 'Fast2SMS provider is not configured.',
       };
     }
     if (this.shouldFailVerify) {
@@ -85,7 +92,7 @@ class TestMockOtpProvider implements IOtpProvider {
       return {
         success: false,
         code: 'PROVIDER_NOT_CONFIGURED',
-        message: 'MSG91 SMS provider is not configured.',
+        message: 'Fast2SMS provider is not configured.',
       };
     }
     if (this.shouldFailSend) {
@@ -219,7 +226,7 @@ describe('Hutty Phone OTP Verification & Security Platform', () => {
       expect(r4.error).toContain('Too many OTP requests');
     });
 
-    it('fails closed when MSG91 SMS provider is not configured or disabled', async () => {
+    it('fails closed when Fast2SMS provider is not configured or disabled', async () => {
       mockProvider.isConfiguredState = false;
 
       const res = await otpService.requestOtp({
@@ -306,24 +313,29 @@ describe('Hutty Phone OTP Verification & Security Platform', () => {
   // 4. Customer Signup Integration
   // ─────────────────────────────────────────────────────────────────────────────
   describe('4. New Customer Signup Flow with Phone Verification', () => {
-    it('rejects account creation if phone verificationToken is absent', async () => {
-      const req: any = {
-        body: {
-          name: 'Sunil Verma',
-          email: 'sunil.unverified@hutty.in',
-          password: 'Password@123',
-          phone: '9876543210',
-          // No verificationToken
-        },
-      };
-      const res: any = {
-        status: vi.fn().mockReturnThis(),
-        json: vi.fn(),
-      };
+    it('rejects account creation if phone verificationToken is absent when verification is enforced', async () => {
+      (ENV as any).REQUIRE_PHONE_VERIFICATION_ON_SIGNUP = true;
+      try {
+        const req: any = {
+          body: {
+            name: 'Sunil Verma',
+            email: 'sunil.unverified@hutty.in',
+            password: 'Password@123',
+            phone: '9876543210',
+            // No verificationToken
+          },
+        };
+        const res: any = {
+          status: vi.fn().mockReturnThis(),
+          json: vi.fn(),
+        };
 
-      await register(req, res);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json.mock.calls[0][0].code).toBe('PHONE_VERIFICATION_REQUIRED');
+        await register(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json.mock.calls[0][0].code).toBe('PHONE_VERIFICATION_REQUIRED');
+      } finally {
+        delete (ENV as any).REQUIRE_PHONE_VERIFICATION_ON_SIGNUP;
+      }
     });
 
     it('rejects account creation if an invalid or fabricated verificationToken is supplied', async () => {
@@ -769,6 +781,248 @@ describe('Hutty Phone OTP Verification & Security Platform', () => {
       expect(status).toBe(201);
       expect(json.success).toBe(true);
       expect(json.data.request.publicReference).toMatch(/^HT-CON-/);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 6. Dedicated Fast2SMS Provider Boundary & Security Suite
+  // ─────────────────────────────────────────────────────────────────────────────
+  describe('6. Dedicated Fast2SMS Provider Boundary & Security Tests', () => {
+    let fast2smsProvider: Fast2SmsProvider;
+    const originalEnv = { ...ENV };
+
+    beforeEach(() => {
+      fast2smsProvider = new Fast2SmsProvider();
+      ENV.FAST2SMS_API_KEY = 'test_fast2sms_api_key_valid_123';
+      ENV.FAST2SMS_OTP_ID = 'test_otp_template_999';
+      ENV.FAST2SMS_OTP_EXPIRY_MINUTES = 5;
+      ENV.FAST2SMS_OTP_LENGTH = 6;
+    });
+
+    afterEach(() => {
+      Object.assign(ENV, originalEnv);
+      vi.restoreAllMocks();
+    });
+
+    it('evaluates isConfigured correctly based on credentials and placeholder detection', () => {
+      expect(fast2smsProvider.isConfigured()).toBe(true);
+
+      ENV.FAST2SMS_API_KEY = '';
+      expect(fast2smsProvider.isConfigured()).toBe(false);
+
+      ENV.FAST2SMS_API_KEY = 'placeholder_fast2sms_api_key';
+      expect(fast2smsProvider.isConfigured()).toBe(false);
+
+      ENV.FAST2SMS_API_KEY = 'your_fast2sms_api_key_here';
+      expect(fast2smsProvider.isConfigured()).toBe(false);
+
+      ENV.FAST2SMS_API_KEY = 'valid_key';
+      ENV.FAST2SMS_OTP_ID = '';
+      expect(fast2smsProvider.isConfigured()).toBe(false);
+    });
+
+    it('fails closed when API key or OTP template is missing without hitting network', async () => {
+      ENV.FAST2SMS_API_KEY = '';
+      const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+      const sendRes = await fast2smsProvider.sendOtp('9876543210');
+      expect(sendRes.success).toBe(false);
+      expect(sendRes.code).toBe('PROVIDER_NOT_CONFIGURED');
+      expect(sendRes.message).toContain('not configured');
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      const verifyRes = await fast2smsProvider.verifyOtp('9876543210', '123456');
+      expect(verifyRes.success).toBe(false);
+      expect(verifyRes.code).toBe('PROVIDER_NOT_CONFIGURED');
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      const retryRes = await fast2smsProvider.retryOtp('9876543210');
+      expect(retryRes.success).toBe(false);
+      expect(retryRes.code).toBe('PROVIDER_NOT_CONFIGURED');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects malformed or non-Indian phone numbers before sending upstream request', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+      const res = await fast2smsProvider.sendOtp('12345');
+      expect(res.success).toBe(false);
+      expect(res.code).toBe('INVALID_PHONE');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('dispatches valid POST to /dev/otp/send with domestic 10-digit number and authorization header', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          return: true,
+          status_code: 200,
+          request_id: 'fast2sms_req_abc123',
+          message: 'OTP sent successfully',
+        }),
+      } as any);
+
+      const res = await fast2smsProvider.sendOtp('+91 98765 43210');
+      expect(res.success).toBe(true);
+      expect(res.providerRef).toBe('fast2sms_req_abc123');
+      expect(res.message).toBe('OTP sent successfully');
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      const [url, options] = fetchSpy.mock.calls[0];
+      expect(url).toBe('https://www.fast2sms.com/dev/otp/send');
+      expect(options?.method).toBe('POST');
+      expect(options?.headers).toEqual({
+        authorization: 'test_fast2sms_api_key_valid_123',
+        'content-type': 'application/json',
+        accept: 'application/json',
+      });
+      const parsedBody = JSON.parse(options?.body as string);
+      expect(parsedBody.mobile).toBe('9876543210'); // 10-digit domestic format
+      expect(parsedBody.otp_id).toBe('test_otp_template_999');
+      expect(parsedBody.otp_length).toBe(6);
+      expect(parsedBody.otp_expiry).toBe(5);
+    });
+
+    it('handles provider rejection (insufficient balance, spamming, DLT blacklisting) gracefully', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({
+          return: false,
+          status_code: 416,
+          message: ["You don't have sufficient wallet balance"],
+        }),
+      } as any);
+
+      const res = await fast2smsProvider.sendOtp('9876543210');
+      expect(res.success).toBe(false);
+      expect(res.code).toBe('UPSTREAM_REJECTED');
+      expect(res.message).toBe("You don't have sufficient wallet balance");
+    });
+
+    it('handles network timeouts and connection failures without exposing secrets', async () => {
+      // 1. Timeout (AbortError)
+      const abortError = new Error('The operation was aborted');
+      abortError.name = 'AbortError';
+      vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(abortError);
+
+      const timeoutRes = await fast2smsProvider.sendOtp('9876543210');
+      expect(timeoutRes.success).toBe(false);
+      expect(timeoutRes.code).toBe('TIMEOUT');
+      expect(timeoutRes.message).toContain('timed out');
+
+      // 2. Network error
+      vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('ECONNRESET'));
+      const netRes = await fast2smsProvider.sendOtp('9876543210');
+      expect(netRes.success).toBe(false);
+      expect(netRes.code).toBe('NETWORK_ERROR');
+      expect(netRes.message).toBe('Unable to connect to SMS gateway.');
+    });
+
+    it('validates OTP successfully via POST /dev/otp/verify with correct credentials', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          return: true,
+          status_code: 200,
+          message: 'OTP verified successfully',
+        }),
+      } as any);
+
+      const res = await fast2smsProvider.verifyOtp('9876543210', '654321');
+      expect(res.success).toBe(true);
+      expect(res.message).toBe('OTP verified successfully');
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      const [url, options] = fetchSpy.mock.calls[0];
+      expect(url).toBe('https://www.fast2sms.com/dev/otp/verify');
+      const body = JSON.parse(options?.body as string);
+      expect(body.mobile).toBe('9876543210');
+      expect(body.otp).toBe('654321');
+    });
+
+    it('returns OTP_MISMATCH when Fast2SMS reports invalid/incorrect OTP', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({
+          return: false,
+          status_code: 400,
+          message: 'Invalid OTP',
+        }),
+      } as any);
+
+      const res = await fast2smsProvider.verifyOtp('9876543210', '000000');
+      expect(res.success).toBe(false);
+      expect(res.code).toBe('OTP_MISMATCH');
+      expect(res.message).toBe('Invalid OTP');
+    });
+
+    it('resends OTP via POST /dev/otp/resend successfully', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          return: true,
+          status_code: 200,
+          request_id: 'retry_fast2sms_999',
+          message: 'OTP sent successfully',
+        }),
+      } as any);
+
+      const res = await fast2smsProvider.retryOtp('9876543210');
+      expect(res.success).toBe(true);
+      expect(res.providerRef).toBe('retry_fast2sms_999');
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      const [url, options] = fetchSpy.mock.calls[0];
+      expect(url).toBe('https://www.fast2sms.com/dev/otp/resend');
+      const body = JSON.parse(options?.body as string);
+      expect(body.otp_id).toBe('test_otp_template_999');
+      expect(body.mobile).toBe('9876543210');
+    });
+
+    it('NEVER logs API keys, plain OTP values, full phone numbers, or passwords in console', async () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          return: true,
+          status_code: 200,
+          message: 'OTP sent successfully',
+        }),
+      } as any);
+
+      const testPhone = '9876543210';
+      const secretApiKey = 'test_fast2sms_api_key_valid_123';
+      const testOtp = '876543';
+
+      await fast2smsProvider.sendOtp(testPhone);
+      await fast2smsProvider.verifyOtp(testPhone, testOtp);
+      await fast2smsProvider.retryOtp(testPhone);
+
+      const allLoggedContent = [
+        ...logSpy.mock.calls.flat(),
+        ...warnSpy.mock.calls.flat(),
+        ...errorSpy.mock.calls.flat(),
+      ]
+        .map(String)
+        .join(' ');
+
+      // Must NEVER contain the raw API key
+      expect(allLoggedContent).not.toContain(secretApiKey);
+      // Must NEVER contain the raw OTP digits
+      expect(allLoggedContent).not.toContain(testOtp);
+      // Must NEVER contain unmasked domestic phone number 9876543210
+      expect(allLoggedContent).not.toContain(testPhone);
+      // Must contain masked phone number
+      expect(allLoggedContent).toContain('+91 98••••••10');
     });
   });
 });

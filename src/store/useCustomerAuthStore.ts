@@ -26,7 +26,7 @@ interface CustomerAuthState {
   error: string | null;
 
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string, phone: string, verificationToken: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string, phone: string, verificationToken?: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (name: string, phone?: string, verificationToken?: string) => Promise<boolean>;
   checkAuth: () => Promise<void>;
@@ -49,7 +49,7 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
           const res = await fetch(getApiUrl('/api/v1/auth/login'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
           });
 
           const data = await res.json();
@@ -70,22 +70,11 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
           });
           return true;
         } catch (err: any) {
-          // Fallback to local session in dev/offline mode
-          const localUser: CustomerUser = {
-            id: `usr_${Date.now()}`,
-            name: email.split('@')[0],
-            email,
-            role: 'CUSTOMER',
-            createdAt: new Date().toISOString(),
-          };
           set({
-            token: `local_jwt_${localUser.id}`,
-            user: localUser,
-            isAuthenticated: true,
             isLoading: false,
-            error: null,
+            error: 'Unable to connect to the server. Please check your internet connection and try again.',
           });
-          return true;
+          return false;
         }
       },
 
@@ -94,14 +83,20 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
         email: string,
         password: string,
         phone: string,
-        verificationToken: string
+        verificationToken?: string
       ): Promise<boolean> => {
         set({ isLoading: true, error: null });
         try {
           const res = await fetch(getApiUrl('/api/v1/auth/register'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, phone, verificationToken }),
+            body: JSON.stringify({
+              name: name.trim(),
+              email: email.trim().toLowerCase(),
+              password,
+              phone: phone.trim(),
+              verificationToken,
+            }),
           });
 
           const data = await res.json();
@@ -124,7 +119,7 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
         } catch (err: any) {
           set({
             isLoading: false,
-            error: err.message || 'Network error connecting to registration server.',
+            error: 'Unable to connect to registration server. Please check your internet connection and try again.',
           });
           return false;
         }

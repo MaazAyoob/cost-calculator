@@ -81,6 +81,30 @@ export async function checkDatabase(client?: PrismaClient): Promise<boolean> {
   await checkTable('user_entitlements', () => prisma.userEntitlement.count());
   await checkTable('projects', () => (prisma as any).project.count());
 
+  console.log('3. Checking for case-insensitive email conflicts in User table...');
+  try {
+    const users = await prisma.user.findMany({ select: { id: true, email: true } });
+    const emailCounts = new Map<string, string[]>();
+    for (const u of users) {
+      const lower = u.email.trim().toLowerCase();
+      if (!emailCounts.has(lower)) {
+        emailCounts.set(lower, []);
+      }
+      emailCounts.get(lower)!.push(u.id);
+    }
+    const duplicates = Array.from(emailCounts.entries()).filter(([_, ids]) => ids.length > 1);
+    if (duplicates.length > 0) {
+      console.warn(`   ⚠️ WARNING: Found ${duplicates.length} case-insensitive duplicate email group(s):`);
+      duplicates.forEach(([dupEmail, ids]) => {
+        console.warn(`      - Email: "${dupEmail}", User IDs: [${ids.join(', ')}]`);
+      });
+    } else {
+      console.log('   ✅ No case-insensitive duplicate accounts found.');
+    }
+  } catch (scanErr: any) {
+    console.warn(`   ⚠️ Note: Could not perform duplicate email scan: ${scanErr.message}`);
+  }
+
   console.log('----------------------------------------------------------------');
   if (allHealthy) {
     console.log('🎉 SUCCESS: All required tables exist and are accessible.');

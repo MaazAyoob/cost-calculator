@@ -22,20 +22,31 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [clientError, setClientError] = useState<string | null>(null);
+  const isSubmittingRef = React.useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
     setClientError(null);
 
-    if (!email.trim() || !password) {
+    if (isSubmittingRef.current || isLoading) {
+      return;
+    }
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
       setClientError('Please enter both your email address and password.');
       return;
     }
 
-    const success = await login(email.trim(), password);
-    if (success) {
-      navigate(redirectDestination, { replace: true });
+    isSubmittingRef.current = true;
+    try {
+      const success = await login(trimmedEmail, password);
+      if (success) {
+        navigate(redirectDestination, { replace: true });
+      }
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 

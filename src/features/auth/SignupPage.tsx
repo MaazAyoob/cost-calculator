@@ -1,10 +1,10 @@
 // ==============================================================================
 // Hutty Customer Sign-Up Page
-// Friendly, straightforward onboarding for homeowners with project persistence
-// Includes secure phone number OTP verification via server-side MSG91 integration
+// Friendly, straightforward onboarding for homeowners with project persistence.
+// Includes debounced email availability check, robust validation, and submission protection.
 // ==============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   User,
@@ -17,14 +17,28 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  Smartphone,
-  Edit2,
+  Loader2,
 } from 'lucide-react';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 import { HuttyLogo } from '../../components/brand/HuttyLogo';
 import { sanitizeRedirectUrl } from '../../components/auth/AuthGuard';
-import { normalizeIndianPhoneNumber, formatDomesticPhone } from '../../utils/phone';
-import { PhoneOtpModal } from '../../components/auth/PhoneOtpModal';
+import { normalizeIndianPhoneNumber } from '../../utils/phone';
+import { getApiUrl } from '../../config/api';
+
+const isValidEmailSyntax = (val: string): boolean => {
+  const trimmed = val.trim();
+  if (!trimmed || trimmed.length > 254) return false;
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  if (!emailRegex.test(trimmed)) return false;
+  const parts = trimmed.split('@');
+  if (parts.length !== 2) return false;
+  const [local, domain] = parts;
+  if (local.length > 64 || local.length === 0) return false;
+  if (domain.length > 255 || domain.length === 0) return false;
+  if (domain.startsWith('-') || domain.endsWith('-')) return false;
+  if (domain.includes('..')) return false;
+  return true;
+};
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -42,50 +56,148 @@ export const SignupPage: React.FC = () => {
   const [consent, setConsent] = useState(true);
   const [clientError, setClientError] = useState<string | null>(null);
 
-  // OTP Verification State
-  const [verificationToken, setVerificationToken] = useState<string | null>(null);
-  const [verifiedPhoneE164, setVerifiedPhoneE164] = useState<string | null>(null);
-  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  // Email availability check states
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [emailDuplicateError, setEmailDuplicateError] = useState<string | null>(null);
+  const [emailAvailableSuccess, setEmailAvailableSuccess] = useState(false);
+
+  // Submission protection guard
+  const isSubmittingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<any>(null);
+  const lastCheckedEmailRef = useRef<string>('');
+  const emailRef = useRef<string>('');
+  emailRef.current = email;
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   const normPhone = normalizeIndianPhoneNumber(phone);
-  const isPhoneVerified = Boolean(
-    verificationToken &&
-    verifiedPhoneE164 &&
-    normPhone.isValid &&
-    verifiedPhoneE164 === normPhone.e164
-  );
+
+  const checkEmailAvailability = useCallback(async (emailToCheck: string) => {
+    const normalized = emailToCheck.trim().toLowerCase();
+    if (!normalized || !isValidEmailSyntax(normalized)) {
+      return;
+    }
+
+    // Do not re-check if already confirmed for this exact address
+    if (lastCheckedEmailRef.current === normalized && (emailAvailableSuccess || emailDuplicateError)) {
+      return;
+    }
+
+    // Cancel any previous in-flight check request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    setIsCheckingEmail(true);
+
+    try {
+      const res = await fetch(getApiUrl('/api/v1/auth/check-email'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalized }),
+        signal: controller.signal,
+      });
+
+      // Discard stale responses if user typed a different email in the meantime
+      if (emailRef.current.trim().toLowerCase() !== normalized) {
+        return;
+      }
+
+      lastCheckedEmailRef.current = normalized;
+
+      if (!res.ok) {
+        // Handle network/server errors separately from duplicate-email errors:
+        // Never claim "Email already exists" for network errors!
+        setEmailDuplicateError(null);
+        setEmailAvailableSuccess(false);
+        return;
+      }
+
+      const data = await res.json();
+      if (data.available === false) {
+        setEmailDuplicateError(data.message || 'An account with this email address already exists. Please log in.');
+        setEmailAvailableSuccess(false);
+      } else {
+        setEmailDuplicateError(null);
+        setEmailAvailableSuccess(true);
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      // Stale or network failure: never falsely display duplicate warning
+      setEmailDuplicateError(null);
+      setEmailAvailableSuccess(false);
+    } finally {
+      if (abortControllerRef.current === controller) {
+        setIsCheckingEmail(false);
+        abortControllerRef.current = null;
+      }
+    }
+  }, [emailAvailableSuccess, emailDuplicateError]);
+
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    // Typing into the email field must immediately clear any duplicate warning and cancel stale requests
+    setEmailDuplicateError(null);
+    setEmailAvailableSuccess(false);
+    setClientError(null);
+    clearError();
+
+    // Cancel in-flight check request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsCheckingEmail(false);
+    }
+
+    // Cancel pending debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    const trimmed = val.trim();
+    // Only schedule a check if syntax is valid, debounced by 600ms
+    if (isValidEmailSyntax(trimmed)) {
+      debounceTimerRef.current = setTimeout(() => {
+        checkEmailAvailability(trimmed);
+      }, 600);
+    }
+  };
+
+  const handleEmailBlur = () => {
+    const trimmed = email.trim();
+    if (isValidEmailSyntax(trimmed)) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+      checkEmailAvailability(trimmed);
+    }
+  };
 
   const handlePhoneChange = (val: string) => {
     setPhone(val);
     setClientError(null);
-    // Invalidate previous verification token if phone is edited
-    if (verificationToken) {
-      setVerificationToken(null);
-      setVerifiedPhoneE164(null);
-    }
+    clearError();
   };
 
-  const handleInitiateOtp = () => {
+  const handlePasswordChange = (val: string) => {
+    // Never silently trim or modify passwords
+    setPassword(val);
     setClientError(null);
     clearError();
-
-    if (!phone.trim()) {
-      setClientError('Please enter your 10-digit mobile number first.');
-      return;
-    }
-
-    if (!normPhone.isValid) {
-      setClientError(normPhone.error || 'Please enter a valid 10-digit Indian mobile number.');
-      return;
-    }
-
-    setIsOtpModalOpen(true);
-  };
-
-  const handleOtpVerified = (token: string, normalizedPhone: string) => {
-    setVerificationToken(token);
-    setVerifiedPhoneE164(normalizedPhone);
-    setClientError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,12 +205,29 @@ export const SignupPage: React.FC = () => {
     clearError();
     setClientError(null);
 
+    // Prevent accidental duplicate form submissions
+    if (isSubmittingRef.current || isLoading) {
+      return;
+    }
+
     if (!name.trim()) {
       setClientError('Please enter your full name.');
       return;
     }
-    if (!email.trim()) {
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
       setClientError('Please enter your email address.');
+      return;
+    }
+
+    if (!isValidEmailSyntax(trimmedEmail)) {
+      setClientError('Please enter a valid email address.');
+      return;
+    }
+
+    if (emailDuplicateError) {
+      setClientError('This email is already registered. Please log in instead.');
       return;
     }
 
@@ -112,31 +241,31 @@ export const SignupPage: React.FC = () => {
       return;
     }
 
-    if (!isPhoneVerified || !verificationToken) {
-      setClientError('Please verify your mobile number with an SMS OTP before creating your account.');
-      setIsOtpModalOpen(true);
+    // Documented password policy: min 12 characters. Never silently trim passwords.
+    if (!password || password.length < 12) {
+      setClientError('Password must be at least 12 characters long.');
       return;
     }
 
-    if (!password || password.length < 6) {
-      setClientError('Password must be at least 6 characters long.');
-      return;
-    }
     if (!consent) {
       setClientError('Please accept the terms to create your account.');
       return;
     }
 
-    const success = await signup(
-      name.trim(),
-      email.trim(),
-      password,
-      normPhone.e164,
-      verificationToken
-    );
+    isSubmittingRef.current = true;
+    try {
+      const success = await signup(
+        name.trim(),
+        trimmedEmail.toLowerCase(),
+        password,
+        normPhone.e164
+      );
 
-    if (success) {
-      navigate(redirectDestination, { replace: true });
+      if (success) {
+        navigate(redirectDestination, { replace: true });
+      }
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
@@ -162,7 +291,7 @@ export const SignupPage: React.FC = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
         <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E2E8E3] shadow-sm">
           
-          {/* Error Banner */}
+          {/* General Error Banner */}
           {(error || clientError) && (
             <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
@@ -186,14 +315,18 @@ export const SignupPage: React.FC = () => {
                   required
                   autoComplete="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setClientError(null);
+                    clearError();
+                  }}
                   placeholder="e.g. Ramesh Kumar"
                   className="block w-full pl-10 pr-3.5 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9]"
                 />
               </div>
             </div>
 
-            {/* Email Address */}
+            {/* Email Address Field with Debounced Duplicate Check */}
             <div>
               <label htmlFor="email" className="block text-xs font-bold text-[#1B3D34] uppercase tracking-wider mb-1.5">
                 Email Address
@@ -208,26 +341,46 @@ export const SignupPage: React.FC = () => {
                   required
                   autoComplete="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onBlur={handleEmailBlur}
                   placeholder="name@example.com"
-                  className="block w-full pl-10 pr-3.5 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9]"
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none transition-all bg-[#FAFBF9] ${
+                    emailDuplicateError
+                      ? 'border-red-400 focus:ring-2 focus:ring-red-400 focus:border-red-400'
+                      : 'border-[#D5E1D8] focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34]'
+                  }`}
                 />
+                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                  {isCheckingEmail ? (
+                    <Loader2 className="w-4 h-4 text-[#8A9A92] animate-spin" />
+                  ) : emailAvailableSuccess ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  ) : null}
+                </div>
               </div>
+
+              {/* Inline duplicate email warning */}
+              {emailDuplicateError && (
+                <div className="mt-1.5 p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                    <span>Email already registered.</span>
+                  </div>
+                  <Link
+                    to={`/login?redirect=${encodeURIComponent(redirectDestination)}`}
+                    className="font-bold underline text-[#1B3D34] hover:text-[#F28C28] whitespace-nowrap ml-1"
+                  >
+                    Log in here
+                  </Link>
+                </div>
+              )}
             </div>
 
-            {/* Phone Number Field with OTP Verification */}
+            {/* Mobile Number Field (Indian +91) */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="phone" className="block text-xs font-bold text-[#1B3D34] uppercase tracking-wider">
-                  Mobile Number <span className="text-red-500">*</span>
-                </label>
-                {isPhoneVerified && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                    Verified
-                  </span>
-                )}
-              </div>
+              <label htmlFor="phone" className="block text-xs font-bold text-[#1B3D34] uppercase tracking-wider mb-1.5">
+                Mobile Number <span className="text-red-500">*</span>
+              </label>
 
               <div className="relative rounded-xl shadow-2xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#687770]">
@@ -241,50 +394,22 @@ export const SignupPage: React.FC = () => {
                   type="tel"
                   required
                   autoComplete="tel"
-                  disabled={isPhoneVerified}
                   value={phone}
                   onChange={(e) => handlePhoneChange(e.target.value)}
                   placeholder="98765 43210"
-                  className="block w-full pl-20 pr-24 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9] disabled:bg-gray-100 disabled:text-[#52605B]"
+                  className="block w-full pl-20 pr-3.5 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9]"
                 />
-
-                <div className="absolute inset-y-0 right-1.5 flex items-center">
-                  {isPhoneVerified ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVerificationToken(null);
-                        setVerifiedPhoneE164(null);
-                      }}
-                      className="px-2.5 py-1.5 text-xs font-bold text-[#687770] hover:text-[#1B3D34] hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                      <span>Change</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleInitiateOtp}
-                      disabled={!normPhone.isValid}
-                      className="px-3 py-1.5 bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold rounded-lg shadow-2xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      Verify
-                    </button>
-                  )}
-                </div>
               </div>
 
-              {!isPhoneVerified && (
-                <p className="mt-1.5 text-[11px] text-[#687770]">
-                  We will send a 6-digit SMS verification code to confirm this number.
-                </p>
-              )}
+              <p className="mt-1.5 text-[11px] text-[#687770]">
+                10-digit Indian mobile number for saving your estimates.
+              </p>
             </div>
 
-            {/* Password */}
+            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-xs font-bold text-[#1B3D34] uppercase tracking-wider mb-1.5">
-                Password <span className="text-gray-400 font-normal lowercase">(min. 6 characters)</span>
+                Password <span className="text-gray-400 font-normal lowercase">(min. 12 characters)</span>
               </label>
               <div className="relative rounded-xl shadow-2xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#687770]">
@@ -296,18 +421,22 @@ export const SignupPage: React.FC = () => {
                   required
                   autoComplete="new-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create a secure password"
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  placeholder="Create a secure password (12+ characters)"
                   className="block w-full pl-10 pr-10 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:border-[#1B3D34] transition-all bg-[#FAFBF9]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8A9A92] hover:text-[#1B3D34] transition-colors cursor-pointer"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              <p className="mt-1 text-[11px] text-[#8A9A92]">
+                Use 12 or more characters. Password managers and special characters are welcome.
+              </p>
             </div>
 
             {/* Terms checkbox */}
@@ -324,7 +453,7 @@ export const SignupPage: React.FC = () => {
               </label>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Button with Loading & Double-Submission Guard */}
             <div className="pt-2">
               <button
                 type="submit"
@@ -358,7 +487,7 @@ export const SignupPage: React.FC = () => {
 
         </div>
 
-        {/* Benefits reminder */}
+        {/* Benefits reminder without false verification labels */}
         <div className="mt-6 flex items-center justify-center gap-6 text-xs text-[#687770]">
           <div className="flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-[#1B3D34]" />
@@ -366,23 +495,12 @@ export const SignupPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#1B3D34]" />
-            <span>Verified Phone Security</span>
+            <span>256-Bit SSL Protection</span>
           </div>
         </div>
 
       </div>
-
-      {/* Phone OTP Verification Modal */}
-      <PhoneOtpModal
-        isOpen={isOtpModalOpen}
-        onClose={() => setIsOtpModalOpen(false)}
-        phone={phone}
-        purpose="SIGNUP"
-        onVerified={handleOtpVerified}
-        onEditPhone={() => {
-          setIsOtpModalOpen(false);
-        }}
-      />
     </div>
   );
 };
+

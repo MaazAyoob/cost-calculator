@@ -5,7 +5,7 @@
 
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
-import { getOtpProvider } from './msg91.service';
+import { getOtpProvider } from './fast2sms.service';
 import { normalizeIndianPhoneNumber, NormalizedPhoneResult } from '../utils/phone';
 
 let prisma: PrismaClient | null = null;

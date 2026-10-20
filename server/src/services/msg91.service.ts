@@ -1,5 +1,7 @@
 // ==============================================================================
-// Hutty MSG91 OTP Provider Integration
+// Hutty MSG91 OTP Provider Integration (DEPRECATED)
+// Replaced by Fast2SMS provider integration in fast2sms.service.ts.
+// Retained for zero-downtime rollback safety.
 // Official v5 Server-Side OTP APIs: SendOTP, Verify OTP, Resend OTP
 // Documentation: https://docs.msg91.com/otp
 // ==============================================================================
@@ -292,17 +294,9 @@ export class Msg91Provider implements IOtpProvider {
   }
 }
 
-// ── Provider Singleton & Test Swapping ──
-let activeProvider: IOtpProvider = new Msg91Provider();
-
-export function getOtpProvider(): IOtpProvider {
-  return activeProvider;
-}
-
-export function setOtpProvider(provider: IOtpProvider): void {
-  activeProvider = provider;
-}
-
-export function resetOtpProvider(): void {
-  activeProvider = new Msg91Provider();
-}
+// ── Provider Singleton & Test Swapping (Delegated to Fast2SMS) ──
+export {
+  getOtpProvider,
+  setOtpProvider,
+  resetOtpProvider,
+} from './fast2sms.service';

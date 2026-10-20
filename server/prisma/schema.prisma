@@ -792,7 +792,7 @@ model ProfessionalApplication {
 }
 
 // ============================================================
-// PHONE NUMBER OTP VERIFICATION CHALLENGES (PHASE 2 MSG91)
+// PHONE NUMBER OTP VERIFICATION CHALLENGES (FAST2SMS PROVIDER)
 // ============================================================
 
 enum OtpPurpose {

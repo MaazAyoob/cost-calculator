@@ -6,8 +6,8 @@
 export interface NormalizedPhoneResult {
   isValid: boolean;
   e164: string;           // Canonical E.164: +919876543210
-  domestic: string;       // 10 digits: 9876543210
-  providerFormat: string; // MSG91 format without leading plus: 919876543210
+  domestic: string;       // 10 digits: 9876543210 (Fast2SMS standard format)
+  providerFormat: string; // 12-digit format without leading plus: 919876543210
   masked: string;         // Masked display: +91 98••••••10
   error?: string;
 }

@@ -19,6 +19,12 @@ export const ENV = {
   CASHFREE_ENV: (process.env.CASHFREE_ENV || 'TEST').toUpperCase(),
   CASHFREE_API_VERSION: process.env.CASHFREE_API_VERSION || '2023-08-01',
   DB_INIT_SECRET: process.env.DB_INIT_SECRET || '',
+  // Fast2SMS Official SMS OTP Provider (SendOTP, Verify OTP, Resend OTP)
+  FAST2SMS_API_KEY: (process.env.FAST2SMS_API_KEY || process.env.FAST2SMS_AUTHORIZATION || '').trim(),
+  FAST2SMS_OTP_ID: (process.env.FAST2SMS_OTP_ID || process.env.FAST2SMS_TEMPLATE_ID || '').trim(),
+  FAST2SMS_OTP_EXPIRY_MINUTES: Number(process.env.FAST2SMS_OTP_EXPIRY_MINUTES) || 5,
+  FAST2SMS_OTP_LENGTH: Number(process.env.FAST2SMS_OTP_LENGTH) || 6,
+  // Deprecated MSG91 variables (retained for backward compatibility during migration)
   MSG91_AUTH_KEY: (process.env.MSG91_AUTH_KEY || '').trim(),
   MSG91_TEMPLATE_ID: (process.env.MSG91_TEMPLATE_ID || '').trim(),
   MSG91_OTP_EXPIRY_MINUTES: Number(process.env.MSG91_OTP_EXPIRY_MINUTES) || 5,

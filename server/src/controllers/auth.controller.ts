@@ -31,6 +31,37 @@ export interface CustomerUserRecord {
 
 export const inMemoryCustomerUsers: Map<string, CustomerUserRecord> = new Map();
 
+// Helper for case-insensitive in-memory lookup
+export function findInMemoryUserByEmail(email: string): CustomerUserRecord | undefined {
+  const norm = email.trim().toLowerCase();
+  for (const [key, user] of inMemoryCustomerUsers.entries()) {
+    if (key.toLowerCase() === norm || user.email.toLowerCase() === norm) {
+      return user;
+    }
+  }
+  return undefined;
+}
+
+// Active in-flight registration lock to prevent concurrent duplicates with same email
+export const activeRegistrations: Set<string> = new Set();
+
+// Robust RFC-compliant email validator
+export function isValidEmail(email: string): boolean {
+  if (!email || typeof email !== 'string') return false;
+  const trimmed = email.trim();
+  if (trimmed.length > 254) return false;
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  if (!emailRegex.test(trimmed)) return false;
+  const parts = trimmed.split('@');
+  if (parts.length !== 2) return false;
+  const [local, domain] = parts;
+  if (local.length > 64 || local.length === 0) return false;
+  if (domain.length > 255 || domain.length === 0) return false;
+  if (domain.startsWith('-') || domain.endsWith('-')) return false;
+  if (domain.includes('..')) return false;
+  return true;
+}
+
 // Seed initial test customer account
 const testCustomerHash = bcrypt.hashSync('Customer@123', 10);
 inMemoryCustomerUsers.set('customer@hutty.in', {
@@ -43,6 +74,63 @@ inMemoryCustomerUsers.set('customer@hutty.in', {
   createdAt: new Date('2026-02-01'),
   updatedAt: new Date('2026-02-01'),
 });
+
+/**
+ * Lightweight, strictly read-only email availability check.
+ * Does NOT create accounts, does NOT send OTPs, does NOT mutate database state.
+ */
+export async function checkEmail(req: Request, res: Response) {
+  const email = (req.body?.email || req.query?.email || '') as string;
+  if (!email || typeof email !== 'string' || !email.trim()) {
+    return res.json({ available: true, valid: false });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!isValidEmail(normalizedEmail)) {
+    return res.json({ available: true, valid: false });
+  }
+
+  // 1. Check admin & demo accounts
+  if (
+    normalizedEmail === inMemoryAdminUser.email.toLowerCase() ||
+    normalizedEmail === 'admin@hutty.in' ||
+    normalizedEmail === 'admin@costcalculator.app' ||
+    normalizedEmail === 'client@rightcon.in'
+  ) {
+    return res.json({
+      available: false,
+      message: 'An account with this email address already exists. Please log in.',
+    });
+  }
+
+  // 2. Check Database if available
+  if (prisma && (prisma as any).user) {
+    try {
+      const existing = await (prisma as any).user.findFirst({
+        where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+      });
+      if (existing) {
+        return res.json({
+          available: false,
+          message: 'An account with this email address already exists. Please log in.',
+        });
+      }
+    } catch {
+      // Fall through to in-memory check
+    }
+  }
+
+  // 3. Check in-memory store
+  const memUser = findInMemoryUserByEmail(normalizedEmail);
+  if (memUser) {
+    return res.json({
+      available: false,
+      message: 'An account with this email address already exists. Please log in.',
+    });
+  }
+
+  return res.json({ available: true });
+}
 
 export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
@@ -99,7 +187,7 @@ export async function login(req: Request, res: Response) {
         req.ip,
         req.headers['user-agent']
       );
-      return res.status(401).json({ error: 'Invalid credentials. Password verification failed.' });
+      return res.status(401).json({ error: 'Invalid credentials. Please verify your email and password.' });
     }
   }
 
@@ -120,7 +208,9 @@ export async function login(req: Request, res: Response) {
   // 3. Database user lookup if available
   if (prisma && (prisma as any).user) {
     try {
-      const dbUser = await (prisma as any).user.findUnique({ where: { email: normalizedEmail } });
+      const dbUser = await (prisma as any).user.findFirst({
+        where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+      });
       if (dbUser && dbUser.password) {
         const isMatch = await bcrypt.compare(password, dbUser.password);
         if (isMatch) {
@@ -150,7 +240,7 @@ export async function login(req: Request, res: Response) {
   }
 
   // 4. In-memory customer users lookup
-  const memUser = inMemoryCustomerUsers.get(normalizedEmail);
+  const memUser = findInMemoryUserByEmail(normalizedEmail);
   if (memUser) {
     const isMatch = await bcrypt.compare(password, memUser.passwordHash);
     if (isMatch) {
@@ -196,17 +286,19 @@ export async function register(req: Request, res: Response) {
   const normalizedEmail = email.trim().toLowerCase();
   const trimmedName = name.trim();
 
-  // Basic email syntax check
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(normalizedEmail)) {
+  if (!isValidEmail(normalizedEmail)) {
     return res.status(400).json({ error: 'Please enter a valid email address.' });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+  // Documented password policy: min 12 characters. Never trim passwords.
+  if (typeof password !== 'string' || password.length < 12) {
+    return res.status(400).json({
+      error: 'Password must be at least 12 characters long.',
+      field: 'password',
+    });
   }
 
-  // Enforce phone number and phone OTP verification
+  // Enforce phone number
   if (!phone || typeof phone !== 'string' || !phone.trim()) {
     return res.status(400).json({
       error: 'A valid Indian mobile phone number is required.',
@@ -222,131 +314,157 @@ export async function register(req: Request, res: Response) {
     });
   }
 
-  if (!verificationToken || typeof verificationToken !== 'string') {
+  // Phone verification handling:
+  // If verificationToken is passed, validate and consume it.
+  // Standard signups do not require SMS OTP ("Do not add email or phone OTP verification").
+  let phoneVerifiedAt: Date | null = null;
+  if (verificationToken && typeof verificationToken === 'string') {
+    const grantResult = await otpService.consumeGrant(verificationToken, normPhone.e164, 'SIGNUP');
+    if (!grantResult.valid) {
+      return res.status(400).json({
+        error: grantResult.error || 'Phone verification failed or expired. Please verify your phone number again.',
+        code: 'PHONE_VERIFICATION_INVALID',
+      });
+    }
+    phoneVerifiedAt = new Date();
+  } else if ((ENV as any).REQUIRE_PHONE_VERIFICATION_ON_SIGNUP) {
     return res.status(400).json({
       error: 'Phone verification is required before account creation. Please verify your phone number with an SMS OTP.',
       code: 'PHONE_VERIFICATION_REQUIRED',
     });
   }
 
-  // Atomically validate and consume the single-use verification grant
-  const grantResult = await otpService.consumeGrant(verificationToken, normPhone.e164, 'SIGNUP');
-  if (!grantResult.valid) {
-    return res.status(400).json({
-      error: grantResult.error || 'Phone verification failed or expired. Please verify your phone number again.',
-      code: 'PHONE_VERIFICATION_INVALID',
-    });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const userId = `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
-  const now = new Date();
-
-  // 1. Attempt PostgreSQL creation
-  if (prisma && (prisma as any).user) {
-    try {
-      const existing = await (prisma as any).user.findUnique({ where: { email: normalizedEmail } });
-      if (existing) {
-        return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
-      }
-
-      const created = await (prisma as any).user.create({
-        data: {
-          id: userId,
-          email: normalizedEmail,
-          name: trimmedName,
-          phone: normPhone.e164,
-          phoneVerifiedAt: now,
-          password: hashedPassword,
-          role: 'USER',
-        },
-      });
-
-      // Historical guest order reconciliation: associate existing unlinked purchases and consultations
-      try {
-        await (prisma as any).pricingPurchase.updateMany({
-          where: { leadEmail: normalizedEmail, userId: null },
-          data: { userId: created.id },
-        });
-        await (prisma as any).consultationRequest.updateMany({
-          where: { homeownerEmail: normalizedEmail, userId: null },
-          data: { userId: created.id },
-        });
-        await (prisma as any).userEntitlement.updateMany({
-          where: { userEmail: normalizedEmail, userId: null },
-          data: { userId: created.id },
-        });
-      } catch (reconErr) {
-        // Reconciliation error is non-fatal
-      }
-
-      const token = jwt.sign(
-        { id: created.id, email: created.email, role: created.role, name: created.name },
-        ENV.JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-
-      return res.status(201).json({
-        success: true,
-        message: 'Account created successfully',
-        token,
-        user: {
-          id: created.id,
-          name: created.name,
-          email: created.email,
-          phone: created.phone,
-          role: created.role,
-          phoneVerified: true,
-          phoneVerifiedAt: created.phoneVerifiedAt,
-        },
-      });
-    } catch (err: any) {
-      if (err.code === 'P2002') {
-        return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
-      }
-      console.warn('[AuthController] Database register failed, falling back to memory:', err.message);
-    }
-  }
-
-  // 2. In-memory registration fallback
-  if (inMemoryCustomerUsers.has(normalizedEmail)) {
+  // Concurrency guard: block simultaneous registration attempts for the same normalized email
+  if (activeRegistrations.has(normalizedEmail)) {
     return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
   }
+  activeRegistrations.add(normalizedEmail);
 
-  const newRecord: CustomerUserRecord = {
-    id: userId,
-    name: trimmedName,
-    email: normalizedEmail,
-    phone: normPhone.e164,
-    phoneVerifiedAt: now,
-    role: 'USER',
-    passwordHash: hashedPassword,
-    createdAt: now,
-    updatedAt: now,
-  };
+  try {
+    // Check against admin & demo reserved emails
+    if (
+      normalizedEmail === inMemoryAdminUser.email.toLowerCase() ||
+      normalizedEmail === 'admin@hutty.in' ||
+      normalizedEmail === 'admin@costcalculator.app' ||
+      normalizedEmail === 'client@rightcon.in'
+    ) {
+      return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
+    }
 
-  inMemoryCustomerUsers.set(normalizedEmail, newRecord);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userId = `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
+    const now = new Date();
 
-  const token = jwt.sign(
-    { id: newRecord.id, email: newRecord.email, role: newRecord.role, name: newRecord.name },
-    ENV.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+    // 1. Attempt PostgreSQL creation
+    if (prisma && (prisma as any).user) {
+      try {
+        const existing = await (prisma as any).user.findFirst({
+          where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+        });
+        if (existing) {
+          return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
+        }
 
-  return res.status(201).json({
-    success: true,
-    message: 'Account created successfully',
-    token,
-    user: {
-      id: newRecord.id,
-      name: newRecord.name,
-      email: newRecord.email,
-      phone: newRecord.phone,
-      role: newRecord.role,
-      phoneVerified: true,
-      phoneVerifiedAt: newRecord.phoneVerifiedAt,
-    },
-  });
+        const created = await (prisma as any).user.create({
+          data: {
+            id: userId,
+            email: normalizedEmail,
+            name: trimmedName,
+            phone: normPhone.e164,
+            phoneVerifiedAt,
+            password: hashedPassword,
+            role: 'USER',
+          },
+        });
+
+        // Historical guest order reconciliation
+        try {
+          await (prisma as any).pricingPurchase.updateMany({
+            where: { leadEmail: normalizedEmail, userId: null },
+            data: { userId: created.id },
+          });
+          await (prisma as any).consultationRequest.updateMany({
+            where: { homeownerEmail: normalizedEmail, userId: null },
+            data: { userId: created.id },
+          });
+          await (prisma as any).userEntitlement.updateMany({
+            where: { userEmail: normalizedEmail, userId: null },
+            data: { userId: created.id },
+          });
+        } catch {
+          // Non-fatal reconciliation error
+        }
+
+        const token = jwt.sign(
+          { id: created.id, email: created.email, role: created.role, name: created.name },
+          ENV.JWT_SECRET,
+          { expiresIn: '7d' }
+        );
+
+        return res.status(201).json({
+          success: true,
+          message: 'Account created successfully',
+          token,
+          user: {
+            id: created.id,
+            name: created.name,
+            email: created.email,
+            phone: created.phone,
+            role: created.role,
+            phoneVerified: Boolean(created.phoneVerifiedAt),
+            phoneVerifiedAt: created.phoneVerifiedAt,
+          },
+        });
+      } catch (err: any) {
+        if (err.code === 'P2002') {
+          return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
+        }
+        console.warn('[AuthController] Database register failed, falling back to memory:', err.message);
+      }
+    }
+
+    // 2. In-memory registration fallback (case-insensitive check)
+    if (findInMemoryUserByEmail(normalizedEmail)) {
+      return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
+    }
+
+    const newRecord: CustomerUserRecord = {
+      id: userId,
+      name: trimmedName,
+      email: normalizedEmail,
+      phone: normPhone.e164,
+      phoneVerifiedAt,
+      role: 'USER',
+      passwordHash: hashedPassword,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    inMemoryCustomerUsers.set(normalizedEmail, newRecord);
+
+    const token = jwt.sign(
+      { id: newRecord.id, email: newRecord.email, role: newRecord.role, name: newRecord.name },
+      ENV.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: 'Account created successfully',
+      token,
+      user: {
+        id: newRecord.id,
+        name: newRecord.name,
+        email: newRecord.email,
+        phone: newRecord.phone,
+        role: newRecord.role,
+        phoneVerified: Boolean(newRecord.phoneVerifiedAt),
+        phoneVerifiedAt: newRecord.phoneVerifiedAt,
+      },
+    });
+  } finally {
+    activeRegistrations.delete(normalizedEmail);
+  }
 }
 
 /**
@@ -590,8 +708,11 @@ export async function resetPassword(req: Request, res: Response) {
     return res.status(400).json({ error: 'Reset token and new password are required.' });
   }
 
-  if (newPassword.length < 6) {
-    return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+  if (typeof newPassword !== 'string' || newPassword.length < 12) {
+    return res.status(400).json({
+      error: 'New password must be at least 12 characters long.',
+      field: 'newPassword',
+    });
   }
 
   try {
@@ -600,7 +721,7 @@ export async function resetPassword(req: Request, res: Response) {
       return res.status(400).json({ error: 'Invalid or expired password reset token.' });
     }
 
-    const email = decoded.email;
+    const email = (decoded.email as string).trim().toLowerCase();
     const newHash = await bcrypt.hash(newPassword, 10);
 
     if (prisma && (prisma as any).user) {
@@ -613,14 +734,14 @@ export async function resetPassword(req: Request, res: Response) {
       } catch {}
     }
 
-    const memUser = inMemoryCustomerUsers.get(email);
+    const memUser = findInMemoryUserByEmail(email);
     if (memUser) {
       memUser.passwordHash = newHash;
       memUser.updatedAt = new Date();
       return res.json({ success: true, message: 'Password has been successfully updated. You may now log in.' });
     }
 
-    return res.json({ success: true, message: 'Password has been successfully updated.' });
+    return res.json({ success: true, message: 'Password has been successfully updated. You may now log in.' });
   } catch (err) {
     return res.status(400).json({ error: 'Invalid or expired password reset token.' });
   }

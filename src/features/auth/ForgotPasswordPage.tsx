@@ -60,8 +60,8 @@ export const ForgotPasswordPage: React.FC = () => {
       setError('Please provide the reset token.');
       return;
     }
-    if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters long.');
+    if (newPassword.length < 12) {
+      setError('New password must be at least 12 characters long.');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -199,7 +199,7 @@ export const ForgotPasswordPage: React.FC = () => {
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="At least 6 characters"
+                    placeholder="At least 12 characters"
                     className="block w-full pl-10 pr-10 py-3 border border-[#D5E1D8] rounded-xl text-sm text-[#1B3D34] placeholder-[#8A9A92] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-[#FAFBF9]"
                   />
                   <button
