@@ -65,7 +65,7 @@ export function isValidEmail(email: string): boolean {
 // Seed initial test customer account
 const testCustomerHash = bcrypt.hashSync('Customer@123', 10);
 inMemoryCustomerUsers.set('customer@hutty.in', {
-  id: 'usr-customer-test',
+  id: 'c0000000-0000-4000-8000-000000000003',
   name: 'Ananya Sharma',
   email: 'customer@hutty.in',
   phone: '9876543210',
@@ -193,15 +193,56 @@ export async function login(req: Request, res: Response) {
 
   // 2. Client demo login
   if (normalizedEmail === 'client@rightcon.in' && password === 'Client@123456') {
+    let resolvedId = 'c0000000-0000-4000-8000-000000000002';
+    let resolvedName = 'Rajesh Sharma';
+    let resolvedPhone: string | null = '+91 9845012345';
+    if (prisma && (prisma as any).user) {
+      try {
+        const dbUser = await (prisma as any).user.findFirst({
+          where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+          select: { id: true, name: true, email: true, phone: true, role: true },
+        });
+        if (dbUser) {
+          resolvedId = dbUser.id;
+          resolvedName = dbUser.name || resolvedName;
+          resolvedPhone = dbUser.phone || resolvedPhone;
+        } else {
+          // Provision in database with valid UUID so foreign keys succeed
+          const clientPassHash = await bcrypt.hash('Client@123456', 10);
+          const newClient = await (prisma as any).user.create({
+            data: {
+              id: resolvedId,
+              name: resolvedName,
+              email: normalizedEmail,
+              phone: resolvedPhone,
+              role: 'USER',
+              password: clientPassHash,
+            },
+            select: { id: true, name: true, email: true, phone: true, role: true },
+          });
+          resolvedId = newClient.id;
+        }
+      } catch (err: any) {
+        console.warn('[AuthController] Demo user database resolution note:', err.message);
+      }
+    }
     const token = jwt.sign(
-      { id: 'user-1', email: normalizedEmail, role: 'USER', name: 'Rajesh Sharma' },
+      { id: resolvedId, email: normalizedEmail, role: 'USER', name: resolvedName },
       ENV.JWT_SECRET,
       { expiresIn: '7d' }
     );
     return res.json({
       success: true,
       token,
-      user: { id: 'user-1', name: 'Rajesh Sharma', email: normalizedEmail, role: 'USER' },
+      user: {
+        id: resolvedId,
+        name: resolvedName,
+        email: normalizedEmail,
+        phone: resolvedPhone,
+        role: 'USER',
+        phoneVerified: false,
+        phoneVerifiedAt: null,
+      },
     });
   }
 
@@ -210,6 +251,7 @@ export async function login(req: Request, res: Response) {
     try {
       const dbUser = await (prisma as any).user.findFirst({
         where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+        select: { id: true, name: true, email: true, phone: true, role: true, password: true },
       });
       if (dbUser && dbUser.password) {
         const isMatch = await bcrypt.compare(password, dbUser.password);
@@ -228,8 +270,8 @@ export async function login(req: Request, res: Response) {
               email: dbUser.email,
               phone: dbUser.phone,
               role: dbUser.role,
-              phoneVerified: Boolean(dbUser.phoneVerifiedAt),
-              phoneVerifiedAt: dbUser.phoneVerifiedAt || null,
+              phoneVerified: false,
+              phoneVerifiedAt: null,
             },
           });
         }
@@ -352,7 +394,7 @@ export async function register(req: Request, res: Response) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
+    const userId = crypto.randomUUID();
     const now = new Date();
 
     // 1. Attempt PostgreSQL creation
@@ -360,6 +402,7 @@ export async function register(req: Request, res: Response) {
       try {
         const existing = await (prisma as any).user.findFirst({
           where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+          select: { id: true },
         });
         if (existing) {
           return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
@@ -371,10 +414,10 @@ export async function register(req: Request, res: Response) {
             email: normalizedEmail,
             name: trimmedName,
             phone: normPhone.e164,
-            phoneVerifiedAt,
             password: hashedPassword,
             role: 'USER',
           },
+          select: { id: true, name: true, email: true, phone: true, role: true },
         });
 
         // Historical guest order reconciliation

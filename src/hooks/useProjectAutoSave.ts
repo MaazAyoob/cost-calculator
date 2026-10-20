@@ -92,6 +92,8 @@ export function useProjectAutoSave() {
           }
         } catch (err) {
           console.warn('[AutoSave] Failed to recover cached project, provisioning fresh project:', err);
+          setProjectId(null);
+          setCachedProjectId(null);
         }
       }
 
@@ -232,10 +234,37 @@ export function useProjectAutoSave() {
           setLastSaved(new Date());
         }
       } else {
-        await updateProject(projectId, payload);
-        lastSavedPayloadHashRef.current = payloadHash;
-        setStatus('SAVED');
-        setLastSaved(new Date());
+        try {
+          await updateProject(projectId, payload);
+          lastSavedPayloadHashRef.current = payloadHash;
+          setStatus('SAVED');
+          setLastSaved(new Date());
+        } catch (updateErr: any) {
+          const msg = updateErr?.message || '';
+          if (msg.includes('not found') || msg.includes('404')) {
+            console.warn('[AutoSave] Stale project ID not found on server, provisioning fresh project:', projectId);
+            setProjectId(null);
+            setCachedProjectId(null);
+            const created = await persistProject({
+              name: payload.name,
+              leadEmail: user?.email,
+              leadName: user?.name,
+              city: payload.city,
+              authority: payload.authority,
+              configuration: payload.configuration,
+              calculation: payload.calculation,
+            });
+            if (created) {
+              setProjectId(created.id);
+              setCachedProjectId(created.id);
+              lastSavedPayloadHashRef.current = payloadHash;
+              setStatus('SAVED');
+              setLastSaved(new Date());
+            }
+          } else {
+            throw updateErr;
+          }
+        }
       }
     } catch (err) {
       console.warn('[AutoSave] Persistence attempt failed:', err);

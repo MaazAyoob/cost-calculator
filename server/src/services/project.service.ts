@@ -144,6 +144,7 @@ export class ProjectService {
         if (params.userId) {
           const userById = await (this.prisma as any).user.findUnique({
             where: { id: params.userId },
+            select: { id: true, name: true, email: true },
           });
           if (userById) {
             return { id: userById.id, name: userById.name, email: userById.email };
@@ -153,6 +154,7 @@ export class ProjectService {
         // 2. Lookup by email case-insensitively
         const userByEmail = await (this.prisma as any).user.findFirst({
           where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+          select: { id: true, name: true, email: true },
         });
         if (userByEmail) {
           return { id: userByEmail.id, name: userByEmail.name, email: userByEmail.email };
@@ -173,6 +175,7 @@ export class ProjectService {
               role: 'USER',
               password: passwordHash,
             },
+            select: { id: true, name: true, email: true },
           });
           return { id: newUser.id, name: newUser.name, email: newUser.email };
         } catch (createErr: any) {
@@ -184,6 +187,7 @@ export class ProjectService {
           ) {
             const existing = await (this.prisma as any).user.findFirst({
               where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+              select: { id: true, name: true, email: true },
             });
             if (existing) {
               return { id: existing.id, name: existing.name, email: existing.email };
@@ -626,9 +630,11 @@ export class ProjectService {
         try {
           const ownerUser = await (this.prisma as any).user.findUnique({
             where: { id: existing.ownerId },
+            select: { id: true, email: true },
           });
           const callerUser = await (this.prisma as any).user.findUnique({
             where: { id: userId },
+            select: { id: true, email: true },
           });
           if (
             ownerUser &&

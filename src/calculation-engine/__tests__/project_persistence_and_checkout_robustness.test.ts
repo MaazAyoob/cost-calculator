@@ -377,4 +377,71 @@ describe('Project Persistence, Report Checkout & Save Lifecycle Robustness', () 
       })
     ).rejects.toThrow(/DURABLE_STORAGE_UNAVAILABLE/);
   });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 9. Selective user projection ensures resilience against unmigrated columns
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('9. findOrCreateUser resolves user with explicit selection without querying unmigrated columns', async () => {
+    const mockPrisma = {
+      user: {
+        findUnique: vi.fn().mockImplementation(async (args: any) => {
+          // Verify that select is provided to avoid SELECT * failing on unmigrated columns
+          expect(args.select).toBeDefined();
+          expect(args.select.id).toBe(true);
+          expect(args.select.email).toBe(true);
+          return { id: 'uuid-existing-user-123', name: 'Existing Owner', email: 'owner@hutty.in' };
+        }),
+        findFirst: vi.fn(),
+        create: vi.fn(),
+      },
+    };
+
+    projectService.setPrismaClient(mockPrisma as any, true);
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
+
+    const resolved = await projectService.findOrCreateUser({
+      userId: 'uuid-existing-user-123',
+      email: 'owner@hutty.in',
+    });
+
+    expect(resolved.id).toBe('uuid-existing-user-123');
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'uuid-existing-user-123' },
+        select: { id: true, name: true, email: true },
+      })
+    );
+
+    // Reset client
+    projectService.setPrismaClient(null, false);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 10. User resolution produces valid UUIDs compatible with Prisma schema
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('10. Newly provisioned user IDs match standard UUID format and satisfy foreign keys', async () => {
+    const mockPrisma = {
+      user: {
+        findUnique: vi.fn().mockResolvedValue(null),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockImplementation(async (args: any) => {
+          expect(args.data.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+          return { id: args.data.id, name: args.data.name, email: args.data.email };
+        }),
+      },
+    };
+
+    projectService.setPrismaClient(mockPrisma as any, true);
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
+
+    const resolved = await projectService.findOrCreateUser({
+      name: 'Fresh Customer',
+      email: 'fresh.customer@hutty.in',
+    });
+
+    expect(resolved.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+
+    // Reset client
+    projectService.setPrismaClient(null, false);
+  });
 });

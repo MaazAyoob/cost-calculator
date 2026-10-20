@@ -127,6 +127,15 @@ export class PricingService {
   private async syncSeedsToPrisma() {
     if (!this.prisma) return;
     try {
+      // Safe, non-destructive schema alignment: ensure User.phoneVerifiedAt exists
+      try {
+        await (this.prisma as any).$executeRawUnsafe(
+          `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "phoneVerifiedAt" TIMESTAMP(3);`
+        );
+      } catch (alterErr: any) {
+        // Table may not yet exist or user has restricted DDL permissions; non-fatal
+      }
+
       for (const t of this.inMemoryTiers) {
         await (this.prisma as any).pricingTier.upsert({
           where: { code: t.code },

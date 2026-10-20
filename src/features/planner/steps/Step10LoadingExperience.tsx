@@ -3,10 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUIStore } from '../../../store/useUIStore';
 import { useWizardStore } from '../../../store/useWizardStore';
-import { Check, Loader2, ArrowRight, ShieldCheck, FileCheck2 } from 'lucide-react';
+import { Check, Loader2, ArrowRight, ShieldCheck, FileCheck2, AlertCircle, RefreshCw } from 'lucide-react';
 import { HuttyLogo } from '../../../components/common/HuttyLogo';
+import type { AutoSaveStatus } from '../../../hooks/useProjectAutoSave';
 
-export const Step10LoadingExperience: React.FC = () => {
+interface Step10LoadingExperienceProps {
+  autoSaveStatus?: AutoSaveStatus;
+  onRetryAutoSave?: () => void;
+}
+
+export const Step10LoadingExperience: React.FC<Step10LoadingExperienceProps> = ({
+  autoSaveStatus = 'SAVED',
+  onRetryAutoSave,
+}) => {
   const navigate = useNavigate();
   const { addToast } = useUIStore();
   const { city } = useWizardStore();
@@ -129,16 +138,42 @@ export const Step10LoadingExperience: React.FC = () => {
             <FileCheck2 className="w-8 h-8 text-[#1B3D34]" />
           </div>
 
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[rgba(27,61,52,0.08)] text-[#1B3D34] border border-[#1B3D34]/20 text-[10px] font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34]" /> COMPUTATION COMPLETE
-            </span>
+          <div className="space-y-3">
+            {autoSaveStatus === 'ERROR' ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-600" /> COMPUTATION COMPLETE · CLOUD SAVE PENDING
+              </span>
+            ) : autoSaveStatus === 'SAVING' ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold uppercase tracking-wider">
+                <Loader2 className="w-3.5 h-3.5 text-blue-600 animate-spin" /> COMPUTATION COMPLETE · SAVING TO CLOUD...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[rgba(27,61,52,0.08)] text-[#1B3D34] border border-[#1B3D34]/20 text-[10px] font-bold uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34]" /> COMPUTATION COMPLETE · SAVED TO CLOUD
+              </span>
+            )}
+
             <h2 className="heading-xl text-3xl font-extrabold text-[#1B3D34] tracking-tight">
-              Your Estimate is Ready.
+              {autoSaveStatus === 'ERROR' ? 'Estimate Ready (Cloud Save Pending)' : 'Your Estimate is Ready.'}
             </h2>
             <p className="text-xs sm:text-sm text-[#4B5563] max-w-md mx-auto leading-relaxed">
-              Your itemized cost list, materials needed, and payment plan are ready.
+              {autoSaveStatus === 'ERROR'
+                ? 'Your local construction estimate is calculated. Saving to the cloud database encountered an issue — click Retry below to save your project before purchasing reports.'
+                : 'Your itemized cost list, materials needed, and payment plan are ready and safely stored.'}
             </p>
+
+            {autoSaveStatus === 'ERROR' && onRetryAutoSave && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={onRetryAutoSave}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Retry Saving Project</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">

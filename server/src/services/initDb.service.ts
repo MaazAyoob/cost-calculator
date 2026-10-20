@@ -86,9 +86,18 @@ export async function runInitAndVerifyPipeline(prismaClient?: PrismaClient): Pro
       ) as "exists";
     `;
     pricingTiersExist = Boolean(checkResult?.[0]?.exists);
-    console.log(`[InitPipeline] Pre-check: public.pricing_tiers table exists = ${pricingTiersExist}`);
   } catch (handshakeErr: any) {
     console.warn('[InitPipeline] Handshake or table pre-check note:', handshakeErr.message);
+  }
+
+  // Ensure critical columns like User.phoneVerifiedAt exist non-destructively
+  try {
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "phoneVerifiedAt" TIMESTAMP(3);`
+    );
+    console.log('[InitPipeline] Verified User.phoneVerifiedAt column exists.');
+  } catch (colErr: any) {
+    console.warn('[InitPipeline] Note on column check:', colErr.message);
   }
 
   // ── Step 1: Schema Synchronization (if table missing) ──

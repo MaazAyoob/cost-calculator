@@ -500,7 +500,10 @@ export const PlannerPage: React.FC = () => {
       <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col">
         {currentStep === 11 ? (
           <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
-            <Step10LoadingExperience />
+            <Step10LoadingExperience
+              autoSaveStatus={autoSaveStatus}
+              onRetryAutoSave={triggerAutoSave}
+            />
           </div>
         ) : (
           <div className="max-w-7xl mx-auto w-full h-full flex flex-col p-4 sm:p-5 lg:p-6 min-h-0 overflow-hidden pb-16 lg:pb-6">
