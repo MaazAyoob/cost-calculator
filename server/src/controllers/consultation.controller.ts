@@ -105,8 +105,8 @@ export async function createBookingRequest(req: AuthenticatedRequest, res: Respo
     }
 
     const userContext = req.user ? { id: req.user.id, email: req.user.email } : undefined;
-    const isTestEnv = process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST);
-    const enforcePhoneVerification = (req as any).enforcePhoneVerification ?? (!isTestEnv || Boolean(parsed.data.verificationToken));
+    // OTP verification is postponed across the platform — do not enforce phone OTP
+    const enforcePhoneVerification = (req as any).enforcePhoneVerification ?? false;
     const result = await consultationService.createBookingRequest(parsed.data, userContext, { enforcePhoneVerification });
 
     res.status(201).json({

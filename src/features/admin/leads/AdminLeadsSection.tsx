@@ -435,7 +435,7 @@ export const AdminLeadsSection: React.FC = () => {
             {summary.unverified}
           </div>
           <div className="text-[11px] text-amber-700 mt-1 font-medium">
-            Requires follow-up / SMS OTP
+            Requires direct follow-up
           </div>
         </div>
 

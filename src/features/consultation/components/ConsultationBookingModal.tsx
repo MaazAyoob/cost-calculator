@@ -37,7 +37,6 @@ import { modalScaleVariant, backdropFadeVariant } from '../../../animations/vari
 import { consultationAnalytics } from '../../../utils/consultationAnalytics';
 import { getApiUrl } from '../../../config/api';
 import { normalizeIndianPhoneNumber } from '../../../utils/phone';
-import { PhoneOtpModal } from '../../../components/auth/PhoneOtpModal';
 
 interface ConsultationBookingModalProps {
   isOpen: boolean;
@@ -99,36 +98,11 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
   // Confirmation result
   const [confirmedRequest, setConfirmedRequest] = useState<ConsultationRequest | null>(null);
 
-  // Phone OTP Verification State
-  const [verificationToken, setVerificationToken] = useState<string | null>(null);
-  const [verifiedPhoneE164, setVerifiedPhoneE164] = useState<string | null>(null);
-  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-
   const normHomeownerPhone = normalizeIndianPhoneNumber(homeownerPhone);
-
-  // Authoritative client-side determination of verified status:
-  // Case A: Authenticated customer with verified canonical phone matching the entered number
-  const isAccountPhoneVerified = Boolean(
-    isAuthenticated &&
-    user?.phoneVerified &&
-    user?.phone &&
-    normalizeIndianPhoneNumber(user.phone).isValid &&
-    normalizeIndianPhoneNumber(user.phone).e164 === normHomeownerPhone.e164
-  );
-
-  // Phone is verified if account phone matches OR OTP verification grant was completed for this exact number
-  const isPhoneVerified = Boolean(
-    isAccountPhoneVerified ||
-    (verificationToken && verifiedPhoneE164 && verifiedPhoneE164 === normHomeownerPhone.e164)
-  );
 
   const handlePhoneChange = (val: string) => {
     setHomeownerPhone(val);
     setErrorMessage(null);
-    if (verificationToken) {
-      setVerificationToken(null);
-      setVerifiedPhoneE164(null);
-    }
   };
 
   // Set min date to tomorrow
@@ -406,13 +380,6 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
       return;
     }
 
-    // Enforce Phone Number Verification Guard
-    if (!isPhoneVerified) {
-      setErrorMessage('Please verify your contact mobile number with an SMS OTP before completing your booking.');
-      setIsOtpModalOpen(true);
-      return;
-    }
-
     consultationAnalytics.track({
       eventName: 'consultation_checkout_started',
       consultantId: consultant.id,
@@ -433,7 +400,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
         message: message.trim() || null,
         preferredDate,
         preferredTime,
-        verificationToken: isAccountPhoneVerified ? undefined : (verificationToken || undefined),
+        verificationToken: undefined,
       });
 
       const { request, payment, razorpayOptions, cashfreeOptions } = bookingData;
@@ -737,27 +704,9 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-[#1B3D34] block">
-                    Mobile Number <span className="text-red-500">*</span>
-                  </label>
-                  {isPhoneVerified ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      {isAccountPhoneVerified ? 'Verified Account' : 'Verified OTP'}
-                    </span>
-                  ) : (
-                    normHomeownerPhone.isValid && (
-                      <button
-                        type="button"
-                        onClick={() => setIsOtpModalOpen(true)}
-                        className="text-[10px] font-bold text-[#1B3D34] hover:text-[#F28C28] underline cursor-pointer"
-                      >
-                        Verify with OTP
-                      </button>
-                    )
-                  )}
-                </div>
+                <label className="text-xs font-bold text-[#1B3D34] block mb-1">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
                 <div className="relative">
                   <Phone className="w-3.5 h-3.5 text-[#4B5563] absolute left-3 top-3" />
                   <span className="text-[11px] font-mono font-bold text-[#52605B] absolute left-8 top-2.5 border-r border-[#E3E8E2] pr-1.5">
@@ -1054,23 +1003,7 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
 
               <div className="flex items-center justify-between">
                 <span className="text-[#4B5563]">Contact Mobile:</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-[#1B3D34]">{homeownerPhone}</span>
-                  {isPhoneVerified ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      Verified
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsOtpModalOpen(true)}
-                      className="text-[10px] font-bold text-[#1B3D34] hover:text-[#F28C28] underline cursor-pointer"
-                    >
-                      Verify via SMS (Required)
-                    </button>
-                  )}
-                </div>
+                <span className="font-semibold text-[#1B3D34]">{homeownerPhone}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -1273,22 +1206,6 @@ export const ConsultationBookingModal: React.FC<ConsultationBookingModalProps> =
       </motion.div>
     </motion.div>
   )}
-
-  <PhoneOtpModal
-    isOpen={isOtpModalOpen}
-    onClose={() => setIsOtpModalOpen(false)}
-    phone={homeownerPhone}
-    purpose="CONSULTATION_BOOKING"
-    onVerified={(token, normP) => {
-      setVerificationToken(token);
-      setVerifiedPhoneE164(normP);
-      setErrorMessage(null);
-    }}
-    onEditPhone={() => {
-      setIsOtpModalOpen(false);
-      setStep(1);
-    }}
-  />
 </AnimatePresence>
   );
 };

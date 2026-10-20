@@ -880,10 +880,8 @@ export class ConsultationService {
       throw new Error(normPhone.error || 'Please enter a valid 10-digit Indian mobile number for booking.');
     }
 
-    const shouldEnforce = options?.enforcePhoneVerification ?? (
-      Boolean(data.verificationToken) ||
-      (process.env.NODE_ENV !== 'test' && !process.env.VITEST)
-    );
+    // OTP verification is postponed across the platform — do not enforce phone OTP unless explicitly requested
+    const shouldEnforce = options?.enforcePhoneVerification ?? false;
 
     if (shouldEnforce) {
       let isPhoneVerified = false;

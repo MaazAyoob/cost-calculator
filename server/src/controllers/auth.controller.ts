@@ -358,7 +358,7 @@ export async function register(req: Request, res: Response) {
 
   // Phone verification handling:
   // If verificationToken is passed, validate and consume it.
-  // Standard signups do not require SMS OTP ("Do not add email or phone OTP verification").
+  // Standard signups do not require SMS OTP (OTP verification is postponed across the platform).
   let phoneVerifiedAt: Date | null = null;
   if (verificationToken && typeof verificationToken === 'string') {
     const grantResult = await otpService.consumeGrant(verificationToken, normPhone.e164, 'SIGNUP');

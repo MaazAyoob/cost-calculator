@@ -280,7 +280,7 @@ describe('Hutty Live Localhost:4000 End-to-End Probes', () => {
     expect(lines[0]).toContain('Customer Name');
   }));
 
-  it('12. Consultation booking rejects unverified phone numbers before Cashfree order creation', runLiveTest(async () => {
+  it('12. Consultation booking accepts valid phone numbers without phone OTP verification', runLiveTest(async () => {
     const res = await httpRequest({
       hostname: 'localhost',
       port: 4000,
@@ -298,8 +298,9 @@ describe('Hutty Live Localhost:4000 End-to-End Probes', () => {
       preferredTime: '10:00 AM',
     });
 
-    expect(res.statusCode).toBe(400);
-    expect(res.json?.code).toBe('PHONE_VERIFICATION_REQUIRED');
+    expect(res.statusCode).toBe(201);
+    expect(res.json?.success).toBe(true);
+    expect(res.json?.data?.request?.publicReference).toMatch(/^HT-CON-/);
   }));
 
   it('13. OTP challenge verification rejects incorrect OTP codes with 400', runLiveTest(async () => {
