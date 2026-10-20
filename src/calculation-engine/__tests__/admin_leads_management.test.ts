@@ -252,6 +252,47 @@ describe('Hutty Admin Leads Management & Export System', () => {
       expect(unverifiedLead?.phoneVerified).toBe(false);
       expect(unverifiedLead?.phoneVerifiedAt).toBeNull();
     });
+
+    it('clearly indicates paid consultation bookings in admin leads with PAID status and fee', async () => {
+      // Create a consultation request with PAID payment
+      (consultationService as any).inMemoryRequests.push({
+        id: 'req_paid_consultation_lead',
+        publicReference: 'HT-CON-PAIDLEAD',
+        homeownerName: 'Sunil Gavaskar',
+        homeownerPhone: '9845099999',
+        homeownerEmail: 'sunil.g@example.com',
+        projectLocation: 'MG Road, Bangalore',
+        projectType: 'Independent Villa',
+        consultationTopic: 'Structural & Elevation Audit',
+        preferredDate: '2026-11-10',
+        preferredTime: '11:00 AM',
+        status: 'AWAITING_REVIEW',
+        amountMinorUnits: 149900,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      (consultationService as any).inMemoryPayments.push({
+        id: 'pay_paid_lead',
+        consultationRequestId: 'req_paid_consultation_lead',
+        gateway: 'CASHFREE',
+        gatewayOrderId: 'order_cf_con_paid_99',
+        gatewayPaymentId: 'cf_pay_12345678',
+        amountMinorUnits: 149900,
+        status: 'PAID',
+        verifiedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const allLeads = await leadsService.assembleAllLeads();
+      const sunilLead = allLeads.find((l) => l.email === 'sunil.g@example.com');
+
+      expect(sunilLead).toBeDefined();
+      expect(sunilLead?.source).toBe('CONSULTATION_BOOKING');
+      expect(sunilLead?.status).toBe('CONVERTED'); // Converted because payment is paid
+      expect(sunilLead?.enquiryDetails).toContain('Fee: ₹1,499 (PAID)');
+      expect(sunilLead?.enquiryDetails).toContain('Structural & Elevation Audit');
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────────

@@ -33,23 +33,27 @@ enum ProjectStatus {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
+  id              String    @id @default(uuid())
+  email           String    @unique
   phone           String?
   phoneVerifiedAt DateTime?
+  disabled        Boolean   @default(false)
+  disabledAt      DateTime?
+  disabledReason  String?
   name            String
   role            Role      @default(USER)
   password        String
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  projects      Project[]
-  auditLogs     AuditLog[]
-  adminSessions AdminSession[]
+  projects        Project[]
+  auditLogs       AuditLog[]
+  adminSessions   AdminSession[]
   consultationRequests ConsultationRequest[]
   pricingPurchases     PricingPurchase[]
   entitlements         UserEntitlement[]
 
   @@index([email])
+  @@index([disabled])
 }
 
 model Project {

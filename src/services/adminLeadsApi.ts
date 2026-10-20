@@ -69,12 +69,7 @@ export interface LeadsApiResponse {
   error?: string;
 }
 
-const getApiBaseUrl = (): string => {
-  if (typeof window !== 'undefined' && (window as any).__API_URL__) {
-    return (window as any).__API_URL__;
-  }
-  return import.meta.env.VITE_API_URL || '';
-};
+import { getApiUrl } from '../config/api';
 
 /**
  * Fetch filtered leads with pagination and metrics
@@ -99,7 +94,8 @@ export async function fetchAdminLeads(filters: LeadFilters, token?: string | nul
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${getApiBaseUrl()}/api/v1/admin/leads?${query.toString()}`, {
+  const url = getApiUrl(`/api/v1/admin/leads?${query.toString()}`);
+  const res = await fetch(url, {
     method: 'GET',
     headers,
   });
@@ -128,7 +124,8 @@ export async function updateAdminLeadStatus(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${getApiBaseUrl()}/api/v1/admin/leads/${encodeURIComponent(leadKey)}/status`, {
+  const url = getApiUrl(`/api/v1/admin/leads/${encodeURIComponent(leadKey)}/status`);
+  const res = await fetch(url, {
     method: 'PATCH',
     headers,
     body: JSON.stringify({ status, notes }),
@@ -172,7 +169,8 @@ export async function downloadAdminLeadsExport(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${getApiBaseUrl()}/api/v1/admin/leads/export?${query.toString()}`, {
+  const url = getApiUrl(`/api/v1/admin/leads/export?${query.toString()}`);
+  const res = await fetch(url, {
     method: 'GET',
     headers,
   });

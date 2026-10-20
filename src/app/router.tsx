@@ -50,6 +50,9 @@ const AccountDashboardPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import('../features/error/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
+const PaymentStatusPage = lazy(() =>
+  import('../features/payment/PaymentStatusPage').then((m) => ({ default: m.PaymentStatusPage }))
+);
 
 const PageFallback = () => (
   <div className="h-[70vh] flex flex-col items-center justify-center space-y-3">
@@ -286,6 +289,16 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
               <PricingPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'payment/status',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <PaymentStatusPage />
             </Suspense>
           </ErrorBoundary>
         ),

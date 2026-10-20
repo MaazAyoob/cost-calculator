@@ -340,6 +340,7 @@ export class LeadsService {
     if (this.prisma) {
       try {
         consultations = await (this.prisma as any).consultationRequest.findMany({
+          include: { payments: true },
           orderBy: { createdAt: 'desc' },
         });
       } catch {
@@ -348,13 +349,22 @@ export class LeadsService {
     }
     // Also include in-memory consultations if not already present
     const inMemReqs = (consultationService as any).inMemoryRequests || [];
+    const inMemPayments = (consultationService as any).inMemoryPayments || [];
     for (const im of inMemReqs) {
       if (!consultations.some((c) => c.id === im.id || c.publicReference === im.publicReference)) {
-        consultations.push(im);
+        consultations.push({
+          ...im,
+          payments: inMemPayments.filter((p: any) => p.consultationRequestId === im.id),
+        });
       }
     }
 
     for (const c of consultations) {
+      // Attach in-memory payments if prisma payments were empty
+      if (!c.payments || c.payments.length === 0) {
+        c.payments = inMemPayments.filter((p: any) => p.consultationRequestId === c.id);
+      }
+
       const normPhone = normalizeIndianPhoneNumber(c.homeownerPhone);
       const phoneDigits = normPhone.isValid ? normPhone.domestic : c.homeownerPhone;
       const phoneDisplay = normPhone.isValid ? `+91 ${formatDomesticPhone(normPhone.domestic)}` : formatDomesticPhone(phoneDigits);
@@ -367,6 +377,20 @@ export class LeadsService {
       const isGeneralEnquiry = c.publicReference?.startsWith('HT-ENQ-') || c.consultationTopic?.toLowerCase().includes('general enquiry');
       const source: LeadSource = isGeneralEnquiry ? 'GENERAL_ENQUIRY' : 'CONSULTATION_BOOKING';
       const sourceLabel = isGeneralEnquiry ? 'General Enquiry' : 'Consultation Booking';
+
+      // Determine authoritative payment status for consultation
+      const hasPaidPayment =
+        c.payments?.some((p: any) => p.status === 'PAID') ||
+        c.status === 'AWAITING_REVIEW' ||
+        c.status === 'ASSIGNED' ||
+        c.status === 'UNDER_REVIEW' ||
+        c.status === 'SCHEDULED' ||
+        c.status === 'COMPLETED';
+
+      const isPendingPayment = !hasPaidPayment && (c.payments?.some((p: any) => p.status === 'PENDING') || c.status === 'PENDING');
+      const paymentTag = isGeneralEnquiry
+        ? ''
+        : (hasPaidPayment ? 'Fee: ₹1,499 (PAID)' : (isPendingPayment ? 'Fee: ₹1,499 (PENDING)' : `Status: ${c.status}`));
 
       // Authoritative verification check:
       // Must be verified via authoritative verification flow (verifiedUsersByPhone or attached verified user record)
@@ -392,6 +416,7 @@ export class LeadsService {
       const rec = leadRecordMap.get(leadKey);
 
       const detailsParts = [
+        paymentTag,
         c.consultationTopic ? `Topic: ${c.consultationTopic}` : '',
         c.consultantNameSnapshot && c.consultantNameSnapshot !== 'Hutty Expert Desk' ? `Expert: ${c.consultantNameSnapshot}` : '',
         c.projectLocation ? `Loc: ${c.projectLocation}` : '',
@@ -411,7 +436,7 @@ export class LeadsService {
         email: normEmail,
         source,
         sourceLabel,
-        status: rec?.status || 'NEW',
+        status: rec?.status || (hasPaidPayment ? 'CONVERTED' : 'NEW'),
         enquiryDetails: detailsParts.join(' | ') || 'Consultation Request',
         notes: rec?.notes || null,
         assignedTo: rec?.assignedTo || null,

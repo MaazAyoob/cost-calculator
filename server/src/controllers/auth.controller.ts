@@ -24,6 +24,9 @@ export interface CustomerUserRecord {
   phone?: string | null;
   phoneVerifiedAt?: Date | null;
   role: string;
+  disabled?: boolean;
+  disabledAt?: Date | null;
+  disabledReason?: string | null;
   passwordHash: string;
   createdAt: Date;
   updatedAt: Date;
@@ -251,9 +254,15 @@ export async function login(req: Request, res: Response) {
     try {
       const dbUser = await (prisma as any).user.findFirst({
         where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
-        select: { id: true, name: true, email: true, phone: true, role: true, password: true },
+        select: { id: true, name: true, email: true, phone: true, role: true, password: true, disabled: true },
       });
       if (dbUser && dbUser.password) {
+        if (dbUser.disabled) {
+          return res.status(403).json({
+            error: 'ACCOUNT_DISABLED',
+            message: 'Your account has been disabled by an administrator. Please contact support.',
+          });
+        }
         const isMatch = await bcrypt.compare(password, dbUser.password);
         if (isMatch) {
           const token = jwt.sign(
@@ -284,6 +293,12 @@ export async function login(req: Request, res: Response) {
   // 4. In-memory customer users lookup
   const memUser = findInMemoryUserByEmail(normalizedEmail);
   if (memUser) {
+    if (memUser.disabled) {
+      return res.status(403).json({
+        error: 'ACCOUNT_DISABLED',
+        message: 'Your account has been disabled by an administrator. Please contact support.',
+      });
+    }
     const isMatch = await bcrypt.compare(password, memUser.passwordHash);
     if (isMatch) {
       const token = jwt.sign(

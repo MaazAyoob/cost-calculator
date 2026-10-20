@@ -92,7 +92,8 @@ export type AdminTab =
   | 'admin-professional-applications'
   | 'pricing-tiers'
   | 'pricing-purchases'
-  | 'leads';
+  | 'leads'
+  | 'users';
 
 interface AdminStoreState {
   // Phase 2E Mode Toggle

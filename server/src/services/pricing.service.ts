@@ -20,6 +20,7 @@ import {
 import { cashfreeService } from './cashfree.service';
 import { projectService } from './project.service';
 import { ENV } from '../config/env';
+import { inMemoryCustomerUsers } from '../controllers/auth.controller';
 
 export interface PricingTierEntity {
   id: string;
@@ -200,6 +201,12 @@ export class PricingService {
         ? null
         : 'In-memory fallback active. Purchases and entitlements are transient and will not survive process restarts until PostgreSQL DATABASE_URL is connected.',
     };
+  }
+
+  public clearInMemory(): void {
+    this.inMemoryPurchases = [];
+    this.inMemoryEntitlements = [];
+    this.inMemoryAuditLogs = [];
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -413,6 +420,27 @@ export class PricingService {
       environment?: string;
     } | null;
   }> {
+    // 0. DISABLED ACCOUNT CHECK (Earliest safe guard: reject before tier lookup, inactive tier rejection, payment creation, or purchase persistence)
+    let resolvedUserId: string | null = payload.userId || null;
+    const checkEmail = (payload.leadEmail || '').toLowerCase().trim();
+    if (resolvedUserId || checkEmail) {
+      let isAccountDisabled = false;
+      const memUser = inMemoryCustomerUsers.get(checkEmail);
+      if (memUser && (memUser as any).disabled) isAccountDisabled = true;
+      if (!isAccountDisabled && this.prisma && resolvedUserId) {
+        try {
+          const u = await (this.prisma as any).user.findUnique({
+            where: { id: resolvedUserId },
+            select: { disabled: true },
+          });
+          if (u?.disabled) isAccountDisabled = true;
+        } catch {}
+      }
+      if (isAccountDisabled) {
+        throw new Error('ACCOUNT_DISABLED: Your account has been disabled. Purchases are not permitted.');
+      }
+    }
+
     const tier = await this.getTierByCode(payload.tierCode);
     if (!tier) {
       throw new Error(`Invalid pricing tier code: "${payload.tierCode}"`);
@@ -436,7 +464,6 @@ export class PricingService {
 
     // 1. PROJECT REFERENCE VALIDATION & PERSISTENCE
     let resolvedProjectId: string | null = null;
-    let resolvedUserId: string | null = payload.userId || null;
 
     if (payload.projectId) {
       // Check if project exists in database / in-memory

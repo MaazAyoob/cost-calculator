@@ -31,6 +31,7 @@ import {
   RefreshCw,
   Sparkles,
   Shield,
+  ShieldCheck,
   Download,
   Calendar,
   Check,
@@ -96,6 +97,7 @@ import { AdminProfessionalApplicationsSection } from './consultation/AdminProfes
 import { AdminPricingTiersSection } from './pricing/AdminPricingTiersSection';
 import { AdminPricingPurchasesSection } from './pricing/AdminPricingPurchasesSection';
 import { AdminLeadsSection } from './leads/AdminLeadsSection';
+import { AdminUsersSection } from './users/AdminUsersSection';
 
 export const AdminPage: React.FC = () => {
   const {
@@ -712,6 +714,13 @@ export const AdminPage: React.FC = () => {
               name: 'Leads & Enquiries',
               icon: <Users className="w-3.5 h-3.5" />,
               sections: [{ id: 'leads', label: 'Leads Management' }],
+            },
+            {
+              num: '09',
+              id: 'USERS',
+              name: 'User Management',
+              icon: <ShieldCheck className="w-3.5 h-3.5" />,
+              sections: [{ id: 'users', label: 'Customer Accounts' }],
             },
           ];
 
@@ -2334,6 +2343,9 @@ export const AdminPage: React.FC = () => {
 
       {/* 9. Customer Leads Management & Export Engine */}
       {activeTab === 'leads' && <AdminLeadsSection />}
+
+      {/* 10. Customer User Management & Account Security */}
+      {activeTab === 'users' && <AdminUsersSection />}
 
       {/* Legacy fallbacks */}
       {activeTab === 'parameters' && <ParametersTab />}

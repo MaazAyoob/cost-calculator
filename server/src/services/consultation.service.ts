@@ -798,6 +798,25 @@ export class ConsultationService {
 
     // 3. Idempotency Check (double-click protection)
     const normalizedEmail = data.homeownerEmail.toLowerCase().trim();
+
+    // Check if customer account is disabled
+    if (userContext?.id || normalizedEmail) {
+      let isAccountDisabled = false;
+      const memUser = inMemoryCustomerUsers.get(normalizedEmail);
+      if (memUser && (memUser as any).disabled) isAccountDisabled = true;
+      if (!isAccountDisabled && this.prisma && userContext?.id) {
+        try {
+          const u = await (this.prisma as any).user.findUnique({
+            where: { id: userContext.id },
+            select: { disabled: true },
+          });
+          if (u?.disabled) isAccountDisabled = true;
+        } catch {}
+      }
+      if (isAccountDisabled) {
+        throw new Error('ACCOUNT_DISABLED: Your account has been disabled. Booking consultations is not permitted.');
+      }
+    }
     if (data.idempotencyKey) {
       const existingReq = await this.findRequestByIdempotencyKey(data.idempotencyKey);
       if (existingReq) {
@@ -1690,20 +1709,27 @@ export class ConsultationService {
       }
     }
 
-    if (allRequests.length === 0) {
-      allRequests = this.inMemoryRequests.filter((r) => {
-        if (status && status !== 'ALL' && r.status !== status) return false;
-        if (search && search.trim()) {
-          const q = search.toLowerCase().trim();
-          const matchRef = r.publicReference.toLowerCase().includes(q);
-          const matchName = r.homeownerName.toLowerCase().includes(q);
-          const matchEmail = r.homeownerEmail.toLowerCase().includes(q);
-          const matchPhone = r.homeownerPhone.includes(q);
-          if (!matchRef && !matchName && !matchEmail && !matchPhone) return false;
-        }
-        return true;
-      });
+    // Merge in-memory requests not already present in database result
+    const inMemMatching = this.inMemoryRequests.filter((r) => {
+      if (status && status !== 'ALL' && r.status !== status) return false;
+      if (search && search.trim()) {
+        const q = search.toLowerCase().trim();
+        const matchRef = r.publicReference.toLowerCase().includes(q);
+        const matchName = r.homeownerName.toLowerCase().includes(q);
+        const matchEmail = r.homeownerEmail.toLowerCase().includes(q);
+        const matchPhone = r.homeownerPhone.includes(q);
+        if (!matchRef && !matchName && !matchEmail && !matchPhone) return false;
+      }
+      return true;
+    });
+
+    for (const im of inMemMatching) {
+      if (!allRequests.some((r) => r.id === im.id || r.publicReference === im.publicReference)) {
+        allRequests.push(im);
+      }
     }
+
+    allRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Attach latest payment & consultant references for in-memory if needed
     for (const req of allRequests) {

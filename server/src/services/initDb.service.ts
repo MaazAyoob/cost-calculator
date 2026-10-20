@@ -90,12 +90,21 @@ export async function runInitAndVerifyPipeline(prismaClient?: PrismaClient): Pro
     console.warn('[InitPipeline] Handshake or table pre-check note:', handshakeErr.message);
   }
 
-  // Ensure critical columns like User.phoneVerifiedAt exist non-destructively
+  // Ensure critical columns like User.phoneVerifiedAt, disabled exist non-destructively
   try {
     await prisma.$executeRawUnsafe(
       `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "phoneVerifiedAt" TIMESTAMP(3);`
     );
-    console.log('[InitPipeline] Verified User.phoneVerifiedAt column exists.');
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "disabled" BOOLEAN DEFAULT false;`
+    );
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "disabledAt" TIMESTAMP(3);`
+    );
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "disabledReason" TEXT;`
+    );
+    console.log('[InitPipeline] Verified User account status columns (phoneVerifiedAt, disabled) exist.');
   } catch (colErr: any) {
     console.warn('[InitPipeline] Note on column check:', colErr.message);
   }

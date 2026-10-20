@@ -92,4 +92,16 @@ router.use('/config', configRoutes);
 import { catalogAdminRouter } from './catalog.routes';
 router.use('/catalog', catalogAdminRouter);
 
+// Customer User Management Endpoints (RBAC Enforced)
+import {
+  getUsers,
+  disableUser,
+  restoreUser,
+  deleteUser,
+} from '../controllers/userManagement.controller';
+router.get('/users', getUsers as any);
+router.patch('/users/:id/disable', disableUser as any);
+router.patch('/users/:id/restore', restoreUser as any);
+router.delete('/users/:id', deleteUser as any);
+
 export default router;
