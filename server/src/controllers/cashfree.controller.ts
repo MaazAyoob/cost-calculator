@@ -246,7 +246,7 @@ export class CashfreeController {
         data: {
           order,
           payments,
-          environment: 'TEST',
+          environment: cashfreeService.environment,
         },
       });
     } catch (err: any) {

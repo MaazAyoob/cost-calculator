@@ -27,6 +27,9 @@ export interface CashfreeCreateOrderInput {
   notifyUrl?: string;
 }
 
+export type CashfreeEnvironment = 'TEST' | 'SANDBOX' | 'PRODUCTION' | 'PROD';
+export type CashfreeNormalizedEnvironment = 'TEST' | 'PRODUCTION';
+
 export interface CashfreeOrderResult {
   orderId: string;
   order_id?: string;
@@ -36,7 +39,7 @@ export interface CashfreeOrderResult {
   orderStatus: string;
   orderAmount: number;
   currency: string;
-  environment: 'TEST' | 'SANDBOX';
+  environment: CashfreeEnvironment;
   gateway: 'CASHFREE';
 }
 
@@ -57,9 +60,21 @@ export class CashfreeService {
     this.apiVersion = ENV.CASHFREE_API_VERSION || '2023-08-01';
   }
 
-  public get baseUrl(): string {
-    const env = (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase();
+  /**
+   * Authoritatively normalizes the configured Cashfree environment.
+   * Maps 'PROD' | 'PRODUCTION' -> 'PRODUCTION'
+   * Maps 'SANDBOX' | 'TEST' (and default fallback) -> 'TEST'
+   */
+  public get environment(): CashfreeNormalizedEnvironment {
+    const env = (process.env.CASHFREE_ENV || ENV.CASHFREE_ENV || 'TEST').toUpperCase().trim();
     if (env === 'PROD' || env === 'PRODUCTION') {
+      return 'PRODUCTION';
+    }
+    return 'TEST';
+  }
+
+  public get baseUrl(): string {
+    if (this.environment === 'PRODUCTION') {
       return 'https://api.cashfree.com/pg';
     }
     return 'https://sandbox.cashfree.com/pg';
@@ -230,7 +245,7 @@ export class CashfreeService {
       orderStatus: data.order_status || 'ACTIVE',
       orderAmount: data.order_amount || params.orderAmount,
       currency: data.order_currency || currency,
-      environment: 'TEST',
+      environment: this.environment,
       gateway: 'CASHFREE',
     };
   }
