@@ -52,7 +52,9 @@ export class ProjectController {
         snapshot,
       } = req.body;
 
-      const email = leadEmail || req.user?.email;
+      // Authoritative User Resolution: prioritize verified server-side session
+      const sessionUser = req.user;
+      const email = (sessionUser?.email || leadEmail || '').trim().toLowerCase();
       if (!email) {
         res.status(400).json({
           success: false,
@@ -61,7 +63,7 @@ export class ProjectController {
         return;
       }
 
-      const userId = req.user?.id || null;
+      const userId = sessionUser?.id || null;
 
       let project;
       if (snapshot) {

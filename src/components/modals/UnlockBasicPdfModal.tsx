@@ -9,6 +9,7 @@ import { generateAndDownloadBasicEstimatePdf, viewBasicEstimatePdfInNewTab } fro
 import { X, Check, Lock, Download, ShieldCheck, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import { modalScaleVariant } from '../../animations/variants';
 import { persistProject, getCachedProjectId, setCachedProjectId } from '../../services/projectApi';
+import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 
 interface Props {
   isOpen: boolean;
@@ -69,9 +70,11 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
     setFormError(null);
     setIsProcessing(true);
 
-    const leadName = name.trim() || 'Valued Homeowner';
-    const leadPhone = phone.trim() || '9876543210';
-    const leadEmail = email.trim() || 'client@example.com';
+    const authState = useCustomerAuthStore.getState();
+    const authUser = authState.user;
+    const leadName = (name.trim() || authUser?.name || 'Valued Homeowner').trim();
+    const leadPhone = (phone.trim() || authUser?.phone || '9876543210').trim();
+    const leadEmail = (email.trim() || authUser?.email || 'client@hutty.in').trim().toLowerCase();
 
     saveLeadInfo({
       name: leadName,
@@ -116,8 +119,15 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
           });
           effectiveProjectId = persisted.id;
           setCachedProjectId(persisted.id);
-        } catch (persistErr) {
-          console.warn('Pre-persisting project notice:', persistErr);
+        } catch (persistErr: any) {
+          setIsProcessing(false);
+          const raw = persistErr?.message || '';
+          if (raw.includes('401') || raw.includes('auth') || raw.includes('token') || raw.includes('login')) {
+            setFormError('Please sign in or create an account to save your project and complete purchase.');
+          } else {
+            setFormError('Unable to save your project to the database before checkout. Please retry.');
+          }
+          return;
         }
       }
 
@@ -315,7 +325,17 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
     } catch (err: any) {
       console.error('Checkout error:', err);
       setIsProcessing(false);
-      setFormError(err.message || 'Payment processing failed. Please check your network or retry.');
+      const raw = err?.message || '';
+      if (
+        raw.includes('Foreign key constraint') ||
+        raw.includes('DURABLE_STORAGE_WRITE_FAILED') ||
+        raw.includes('Prisma') ||
+        raw.includes('Project_ownerId_fkey')
+      ) {
+        setFormError('Unable to persist project ownership. Please ensure you are logged in and retry.');
+      } else {
+        setFormError(raw || 'Payment processing failed. Please check your network or retry.');
+      }
     }
   };
 

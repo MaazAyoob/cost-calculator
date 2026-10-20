@@ -140,7 +140,7 @@ export class ProjectService {
 
     if (this.isDbConnected()) {
       try {
-        // 1. If explicit userId provided, check if exists
+        // 1. If explicit userId provided, check if exists in database
         if (params.userId) {
           const userById = await (this.prisma as any).user.findUnique({
             where: { id: params.userId },
@@ -150,35 +150,54 @@ export class ProjectService {
           }
         }
 
-        // 2. Lookup by email
-        const userByEmail = await (this.prisma as any).user.findUnique({
-          where: { email: normalizedEmail },
+        // 2. Lookup by email case-insensitively
+        const userByEmail = await (this.prisma as any).user.findFirst({
+          where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
         });
         if (userByEmail) {
           return { id: userByEmail.id, name: userByEmail.name, email: userByEmail.email };
         }
 
-        // 3. Provision a new User for this homeowner lead
+        // 3. Provision a new User for this homeowner lead using a standard UUID
         const randomPassword = crypto.randomBytes(24).toString('hex');
         const passwordHash = await bcrypt.hash(randomPassword, 10);
+        const newUserId = crypto.randomUUID();
 
-        const newUser = await (this.prisma as any).user.create({
-          data: {
-            id: `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
-            name: params.name?.trim() || 'Homeowner',
-            email: normalizedEmail,
-            phone: params.phone?.trim() || null,
-            role: 'USER',
-            password: passwordHash,
-          },
-        });
-        return { id: newUser.id, name: newUser.name, email: newUser.email };
+        try {
+          const newUser = await (this.prisma as any).user.create({
+            data: {
+              id: newUserId,
+              name: params.name?.trim() || 'Homeowner',
+              email: normalizedEmail,
+              phone: params.phone?.trim() || null,
+              role: 'USER',
+              password: passwordHash,
+            },
+          });
+          return { id: newUser.id, name: newUser.name, email: newUser.email };
+        } catch (createErr: any) {
+          // If creation collided on unique constraint (P2002), re-query by email
+          if (
+            createErr.code === 'P2002' ||
+            createErr.message?.includes('Unique constraint') ||
+            createErr.message?.includes('duplicate key')
+          ) {
+            const existing = await (this.prisma as any).user.findFirst({
+              where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+            });
+            if (existing) {
+              return { id: existing.id, name: existing.name, email: existing.email };
+            }
+          }
+          throw createErr;
+        }
       } catch (err: any) {
-        console.warn('[ProjectService] Prisma user lookup/creation failed, using fallback:', err.message);
+        console.error('[ProjectService] Prisma user lookup/creation error:', err.message);
+        throw new Error(`DURABLE_STORAGE_WRITE_FAILED: Failed to resolve owner account in database: ${err.message}`);
       }
     }
 
-    // In-memory fallback: preserve consistent user identity by email
+    // In-memory fallback: only when database connection is not active
     if (!this.inMemoryUsers) {
       this.inMemoryUsers = new Map();
     }
@@ -402,7 +421,16 @@ export class ProjectService {
     configuration?: any;
     calculation?: any;
   }): Promise<ProjectEntity> {
-    const ownerId = input.userId || input.ownerId || `usr-${Date.now()}`;
+    let ownerId = input.userId || input.ownerId;
+    if (this.isDbConnected()) {
+      const owner = await this.findOrCreateUser({
+        userId: ownerId,
+        email: input.leadEmail || 'client@hutty.in',
+      });
+      ownerId = owner.id;
+    } else {
+      ownerId = ownerId || `usr-${Date.now()}`;
+    }
     const title = input.title || input.name || 'Custom Home Project';
 
     const project: ProjectEntity = {
@@ -593,7 +621,27 @@ export class ProjectService {
     }
 
     if (existing.ownerId !== userId) {
-      throw new Error(`FORBIDDEN: You do not have permission to modify this project.`);
+      let isOwner = false;
+      if (this.isDbConnected()) {
+        try {
+          const ownerUser = await (this.prisma as any).user.findUnique({
+            where: { id: existing.ownerId },
+          });
+          const callerUser = await (this.prisma as any).user.findUnique({
+            where: { id: userId },
+          });
+          if (
+            ownerUser &&
+            callerUser &&
+            ownerUser.email.toLowerCase() === callerUser.email.toLowerCase()
+          ) {
+            isOwner = true;
+          }
+        } catch {}
+      }
+      if (!isOwner) {
+        throw new Error(`FORBIDDEN: You do not have permission to modify this project.`);
+      }
     }
 
     const now = new Date().toISOString();
@@ -616,10 +664,10 @@ export class ProjectService {
                 plotLength: Number(cfg.plotLength) || 30,
                 plotWidth: Number(cfg.plotWidth) || 40,
                 houseType: cfg.houseType || 'Duplex',
-                floors: Number(cfg.floors) || 2,
+                floors: Math.max(1, Math.round(Number(cfg.floors) || 2)),
                 parkingType: cfg.parkingType || 'Normal Ground',
-                carCount: Number(cfg.carCount) || 1,
-                bikeCount: Number(cfg.bikeCount) || 2,
+                carCount: Math.round(Number(cfg.carCount) || 1),
+                bikeCount: Math.round(Number(cfg.bikeCount) || 2),
                 evCharging: Boolean(cfg.evCharging),
                 liftRequired: Boolean(cfg.liftRequired),
                 roomsJson: cfg.rooms || cfg.roomsJson || {},
@@ -630,10 +678,10 @@ export class ProjectService {
                 plotLength: cfg.plotLength !== undefined ? Number(cfg.plotLength) : undefined,
                 plotWidth: cfg.plotWidth !== undefined ? Number(cfg.plotWidth) : undefined,
                 houseType: cfg.houseType || undefined,
-                floors: cfg.floors !== undefined ? Number(cfg.floors) : undefined,
+                floors: cfg.floors !== undefined ? Math.max(1, Math.round(Number(cfg.floors))) : undefined,
                 parkingType: cfg.parkingType || undefined,
-                carCount: cfg.carCount !== undefined ? Number(cfg.carCount) : undefined,
-                bikeCount: cfg.bikeCount !== undefined ? Number(cfg.bikeCount) : undefined,
+                carCount: cfg.carCount !== undefined ? Math.round(Number(cfg.carCount)) : undefined,
+                bikeCount: cfg.bikeCount !== undefined ? Math.round(Number(cfg.bikeCount)) : undefined,
                 evCharging: cfg.evCharging !== undefined ? Boolean(cfg.evCharging) : undefined,
                 liftRequired: cfg.liftRequired !== undefined ? Boolean(cfg.liftRequired) : undefined,
                 roomsJson: cfg.rooms || cfg.roomsJson || undefined,
@@ -654,9 +702,9 @@ export class ProjectService {
                 totalCostINR: Number(calc.totalCostINR) || 4800000,
                 costPerSqFt: Number(calc.costPerSqFt) || 2000,
                 steelTonnes: Number(calc.steelTonnes) || 0,
-                cementBags: Number(calc.cementBags) || 0,
+                cementBags: Math.round(Number(calc.cementBags) || 0),
                 concreteCuM: Number(calc.concreteCuM) || 0,
-                timelineMonths: Number(calc.timelineMonths) || 12,
+                timelineMonths: Math.round(Number(calc.timelineMonths) || 12),
                 budgetBreakdown: calc.budgetBreakdown || {},
                 quantitiesJson: calc.quantitiesJson || {},
                 configSnapshot: calc.configSnapshot || null,
@@ -666,9 +714,9 @@ export class ProjectService {
                 totalCostINR: calc.totalCostINR !== undefined ? Number(calc.totalCostINR) : undefined,
                 costPerSqFt: calc.costPerSqFt !== undefined ? Number(calc.costPerSqFt) : undefined,
                 steelTonnes: calc.steelTonnes !== undefined ? Number(calc.steelTonnes) : undefined,
-                cementBags: calc.cementBags !== undefined ? Number(calc.cementBags) : undefined,
+                cementBags: calc.cementBags !== undefined ? Math.round(Number(calc.cementBags)) : undefined,
                 concreteCuM: calc.concreteCuM !== undefined ? Number(calc.concreteCuM) : undefined,
-                timelineMonths: calc.timelineMonths !== undefined ? Number(calc.timelineMonths) : undefined,
+                timelineMonths: calc.timelineMonths !== undefined ? Math.round(Number(calc.timelineMonths)) : undefined,
                 budgetBreakdown: calc.budgetBreakdown || undefined,
                 quantitiesJson: calc.quantitiesJson || undefined,
                 configSnapshot: calc.configSnapshot || undefined,
@@ -698,6 +746,9 @@ export class ProjectService {
         };
       } catch (err: any) {
         console.warn('[ProjectService] Prisma project update failed:', err.message);
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to update project in database: ' + err.message);
+        }
       }
     }
 

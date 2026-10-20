@@ -48,13 +48,16 @@ export class PricingController {
 
       // NOTE: We intentionally DO NOT read or trust any `amount` or `price` from req.body.
       // The service authoritatively looks up the price in minor units based on tierCode.
-      const userId = (req as any).user?.id || null;
+      const sessionUser = (req as any).user;
+      const userId = sessionUser?.id || null;
+      const effectiveLeadEmail = sessionUser?.email ? sessionUser.email.toLowerCase() : leadEmail.trim().toLowerCase();
+      const effectiveLeadName = sessionUser?.name || leadName.trim();
 
       const result = await pricingService.initiatePurchase({
         tierCode,
-        leadName,
-        leadPhone,
-        leadEmail,
+        leadName: effectiveLeadName,
+        leadPhone: leadPhone.trim(),
+        leadEmail: effectiveLeadEmail,
         userId,
         projectId,
         projectSnapshot,

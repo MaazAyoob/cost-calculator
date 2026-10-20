@@ -33,6 +33,8 @@ export function useProjectAutoSave() {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isInitializingRef = useRef<boolean>(true);
   const lastSavedPayloadHashRef = useRef<string>('');
+  const isSavingRef = useRef<boolean>(false);
+  const pendingSaveRef = useRef<boolean>(false);
 
   // 1. Initial Load & Recovery on Mount
   useEffect(() => {
@@ -72,7 +74,11 @@ export function useProjectAutoSave() {
                 ...(mb.windowsDetail ? { windows: mb.windowsDetail } : {}),
                 ...(mb.flooringZones ? { flooringZones: mb.flooringZones } : {}),
                 ...(mb.wallCladding ? { wallCladding: mb.wallCladding } : {}),
-                ...(mb.electricalDetail ? { electrical: mb.electricalDetail } : {}),
+                ...(mb.electricalDetail
+                  ? { electrical: mb.electricalDetail }
+                  : mb.electrical
+                  ? { electrical: { conduit: 'Heavy-Duty ISI Marked PVC', wireTier: mb.electrical } }
+                  : {}),
                 ...(mb.bathroomFittings ? { bathroomFittings: mb.bathroomFittings } : {}),
                 ...(mb.paintingDetail ? { painting: mb.paintingDetail } : {}),
                 hasStartedSelection: true,
@@ -119,6 +125,7 @@ export function useProjectAutoSave() {
               electricalDetail: wizard.electrical,
               bathroomFittings: wizard.bathroomFittings,
               paintingDetail: wizard.painting,
+              electrical: wizard.electrical?.wireTier || wizard.materialBrands?.electrical,
             },
           },
         });
@@ -144,12 +151,17 @@ export function useProjectAutoSave() {
   }, [isAuthenticated, user?.email]);
 
   // 2. Debounced Auto-Save on Input / Calculation Changes
-  const triggerAutoSave = useCallback(async () => {
-    if (!isAuthenticated || !projectId || isInitializingRef.current) return;
+  const triggerAutoSave = useCallback(async (isRetry: boolean = false) => {
+    if (!isAuthenticated || isInitializingRef.current) return;
+
+    if (isSavingRef.current) {
+      pendingSaveRef.current = true;
+      return;
+    }
 
     const currentProjectName = useProjectStore.getState().project.name || `${wizard.houseType || 'Residential'} Construction Project`;
 
-    // Build payload
+    // Build payload including all step selections (including Step 8 Electrical & MEP)
     const payload = {
       name: currentProjectName,
       city: wizard.city || 'Bangalore',
@@ -175,6 +187,7 @@ export function useProjectAutoSave() {
           electricalDetail: wizard.electrical,
           bathroomFittings: wizard.bathroomFittings,
           paintingDetail: wizard.painting,
+          electrical: wizard.electrical?.wireTier || wizard.materialBrands?.electrical,
         },
       },
       calculation: {
@@ -190,25 +203,56 @@ export function useProjectAutoSave() {
       },
     };
 
-    // Fast change detection to avoid duplicate writes
+    // Fast change detection to avoid duplicate writes unless forced by retry
     const payloadHash = JSON.stringify(payload);
-    if (payloadHash === lastSavedPayloadHashRef.current) {
+    if (!isRetry && payloadHash === lastSavedPayloadHashRef.current && status === 'SAVED') {
       return;
     }
 
+    isSavingRef.current = true;
     setStatus('SAVING');
+
     try {
-      await updateProject(projectId, payload);
-      lastSavedPayloadHashRef.current = payloadHash;
-      setStatus('SAVED');
-      setLastSaved(new Date());
+      if (!projectId) {
+        // Project ID was not yet created or failed earlier; provision now
+        const created = await persistProject({
+          name: payload.name,
+          leadEmail: user?.email,
+          leadName: user?.name,
+          city: payload.city,
+          authority: payload.authority,
+          configuration: payload.configuration,
+          calculation: payload.calculation,
+        });
+        if (created) {
+          setProjectId(created.id);
+          setCachedProjectId(created.id);
+          lastSavedPayloadHashRef.current = payloadHash;
+          setStatus('SAVED');
+          setLastSaved(new Date());
+        }
+      } else {
+        await updateProject(projectId, payload);
+        lastSavedPayloadHashRef.current = payloadHash;
+        setStatus('SAVED');
+        setLastSaved(new Date());
+      }
     } catch (err) {
       console.warn('[AutoSave] Persistence attempt failed:', err);
       setStatus('ERROR');
+    } finally {
+      isSavingRef.current = false;
+      if (pendingSaveRef.current) {
+        pendingSaveRef.current = false;
+        triggerAutoSave();
+      }
     }
   }, [
     isAuthenticated,
     projectId,
+    status,
+    user?.email,
+    user?.name,
     wizard.city,
     wizard.authority,
     wizard.plotLength,
@@ -232,11 +276,17 @@ export function useProjectAutoSave() {
     wizard.painting,
     area.totalBUASqFt,
     budget.totalProjectCost,
+    budget.heads,
     quantities,
   ]);
 
+  const handleRetry = useCallback(() => {
+    lastSavedPayloadHashRef.current = '';
+    triggerAutoSave(true);
+  }, [triggerAutoSave]);
+
   useEffect(() => {
-    if (!isAuthenticated || isInitializingRef.current || !projectId) return;
+    if (!isAuthenticated || isInitializingRef.current) return;
 
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -251,12 +301,13 @@ export function useProjectAutoSave() {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [triggerAutoSave, isAuthenticated, projectId]);
+  }, [triggerAutoSave, isAuthenticated]);
 
   return {
     status,
     projectId,
     lastSaved,
-    triggerAutoSave,
+    triggerAutoSave: handleRetry,
+    retryAutoSave: handleRetry,
   };
 }

@@ -17,6 +17,19 @@ import {
 } from '../types/pricing';
 import { DEFAULT_PRICING_TIERS } from '../config/pricing';
 import { getApiUrl } from '../config/api';
+import { useCustomerAuthStore } from './useCustomerAuthStore';
+
+function getPricingAuthHeaders(includeJson: boolean = true): HeadersInit {
+  const headers: Record<string, string> = {};
+  if (includeJson) {
+    headers['Content-Type'] = 'application/json';
+  }
+  const token = useCustomerAuthStore.getState().token;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 interface PricingState {
   tiers: PricingTier[];
@@ -147,7 +160,9 @@ export const usePricingStore = create<PricingState>()(
           if (email) params.set('email', email);
           if (projectId) params.set('projectId', projectId);
 
-          const res = await fetch(getApiUrl(`/pricing/my/entitlements?${params.toString()}`));
+          const res = await fetch(getApiUrl(`/pricing/my/entitlements?${params.toString()}`), {
+            headers: getPricingAuthHeaders(false),
+          });
           if (res.ok) {
             const json = await res.json();
             if (json.success && Array.isArray(json.data)) {
@@ -164,7 +179,7 @@ export const usePricingStore = create<PricingState>()(
         try {
           const res = await fetch(getApiUrl('/pricing/purchases'), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getPricingAuthHeaders(true),
             body: JSON.stringify(payload),
           });
 
@@ -214,7 +229,7 @@ export const usePricingStore = create<PricingState>()(
         try {
           const res = await fetch(getApiUrl('/pricing/purchases/confirm'), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getPricingAuthHeaders(true),
             body: JSON.stringify({ purchaseId, gatewayPaymentId, gatewayOrderId, razorpaySignature }),
           });
 
@@ -241,7 +256,7 @@ export const usePricingStore = create<PricingState>()(
         try {
           const res = await fetch(getApiUrl('/cashfree/verify'), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getPricingAuthHeaders(true),
             body: JSON.stringify({ purchaseId, orderId, cfPaymentId }),
           });
 
@@ -272,7 +287,7 @@ export const usePricingStore = create<PricingState>()(
         try {
           await fetch(getApiUrl('/pricing/purchases/fail'), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getPricingAuthHeaders(true),
             body: JSON.stringify({ purchaseId, reason }),
           });
         } catch {}
