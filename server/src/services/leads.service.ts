@@ -296,7 +296,37 @@ export class LeadsService {
 
     if (this.prisma) {
       try {
-        const dbUsers = await (this.prisma as any).user.findMany();
+        let dbUsers: any[] = [];
+        try {
+          dbUsers = await (this.prisma as any).user.findMany({
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+              phoneVerifiedAt: true,
+            },
+          });
+        } catch {
+          try {
+            dbUsers = await (this.prisma as any).user.findMany({
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+              },
+            });
+          } catch {
+            const raw = await (this.prisma as any).$queryRawUnsafe(
+              `SELECT "id", "name", "email", "phone", "role"::text as "role" FROM "User";`
+            );
+            if (Array.isArray(raw)) dbUsers = raw;
+          }
+        }
+
         for (const u of dbUsers) {
           allUsers.push(u);
           if (u.phone) {
@@ -305,7 +335,7 @@ export class LeadsService {
               verifiedUsersByPhone.set(norm.e164, {
                 id: u.id,
                 email: u.email,
-                phoneVerifiedAt: u.phoneVerifiedAt,
+                phoneVerifiedAt: u.phoneVerifiedAt ? new Date(u.phoneVerifiedAt) : null,
               });
             }
           }

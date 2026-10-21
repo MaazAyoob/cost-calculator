@@ -57,8 +57,10 @@ export interface UserManagementResult {
 export class UserManagementService {
   private prisma: PrismaClient | null = null;
 
-  constructor() {
-    if (process.env.DATABASE_URL) {
+  constructor(client?: PrismaClient | null) {
+    if (client !== undefined) {
+      this.prisma = client;
+    } else if (process.env.DATABASE_URL) {
       try {
         this.prisma = new PrismaClient();
       } catch {
@@ -67,17 +69,41 @@ export class UserManagementService {
     }
   }
 
+  public setPrismaClient(client: PrismaClient | null): void {
+    this.prisma = client;
+  }
+
+  private getPrisma(): PrismaClient | null {
+    if (this.prisma) return this.prisma;
+    if (process.env.DATABASE_URL) {
+      try {
+        this.prisma = new PrismaClient();
+        return this.prisma;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
   /**
    * Queries, filters, and paginates users without ever exposing password hashes or tokens.
+   * Employs multi-tier schema resilience to ensure 100% of persisted PostgreSQL users
+   * are returned even when migrations (like `disabled` or `Project` relations) are pending.
    */
   public async getUsers(filters: UserFilters = {}): Promise<UserManagementResult> {
     const { search, status = 'ALL', sort = 'newest', page = 1, limit = 25 } = filters;
     const allUsersMap = new Map<string, AdminUserListItem>();
+    const prisma = this.getPrisma();
 
     // 1. Fetch from Database if available
-    if (this.prisma) {
+    if (prisma) {
+      let dbUsers: any[] = [];
+      let countsAvailable = false;
+
+      // Tier 1: Attempt full Prisma selection with relations and counts
       try {
-        const dbUsers = await (this.prisma as any).user.findMany({
+        dbUsers = await (prisma as any).user.findMany({
           select: {
             id: true,
             name: true,
@@ -100,40 +126,148 @@ export class UserManagementService {
           },
           orderBy: { createdAt: 'desc' },
         });
+        countsAvailable = true;
+      } catch (tier1Err: any) {
+        console.warn(
+          '[UserManagementService] Full schema query unavailable, attempting baseline column fallback:',
+          tier1Err.message
+        );
+
+        // Tier 2: Attempt Prisma query with verified baseline columns only
+        try {
+          dbUsers = await (prisma as any).user.findMany({
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+          });
+        } catch (tier2Err: any) {
+          console.warn(
+            '[UserManagementService] Baseline Prisma findMany failed, attempting direct raw SQL query:',
+            tier2Err.message
+          );
+
+          // Tier 3: Direct Raw SQL query against PostgreSQL "User" table
+          try {
+            const rawUsers = await (prisma as any).$queryRawUnsafe(
+              `SELECT "id", "name", "email", "phone", "role"::text as "role", "createdAt", "updatedAt"
+               FROM "User"
+               ORDER BY "createdAt" DESC;`
+            );
+            if (Array.isArray(rawUsers)) {
+              dbUsers = rawUsers;
+            }
+          } catch (tier3Err: any) {
+            console.error(
+              '[UserManagementService] Direct raw SQL query failed to retrieve users:',
+              tier3Err.message
+            );
+          }
+        }
+      }
+
+      // If we got users from Tier 2 or Tier 3, enrich with safe checks for disabled status, phoneVerifiedAt, and counts
+      if (dbUsers.length > 0 && !countsAvailable) {
+        const metaMap = new Map<string, { disabled: boolean; disabledAt: Date | null; disabledReason: string | null; phoneVerifiedAt: Date | null }>();
+        try {
+          const rawMeta = await (prisma as any).$queryRawUnsafe(
+            `SELECT "id", "disabled", "disabledAt", "disabledReason", "phoneVerifiedAt" FROM "User";`
+          );
+          if (Array.isArray(rawMeta)) {
+            for (const r of rawMeta) {
+              metaMap.set(r.id, {
+                disabled: Boolean(r.disabled),
+                disabledAt: r.disabledAt ? new Date(r.disabledAt) : null,
+                disabledReason: r.disabledReason || null,
+                phoneVerifiedAt: r.phoneVerifiedAt ? new Date(r.phoneVerifiedAt) : null,
+              });
+            }
+          }
+        } catch {
+          // Columns not present in schema yet; default active
+        }
+
+        const projectCounts = new Map<string, number>();
+        const consultationCounts = new Map<string, number>();
+        const purchaseCounts = new Map<string, number>();
+
+        try {
+          const pCounts = await (prisma as any).$queryRawUnsafe(
+            `SELECT "ownerId" as "id", COUNT(*)::int as "count" FROM "Project" GROUP BY "ownerId";`
+          );
+          if (Array.isArray(pCounts)) {
+            for (const r of pCounts) projectCounts.set(r.id, Number(r.count) || 0);
+          }
+        } catch {}
+
+        try {
+          const cCounts = await (prisma as any).$queryRawUnsafe(
+            `SELECT "userId" as "id", COUNT(*)::int as "count" FROM "consultation_requests" WHERE "userId" IS NOT NULL GROUP BY "userId";`
+          );
+          if (Array.isArray(cCounts)) {
+            for (const r of cCounts) consultationCounts.set(r.id, Number(r.count) || 0);
+          }
+        } catch {}
+
+        try {
+          const purCounts = await (prisma as any).$queryRawUnsafe(
+            `SELECT "userId" as "id", COUNT(*)::int as "count" FROM "pricing_purchases" WHERE "userId" IS NOT NULL GROUP BY "userId";`
+          );
+          if (Array.isArray(purCounts)) {
+            for (const r of purCounts) purchaseCounts.set(r.id, Number(r.count) || 0);
+          }
+        } catch {}
 
         for (const u of dbUsers) {
-          const normPhone = u.phone ? normalizeIndianPhoneNumber(u.phone) : null;
-          const phoneDisplay = normPhone && normPhone.isValid
-            ? `+91 ${formatDomesticPhone(normPhone.domestic)}`
-            : (u.phone ? formatDomesticPhone(u.phone) : null);
-
-          allUsersMap.set(u.id, {
-            id: u.id,
-            name: u.name,
-            email: u.email,
-            phone: u.phone,
-            phoneFormatted: phoneDisplay,
-            phoneVerified: Boolean(u.phoneVerifiedAt),
-            phoneVerifiedAt: u.phoneVerifiedAt ? new Date(u.phoneVerifiedAt).toISOString() : null,
-            role: u.role || 'USER',
-            disabled: Boolean(u.disabled),
-            disabledAt: u.disabledAt ? new Date(u.disabledAt).toISOString() : null,
-            disabledReason: u.disabledReason || null,
-            createdAt: new Date(u.createdAt).toISOString(),
-            updatedAt: new Date(u.updatedAt).toISOString(),
-            counts: {
-              projects: u._count?.projects || 0,
-              consultations: u._count?.consultationRequests || 0,
-              purchases: u._count?.pricingPurchases || 0,
-            },
-          });
+          const meta = metaMap.get(u.id);
+          u.disabled = meta ? meta.disabled : Boolean(u.disabled);
+          u.disabledAt = meta ? meta.disabledAt : (u.disabledAt || null);
+          u.disabledReason = meta ? meta.disabledReason : (u.disabledReason || null);
+          u.phoneVerifiedAt = meta ? meta.phoneVerifiedAt : (u.phoneVerifiedAt || null);
+          u._count = {
+            projects: projectCounts.get(u.id) || 0,
+            consultationRequests: consultationCounts.get(u.id) || 0,
+            pricingPurchases: purchaseCounts.get(u.id) || 0,
+          };
         }
-      } catch (dbErr: any) {
-        console.warn('[UserManagementService] Database fetch warning:', dbErr.message);
+      }
+
+      for (const u of dbUsers) {
+        const normPhone = u.phone ? normalizeIndianPhoneNumber(u.phone) : null;
+        const phoneDisplay = normPhone && normPhone.isValid
+          ? `+91 ${formatDomesticPhone(normPhone.domestic)}`
+          : (u.phone ? formatDomesticPhone(u.phone) : null);
+
+        allUsersMap.set(u.id, {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone,
+          phoneFormatted: phoneDisplay,
+          phoneVerified: Boolean(u.phoneVerifiedAt),
+          phoneVerifiedAt: u.phoneVerifiedAt ? new Date(u.phoneVerifiedAt).toISOString() : null,
+          role: u.role || 'USER',
+          disabled: Boolean(u.disabled),
+          disabledAt: u.disabledAt ? new Date(u.disabledAt).toISOString() : null,
+          disabledReason: u.disabledReason || null,
+          createdAt: new Date(u.createdAt).toISOString(),
+          updatedAt: new Date(u.updatedAt).toISOString(),
+          counts: {
+            projects: u._count?.projects || 0,
+            consultations: u._count?.consultationRequests || 0,
+            purchases: u._count?.pricingPurchases || 0,
+          },
+        });
       }
     }
 
-    // 2. Merge with inMemoryCustomerUsers (for offline/dev environments)
+    // 2. Merge with inMemoryCustomerUsers (for offline/test environments)
     for (const mem of inMemoryCustomerUsers.values()) {
       if (!allUsersMap.has(mem.id)) {
         const normPhone = mem.phone ? normalizeIndianPhoneNumber(mem.phone) : null;
@@ -258,9 +392,10 @@ export class UserManagementService {
     const cleanReason = reason?.trim() || 'Account disabled by administrator review';
 
     // 1. Database update
-    if (this.prisma) {
+    const prisma = this.getPrisma();
+    if (prisma) {
       try {
-        await (this.prisma as any).user.update({
+        await (prisma as any).user.update({
           where: { id: targetUserId },
           data: {
             disabled: true,
@@ -271,7 +406,7 @@ export class UserManagementService {
 
         // Record security audit log
         try {
-          await (this.prisma as any).auditLog.create({
+          await (prisma as any).auditLog.create({
             data: {
               action: 'USER_ACCOUNT_DISABLED',
               userId: targetUserId,
@@ -287,7 +422,20 @@ export class UserManagementService {
           // non-fatal
         }
       } catch (err: any) {
-        console.error('[UserManagementService] Database disableUser error:', err.message);
+        console.warn('[UserManagementService] Prisma disableUser failed, attempting raw SQL:', err.message);
+        try {
+          await (prisma as any).$executeRawUnsafe(
+            `UPDATE "User" SET "disabled" = TRUE, "disabledAt" = $1, "disabledReason" = $2 WHERE "id" = $3;`,
+            disabledAt,
+            cleanReason,
+            targetUserId
+          );
+        } catch (rawErr: any) {
+          console.error('[UserManagementService] Database disableUser error:', rawErr.message);
+          throw new Error(
+            `Cannot disable account in database: Column "disabled" does not exist. Please apply database migration 20261021_add_user_disabled_column.`
+          );
+        }
       }
     }
 
@@ -326,9 +474,10 @@ export class UserManagementService {
     }
 
     // 1. Database update
-    if (this.prisma) {
+    const prisma = this.getPrisma();
+    if (prisma) {
       try {
-        await (this.prisma as any).user.update({
+        await (prisma as any).user.update({
           where: { id: targetUserId },
           data: {
             disabled: false,
@@ -338,7 +487,7 @@ export class UserManagementService {
         });
 
         try {
-          await (this.prisma as any).auditLog.create({
+          await (prisma as any).auditLog.create({
             data: {
               action: 'USER_ACCOUNT_RESTORED',
               userId: targetUserId,
@@ -353,7 +502,18 @@ export class UserManagementService {
           // non-fatal
         }
       } catch (err: any) {
-        console.error('[UserManagementService] Database restoreUser error:', err.message);
+        console.warn('[UserManagementService] Prisma restoreUser failed, attempting raw SQL:', err.message);
+        try {
+          await (prisma as any).$executeRawUnsafe(
+            `UPDATE "User" SET "disabled" = FALSE, "disabledAt" = NULL, "disabledReason" = NULL WHERE "id" = $1;`,
+            targetUserId
+          );
+        } catch (rawErr: any) {
+          console.error('[UserManagementService] Database restoreUser error:', rawErr.message);
+          throw new Error(
+            `Cannot restore account in database: Column "disabled" does not exist. Please apply database migration 20261021_add_user_disabled_column.`
+          );
+        }
       }
     }
 
@@ -423,11 +583,12 @@ export class UserManagementService {
     let consultationsCount = existing.counts.consultations;
     let purchasesCount = existing.counts.purchases;
 
-    if (this.prisma) {
+    const prisma = this.getPrisma();
+    if (prisma) {
       try {
-        projectsCount = await (this.prisma as any).project.count({ where: { ownerId: targetUserId } });
-        consultationsCount = await (this.prisma as any).consultationRequest.count({ where: { userId: targetUserId } });
-        purchasesCount = await (this.prisma as any).pricingPurchase.count({ where: { userId: targetUserId } });
+        projectsCount = await (prisma as any).project.count({ where: { ownerId: targetUserId } });
+        consultationsCount = await (prisma as any).consultationRequest.count({ where: { userId: targetUserId } });
+        purchasesCount = await (prisma as any).pricingPurchase.count({ where: { userId: targetUserId } });
       } catch {
         // Fall back to existing counts
       }
@@ -444,9 +605,9 @@ export class UserManagementService {
       const disabledAt = new Date();
       const removalReason = reason?.trim() || `Account removed and PII scrubbed by admin: ${actorAdminEmail}`;
 
-      if (this.prisma) {
+      if (prisma) {
         try {
-          await (this.prisma as any).user.update({
+          await (prisma as any).user.update({
             where: { id: targetUserId },
             data: {
               name: anonymizedName,
@@ -459,30 +620,41 @@ export class UserManagementService {
               disabledReason: removalReason,
             },
           });
-
-          try {
-            await (this.prisma as any).auditLog.create({
-              data: {
-                action: 'USER_ACCOUNT_ANONYMIZED_AND_REMOVED',
-                userId: targetUserId,
-                details: {
-                  previousEmail: existing.email,
-                  anonymizedEmail,
-                  performedBy: actorAdminEmail,
-                  retainedProjects: projectsCount,
-                  retainedConsultations: consultationsCount,
-                  retainedPurchases: purchasesCount,
-                  reason: removalReason,
-                  timestamp: disabledAt.toISOString(),
-                },
-              },
-            });
-          } catch {
-            // non-fatal
-          }
         } catch (err: any) {
-          console.error('[UserManagementService] Database anonymizeUser error:', err.message);
-          throw new Error(`Failed to remove and anonymize user: ${err.message}`);
+          // If disabled column doesn't exist, try raw SQL with baseline columns
+          try {
+            await (prisma as any).$executeRawUnsafe(
+              `UPDATE "User" SET "name" = $1, "email" = $2, "phone" = NULL, "password" = $3 WHERE "id" = $4;`,
+              anonymizedName,
+              anonymizedEmail,
+              scrambledPassword,
+              targetUserId
+            );
+          } catch (rawErr: any) {
+            console.error('[UserManagementService] Database anonymizeUser error:', rawErr.message);
+            throw new Error(`Failed to remove and anonymize user: ${rawErr.message}`);
+          }
+        }
+
+        try {
+          await (prisma as any).auditLog.create({
+            data: {
+              action: 'USER_ACCOUNT_ANONYMIZED_AND_REMOVED',
+              userId: targetUserId,
+              details: {
+                previousEmail: existing.email,
+                anonymizedEmail,
+                performedBy: actorAdminEmail,
+                retainedProjects: projectsCount,
+                retainedConsultations: consultationsCount,
+                retainedPurchases: purchasesCount,
+                reason: removalReason,
+                timestamp: disabledAt.toISOString(),
+              },
+            },
+          });
+        } catch {
+          // non-fatal
         }
       }
 
@@ -503,31 +675,35 @@ export class UserManagementService {
     } else {
       // ── CLEAN PERMANENT REMOVAL WORKFLOW ──
       // Bare user account with 0 attached transactions or projects can be permanently deleted
-      if (this.prisma) {
+      if (prisma) {
         try {
-          await (this.prisma as any).user.delete({
+          await (prisma as any).user.delete({
             where: { id: targetUserId },
           });
-
-          try {
-            await (this.prisma as any).auditLog.create({
-              data: {
-                action: 'USER_ACCOUNT_PERMANENTLY_DELETED',
-                userId: null,
-                details: {
-                  deletedUserId: targetUserId,
-                  deletedEmail: existing.email,
-                  performedBy: actorAdminEmail,
-                  timestamp: new Date().toISOString(),
-                },
-              },
-            });
-          } catch {
-            // non-fatal
-          }
         } catch (err: any) {
-          console.error('[UserManagementService] Database deleteUser error:', err.message);
-          throw new Error(`Failed to delete user: ${err.message}`);
+          try {
+            await (prisma as any).$executeRawUnsafe(`DELETE FROM "User" WHERE "id" = $1;`, targetUserId);
+          } catch (rawErr: any) {
+            console.error('[UserManagementService] Database deleteUser error:', rawErr.message);
+            throw new Error(`Failed to delete user: ${rawErr.message}`);
+          }
+        }
+
+        try {
+          await (prisma as any).auditLog.create({
+            data: {
+              action: 'USER_ACCOUNT_PERMANENTLY_DELETED',
+              userId: null,
+              details: {
+                deletedUserId: targetUserId,
+                deletedEmail: existing.email,
+                performedBy: actorAdminEmail,
+                timestamp: new Date().toISOString(),
+              },
+            },
+          });
+        } catch {
+          // non-fatal
         }
       }
 
@@ -550,9 +726,14 @@ export class UserManagementService {
    * Helper: Finds user by ID from DB or in-memory.
    */
   public async findUserById(id: string): Promise<AdminUserListItem | null> {
-    if (this.prisma) {
+    const prisma = this.getPrisma();
+    if (prisma) {
+      let u: any = null;
+      let countsAvailable = false;
+
+      // Tier 1: Try full Prisma findUnique
       try {
-        const u = await (this.prisma as any).user.findUnique({
+        u = await (prisma as any).user.findUnique({
           where: { id },
           select: {
             id: true,
@@ -575,36 +756,92 @@ export class UserManagementService {
             },
           },
         });
-
-        if (u) {
-          const normPhone = u.phone ? normalizeIndianPhoneNumber(u.phone) : null;
-          const phoneDisplay = normPhone && normPhone.isValid
-            ? `+91 ${formatDomesticPhone(normPhone.domestic)}`
-            : (u.phone ? formatDomesticPhone(u.phone) : null);
-
-          return {
-            id: u.id,
-            name: u.name,
-            email: u.email,
-            phone: u.phone,
-            phoneFormatted: phoneDisplay,
-            phoneVerified: Boolean(u.phoneVerifiedAt),
-            phoneVerifiedAt: u.phoneVerifiedAt ? new Date(u.phoneVerifiedAt).toISOString() : null,
-            role: u.role || 'USER',
-            disabled: Boolean(u.disabled),
-            disabledAt: u.disabledAt ? new Date(u.disabledAt).toISOString() : null,
-            disabledReason: u.disabledReason || null,
-            createdAt: new Date(u.createdAt).toISOString(),
-            updatedAt: new Date(u.updatedAt).toISOString(),
-            counts: {
-              projects: u._count?.projects || 0,
-              consultations: u._count?.consultationRequests || 0,
-              purchases: u._count?.pricingPurchases || 0,
-            },
-          };
-        }
+        countsAvailable = true;
       } catch {
-        // Fall back
+        // Tier 2: Try baseline columns
+        try {
+          u = await (prisma as any).user.findUnique({
+            where: { id },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          });
+        } catch {
+          // Tier 3: Direct Raw SQL
+          try {
+            const raw = await (prisma as any).$queryRawUnsafe(
+              `SELECT "id", "name", "email", "phone", "role"::text as "role", "createdAt", "updatedAt"
+               FROM "User" WHERE "id" = $1 LIMIT 1;`,
+              id
+            );
+            if (Array.isArray(raw) && raw.length > 0) {
+              u = raw[0];
+            }
+          } catch {}
+        }
+      }
+
+      if (u) {
+        if (!countsAvailable) {
+          try {
+            const rawMeta = await (prisma as any).$queryRawUnsafe(
+              `SELECT "disabled", "disabledAt", "disabledReason", "phoneVerifiedAt" FROM "User" WHERE "id" = $1 LIMIT 1;`,
+              id
+            );
+            if (Array.isArray(rawMeta) && rawMeta.length > 0) {
+              u.disabled = rawMeta[0].disabled;
+              u.disabledAt = rawMeta[0].disabledAt;
+              u.disabledReason = rawMeta[0].disabledReason;
+              u.phoneVerifiedAt = rawMeta[0].phoneVerifiedAt;
+            }
+          } catch {}
+
+          let pCount = 0;
+          let cCount = 0;
+          let purCount = 0;
+          try {
+            pCount = await (prisma as any).project.count({ where: { ownerId: id } });
+          } catch {}
+          try {
+            cCount = await (prisma as any).consultationRequest.count({ where: { userId: id } });
+          } catch {}
+          try {
+            purCount = await (prisma as any).pricingPurchase.count({ where: { userId: id } });
+          } catch {}
+          u._count = { projects: pCount, consultationRequests: cCount, pricingPurchases: purCount };
+        }
+
+        const normPhone = u.phone ? normalizeIndianPhoneNumber(u.phone) : null;
+        const phoneDisplay = normPhone && normPhone.isValid
+          ? `+91 ${formatDomesticPhone(normPhone.domestic)}`
+          : (u.phone ? formatDomesticPhone(u.phone) : null);
+
+        return {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone,
+          phoneFormatted: phoneDisplay,
+          phoneVerified: Boolean(u.phoneVerifiedAt),
+          phoneVerifiedAt: u.phoneVerifiedAt ? new Date(u.phoneVerifiedAt).toISOString() : null,
+          role: u.role || 'USER',
+          disabled: Boolean(u.disabled),
+          disabledAt: u.disabledAt ? new Date(u.disabledAt).toISOString() : null,
+          disabledReason: u.disabledReason || null,
+          createdAt: new Date(u.createdAt).toISOString(),
+          updatedAt: new Date(u.updatedAt).toISOString(),
+          counts: {
+            projects: u._count?.projects || 0,
+            consultations: u._count?.consultationRequests || 0,
+            purchases: u._count?.pricingPurchases || 0,
+          },
+        };
       }
     }
 

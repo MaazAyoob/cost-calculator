@@ -10,10 +10,16 @@ import { otpService } from '../services/otp.service';
 import { normalizeIndianPhoneNumber } from '../utils/phone';
 
 let prisma: PrismaClient | null = null;
-try {
-  prisma = new PrismaClient();
-} catch (e) {
-  // Graceful fallback
+if (process.env.DATABASE_URL) {
+  try {
+    prisma = new PrismaClient();
+  } catch (e) {
+    prisma = null;
+  }
+}
+
+export function setAuthPrismaClient(client: PrismaClient | null): void {
+  prisma = client;
 }
 
 // In-memory customer users storage fallback for local/test environments
@@ -111,6 +117,7 @@ export async function checkEmail(req: Request, res: Response) {
     try {
       const existing = await (prisma as any).user.findFirst({
         where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+        select: { id: true },
       });
       if (existing) {
         return res.json({
@@ -119,7 +126,20 @@ export async function checkEmail(req: Request, res: Response) {
         });
       }
     } catch {
-      // Fall through to in-memory check
+      try {
+        const raw = await (prisma as any).$queryRawUnsafe(
+          `SELECT "id" FROM "User" WHERE lower("email") = lower($1) LIMIT 1;`,
+          normalizedEmail
+        );
+        if (Array.isArray(raw) && raw.length > 0) {
+          return res.json({
+            available: false,
+            message: 'An account with this email address already exists. Please log in.',
+          });
+        }
+      } catch {
+        // Fall through to in-memory check
+      }
     }
   }
 
@@ -468,16 +488,29 @@ export async function register(req: Request, res: Response) {
             createErr.message?.includes('disabled')
           ) {
             console.warn('[AuthController] Attempting resilient raw SQL user creation due to schema discrepancy:', createErr.message);
-            await (prisma as any).$executeRawUnsafe(
-              `INSERT INTO "User" ("id", "name", "email", "phone", "role", "password", "createdAt", "updatedAt")
-               VALUES ($1, $2, $3, $4, 'USER'::"Role", $5, NOW(), NOW())
-               ON CONFLICT ("email") DO NOTHING;`,
-              userId,
-              trimmedName,
-              normalizedEmail,
-              normPhone.e164,
-              hashedPassword
-            );
+            try {
+              await (prisma as any).$executeRawUnsafe(
+                `INSERT INTO "User" ("id", "name", "email", "phone", "role", "password", "createdAt", "updatedAt")
+                 VALUES ($1, $2, $3, $4, 'USER'::"Role", $5, NOW(), NOW())
+                 ON CONFLICT ("email") DO NOTHING;`,
+                userId,
+                trimmedName,
+                normalizedEmail,
+                normPhone.e164,
+                hashedPassword
+              );
+            } catch {
+              await (prisma as any).$executeRawUnsafe(
+                `INSERT INTO "User" ("id", "name", "email", "phone", "role", "password", "createdAt", "updatedAt")
+                 VALUES ($1, $2, $3, $4, 'USER', $5, NOW(), NOW())
+                 ON CONFLICT ("email") DO NOTHING;`,
+                userId,
+                trimmedName,
+                normalizedEmail,
+                normPhone.e164,
+                hashedPassword
+              );
+            }
 
             const resolved = await (prisma as any).$queryRawUnsafe(
               `SELECT "id", "name", "email", "phone", "role" FROM "User" WHERE lower("email") = lower($1) LIMIT 1;`,
@@ -533,14 +566,38 @@ export async function register(req: Request, res: Response) {
           },
         });
       } catch (err: any) {
-        if (err.code === 'P2002') {
+        if (
+          err.code === 'P2002' ||
+          err.message?.includes('duplicate key') ||
+          err.message?.includes('already exists')
+        ) {
           return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
         }
-        console.warn('[AuthController] Database register failed, falling back to memory:', err.message);
+        let allowOfflineFallback = false;
+        if (
+          process.env.NODE_ENV !== 'production' &&
+          (err.message?.includes('Environment variable not found') ||
+           err.message?.includes("Can't reach database server") ||
+           err.code === 'P1001')
+        ) {
+          console.warn('[AuthController] Database unreachable in non-production, using offline test store:', err.message);
+          allowOfflineFallback = true;
+        } else {
+          console.error('[AuthController] Database register failed:', err.message);
+          // CRITICAL: When database is configured, never silently fall back to ephemeral memory
+          // and report success. The user account must be durably persisted.
+          return res.status(500).json({
+            error: 'DURABLE_STORAGE_WRITE_FAILED: Failed to create customer account in database. Please try again.',
+          });
+        }
+
+        if (!allowOfflineFallback) {
+          return;
+        }
       }
     }
 
-    // 2. In-memory registration fallback (case-insensitive check)
+    // 2. In-memory registration fallback (strictly for unit tests / offline environments where DATABASE_URL is not configured)
     if (findInMemoryUserByEmail(normalizedEmail)) {
       return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
     }
