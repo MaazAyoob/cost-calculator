@@ -487,7 +487,7 @@ export class PricingService {
             snapshot: payload.projectSnapshot,
           });
           resolvedProjectId = persisted.id;
-          if (!resolvedUserId && persisted.ownerId) {
+          if (persisted.ownerId) {
             resolvedUserId = persisted.ownerId;
           }
         } else {
@@ -529,7 +529,7 @@ export class PricingService {
         snapshot: payload.projectSnapshot,
       });
       resolvedProjectId = persisted.id;
-      if (!resolvedUserId && persisted.ownerId) {
+      if (persisted.ownerId) {
         resolvedUserId = persisted.ownerId;
       }
     }
@@ -601,11 +601,43 @@ export class PricingService {
 
     if (this.prisma && this.dbConnected) {
       try {
+        // Defensive check: Ensure userId and projectId reference valid PostgreSQL records to prevent foreign key aborts
+        let safeUserId = purchase.userId;
+        if (safeUserId) {
+          const userExists = await (this.prisma as any).user.findUnique({
+            where: { id: safeUserId },
+            select: { id: true },
+          });
+          if (!userExists) {
+            // Check if user exists by email
+            const userByEmail = await (this.prisma as any).user.findFirst({
+              where: { email: { equals: purchase.leadEmail, mode: 'insensitive' } },
+              select: { id: true },
+            });
+            safeUserId = userByEmail ? userByEmail.id : null;
+          }
+        }
+
+        let safeProjectId = purchase.projectId;
+        if (safeProjectId) {
+          try {
+            const projectExists = await (this.prisma as any).project.findUnique({
+              where: { id: safeProjectId },
+              select: { id: true },
+            });
+            if (!projectExists) {
+              safeProjectId = null;
+            }
+          } catch {
+            safeProjectId = null;
+          }
+        }
+
         await (this.prisma as any).pricingPurchase.create({
           data: {
             id: purchase.id,
             publicReference: purchase.publicReference,
-            userId: purchase.userId,
+            userId: safeUserId,
             tierId: purchase.tierId,
             tierCodeSnapshot: purchase.tierCodeSnapshot,
             tierNameSnapshot: purchase.tierNameSnapshot,
@@ -618,10 +650,12 @@ export class PricingService {
             leadName: purchase.leadName,
             leadPhone: purchase.leadPhone,
             leadEmail: purchase.leadEmail,
-            projectId: purchase.projectId,
+            projectId: safeProjectId,
             projectSnapshot: purchase.projectSnapshot,
           },
         });
+        purchase.userId = safeUserId;
+        purchase.projectId = safeProjectId;
       } catch (err: any) {
         if (process.env.NODE_ENV === 'production') {
           throw new Error('DURABLE_STORAGE_WRITE_FAILED: Failed to record purchase in database: ' + err.message);

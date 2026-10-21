@@ -252,10 +252,29 @@ export async function login(req: Request, res: Response) {
   // 3. Database user lookup if available
   if (prisma && (prisma as any).user) {
     try {
-      const dbUser = await (prisma as any).user.findFirst({
-        where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
-        select: { id: true, name: true, email: true, phone: true, role: true, password: true, disabled: true },
-      });
+      let dbUser: any = null;
+      try {
+        dbUser = await (prisma as any).user.findFirst({
+          where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+          select: { id: true, name: true, email: true, phone: true, role: true, password: true, disabled: true },
+        });
+      } catch (colErr: any) {
+        // If column disabled does not exist in production database, retry without selecting disabled
+        if (
+          colErr.message?.includes('disabled') ||
+          colErr.message?.includes('does not exist') ||
+          colErr.code === 'P2022'
+        ) {
+          console.warn('[AuthController] Database login query falling back to baseline columns due to schema discrepancy:', colErr.message);
+          dbUser = await (prisma as any).user.findFirst({
+            where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+            select: { id: true, name: true, email: true, phone: true, role: true, password: true },
+          });
+        } else {
+          throw colErr;
+        }
+      }
+
       if (dbUser && dbUser.password) {
         if (dbUser.disabled) {
           return res.status(403).json({
@@ -285,7 +304,8 @@ export async function login(req: Request, res: Response) {
           });
         }
       }
-    } catch {
+    } catch (err: any) {
+      console.warn('[AuthController] Database user lookup failed, falling through to memory check:', err.message);
       // Fall through to in-memory check
     }
   }
@@ -423,17 +443,56 @@ export async function register(req: Request, res: Response) {
           return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
         }
 
-        const created = await (prisma as any).user.create({
-          data: {
-            id: userId,
-            email: normalizedEmail,
-            name: trimmedName,
-            phone: normPhone.e164,
-            password: hashedPassword,
-            role: 'USER',
-          },
-          select: { id: true, name: true, email: true, phone: true, role: true },
-        });
+        let created: any = null;
+        try {
+          created = await (prisma as any).user.create({
+            data: {
+              id: userId,
+              email: normalizedEmail,
+              name: trimmedName,
+              phone: normPhone.e164,
+              password: hashedPassword,
+              role: 'USER',
+            },
+            select: { id: true, name: true, email: true, phone: true, role: true },
+          });
+        } catch (createErr: any) {
+          if (createErr.code === 'P2002') {
+            return res.status(409).json({ error: 'An account with this email address already exists. Please log in.' });
+          }
+          // If creation failed due to missing columns (e.g. column disabled does not exist in unmigrated DB),
+          // perform resilient raw SQL insertion directly into PostgreSQL "User"
+          if (
+            createErr.code === 'P2022' ||
+            createErr.message?.includes('does not exist') ||
+            createErr.message?.includes('disabled')
+          ) {
+            console.warn('[AuthController] Attempting resilient raw SQL user creation due to schema discrepancy:', createErr.message);
+            await (prisma as any).$executeRawUnsafe(
+              `INSERT INTO "User" ("id", "name", "email", "phone", "role", "password", "createdAt", "updatedAt")
+               VALUES ($1, $2, $3, $4, 'USER'::"Role", $5, NOW(), NOW())
+               ON CONFLICT ("email") DO NOTHING;`,
+              userId,
+              trimmedName,
+              normalizedEmail,
+              normPhone.e164,
+              hashedPassword
+            );
+
+            const resolved = await (prisma as any).$queryRawUnsafe(
+              `SELECT "id", "name", "email", "phone", "role" FROM "User" WHERE lower("email") = lower($1) LIMIT 1;`,
+              normalizedEmail
+            );
+
+            if (Array.isArray(resolved) && resolved.length > 0) {
+              created = resolved[0];
+            } else {
+              throw createErr;
+            }
+          } else {
+            throw createErr;
+          }
+        }
 
         // Historical guest order reconciliation
         try {
