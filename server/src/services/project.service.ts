@@ -194,6 +194,40 @@ export class ProjectService {
               return { id: existing.id, name: existing.name, email: existing.email };
             }
           }
+
+          // Resilient fallback: If creation failed due to missing columns (e.g. column disabled does not exist in un-migrated DB),
+          // insert using raw SQL with only verified baseline columns
+          if (
+            createErr.code === 'P2022' ||
+            createErr.message?.includes('does not exist') ||
+            createErr.message?.includes('column disabled')
+          ) {
+            try {
+              console.warn('[ProjectService] Schema mismatch detected during user creation; attempting baseline column SQL insert:', createErr.message);
+              await (this.prisma as any).$executeRawUnsafe(
+                `INSERT INTO "User" ("id", "name", "email", "phone", "role", "password", "createdAt", "updatedAt")
+                 VALUES ($1, $2, $3, $4, 'USER'::"Role", $5, NOW(), NOW())
+                 ON CONFLICT ("email") DO NOTHING;`,
+                newUserId,
+                params.name?.trim() || 'Homeowner',
+                normalizedEmail,
+                params.phone?.trim() || null,
+                passwordHash
+              );
+
+              const resolved = await (this.prisma as any).$queryRawUnsafe(
+                `SELECT "id", "name", "email" FROM "User" WHERE lower("email") = lower($1) LIMIT 1;`,
+                normalizedEmail
+              );
+
+              if (Array.isArray(resolved) && resolved.length > 0) {
+                return { id: resolved[0].id, name: resolved[0].name, email: resolved[0].email };
+              }
+            } catch (rawFallbackErr: any) {
+              console.error('[ProjectService] Raw SQL baseline user insert fallback failed:', rawFallbackErr.message);
+            }
+          }
+
           throw createErr;
         }
       } catch (err: any) {

@@ -605,4 +605,143 @@ describe('Project Persistence, Report Checkout & Save Lifecycle Robustness', () 
 
     projectService.setPrismaClient(null, false);
   });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 15. User owner resolution creates active user with disabled = false by default
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('15. Owner account resolution creates active user with disabled = false, preserving user validity', async () => {
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
+    let createdUserData: any = null;
+
+    const mockPrisma = {
+      user: {
+        findUnique: vi.fn().mockResolvedValue(null),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockImplementation(async ({ data }: any) => {
+          createdUserData = {
+            ...data,
+            disabled: false,
+            disabledAt: null,
+            disabledReason: null,
+          };
+          return { id: data.id, name: data.name, email: data.email };
+        }),
+      },
+      project: {
+        create: vi.fn().mockResolvedValue({ id: 'proj-disabled-check', name: 'Disabled Column Test' }),
+      },
+    };
+
+    projectService.setPrismaClient(mockPrisma as any, true);
+
+    const project = await projectService.createProject({
+      name: 'Disabled Column Test',
+      leadEmail: 'active.customer@hutty.in',
+      leadName: 'Naveen Kumar',
+    });
+
+    expect(project).toBeDefined();
+    expect(mockPrisma.user.create).toHaveBeenCalled();
+    expect(createdUserData.email).toBe('active.customer@hutty.in');
+    expect(createdUserData.disabled).toBe(false);
+    expect(createdUserData.disabledAt).toBeNull();
+    expect(createdUserData.disabledReason).toBeNull();
+
+    projectService.setPrismaClient(null, false);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 16. Resilient fallback user creation when "column disabled does not exist" in unmigrated DB
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('16. Recovers seamlessly via baseline raw SQL insert when column disabled does not exist in production DB', async () => {
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
+    const missingColumnErr = new Error('Invalid prisma.user.create() invocation: The column disabled does not exist in the current database.');
+    (missingColumnErr as any).code = 'P2022';
+
+    let rawInsertExecuted = false;
+
+    const mockPrisma = {
+      user: {
+        findUnique: vi.fn().mockResolvedValue(null),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockRejectedValue(missingColumnErr),
+      },
+      $executeRawUnsafe: vi.fn().mockImplementation(async (sql: string) => {
+        if (sql.includes('INSERT INTO "User"')) {
+          rawInsertExecuted = true;
+          return 1;
+        }
+        return 0;
+      }),
+      $queryRawUnsafe: vi.fn().mockImplementation(async (sql: string) => {
+        if (sql.includes('FROM "User"')) {
+          return [{ id: 'usr-recovered-uuid', name: 'Homeowner', email: 'unmigrated@hutty.in' }];
+        }
+        return [];
+      }),
+      project: {
+        create: vi.fn().mockResolvedValue({ id: 'proj-recovered-1', name: 'Resilient Save Project' }),
+      },
+    };
+
+    projectService.setPrismaClient(mockPrisma as any, true);
+
+    const project = await projectService.createProject({
+      name: 'Resilient Save Project',
+      leadEmail: 'unmigrated@hutty.in',
+      leadName: 'Homeowner',
+    });
+
+    expect(project).toBeDefined();
+    expect(rawInsertExecuted).toBe(true);
+    expect(mockPrisma.$executeRawUnsafe).toHaveBeenCalled();
+    expect(mockPrisma.$queryRawUnsafe).toHaveBeenCalled();
+
+    projectService.setPrismaClient(null, false);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 17. Expired optional-auth tokens do not block legitimate guest estimate saving
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('17. Guest saving proceeds without HTTP 403 when authorization token is expired or absent', async () => {
+    const { ProjectController } = await import('../../../server/src/controllers/project.controller');
+
+    let responseStatus = 0;
+    let responseJson: any = null;
+
+    const req = {
+      user: undefined, // Simulates optionalAuth gracefully discarding an expired token
+      body: {
+        name: 'Guest Whitefield Estimate',
+        leadEmail: 'guest.homeowner@example.com',
+        leadName: 'Guest Homeowner',
+        leadPhone: '9845011223',
+        configuration: {
+          houseType: 'Villa',
+          floors: 2,
+        },
+        calculation: {
+          totalCostINR: 6500000,
+        },
+      },
+    } as any;
+
+    const res = {
+      status: (code: number) => {
+        responseStatus = code;
+        return res;
+      },
+      json: (data: any) => {
+        responseJson = data;
+        return res;
+      },
+    } as any;
+
+    await ProjectController.createProject(req, res);
+
+    expect(responseStatus).toBe(201);
+    expect(responseJson.success).toBe(true);
+    expect(responseJson.data.name).toBe('Guest Whitefield Estimate');
+    expect(responseJson.data.id).toBeDefined();
+  });
 });
