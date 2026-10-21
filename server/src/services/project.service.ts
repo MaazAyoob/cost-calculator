@@ -57,6 +57,7 @@ export interface CalculationResultEntity {
 }
 
 export interface CreateProjectInput {
+  id?: string;
   name?: string;
   ownerId?: string | null;
   leadName?: string;
@@ -246,7 +247,26 @@ export class ProjectService {
       phone: input.leadPhone,
     });
 
-    const projectId = crypto.randomUUID();
+    // Idempotency check: if project already exists with this ID, update in-place rather than creating duplicates
+    if (input.id) {
+      const existing = await this.getProjectById(input.id);
+      if (existing) {
+        return this.updateProject(
+          input.id,
+          existing.ownerId,
+          {
+            name: input.name,
+            city: input.city,
+            authority: input.authority,
+            configuration: input.configuration,
+            calculation: input.calculation,
+          },
+          leadEmail
+        );
+      }
+    }
+
+    const projectId = input.id || crypto.randomUUID();
     const houseType = input.configuration?.houseType || 'Residential';
     const projectName = input.name?.trim() || `${houseType} Residence`;
     const city = input.city || 'Bangalore';
@@ -260,10 +280,10 @@ export class ProjectService {
       plotLength: Number(input.configuration?.plotLength) || 30,
       plotWidth: Number(input.configuration?.plotWidth) || 40,
       houseType,
-      floors: Math.max(1, Number(input.configuration?.floors) || 2),
+      floors: Math.max(1, Math.round(Number(input.configuration?.floors) || 2)),
       parkingType: input.configuration?.parkingType || 'Normal Ground',
-      carCount: Number(input.configuration?.carCount) || 1,
-      bikeCount: Number(input.configuration?.bikeCount) || 2,
+      carCount: Math.round(Number(input.configuration?.carCount) || 1),
+      bikeCount: Math.round(Number(input.configuration?.bikeCount) || 2),
       evCharging: Boolean(input.configuration?.evCharging),
       liftRequired: Boolean(input.configuration?.liftRequired),
       roomsJson: input.configuration?.rooms || {},
@@ -278,9 +298,9 @@ export class ProjectService {
       totalCostINR: Number(input.calculation?.totalCostINR) || 4800000,
       costPerSqFt: Number(input.calculation?.costPerSqFt) || 2000,
       steelTonnes: Number(input.calculation?.steelTonnes) || 0,
-      cementBags: Number(input.calculation?.cementBags) || 0,
+      cementBags: Math.round(Number(input.calculation?.cementBags) || 0),
       concreteCuM: Number(input.calculation?.concreteCuM) || 0,
-      timelineMonths: Number(input.calculation?.timelineMonths) || 12,
+      timelineMonths: Math.round(Number(input.calculation?.timelineMonths) || 12),
       budgetBreakdown: input.calculation?.budgetBreakdown || {},
       quantitiesJson: input.calculation?.quantitiesJson || {},
       configSnapshot: input.calculation?.configSnapshot || null,
@@ -617,7 +637,8 @@ export class ProjectService {
       authority?: string;
       configuration?: any;
       calculation?: any;
-    }
+    },
+    userEmail?: string
   ): Promise<ProjectEntity> {
     const existing = await this.getProjectById(id);
     if (!existing) {
@@ -626,6 +647,7 @@ export class ProjectService {
 
     if (existing.ownerId !== userId) {
       let isOwner = false;
+      const normalizedCallerEmail = (userEmail || '').trim().toLowerCase();
       if (this.isDbConnected()) {
         try {
           const ownerUser = await (this.prisma as any).user.findUnique({
@@ -636,14 +658,21 @@ export class ProjectService {
             where: { id: userId },
             select: { id: true, email: true },
           });
+          const ownerEmail = (ownerUser?.email || '').trim().toLowerCase();
+          const callerDbEmail = (callerUser?.email || '').trim().toLowerCase();
+
           if (
-            ownerUser &&
-            callerUser &&
-            ownerUser.email.toLowerCase() === callerUser.email.toLowerCase()
+            (ownerEmail && callerDbEmail && ownerEmail === callerDbEmail) ||
+            (ownerEmail && normalizedCallerEmail && ownerEmail === normalizedCallerEmail)
           ) {
             isOwner = true;
           }
         } catch {}
+      } else {
+        const inMemOwner = this.inMemoryUsers?.get(normalizedCallerEmail);
+        if (inMemOwner && inMemOwner.id === existing.ownerId) {
+          isOwner = true;
+        }
       }
       if (!isOwner) {
         throw new Error(`FORBIDDEN: You do not have permission to modify this project.`);

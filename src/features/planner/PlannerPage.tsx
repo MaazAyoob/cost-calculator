@@ -171,7 +171,7 @@ export const PlannerPage: React.FC = () => {
   const [mobileActiveTab, setMobileActiveTab] = useState<'form' | 'preview'>('form');
 
   // Customer Persistent Project Auto-Save
-  const { status: autoSaveStatus, lastSaved, triggerAutoSave } = useProjectAutoSave();
+  const { status: autoSaveStatus, lastSaved, errorMessage: autoSaveErrorMessage, triggerAutoSave } = useProjectAutoSave();
 
   const totalCost = budget.totalProjectCost || 0;
   const buaSqFt = area.totalBUASqFt || 0;
@@ -341,6 +341,7 @@ export const PlannerPage: React.FC = () => {
           <ProjectSaveStatusBadge
             status={autoSaveStatus}
             lastSaved={lastSaved}
+            errorMessage={autoSaveErrorMessage}
             onRetry={triggerAutoSave}
           />
         </div>
@@ -502,6 +503,7 @@ export const PlannerPage: React.FC = () => {
           <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
             <Step10LoadingExperience
               autoSaveStatus={autoSaveStatus}
+              errorMessage={autoSaveErrorMessage}
               onRetryAutoSave={triggerAutoSave}
             />
           </div>

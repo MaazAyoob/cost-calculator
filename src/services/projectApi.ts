@@ -8,6 +8,7 @@ import { getApiUrl } from '../config/api';
 import { useCustomerAuthStore } from '../store/useCustomerAuthStore';
 
 export interface PersistProjectPayload {
+  id?: string;
   name?: string;
   leadName?: string;
   leadEmail?: string;
@@ -86,14 +87,24 @@ export async function persistProject(payload: PersistProjectPayload): Promise<Pe
     body: JSON.stringify(bodyPayload),
   });
 
-  const json = await res.json();
+  const json = await res.json().catch(() => ({}));
   if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Failed to persist project in database');
+    const errorMsg =
+      json.message ||
+      json.error ||
+      (res.status === 403
+        ? 'Session expired or access forbidden. Please sign in to save.'
+        : res.status === 401
+        ? 'Authentication required to save project.'
+        : 'Failed to persist project in database');
+    throw new Error(errorMsg);
   }
 
-  cachedPersistedProjectId = json.data.id;
+  cachedPersistedProjectId = json.data?.id || null;
   try {
-    sessionStorage.setItem('hutty_persisted_project_id', json.data.id);
+    if (json.data?.id) {
+      sessionStorage.setItem('hutty_persisted_project_id', json.data.id);
+    }
   } catch {}
 
   return json.data;
@@ -108,9 +119,9 @@ export async function fetchUserProjects(): Promise<PersistedProject[]> {
     headers: getAuthHeaders(),
   });
 
-  const json = await res.json();
+  const json = await res.json().catch(() => ({}));
   if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Failed to load projects');
+    throw new Error(json.message || json.error || 'Failed to load projects');
   }
   return json.data || [];
 }
@@ -124,9 +135,9 @@ export async function fetchProjectById(id: string): Promise<PersistedProject> {
     headers: getAuthHeaders(),
   });
 
-  const json = await res.json();
+  const json = await res.json().catch(() => ({}));
   if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Failed to load project');
+    throw new Error(json.message || json.error || 'Failed to load project');
   }
   return json.data;
 }
@@ -142,9 +153,15 @@ export async function updateProject(id: string, payload: Partial<PersistProjectP
     body: JSON.stringify(payload),
   });
 
-  const json = await res.json();
+  const json = await res.json().catch(() => ({}));
   if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Failed to auto-save project');
+    const errorMsg =
+      json.message ||
+      json.error ||
+      (res.status === 403
+        ? 'Session expired or unauthorized to update project.'
+        : 'Failed to auto-save project');
+    throw new Error(errorMsg);
   }
   return json.data;
 }

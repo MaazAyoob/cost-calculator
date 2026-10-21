@@ -72,7 +72,17 @@ app.use(
     },
   })
 );
-app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: '2mb',
+    verify: (req: any, _res, buf) => {
+      if (!req.rawBody) {
+        req.rawBody = buf.toString('utf8');
+      }
+    },
+  })
+);
 app.use(morgan('dev'));
 
 // Serve uploaded images statically

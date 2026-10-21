@@ -41,6 +41,7 @@ export class ProjectController {
   public static async createProject(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const {
+        id,
         name,
         leadName,
         leadEmail,
@@ -76,6 +77,7 @@ export class ProjectController {
         });
       } else {
         project = await projectService.createProject({
+          id,
           name,
           ownerId: userId,
           leadName: leadName || req.user?.name,
@@ -160,7 +162,7 @@ export class ProjectController {
         return;
       }
 
-      const updated = await projectService.updateProject(id, userId, req.body);
+      const updated = await projectService.updateProject(id, userId, req.body, req.user?.email);
       res.status(200).json({
         success: true,
         message: 'Project updated successfully',

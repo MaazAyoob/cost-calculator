@@ -80,6 +80,8 @@ export async function checkDatabase(client?: PrismaClient): Promise<boolean> {
   await checkTable('pricing_purchases', () => prisma.pricingPurchase.count());
   await checkTable('user_entitlements', () => prisma.userEntitlement.count());
   await checkTable('projects', () => (prisma as any).project.count());
+  await checkTable('project_configurations', () => (prisma as any).projectConfiguration.count());
+  await checkTable('calculation_results', () => (prisma as any).calculationResult.count());
 
   console.log('3. Checking for case-insensitive email conflicts in User table...');
   try {

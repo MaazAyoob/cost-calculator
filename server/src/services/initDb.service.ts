@@ -109,33 +109,29 @@ export async function runInitAndVerifyPipeline(prismaClient?: PrismaClient): Pro
     console.warn('[InitPipeline] Note on column check:', colErr.message);
   }
 
-  // ── Step 1: Schema Synchronization (if table missing) ──
-  if (!pricingTiersExist) {
-    console.log('[InitPipeline] Table public.pricing_tiers not found. Running Prisma db push...');
-    const schemaPath = resolveSchemaPath();
-    const schemaDir = path.dirname(schemaPath);
-    console.log(`[InitPipeline] Using schema: ${schemaPath}`);
+  // ── Step 1: Version-Controlled Schema Verification ──
+  // Per production safety invariants, automatic `prisma db push` is disabled during server boot.
+  // Schema migrations are version-controlled and applied via reviewed migration SQL.
+  let projectTableExists = false;
+  try {
+    const projCheck: any = await prisma.$queryRaw`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'Project'
+      ) as "exists";
+    `;
+    projectTableExists = Boolean(projCheck?.[0]?.exists);
+  } catch (projCheckErr: any) {
+    console.warn('[InitPipeline] Project table check note:', projCheckErr.message);
+  }
 
-    try {
-      execSync(`npx prisma db push --schema="${schemaPath}" --skip-generate`, {
-        stdio: 'inherit',
-        env: process.env,
-        cwd: schemaDir,
-      });
-      console.log('[InitPipeline] ✅ Prisma db push completed successfully.');
-    } catch (pushErr: any) {
-      const msg = `Prisma db push failed: ${pushErr.message}`;
-      console.error(`[InitPipeline] ❌ ${msg}`);
-      return {
-        success: false,
-        alreadyInitialized: false,
-        tableCounts: {},
-        message: msg,
-        timestamp,
-      };
-    }
+  if (!pricingTiersExist || !projectTableExists) {
+    console.warn(
+      `[InitPipeline] ⚠️ Core tables missing (pricing_tiers: ${pricingTiersExist}, Project: ${projectTableExists}). Apply migration SQL (server/prisma/migrations/20261021_add_project_persistence/migration.sql).`
+    );
   } else {
-    console.log('[InitPipeline] Schema already contains public.pricing_tiers. Skipping schema push.');
+    console.log('[InitPipeline] ✅ Core schema verified (public.pricing_tiers and public.Project exist).');
   }
 
   // ── Step 2: Idempotent Reference Seed ──

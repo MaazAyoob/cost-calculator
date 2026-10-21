@@ -10,6 +10,7 @@ import { AutoSaveStatus } from '../../hooks/useProjectAutoSave';
 interface ProjectSaveStatusBadgeProps {
   status: AutoSaveStatus;
   lastSaved?: Date | null;
+  errorMessage?: string | null;
   onRetry?: () => void;
   className?: string;
 }
@@ -17,6 +18,7 @@ interface ProjectSaveStatusBadgeProps {
 export const ProjectSaveStatusBadge: React.FC<ProjectSaveStatusBadgeProps> = ({
   status,
   lastSaved,
+  errorMessage,
   onRetry,
   className = '',
 }) => {
@@ -32,7 +34,9 @@ export const ProjectSaveStatusBadge: React.FC<ProjectSaveStatusBadgeProps> = ({
           : 'bg-gray-50 text-gray-600 border border-gray-200'
       } ${className}`}
       title={
-        lastSaved
+        status === 'ERROR' && errorMessage
+          ? `Auto-save error: ${errorMessage}`
+          : lastSaved
           ? `Last saved to cloud at ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
           : 'Project auto-save'
       }

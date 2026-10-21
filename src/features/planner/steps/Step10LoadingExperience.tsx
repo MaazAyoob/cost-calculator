@@ -9,11 +9,13 @@ import type { AutoSaveStatus } from '../../../hooks/useProjectAutoSave';
 
 interface Step10LoadingExperienceProps {
   autoSaveStatus?: AutoSaveStatus;
+  errorMessage?: string | null;
   onRetryAutoSave?: () => void;
 }
 
 export const Step10LoadingExperience: React.FC<Step10LoadingExperienceProps> = ({
   autoSaveStatus = 'SAVED',
+  errorMessage,
   onRetryAutoSave,
 }) => {
   const navigate = useNavigate();
@@ -158,7 +160,9 @@ export const Step10LoadingExperience: React.FC<Step10LoadingExperienceProps> = (
             </h2>
             <p className="text-xs sm:text-sm text-[#4B5563] max-w-md mx-auto leading-relaxed">
               {autoSaveStatus === 'ERROR'
-                ? 'Your local construction estimate is calculated. Saving to the cloud database encountered an issue — click Retry below to save your project before purchasing reports.'
+                ? (errorMessage && (errorMessage.includes('expired') || errorMessage.includes('sign in'))
+                    ? 'Your session has expired. Please sign in to sync this estimate to your account, or click Retry.'
+                    : `Your local construction estimate is calculated. Cloud sync note: ${errorMessage || 'Saving encountered an issue — click Retry below to save your project.'}`)
                 : 'Your itemized cost list, materials needed, and payment plan are ready and safely stored.'}
             </p>
 

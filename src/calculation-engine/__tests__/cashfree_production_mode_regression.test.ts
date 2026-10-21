@@ -412,5 +412,84 @@ describe('Cashfree Production Mode & Environment Regression Suite', () => {
       expect(result.handled).toBe(true);
       expect(result.message).toContain('already verified as PAID');
     });
+
+    it('successfully verifies webhook signature when secret has trailing whitespace or newline', () => {
+      process.env.CASHFREE_ENV = 'PRODUCTION';
+      process.env.CASHFREE_WEBHOOK_SECRET = `  ${mockWebhookSecret}\n  `;
+
+      const rawBody = JSON.stringify({ type: 'PAYMENT_SUCCESS_WEBHOOK', data: { order: { order_id: 'order_ws_trim' } } });
+      const timestamp = String(Date.now());
+      const signature = crypto
+        .createHmac('sha256', mockWebhookSecret)
+        .update(`${timestamp}${rawBody}`)
+        .digest('base64');
+
+      const isValid = cashfreeService.verifyWebhookSignature(rawBody, signature, timestamp);
+      expect(isValid).toBe(true);
+    });
+
+    it('successfully verifies webhook signature using CASHFREE_SECRET_KEY when webhook secret differs or is unset', () => {
+      process.env.CASHFREE_ENV = 'PRODUCTION';
+      process.env.CASHFREE_SECRET_KEY = mockProdSecret;
+      delete process.env.CASHFREE_WEBHOOK_SECRET;
+
+      const rawBody = JSON.stringify({ type: 'PAYMENT_SUCCESS_WEBHOOK', data: { order: { order_id: 'order_secret_key_sig' } } });
+      const timestamp = String(Date.now());
+      const signature = crypto
+        .createHmac('sha256', mockProdSecret)
+        .update(`${timestamp}${rawBody}`)
+        .digest('base64');
+
+      const isValid = cashfreeService.verifyWebhookSignature(rawBody, signature, timestamp);
+      expect(isValid).toBe(true);
+    });
+
+    it('correctly handles Buffer rawBody in CashfreeController.handleWebhook', async () => {
+      process.env.CASHFREE_ENV = 'PRODUCTION';
+      process.env.CASHFREE_SECRET_KEY = mockProdSecret;
+      delete process.env.CASHFREE_WEBHOOK_SECRET;
+
+      const rawPayload = JSON.stringify({
+        type: 'PAYMENT_SUCCESS_WEBHOOK',
+        data: {
+          order: { order_id: 'order_buffer_check', order_amount: 1499.0 },
+          payment: { cf_payment_id: 123456, payment_status: 'SUCCESS', payment_amount: 1499.0 },
+        },
+      });
+      const timestamp = String(Date.now());
+      const signature = crypto
+        .createHmac('sha256', mockProdSecret)
+        .update(`${timestamp}${rawPayload}`)
+        .digest('base64');
+
+      vi.spyOn(pricingService, 'getPurchaseByGatewayOrderId').mockResolvedValue(null);
+      vi.spyOn(consultationService, 'getPaymentByOrderId').mockResolvedValue(null);
+
+      let statusResult = 0;
+      let jsonResult: any;
+      const req = {
+        headers: {
+          'x-webhook-signature': signature,
+          'x-webhook-timestamp': timestamp,
+        },
+        rawBody: Buffer.from(rawPayload, 'utf8'),
+        body: JSON.parse(rawPayload),
+      } as any;
+      const res = {
+        status: (code: number) => {
+          statusResult = code;
+          return res;
+        },
+        json: (data: any) => {
+          jsonResult = data;
+          return res;
+        },
+      } as any;
+
+      await CashfreeController.handleWebhook(req, res);
+
+      expect(statusResult).toBe(200);
+      expect(jsonResult.status).toBe('ignored'); // order not found, but signature verified without HTTP 400!
+    });
   });
 });

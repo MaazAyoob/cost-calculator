@@ -30,7 +30,7 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
   const token = authHeader && (authHeader as string).split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
+    return res.status(401).json({ success: false, error: 'Access token required', message: 'Access token required' });
   }
 
   // Allow dev mock token strictly in non-production local development environments
@@ -80,7 +80,7 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
 
     next();
   } catch (err) {
-    return res.status(403).json({ error: 'Invalid or expired token' });
+    return res.status(403).json({ success: false, error: 'Invalid or expired token', message: 'Invalid or expired token' });
   }
 }
 

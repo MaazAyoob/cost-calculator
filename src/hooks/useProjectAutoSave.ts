@@ -29,6 +29,7 @@ export function useProjectAutoSave() {
 
   const [status, setStatus] = useState<AutoSaveStatus>('IDLE');
   const [projectId, setProjectId] = useState<string | null>(getCachedProjectId());
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -100,8 +101,10 @@ export function useProjectAutoSave() {
 
       // Provision a fresh project record for this authenticated session
       try {
+        const clientDraftId = getCachedProjectId() || crypto.randomUUID();
         const projectName = useProjectStore.getState().project.name || `${wizard.houseType || 'Residential'} Construction Project`;
         const created = await persistProject({
+          id: clientDraftId,
           name: projectName,
           leadEmail: user?.email,
           leadName: user?.name,
@@ -137,10 +140,14 @@ export function useProjectAutoSave() {
           setProjectId(created.id);
           setCachedProjectId(created.id);
           setStatus('SAVED');
+          setErrorMessage(null);
           setLastSaved(new Date());
         }
-      } catch (err) {
-        if (isMounted) setStatus('ERROR');
+      } catch (err: any) {
+        if (isMounted) {
+          setErrorMessage(err?.message || 'Failed to save project to cloud');
+          setStatus('ERROR');
+        }
       } finally {
         isInitializingRef.current = false;
       }
@@ -217,8 +224,10 @@ export function useProjectAutoSave() {
 
     try {
       if (!projectId) {
-        // Project ID was not yet created or failed earlier; provision now
+        // Project ID was not yet created or failed earlier; provision now with stable draft ID
+        const draftId = getCachedProjectId() || crypto.randomUUID();
         const created = await persistProject({
+          id: draftId,
           name: payload.name,
           leadEmail: user?.email,
           leadName: user?.name,
@@ -232,6 +241,7 @@ export function useProjectAutoSave() {
           setCachedProjectId(created.id);
           lastSavedPayloadHashRef.current = payloadHash;
           setStatus('SAVED');
+          setErrorMessage(null);
           setLastSaved(new Date());
         }
       } else {
@@ -239,14 +249,14 @@ export function useProjectAutoSave() {
           await updateProject(projectId, payload);
           lastSavedPayloadHashRef.current = payloadHash;
           setStatus('SAVED');
+          setErrorMessage(null);
           setLastSaved(new Date());
         } catch (updateErr: any) {
           const msg = updateErr?.message || '';
           if (msg.includes('not found') || msg.includes('404')) {
             console.warn('[AutoSave] Stale project ID not found on server, provisioning fresh project:', projectId);
-            setProjectId(null);
-            clearCachedProjectId();
             const created = await persistProject({
+              id: projectId, // Maintain same ID to remain idempotent
               name: payload.name,
               leadEmail: user?.email,
               leadName: user?.name,
@@ -260,6 +270,7 @@ export function useProjectAutoSave() {
               setCachedProjectId(created.id);
               lastSavedPayloadHashRef.current = payloadHash;
               setStatus('SAVED');
+              setErrorMessage(null);
               setLastSaved(new Date());
             }
           } else {
@@ -267,8 +278,9 @@ export function useProjectAutoSave() {
           }
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn('[AutoSave] Persistence attempt failed:', err);
+      setErrorMessage(err?.message || 'Failed to auto-save project');
       setStatus('ERROR');
     } finally {
       isSavingRef.current = false;
@@ -336,6 +348,7 @@ export function useProjectAutoSave() {
   return {
     status,
     projectId,
+    errorMessage,
     lastSaved,
     triggerAutoSave: handleRetry,
     retryAutoSave: handleRetry,

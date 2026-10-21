@@ -24,7 +24,11 @@ export class CashfreeController {
       const timestamp = (req.headers['x-webhook-timestamp'] ||
         req.headers['X-Webhook-Timestamp']) as string | undefined;
 
-      const rawBody = (req as any).rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+      const rawBody = (req as any).rawBody
+        ? (Buffer.isBuffer((req as any).rawBody)
+            ? (req as any).rawBody.toString('utf8')
+            : String((req as any).rawBody))
+        : (typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
 
       const result = await cashfreeService.handleWebhook(rawBody, signature, timestamp);
       res.status(200).json(result);

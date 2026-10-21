@@ -104,8 +104,8 @@ export class CashfreeService {
 
   public get webhookSecret(): string {
     return (
-      process.env.CASHFREE_WEBHOOK_SECRET ||
-      ENV.CASHFREE_WEBHOOK_SECRET ||
+      (process.env.CASHFREE_WEBHOOK_SECRET || '').trim() ||
+      (ENV.CASHFREE_WEBHOOK_SECRET || '').trim() ||
       this.secretKey
     );
   }
@@ -422,25 +422,48 @@ export class CashfreeService {
     signatureHeader?: string,
     timestampHeader?: string
   ): boolean {
-    const secret = this.webhookSecret;
-    if (!secret) return false;
     if (!signatureHeader || !timestampHeader || !rawBody) return false;
 
-    try {
-      const signedPayload = `${timestampHeader}${rawBody}`;
-      const expectedSignature = crypto
-        .createHmac('sha256', secret)
-        .update(signedPayload)
-        .digest('base64');
+    // Collect all candidate secrets trimmed of whitespace
+    const candidateSecrets = Array.from(
+      new Set(
+        [
+          this.webhookSecret,
+          (process.env.CASHFREE_WEBHOOK_SECRET || '').trim(),
+          (ENV.CASHFREE_WEBHOOK_SECRET || '').trim(),
+          this.secretKey,
+          (process.env.CASHFREE_SECRET_KEY || '').trim(),
+          (ENV.CASHFREE_SECRET_KEY || '').trim(),
+          (process.env.CASHFREE_CLIENT_SECRET || '').trim(),
+          (process.env.CASHFREE_API_SECRET || '').trim(),
+        ].filter((s): s is string => typeof s === 'string' && s.length > 0)
+      )
+    );
 
-      const sigBuf = Buffer.from(signatureHeader, 'utf8');
-      const expBuf = Buffer.from(expectedSignature, 'utf8');
+    if (candidateSecrets.length === 0) return false;
 
-      if (sigBuf.length !== expBuf.length) return false;
-      return crypto.timingSafeEqual(sigBuf, expBuf);
-    } catch {
-      return false;
+    const trimmedSignature = signatureHeader.trim();
+    const sigBuf = Buffer.from(trimmedSignature, 'utf8');
+
+    for (const secret of candidateSecrets) {
+      try {
+        const signedPayload = `${timestampHeader}${rawBody}`;
+        const expectedSignature = crypto
+          .createHmac('sha256', secret)
+          .update(signedPayload)
+          .digest('base64');
+
+        const expBuf = Buffer.from(expectedSignature, 'utf8');
+
+        if (sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf)) {
+          return true;
+        }
+      } catch {
+        continue;
+      }
     }
+
+    return false;
   }
 
   /**

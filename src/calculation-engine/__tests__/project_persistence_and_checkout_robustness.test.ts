@@ -444,4 +444,165 @@ describe('Project Persistence, Report Checkout & Save Lifecycle Robustness', () 
     // Reset client
     projectService.setPrismaClient(null, false);
   });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 11. Integer normalization protects against float schema validation rejections
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('11. createProject safely rounds float values for integer fields (cementBags, timelineMonths, floors, carCount, bikeCount)', async () => {
+    let capturedPrismaData: any = null;
+    const mockPrisma = {
+      user: {
+        findUnique: vi.fn().mockResolvedValue({ id: 'u-1', name: 'Homeowner', email: 'float.test@hutty.in' }),
+        findFirst: vi.fn().mockResolvedValue({ id: 'u-1', name: 'Homeowner', email: 'float.test@hutty.in' }),
+      },
+      project: {
+        create: vi.fn().mockImplementation(async (args: any) => {
+          capturedPrismaData = args.data;
+          return { id: args.data.id, ...args.data };
+        }),
+      },
+    };
+
+    projectService.setPrismaClient(mockPrisma as any, true);
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
+
+    const project = await projectService.createProject({
+      name: 'Float Normalization Test Residence',
+      leadEmail: 'float.test@hutty.in',
+      configuration: {
+        floors: 2.7,
+        carCount: 1.4,
+        bikeCount: 2.2,
+      },
+      calculation: {
+        totalBUASqFt: 2450.5,
+        totalCostINR: 5200000,
+        costPerSqFt: 2122,
+        cementBags: 853.4,
+        timelineMonths: 11.8,
+      },
+    });
+
+    expect(Number.isInteger(project.calculation?.cementBags)).toBe(true);
+    expect(project.calculation?.cementBags).toBe(853);
+    expect(Number.isInteger(project.calculation?.timelineMonths)).toBe(true);
+    expect(project.calculation?.timelineMonths).toBe(12);
+    expect(Number.isInteger(project.configuration?.floors)).toBe(true);
+    expect(project.configuration?.floors).toBe(3);
+    expect(Number.isInteger(project.configuration?.carCount)).toBe(true);
+    expect(project.configuration?.carCount).toBe(1);
+    expect(Number.isInteger(project.configuration?.bikeCount)).toBe(true);
+    expect(project.configuration?.bikeCount).toBe(2);
+
+    expect(capturedPrismaData.calculation.create.cementBags).toBe(853);
+    expect(capturedPrismaData.calculation.create.timelineMonths).toBe(12);
+
+    projectService.setPrismaClient(null, false);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 12. Idempotent project creation prevents duplicate rows upon client retries
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('12. Repeated save attempts with explicit draft project ID update in-place without creating duplicates', async () => {
+    const stableDraftId = 'draft-project-session-uuid-101';
+    const leadEmail = 'idempotent.lead@hutty.in';
+
+    // First attempt: initial project save
+    const firstSave = await projectService.createProject({
+      id: stableDraftId,
+      name: 'Whitefield Villa - V1',
+      leadEmail,
+      city: 'Bangalore',
+      calculation: {
+        totalCostINR: 5000000,
+      },
+    });
+
+    expect(firstSave.id).toBe(stableDraftId);
+    expect(firstSave.name).toBe('Whitefield Villa - V1');
+
+    // Second attempt: retry save with updated inputs
+    const retrySave = await projectService.createProject({
+      id: stableDraftId,
+      name: 'Whitefield Villa - V2 Updated',
+      leadEmail,
+      city: 'Bangalore',
+      calculation: {
+        totalCostINR: 5500000,
+      },
+    });
+
+    expect(retrySave.id).toBe(stableDraftId);
+    expect(retrySave.name).toBe('Whitefield Villa - V2 Updated');
+
+    // Confirm that only one project exists for this ID and owner
+    const allUserProjects = await projectService.getUserProjects(firstSave.ownerId);
+    const matches = allUserProjects.filter((p) => p.id === stableDraftId);
+    expect(matches.length).toBe(1);
+    expect(matches[0].name).toBe('Whitefield Villa - V2 Updated');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 13. Resilient ownership verification matches by verified email across identity systems
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('13. updateProject accepts updates when caller verified email matches project owner, even if user ID format differs', async () => {
+    const leadEmail = 'owner.matching@hutty.in';
+
+    const project = await projectService.createProject({
+      name: 'Ownership Test House',
+      leadEmail,
+    });
+
+    // Caller with different user ID (e.g. from in-memory token 'usr-mem-999') but matching email
+    const updated = await projectService.updateProject(
+      project.id,
+      'usr-mem-999',
+      { name: 'Ownership Test House - Renamed' },
+      leadEmail
+    );
+
+    expect(updated.name).toBe('Ownership Test House - Renamed');
+
+    // Caller with different user ID AND different email must be rejected with FORBIDDEN
+    await expect(
+      projectService.updateProject(
+        project.id,
+        'unauthorized-intruder-id',
+        { name: 'Hacked Project Name' },
+        'intruder@otherdomain.com'
+      )
+    ).rejects.toThrow(/FORBIDDEN/);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 14. Missing schema in production triggers durable failure rather than silent corruption
+  // ─────────────────────────────────────────────────────────────────────────────
+  it('14. In production mode, Prisma missing table error (P2021) throws DURABLE_STORAGE_WRITE_FAILED', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
+
+    const p2021Error = new Error('The table public.Project does not exist in the current database.');
+    (p2021Error as any).code = 'P2021';
+
+    const mockPrisma = {
+      user: {
+        findUnique: vi.fn().mockResolvedValue({ id: 'owner-uuid-1', name: 'Owner', email: 'p2021@hutty.in' }),
+        findFirst: vi.fn().mockResolvedValue({ id: 'owner-uuid-1', name: 'Owner', email: 'p2021@hutty.in' }),
+      },
+      project: {
+        create: vi.fn().mockRejectedValue(p2021Error),
+      },
+    };
+
+    projectService.setPrismaClient(mockPrisma as any, true);
+
+    await expect(
+      projectService.createProject({
+        name: 'Schema Failure Test',
+        leadEmail: 'p2021@hutty.in',
+      })
+    ).rejects.toThrow(/DURABLE_STORAGE_WRITE_FAILED/);
+
+    projectService.setPrismaClient(null, false);
+  });
 });

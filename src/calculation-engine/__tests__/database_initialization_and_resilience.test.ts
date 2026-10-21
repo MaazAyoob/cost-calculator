@@ -222,7 +222,7 @@ describe('Production Database Initialization & Resilience Suite', () => {
       expect(pkg.dependencies['prisma']).toBeDefined();
     });
 
-    it('verifies initAndVerify script orchestrates push, seed, and diagnostic checks non-destructively', () => {
+    it('verifies initAndVerify script orchestrates safe schema verification, seed, and diagnostic checks non-destructively', () => {
       const initPath = path.resolve(__dirname, '../../../server/prisma/initAndVerify.ts');
       expect(fs.existsSync(initPath)).toBe(true);
       const initContent = fs.readFileSync(initPath, 'utf8');
@@ -230,9 +230,11 @@ describe('Production Database Initialization & Resilience Suite', () => {
 
       const servicePath = path.resolve(__dirname, '../../../server/src/services/initDb.service.ts');
       const serviceContent = fs.readFileSync(servicePath, 'utf8');
-      expect(serviceContent).toContain('npx prisma db push');
+      expect(serviceContent).toContain('Version-Controlled Schema Verification');
       expect(serviceContent).toContain('runSeed(');
       expect(serviceContent).toContain('checkDatabase(');
+      // Confirms startup no longer executes automatic prisma db push
+      expect(serviceContent).not.toContain("execSync('npx prisma db push");
     });
 
     it('verifies seed script idempotency: handles upsert safely without destructive calls', () => {
