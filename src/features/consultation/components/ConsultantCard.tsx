@@ -47,6 +47,9 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[rgba(27,61,52,0.08)] text-[#1B3D34] border border-[rgba(27,61,52,0.12)]">
                 {consultant.category}
               </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                Sample Profile
+              </span>
               {consultant.featured && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F28C28]/15 text-[#F28C28] flex items-center gap-1">
                   <Sparkles className="w-2.5 h-2.5" />

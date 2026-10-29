@@ -56,21 +56,13 @@ export class ProjectController {
       // Authoritative User Resolution: prioritize verified server-side session
       const sessionUser = req.user;
       const email = (sessionUser?.email || leadEmail || '').trim().toLowerCase();
-      if (!email) {
-        res.status(400).json({
-          success: false,
-          message: 'Homeowner email is required to persist a project',
-        });
-        return;
-      }
-
       const userId = sessionUser?.id || null;
 
       let project;
       if (snapshot) {
         project = await projectService.createProjectFromSnapshot({
           leadName: leadName || req.user?.name,
-          leadEmail: email,
+          leadEmail: email || 'guest@draft.hutty.in',
           leadPhone,
           userId,
           snapshot,
@@ -120,13 +112,11 @@ export class ProjectController {
 
       // Customer data isolation & access control
       if (!req.user) {
-        if (project.ownerId) {
-          res.status(401).json({
-            success: false,
-            message: 'Authentication required to access this project',
-          });
-          return;
-        }
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required to access this project',
+        });
+        return;
       } else if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPERADMIN') {
         if (project.ownerId && project.ownerId !== req.user.id) {
           res.status(403).json({

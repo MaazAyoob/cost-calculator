@@ -9,7 +9,6 @@ import { useEntitlementStore } from '../../store/useEntitlementStore';
 import { usePricingStore } from '../../store/usePricingStore';
 import { PricingTierCode } from '../../types/pricing';
 import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
-import { UnlockBasicPdfModal } from '../../components/modals/UnlockBasicPdfModal';
 import { CalculationTraceModal } from '../../components/modals/CalculationTraceModal';
 import { generateAndDownloadDetailedReportPdf, viewDetailedReportPdfInNewTab, generateAndDownloadBasicEstimatePdf } from './pdfService';
 import { isDevPdfTestingEnabled } from '../../config/devTesting';
@@ -252,18 +251,9 @@ export const ReportPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={handleDownloadBasicPdf}
-                  disabled={isGeneratingBasicPdf}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
-                  title="Download concise 1-page summary PDF"
-                >
-                  <FileText className="w-3.5 h-3.5 text-[#1B3D34]" /> Basic PDF
-                </button>
-                <button
-                  type="button"
                   onClick={handleDownloadPdf}
                   disabled={isGeneratingPdf}
-                  className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Download className="w-3.5 h-3.5 text-[#F28C28]" />
                   <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download Detailed PDF'}</span>
@@ -305,22 +295,6 @@ export const ReportPage: React.FC = () => {
                     )}
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={handleDownloadBasicPdf}
-                  disabled={isGeneratingBasicPdf}
-                  className="px-3.5 py-1.5 rounded-lg border border-[#1B3D34] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                  title="Concise estimate summary in downloadable PDF format"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#F28C28]" />
-                  <span>
-                    {isGeneratingBasicPdf
-                      ? 'Generating PDF...'
-                      : isBasicPdfUnlocked
-                      ? 'Download Basic Estimate PDF'
-                      : 'Download Basic Estimate PDF — ₹99'}
-                  </span>
-                </button>
                 <button
                   type="button"
                   onClick={() => setShowUnlockModal(true)}
@@ -372,25 +346,10 @@ export const ReportPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-[#4B5563] leading-relaxed max-w-2xl">
-                Your full house configuration, estimated built-up area, and preliminary cost breakdown are visible below. If you need a downloadable copy for your records, unlock the Basic Estimate PDF for ₹99, or get the complete contractor-grade Detailed BOQ for ₹499.
+                Your full house configuration, estimated built-up area, and preliminary cost breakdown are visible below. Unlock the complete contractor-grade Detailed BOQ report for ₹499 to get work-wise quantities, material schedules, and downloadable PDF.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={handleDownloadBasicPdf}
-                disabled={isGeneratingBasicPdf}
-                className="px-3.5 py-2 rounded-xl border border-[#1B3D34] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] flex items-center gap-1.5 cursor-pointer shadow-2xs"
-              >
-                <Download className="w-3.5 h-3.5 text-[#F28C28]" />
-                <span>
-                  {isGeneratingBasicPdf
-                    ? 'Generating...'
-                    : isBasicPdfUnlocked
-                    ? 'Download Basic Estimate PDF'
-                    : 'Download Basic Estimate PDF — ₹99'}
-                </span>
-              </button>
               <button
                 type="button"
                 onClick={() => setShowUnlockModal(true)}
@@ -1322,11 +1281,6 @@ export const ReportPage: React.FC = () => {
         isOpen={showUnlockModal}
         onClose={() => setShowUnlockModal(false)}
         initialTierCode={unlockModalTier}
-      />
-
-      <UnlockBasicPdfModal
-        isOpen={showBasicPdfModal}
-        onClose={() => setShowBasicPdfModal(false)}
       />
 
       <CalculationTraceModal

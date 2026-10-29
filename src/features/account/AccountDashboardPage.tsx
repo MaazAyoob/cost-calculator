@@ -498,7 +498,7 @@ export const AccountDashboardPage: React.FC = () => {
                 <FileCheck className="w-12 h-12 text-[#687770] mx-auto opacity-70" />
                 <h3 className="text-base font-bold text-[#1B3D34]">Reports you unlock will appear here</h3>
                 <p className="text-xs text-[#52605B] leading-relaxed max-w-xs mx-auto">
-                  When you download your ₹99 Basic Estimate or unlock the ₹499 Detailed BOQ dossier, your permanent PDF documents are preserved here.
+                  When you unlock the ₹499 Detailed BOQ dossier or ₹1,499 Premium package, your permanent PDF documents are preserved here.
                 </p>
                 <button
                   type="button"
@@ -518,7 +518,7 @@ export const AccountDashboardPage: React.FC = () => {
                   >
                     <div className="space-y-1">
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF3EF] text-[#1B3D34] border border-[#D5E5DC]">
-                        {rep.tierCode === 'ESTIMATE_99' ? '₹99 Verified PDF' : '₹499 Detailed Dossier'}
+                        {rep.tierCode === 'PREMIUM_1499' ? '₹1,499 Premium Package' : rep.tierCode === 'ESTIMATE_99' || rep.tierCode === 'BASIC_ESTIMATE_PDF' ? 'Basic Estimate PDF' : '₹499 Detailed Dossier'}
                       </span>
                       <h4 className="font-bold text-sm text-[#1B3D34] mt-1">{rep.reportTitle}</h4>
                       <p className="text-xs text-[#52605B]">Project: {rep.projectName} ({rep.city})</p>

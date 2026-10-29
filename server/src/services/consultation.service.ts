@@ -725,6 +725,7 @@ export class ConsultationService {
       paymentSessionId?: string;
       payment_session_id?: string;
       amount: number;
+      orderAmount?: number;
       amountMinorUnits: number;
       currency: string;
       gateway: string;
@@ -884,6 +885,7 @@ export class ConsultationService {
             paymentSessionId: cfPaymentSessionId,
             payment_session_id: cfPaymentSessionId,
             amount: CONSULTATION_PRICE_INR,
+            orderAmount: CONSULTATION_PRICE_INR,
             amountMinorUnits: CONSULTATION_PRICE_PAISE,
             currency: CONSULTATION_CURRENCY,
             gateway: 'CASHFREE',
@@ -1172,6 +1174,7 @@ export class ConsultationService {
         paymentSessionId: cfPaymentSessionId,
         payment_session_id: cfPaymentSessionId,
         amount: CONSULTATION_PRICE_INR,
+        orderAmount: CONSULTATION_PRICE_INR,
         amountMinorUnits: CONSULTATION_PRICE_PAISE,
         currency: CONSULTATION_CURRENCY,
         gateway: targetGateway,

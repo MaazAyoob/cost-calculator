@@ -338,7 +338,13 @@ export const ConsultantProfilePage: React.FC = () => {
         </div>
         <button
           type="button"
-          onClick={() => setIsBookingModalOpen(true)}
+          onClick={() => {
+            if (!isAuthenticated) {
+              navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+              return;
+            }
+            setIsBookingModalOpen(true);
+          }}
           className="hutty-btn-primary px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-xs min-h-[44px]"
         >
           <span>Book Consultation — {LAUNCH_CONSULTATION_PRICE_DISPLAY}</span>

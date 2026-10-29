@@ -93,7 +93,7 @@ export async function persistProject(payload: PersistProjectPayload): Promise<Pe
       json.message ||
       json.error ||
       (res.status === 403
-        ? 'Session expired or access forbidden. Please sign in to save.'
+        ? 'Session expired or access forbidden. Please retry.'
         : res.status === 401
         ? 'Authentication required to save project.'
         : 'Failed to persist project in database');

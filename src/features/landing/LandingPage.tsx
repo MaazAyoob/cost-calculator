@@ -1,16 +1,10 @@
 import React from 'react';
 import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
-import { CostAmbiguityTrapSection } from './sections/CostAmbiguityTrapSection';
-import { VisualStorytellingSection } from './sections/VisualStorytellingSection';
-import { SignatureMeasurementSection } from './sections/SignatureMeasurementSection';
+import { ThreeEasyStepsSection } from './sections/ThreeEasyStepsSection';
+import { FourOfferingsSection } from './sections/FourOfferingsSection';
 import { SignatureConstructionBreakdownSection } from './sections/SignatureConstructionBreakdownSection';
-import { SignatureCostMapSection } from './sections/SignatureCostMapSection';
-import { SignaturePlanningTimelineSection } from './sections/SignaturePlanningTimelineSection';
 import { SignatureExpertSection } from './sections/SignatureExpertSection';
-import { SignaturePricingSection } from './sections/SignaturePricingSection';
-import { EngineeringStandardsSection } from './sections/EngineeringStandardsSection';
-import { LiveMaterialPricesSection } from './sections/LiveMaterialPricesSection';
 import { FaqSection } from './sections/FaqSection';
 import { FinalCtaSection } from './sections/FinalCtaSection';
 
@@ -22,43 +16,25 @@ export const LandingPage: React.FC = () => {
         description="Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need it."
       />
 
-      {/* 01. Hero — Architectural Split Statement + Interactive 3D Massing HUD */}
+      {/* 01. Hero — Architectural Split Statement + Interactive Planning Panel */}
       <HeroSection />
 
-      {/* 02. The Problem — The Cost Ambiguity Trap & Why Square-Foot Rates Fail */}
-      <CostAmbiguityTrapSection />
+      {/* 02. Three Simple Steps — Plot, Home, Estimate */}
+      <ThreeEasyStepsSection />
 
-      {/* 03. Hutty's Approach — The 7-Stage Progression Flow (Plot to Total BOQ) */}
-      <VisualStorytellingSection />
+      {/* 03. Core Offerings — Free, Detailed BOQ (₹499), Expert Consultation (₹1,499) */}
+      <FourOfferingsSection />
 
-      {/* 04. Signature A — Architectural Measurement & Setbacks (Large BUA) */}
-      <SignatureMeasurementSection />
-
-      {/* 05. Signature B — Construction Breakdown (What Your Home Consumes: Steel, Cement, Sand) */}
+      {/* 04. Construction Breakdown — Steel, Cement, Sand, Labour */}
       <SignatureConstructionBreakdownSection />
 
-      {/* 06. Signature C — The Cost Map (Proportional Trade Allocation & Rupee Distribution) */}
-      <SignatureCostMapSection />
-
-      {/* 07. Signature D — Homeowner Roadmap (Plan, Measure, Estimate, Review, Build) */}
-      <SignaturePlanningTimelineSection />
-
-      {/* 08. Signature E — Independent Expert Consultation (Flat ₹1,499) */}
+      {/* 05. Independent Expert Consultation — Unbiased Review (₹1,499) */}
       <SignatureExpertSection />
 
-      {/* 09. Commercial Pricing — Asymmetric Hierarchy (Spotlight ₹499 BOQ Dossier) */}
-      <SignaturePricingSection />
-
-      {/* 10. Engineering Standards — IS 456:2000, IS 1786 Fe550D & NBC 2016 Standards */}
-      <EngineeringStandardsSection />
-
-      {/* 11. Live Material Trackers — Bangalore Verified Brand Retail Prices */}
-      <LiveMaterialPricesSection />
-
-      {/* 12. Architectural Planning FAQ */}
+      {/* 06. Homeowner Frequently Asked Questions */}
       <FaqSection />
 
-      {/* 13. Final Action Callout */}
+      {/* 07. Final Call to Action */}
       <FinalCtaSection />
     </div>
   );

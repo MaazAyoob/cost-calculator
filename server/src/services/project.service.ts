@@ -12,8 +12,8 @@ export interface ProjectEntity {
   id: string;
   name: string;
   title?: string;
-  ownerId: string;
-  userId?: string;
+  ownerId?: string | null;
+  userId?: string | null;
   city: string;
   authority: string;
   status: 'DRAFT' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED' | string;
@@ -61,7 +61,7 @@ export interface CreateProjectInput {
   name?: string;
   ownerId?: string | null;
   leadName?: string;
-  leadEmail: string;
+  leadEmail?: string | null;
   leadPhone?: string | null;
   city?: string;
   authority?: string;
@@ -268,18 +268,26 @@ export class ProjectService {
    * Persists a complete Project, ProjectConfiguration, and CalculationResult to PostgreSQL.
    */
   public async createProject(input: CreateProjectInput): Promise<ProjectEntity> {
-    const leadEmail = input.leadEmail?.trim().toLowerCase();
-    if (!leadEmail) {
+    if (!input.leadEmail?.trim() && !input.ownerId) {
       throw new Error('Valid homeowner email is required to persist project.');
     }
 
-    // Resolve owner User in PostgreSQL
-    const owner = await this.findOrCreateUser({
-      userId: input.ownerId,
-      name: input.leadName,
-      email: leadEmail,
-      phone: input.leadPhone,
-    });
+    const leadEmail = input.leadEmail ? input.leadEmail.trim().toLowerCase() : null;
+    let ownerId: string | null = input.ownerId || null;
+
+    if (!ownerId && leadEmail) {
+      const owner = await this.findOrCreateUser({
+        userId: input.ownerId,
+        name: input.leadName,
+        email: leadEmail,
+        phone: input.leadPhone,
+      });
+      ownerId = owner.id;
+    }
+
+    if (!ownerId) {
+      throw new Error('Unable to resolve project owner');
+    }
 
     // Idempotency check: if project already exists with this ID, update in-place rather than creating duplicates
     if (input.id) {
@@ -287,7 +295,7 @@ export class ProjectService {
       if (existing) {
         return this.updateProject(
           input.id,
-          existing.ownerId,
+          existing.ownerId || ownerId,
           {
             name: input.name,
             city: input.city,
@@ -295,7 +303,7 @@ export class ProjectService {
             configuration: input.configuration,
             calculation: input.calculation,
           },
-          leadEmail
+          leadEmail || undefined
         );
       }
     }
@@ -344,7 +352,8 @@ export class ProjectService {
     const projectEntity: ProjectEntity = {
       id: projectId,
       name: projectName,
-      ownerId: owner.id,
+      ownerId: ownerId,
+      userId: ownerId,
       city,
       authority,
       status: 'PLANNED',
@@ -354,7 +363,7 @@ export class ProjectService {
       updatedAt: new Date().toISOString(),
     };
 
-    if (this.isDbConnected()) {
+    if (this.isDbConnected() && ownerId) {
       try {
         await (this.prisma as any).project.create({
           data: {
@@ -664,7 +673,7 @@ export class ProjectService {
    */
   public async updateProject(
     id: string,
-    userId: string,
+    userId: string | null,
     updateData: {
       name?: string;
       city?: string;
@@ -679,7 +688,7 @@ export class ProjectService {
       throw new Error(`Project with ID "${id}" not found.`);
     }
 
-    if (existing.ownerId !== userId) {
+    if (existing.ownerId && existing.ownerId !== userId) {
       let isOwner = false;
       const normalizedCallerEmail = (userEmail || '').trim().toLowerCase();
       if (this.isDbConnected()) {
@@ -688,10 +697,12 @@ export class ProjectService {
             where: { id: existing.ownerId },
             select: { id: true, email: true },
           });
-          const callerUser = await (this.prisma as any).user.findUnique({
-            where: { id: userId },
-            select: { id: true, email: true },
-          });
+          const callerUser = userId
+            ? await (this.prisma as any).user.findUnique({
+                where: { id: userId },
+                select: { id: true, email: true },
+              })
+            : null;
           const ownerEmail = (ownerUser?.email || '').trim().toLowerCase();
           const callerDbEmail = (callerUser?.email || '').trim().toLowerCase();
 
@@ -848,7 +859,11 @@ export class ProjectService {
   /**
    * Renames a project owned by the authenticated customer.
    */
-  public async renameProject(id: string, userId: string, newName: string): Promise<ProjectEntity> {
+  public async renameProject(
+    id: string,
+    userId: string | null,
+    newName: string
+  ): Promise<ProjectEntity> {
     if (!newName || !newName.trim()) {
       throw new Error('Project name cannot be empty.');
     }
@@ -856,15 +871,18 @@ export class ProjectService {
   }
 
   /**
-   * Safely archives/deletes a project owned by the authenticated customer.
+   * Safely archives/deletes a project owned by the authenticated customer or authorized guest.
    */
-  public async deleteProject(id: string, userId: string): Promise<{ success: boolean; message: string }> {
+  public async deleteProject(
+    id: string,
+    userId: string | null
+  ): Promise<{ success: boolean; message: string }> {
     const existing = await this.getProjectById(id);
     if (!existing) {
       throw new Error(`Project with ID "${id}" not found.`);
     }
 
-    if (existing.ownerId !== userId) {
+    if (existing.ownerId && existing.ownerId !== userId) {
       throw new Error(`FORBIDDEN: You do not have permission to delete this project.`);
     }
 

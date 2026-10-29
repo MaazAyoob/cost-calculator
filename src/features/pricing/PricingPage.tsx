@@ -27,6 +27,7 @@ import { UnlockReportModal } from '../../components/modals/UnlockReportModal';
 import { PricingTierCode } from '../../types/pricing';
 import { formatPaiseToINR } from '../../config/pricing';
 import { SEO } from '../../components/common/SEO';
+import consultationArchitectImg from '../../assets/consultation-architect.jpg';
 
 export const PricingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ export const PricingPage: React.FC = () => {
               <div className="space-y-2 text-xs text-[#1B3D34]">
                 <div className="flex items-start gap-2">
                   <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span>Interactive 10-step room &amp; material choices</span>
+                  <span>Interactive 8-stage room &amp; material choices</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
@@ -297,33 +298,51 @@ export const PricingPage: React.FC = () => {
         </div>
 
         {/* ── DECOUPLED CONSULTATION SERVICE CALLOUT (₹1,499) ── */}
-        <div className="bg-[#112821] text-white rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md text-left arch-bracketed">
-          <div className="space-y-2 max-w-2xl">
+        <div className="bg-[#112821] text-white rounded-3xl overflow-hidden shadow-md text-left grid grid-cols-1 lg:grid-cols-12 items-center">
+          <div className="lg:col-span-5 h-64 sm:h-72 lg:h-full w-full relative overflow-hidden bg-slate-900">
+            <img
+              src={consultationArchitectImg}
+              alt="Indian architect consulting with homeowners on residential plan"
+              className="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent to-[#112821]/90" />
+            
+            <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider">
+              Council of Architecture &bull; Bangalore
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-white/10 text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28]">
               <UserCheck className="w-3.5 h-3.5" />
               <span>SEPARATE PROFESSIONAL SERVICE</span>
             </div>
+            
             <h3 className="text-xl sm:text-2xl font-black font-heading text-white">
               Need help building your home? Talk to an expert.
             </h3>
+            
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
               Book a 45-minute 1-on-1 private advisory session with a Council of Architecture (COA) registered architect or chartered structural engineer. We review your house plan, contractor quote, structural questions, or site problems.
             </p>
-          </div>
 
-          <div className="shrink-0 flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-            <div className="text-center md:text-right">
-              <span className="text-[10px] text-white/60 uppercase font-mono block">Consultation Fee</span>
-              <span className="text-3xl font-black text-[#F28C28] font-heading">₹1,499</span>
+            <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10 pt-4">
+              <div>
+                <span className="text-[10px] text-white/60 uppercase font-mono block">Consultation Fee</span>
+                <span className="text-3xl font-black text-[#F28C28] font-heading">₹1,499</span>
+                <span className="text-[10px] text-white/50 block">45-minute independent session</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate('/consult')}
+                className="hutty-btn-primary bg-[#F28C28] hover:bg-[#D9771A] text-[#1B3D34] font-bold px-6 py-3.5 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+              >
+                <span>Consult an Expert — ₹1,499</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#1B3D34]" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => navigate('/consult')}
-              className="hutty-btn-primary bg-[#F28C28] hover:bg-[#D9771A] text-[#1B3D34] font-bold px-6 py-3.5 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
-            >
-              <span>Consult an Expert — ₹1,499</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#1B3D34]" />
-            </button>
           </div>
         </div>
 

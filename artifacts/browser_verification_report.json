@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-10-29T11:28:48.135Z",
+  "findings": [
+    {
+      "test": "Homepage",
+      "status": "PASS",
+      "details": {
+        "h1": "Understand your home before you build.",
+        "hasCta": true,
+        "ctaText": "Start Free Estimate",
+        "has3DToggle": true,
+        "hasPreset30x40": false,
+        "expertImgLoaded": false,
+        "heroImgLoaded": true,
+        "navLinks": []
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\01_homepage_verified.png",
+        "size": 1644623
+      }
+    },
+    {
+      "test": "Fast-Track to Stage 7",
+      "status": "PASS",
+      "details": {
+        "url": "http://127.0.0.1:4173/calculator?stage=7",
+        "h2": "Here's your estimated construction cost.",
+        "hasTotalEstimate": true,
+        "totalCostSnippet": "₹ \n1,290,764",
+        "hasRefineSection": false
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\03_fast_track_stage7.png",
+        "size": 447149
+      }
+    },
+    {
+      "test": "Stages 1-8 Complete Flow",
+      "status": "PASS",
+      "details": {
+        "stage7": {
+          "h2": "Here's your estimated construction cost.",
+          "totalCost": "₹ \n2,137,898",
+          "ratePerSqFt": "Residential Construction Calculator\n•\nBangalore\nStart Over\nConsult an Expert (₹1,499)\nYour Plot\nYour Home\nYour Rooms\nBuildable Space\nConstruction Style\nFinishes & Materials\n7\nYour Estimate\n8\nDetailed BOQ\nLIVE PRELIMINARY ESTIMATE:\n₹ 21,37,898\nSTAGE 7 OF 8 • YOUR ESTIMATE\nHere's your estimated construction cost.\n\nCalculated in real-time by the canonical engine using Bengaluru verified market rates and statutory planning guidelines.\n\nESTIMATED CONSTRUCTION BUDGET\n₹ \n2,137,898\n(Range: ₹20,52,382 – ₹22,23,414)\nEFFECTIVE RATE\n₹ \n1,485\n/sq.ft BUA\nTOTAL BUILT-UP AREA\n1,440 sq.ft\nFLOORS & FOOTPRINT\nG+1 (720 sq.ft/flr)\nSPECIFICATION\nPREMIUM Tier\nEST. TIMELINE\n8 Months\nCost Breakdown • Where Your Budget Goes\n100% Accounted\nMaterials Needed (61%)\n₹13,13,232\nSteel, cement, sand, blocks, bricks & tiles\nLabour and Work Costs (30%)\n₹6,37,396\nMasons, bar-benders, carpenters & helpers\nFittings & Services (9%)\n₹1,87,270\nDoors, windows, sanitary, plumbing & services\nReconciled Sum: ₹13,13,232 + ₹6,37,396 + ₹1,87,270\n= ₹21,37,898 (Exact 0-residual match)\nMaterials Needed • Quantities for Your House\nDerived from IS 456 Structural Physics\nSTEEL NEEDED\n4.32 Tonnes\nFe550D TMT Rebar\nCEMENT NEEDED\n576 Bags\n50kg Portland Bags\nM-SAND / PLASTERING\n1,728 CFT\nManufactured Sand\nMASONRY BLOCKS\n2,149 Pcs\nSolid 6\" & 4\" Units\nWhat Is Included in this Estimate:\n• Complete RCC structural foundation, plinth beam & slabs\n• Outer and internal masonry walling with 2 coats plastering\n• Full flooring tiling and wall dado in bathrooms & kitchen\n• Complete concealed CPVC plumbing & sanitary fittings\n• Fire-retardant wiring, switchboards & distribution boards\nWhat Is Excluded (Quoted Separately):\n• Compound boundary wall and steel main entrance gate\n• Deep borewell drilling, casing pipe & submersible pump\n• BESCOM permanent 3-phase meter deposit and wiring fees\n• Interior modular woodwork (kitchen cabinets, wardrobes)\n• Lift machine installation (civil shaft structure is included)\nWant to refine this estimate? Jump to any decision:\nUpdates live\n1\nPlot & Dimensions\n2\nFloors & Scale\n3\nRooms & Spaces\n4\nSetbacks & Bylaws\n5\nStructure & Walls\n6\nFinishes & Quality\nEARLY PLANNING DISCLAIMER\n\nThis is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked.\n\nAdjust My Selections\nView Detailed BOQ & Reports\nDetails & assumptions\n• Plain explanation, rates, rules & formulas\nInspect\nDetails & assumptions\n\nStage 7 of 8 • Transparent formulas, rates, and planning rules\n\nHow your estimate is calculated\nYour home size\nBuilding-space rules\nCost breakdown\nMaterial quantities\nRates and pricing\nAssumptions and unknowns\nLimitations & exclusions\nTechnical calculation details\nESTIMATION METHOD\nHow we estimated your cost\n\nWe estimate the size of your home based on your plot dimensions and floor count, calculate construction costs using Hutty's verified Bengaluru market rates, and add the applicable structural and finishing components.\n\nHOME SIZE CALCULATION\n1,440 sq.ft\nGround footprint (840 sq.ft) × 2 planned floors\nRATE APPLIED\n₹1,485/sq.ft\nPREMIUM specification tier • Bangalore baseline\nPlain language summary:\n\nEvery rupee is tied to actual construction trade work (materials, mason labour, carpentry, plumbing, and electrical), not an arbitrary lump-sum guess.\n\nAll values update in real-time as you modify your home plan.\nDone\nYOUR HOME SNAPSHOT\nBangalore Project\nLIVE ENGINE\nDUPLEX\nG+1\nESTIMATED PROJECT COST\n₹21,37,898\n@ ₹1,485 / sq.ft BUA\n1,440 sq.ft BUA\nSelected package\nPremium\nTiers\nPlot area\n1,200 sq.ft\n40 × 30 ft\nHome configuration\nDuplex • G+1\nRooms\n1 bedrooms • 0 bathrooms\n1 kitchen\nWindow Glazing\nMaterials Needed\n20 sq.ft\nSTRUCTURE\n₹15,30,320\nFINISHES\n₹3,72,645\nMEP\n₹2,34,933\nGST/MISC\n₹0\nReview All Selections",
+          "hasBreakdown": true,
+          "refineButtons": [
+            "Your Plot",
+            "Your Rooms",
+            "Finishes & Materials",
+            "1\nPlot & Dimensions",
+            "2\nFloors & Scale",
+            "3\nRooms & Spaces",
+            "4\nSetbacks & Bylaws",
+            "5\nStructure & Walls",
+            "6\nFinishes & Quality"
+          ]
+        },
+        "stage8": {
+          "h2": "See what your home may need, work by work.",
+          "hasSubstructure": true,
+          "hasFreeTier": true,
+          "has499Tier": true,
+          "has1499Tier": true
+        }
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\10_stage8_boq.png",
+        "size": 557496
+      }
+    },
+    {
+      "test": "How It Works Page",
+      "status": "PASS",
+      "details": {
+        "h1": "Build your home with clarity, one step at a time.",
+        "familyImgLoaded": true,
+        "familyImgSrc": "http://127.0.0.1:4173/assets/how-it-works-family-Rfl65Tdt.jpg",
+        "stepCardsCount": 7,
+        "sampleSteps": [
+          "Every detail planned before pouring concrete.",
+          "Your Plot & Living Spaces",
+          "Your Buildable Space & Setbacks",
+          "Construction Style & Materials"
+        ],
+        "hasCta": true
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\11_how_it_works.png",
+        "size": 1327958
+      }
+    },
+    {
+      "test": "Consultation Page",
+      "status": "PASS",
+      "details": {
+        "h1": "Build with confidence. Talk to the right expert.",
+        "architectImgLoaded": true,
+        "has1499Fee": true,
+        "sampleProfileBadgesCount": 0,
+        "bookButtonsCount": 4
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\12_consultation_page.png",
+        "size": 1352069
+      }
+    },
+    {
+      "test": "Pricing Page",
+      "status": "PASS",
+      "details": {
+        "h1": "Choose how much clarity you need.",
+        "hasFree0": true,
+        "hasBOQ499": true,
+        "hasPremium1499": true,
+        "hasDecoupledConsultCard": true,
+        "obsolete99Found": false
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\13_pricing_page.png",
+        "size": 287607
+      }
+    },
+    {
+      "test": "Professionals Join Page",
+      "status": "PASS",
+      "details": {
+        "h1": "Apply to Join Hutty as a Construction Professional",
+        "engineerImgLoaded": true,
+        "hasFormInputs": true
+      },
+      "screenshot": {
+        "path": "C:\\Users\\Avita\\Desktop\\Programming\\big bnglore client\\cost calculator rightcon\\artifacts\\browser-verification-live\\14_professionals_join.png",
+        "size": 758439
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarnings": [
+    "[RateService] /api/v1/config/active returned 500 — using static baseline.",
+    "[RateService] /api/v1/config/active returned 500 — using static baseline.",
+    "THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.",
+    "[RateService] /api/v1/config/active returned 500 — using static baseline.",
+    "[RateService] /api/v1/config/active returned 500 — using static baseline.",
+    "THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.",
+    "THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.",
+    "[RateService] /api/v1/config/active returned 500 — using static baseline.",
+    "THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead.",
+    "THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead."
+  ],
+  "screenshots": [
+    "01_homepage_verified.png",
+    "02_stage1_plot.png",
+    "03_fast_track_stage7.png",
+    "04_stage2_floors.png",
+    "05_stage3_rooms.png",
+    "06_stage4_buildable_space.png",
+    "07_stage5_construction.png",
+    "08_stage6_finishes.png",
+    "09_stage7_estimate.png",
+    "10_stage8_boq.png",
+    "11_how_it_works.png",
+    "12_consultation_page.png",
+    "13_pricing_page.png",
+    "14_professionals_join.png",
+    "15_mobile_homepage.png",
+    "16_mobile_stage1.png",
+    "17_mobile_stage7.png"
+  ]
+}

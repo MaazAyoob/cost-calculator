@@ -10,6 +10,7 @@ import { X, Check, Lock, Download, ShieldCheck, FileText, AlertCircle, Loader2 }
 import { modalScaleVariant } from '../../animations/variants';
 import { persistProject, getCachedProjectId, setCachedProjectId } from '../../services/projectApi';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
+import { normalizeIndianPhoneNumber } from '../../utils/phone';
 
 interface Props {
   isOpen: boolean;
@@ -73,12 +74,19 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
     const authState = useCustomerAuthStore.getState();
     const authUser = authState.user;
     const leadName = (name.trim() || authUser?.name || 'Valued Homeowner').trim();
-    const leadPhone = (phone.trim() || authUser?.phone || '9876543210').trim();
+    const leadPhone = (phone.trim() || authUser?.phone || '').trim();
     const leadEmail = (email.trim() || authUser?.email || 'client@hutty.in').trim().toLowerCase();
+
+    const phoneNorm = normalizeIndianPhoneNumber(leadPhone);
+    if (!phoneNorm.isValid) {
+      setIsProcessing(false);
+      setFormError(phoneNorm.error || 'Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
 
     saveLeadInfo({
       name: leadName,
-      phone: leadPhone,
+      phone: phoneNorm.domestic,
       email: leadEmail,
     });
 
@@ -92,7 +100,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
             name: `${result.input?.houseType || wizard.houseType || 'Residential'} Estimate`,
             leadName,
             leadEmail,
-            leadPhone,
+            leadPhone: phoneNorm.domestic,
             city: wizard.city || 'Bangalore',
             authority: wizard.authority || 'BBMP/BDA',
             configuration: {
@@ -125,7 +133,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
           if (raw.includes('401') || raw.includes('auth') || raw.includes('token') || raw.includes('login')) {
             setFormError('Please sign in or create an account to save your project and complete purchase.');
           } else {
-            setFormError('Unable to save your project to the database before checkout. Please retry.');
+            setFormError('Unable to save your project before checkout. Please retry.');
           }
           return;
         }

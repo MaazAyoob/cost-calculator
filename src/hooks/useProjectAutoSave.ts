@@ -38,9 +38,11 @@ export function useProjectAutoSave() {
   const isSavingRef = useRef<boolean>(false);
   const pendingSaveRef = useRef<boolean>(false);
 
+  const canAutoSave = isAuthenticated;
+
   // 1. Initial Load & Recovery on Mount
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!canAutoSave) return;
 
     let isMounted = true;
 
@@ -158,11 +160,11 @@ export function useProjectAutoSave() {
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated, user?.email]);
+  }, [canAutoSave, isAuthenticated, user?.email]);
 
   // 2. Debounced Auto-Save on Input / Calculation Changes
   const triggerAutoSave = useCallback(async (isRetry: boolean = false) => {
-    if (!isAuthenticated || isInitializingRef.current) return;
+    if (!canAutoSave || isInitializingRef.current) return;
 
     if (isSavingRef.current) {
       pendingSaveRef.current = true;
@@ -328,7 +330,7 @@ export function useProjectAutoSave() {
   }, [triggerAutoSave]);
 
   useEffect(() => {
-    if (!isAuthenticated || isInitializingRef.current) return;
+    if (!canAutoSave || isInitializingRef.current) return;
 
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -343,7 +345,7 @@ export function useProjectAutoSave() {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [triggerAutoSave, isAuthenticated]);
+  }, [triggerAutoSave, canAutoSave]);
 
   return {
     status,

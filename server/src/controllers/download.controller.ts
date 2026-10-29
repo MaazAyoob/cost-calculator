@@ -14,78 +14,53 @@ async function verifyDownloadEntitlement(
   requiredType: 'basic' | 'detailed' = 'detailed'
 ): Promise<{ authorized: boolean; reason?: string }> {
   const userId = (req as any).user?.id || null;
-  const userEmail = (req.query.email as string) || (req as any).user?.email || null;
+  const userEmail = (req as any).user?.email || null;
+  const queryEmail = (req.query.email as string) || null;
   const projectId = (req.query.projectId as string) || (req.query.project as string) || null;
   const orderRef = (req.query.orderRef as string) || (req.query.orderId as string) || null;
 
-  // 1. If basic PDF is requested (₹99 or higher)
-  if (requiredType === 'basic') {
-    if (projectId || userId || userEmail) {
-      const hasBasic = await pricingService.canAccessFeature('BASIC_PDF_DOWNLOAD', userId, userEmail, projectId);
-      const hasFull = await pricingService.canAccessFeature('FULL_PDF_REPORT', userId, userEmail, projectId);
-      const hasReportDownload = await pricingService.canAccessFeature('REPORT_DOWNLOAD', userId, userEmail, projectId);
-      if (hasBasic || hasFull || hasReportDownload) {
-        return { authorized: true };
-      }
-    }
-
-    if (orderRef) {
-      const purchase = await pricingService.getPurchaseByPublicReference(orderRef);
-      if (purchase && purchase.status === 'PAID') {
-        // Enforce project and user integrity to prevent IDOR / cross-user access
-        if (projectId && purchase.projectId && purchase.projectId !== projectId) {
-          return { authorized: false, reason: 'Purchase record does not match the requested project ID.' };
-        }
-        if (userId && purchase.userId && purchase.userId !== userId) {
-          return { authorized: false, reason: 'Purchase record does not match the authenticated user.' };
-        }
-        if (userEmail && purchase.leadEmail && purchase.leadEmail.toLowerCase() !== userEmail.toLowerCase()) {
-          return { authorized: false, reason: 'Purchase record does not match the provided customer email.' };
-        }
-
-        const tier = await pricingService.getTierById(purchase.tierId);
-        if (
-          tier &&
-          (tier.code === 'BASIC_ESTIMATE_PDF' ||
-            tier.code === 'ESTIMATE_99' ||
-            tier.code === 'DETAILED_ESTIMATE_499' ||
-            tier.code === 'PREMIUM_1499')
-        ) {
-          return { authorized: true };
-        }
-      }
-    }
-
-    return {
-      authorized: false,
-      reason: 'Valid entitlement required. Please unlock the Basic Estimate PDF (₹99) or Detailed BOQ (₹499) to download.',
-    };
-  }
-
-  // 2. Detailed construction deliverables (Full BOQ PDF, Material/Works CSV, Excel)
-  if (projectId || userId || userEmail) {
-    const hasReportDownload = await pricingService.canAccessFeature('REPORT_DOWNLOAD', userId, userEmail, projectId);
-    const hasFullPdf = await pricingService.canAccessFeature('FULL_PDF_REPORT', userId, userEmail, projectId);
-    if (hasReportDownload || hasFullPdf) {
-      return { authorized: true };
-    }
-  }
-
+  // 1. Order reference verification (primary path for guests and verified purchases)
   if (orderRef) {
     const purchase = await pricingService.getPurchaseByPublicReference(orderRef);
-    if (purchase && purchase.status === 'PAID') {
-      // Cross-user / cross-project integrity check
-      if (projectId && purchase.projectId && purchase.projectId !== projectId) {
-        return { authorized: false, reason: 'Purchase record does not match the requested project ID.' };
-      }
-      if (userId && purchase.userId && purchase.userId !== userId) {
-        return { authorized: false, reason: 'Purchase record does not match the authenticated user.' };
-      }
-      if (userEmail && purchase.leadEmail && purchase.leadEmail.toLowerCase() !== userEmail.toLowerCase()) {
-        return { authorized: false, reason: 'Purchase record does not match the provided customer email.' };
-      }
+    if (!purchase || purchase.status !== 'PAID') {
+      return {
+        authorized: false,
+        reason: 'Payment verification required. The provided purchase order is unverified or has not been completed.',
+      };
+    }
 
-      const tier = await pricingService.getTierById(purchase.tierId);
+    // Enforce project and customer integrity to prevent IDOR / guessing / cross-access
+    if (projectId && purchase.projectId && purchase.projectId !== projectId) {
+      return {
+        authorized: false,
+        reason: 'Security violation: Purchase record does not match the requested project ID.',
+      };
+    }
+    if (userId && purchase.userId && purchase.userId !== userId) {
+      return {
+        authorized: false,
+        reason: 'Security violation: Purchase record does not belong to the current authenticated account.',
+      };
+    }
+    if (queryEmail && purchase.leadEmail && purchase.leadEmail.toLowerCase() !== queryEmail.toLowerCase()) {
+      return {
+        authorized: false,
+        reason: 'Security violation: Purchase record does not match the provided customer email.',
+      };
+    }
+
+    const tier = await pricingService.getTierById(purchase.tierId);
+    if (requiredType === 'basic') {
+      if (
+        tier &&
+        (tier.code === 'BASIC_ESTIMATE_PDF' ||
+          tier.code === 'ESTIMATE_99' ||
+          tier.code === 'DETAILED_ESTIMATE_499' ||
+          tier.code === 'PREMIUM_1499')
+      ) {
+        return { authorized: true };
+      }
+    } else {
       if (tier && (tier.code === 'DETAILED_ESTIMATE_499' || tier.code === 'PREMIUM_1499')) {
         return { authorized: true };
       }
@@ -98,9 +73,30 @@ async function verifyDownloadEntitlement(
     }
   }
 
+  // 2. Authenticated user entitlement check (only when user session is verified)
+  if (userId) {
+    if (requiredType === 'basic') {
+      const hasBasic = await pricingService.canAccessFeature('BASIC_PDF_DOWNLOAD', userId, userEmail, projectId);
+      const hasFull = await pricingService.canAccessFeature('FULL_PDF_REPORT', userId, userEmail, projectId);
+      const hasReportDownload = await pricingService.canAccessFeature('REPORT_DOWNLOAD', userId, userEmail, projectId);
+      if (hasBasic || hasFull || hasReportDownload) {
+        return { authorized: true };
+      }
+    } else {
+      const hasReportDownload = await pricingService.canAccessFeature('REPORT_DOWNLOAD', userId, userEmail, projectId);
+      const hasFullPdf = await pricingService.canAccessFeature('FULL_PDF_REPORT', userId, userEmail, projectId);
+      if (hasReportDownload || hasFullPdf) {
+        return { authorized: true };
+      }
+    }
+  }
+
   return {
     authorized: false,
-    reason: 'Paid entitlement required. Please unlock Detailed BOQ (₹499) or Premium BOQ (₹1,499) to download this report.',
+    reason:
+      requiredType === 'basic'
+        ? 'Valid entitlement required. Please provide a verified order reference (e.g. HT-PUR-...) or unlock the Basic Estimate PDF (₹99).'
+        : 'Paid entitlement required. Please provide a verified order reference (e.g. HT-PUR-...) or unlock Detailed BOQ (₹499) to download this report.',
   };
 }
 

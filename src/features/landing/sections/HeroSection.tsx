@@ -93,11 +93,7 @@ export const HeroSection: React.FC = () => {
 
   const handleStartEstimate = (pkgId: 'STANDARD' | 'PREMIUM' | 'LUXURY' = 'PREMIUM') => {
     setSelectedPackage(pkgId, true);
-    if (isAuthenticated) {
-      navigate('/calculator');
-    } else {
-      navigate('/login?redirect=/calculator');
-    }
+    navigate('/calculator');
   };
 
   const handleZoom = (factor: number) => {
@@ -135,11 +131,11 @@ export const HeroSection: React.FC = () => {
             {/* 2. Main Headline */}
             <div className="space-y-2">
               <h1 className="text-3xl sm:text-4xl lg:text-[2.65rem] xl:text-[3rem] font-black text-[#1B3D34] tracking-tight leading-[1.12]">
-                Know your home cost <br />
+                Understand your home <br />
                 <span className="text-[#F28C28]">before</span> you build.
               </h1>
               <p className="text-[#52605B] text-sm sm:text-base font-normal leading-relaxed max-w-lg">
-                Estimate your construction cost, explore material quantities and get expert guidance—all in one place.
+                Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need it.
               </p>
             </div>
 
@@ -231,13 +227,7 @@ export const HeroSection: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isAuthenticated) {
-                      navigate('/consult');
-                    } else {
-                      navigate('/login?redirect=/consult');
-                    }
-                  }}
+                  onClick={() => navigate('/consult')}
                   className="bg-white hover:bg-[#F8F9F7] text-[#1B3D34] border border-[#D7DFD9] font-semibold text-sm py-3.5 px-5 rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
                 >
                   <User className="w-4 h-4 text-[#1B3D34]" />
@@ -510,10 +500,10 @@ export const HeroSection: React.FC = () => {
             </div>
             <div className="min-w-0">
               <strong className="text-xs sm:text-sm font-bold text-[#1B3D34] block leading-tight">
-                Trusted by homeowners
+                Built for clarity
               </strong>
               <span className="text-xs text-[#52605B] block leading-tight mt-0.5">
-                10,000+ estimates created
+                Instant planning estimates
               </span>
             </div>
           </div>

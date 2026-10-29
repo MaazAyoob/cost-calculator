@@ -1,6 +1,8 @@
 import React from 'react';
-import { ArrowRight, ShieldCheck, CheckCircle2, Compass, Award, Check } from 'lucide-react';
+import { ArrowRight, ShieldCheck, CheckCircle2, Compass, Award, Check, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import consultationArchitectImg from '../../../assets/consultation-architect.jpg';
 
 const EXPERT_SPECIALTIES = [
   {
@@ -54,6 +56,45 @@ export const SignatureExpertSection: React.FC = () => {
             <span className="text-xs font-semibold text-[#F28C28] block">
               100% Unbiased &bull; Independent Review
             </span>
+          </div>
+        </div>
+
+        {/* Editorial Photo Banner: Architect & Homeowner Consultation */}
+        <div className="relative rounded-3xl overflow-hidden border border-[#E3E8E2] shadow-sm bg-white grid grid-cols-1 lg:grid-cols-12 items-center">
+          <div className="lg:col-span-5 h-64 sm:h-72 w-full relative overflow-hidden bg-slate-100">
+            <img
+              src={consultationArchitectImg}
+              alt="Indian architect reviewing floor plans with homeowners in Bangalore studio"
+              className="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 hidden lg:block" />
+          </div>
+
+          <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 space-y-4 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] text-xs font-bold text-[#1B3D34]">
+              <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
+              <span>Independent Technical Oversight</span>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading tracking-tight leading-snug">
+              An hour with an independent architect can save lakhs in unexpected redesigns.
+            </h3>
+
+            <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed max-w-xl">
+              Hutty does not take contractor kickbacks or push construction packages. When you book a consultation, our licensed Council of Architecture (COA) practitioners review your layout, check municipal bylaws, and audit your contractor’s bill of quantities with total objectivity.
+            </p>
+
+            <div className="pt-1 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#1B3D34]">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                <span>45-Minute Private Video Call</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                <span>Written Follow-Up Summary</span>
+              </div>
+            </div>
           </div>
         </div>
 

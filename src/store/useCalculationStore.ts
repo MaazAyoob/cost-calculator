@@ -29,7 +29,7 @@ function buildInput(): EngineInput {
     roadWideningFt:  s.roadWideningFt || 0,
     prescribedBuildingLineFt: s.prescribedBuildingLineFt || 0,
     houseType:       s.houseType || 'Duplex',
-    floors:          s.floors > 0 ? s.floors : (s.plotLength > 0 && s.plotWidth > 0 ? 1 : 0),
+    floors:          s.floors > 0 ? s.floors : (s.plotLength > 0 && s.plotWidth > 0 ? (s.houseType === 'Rental Units' ? 3 : 2) : 0),
     parkingType:     (s.parkingType as any) || 'Normal Ground',
     carCount:        s.carCount || 0,
     bikeCount:       s.bikeCount || 0,
@@ -48,6 +48,8 @@ function buildInput(): EngineInput {
     contractorMode:  s.contractorMode || 'independent',
     contractorMarginRate: s.contractorMarginRate,
     applyContractorGST: s.applyContractorGST,
+    estimateMode:    s.estimateMode || 'quick',
+    isCustomRooms:   Boolean(s.isCustomRooms),
   };
   return input;
 }

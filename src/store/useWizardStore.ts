@@ -19,8 +19,8 @@ import { useReportStore } from './useReportStore';
 
 export type QualityTier = 'Essential' | 'Premium' | 'Luxury';
 export type CityLocation = 'Bangalore' | 'Mysore';
-export type AuthorityOption = 'BBMP/BDA' | 'MUDA';
-export type HouseType = 'Duplex' | 'Triplex' | 'Rental Units' | 'Mixed Use';
+export type AuthorityOption = 'BBMP/BDA' | 'MUDA' | 'Not sure';
+export type HouseType = 'Duplex' | 'Triplex' | 'Rental Units' | 'Mixed Use' | 'Farmhouse';
 export type ParkingTypeOption = 'Stilt' | 'Normal Ground' | 'EV Charging Ready';
 
 export interface RoomCounts {
@@ -35,7 +35,23 @@ export interface RoomCounts {
   pooja: number;
   utility: number;
   storeRoom: number;
+  terrace?: number;
 }
+
+export const SAMPLE_ROOM_CONFIG: RoomCounts = {
+  bedrooms: 3,
+  bathrooms: 3,
+  living: 1,
+  kitchen: 1,
+  dining: 1,
+  balcony: 1,
+  pooja: 1,
+  utility: 1,
+  commonToilets: 0,
+  office: 0,
+  storeRoom: 0,
+  terrace: 1,
+};
 
 export interface MaterialBrandSelection {
   steel: 'Tata Tiscon' | 'JSW Neosteel' | 'Indus TMT' | string;
@@ -81,6 +97,11 @@ export interface ConfiguratorState {
   carCount: number;
   bikeCount: number;
   evCharging: boolean;
+  startTimeline?: string;
+
+  // Estimation Mode & Customization Invariants
+  estimateMode: 'quick' | 'custom';
+  isCustomRooms: boolean;
 
   // Screen 02: Space Requirements (Starts 0/null)
   rooms: RoomCounts;
@@ -115,6 +136,8 @@ export interface ConfiguratorState {
   setSelectedPackage: (packageId: ConstructionPackageId | string, applyDefaults?: boolean) => void;
   setSpecificationTier: (tier: 'standard' | 'premium' | 'luxury') => void;
   setCity: (city: CityLocation) => void;
+  setAuthority: (authority: AuthorityOption | 'Not sure') => void;
+  setStartTimeline: (startTimeline: string) => void;
   setPlotDimensions: (length: number, width: number) => void;
   setRoadWidth: (roadWidthFt: number) => void;
   setBuiltUpAreaPerFloor: (bua: number) => void;
@@ -126,6 +149,8 @@ export interface ConfiguratorState {
   setPrescribedBuildingLineFt: (buildingLineFt: number) => void;
   setHouseConfig: (type: HouseType, floors: number) => void;
   setParkingConfig: (parkingType: ParkingTypeOption, carCount: number, bikeCount: number, evCharging: boolean) => void;
+  setEstimateMode: (mode: 'quick' | 'custom') => void;
+  applySampleRoomConfig: () => void;
   updateRoomCount: (room: keyof RoomCounts, delta: number) => void;
   setRoomCount: (room: keyof RoomCounts, count: number) => void;
   setLiftRequired: (required: boolean) => void;
@@ -187,20 +212,15 @@ export function getFreshZeroState() {
     carCount: 0,
     bikeCount: 0,
     evCharging: false,
+    startTimeline: '1-3_months',
 
-    // Space Requirements: zeroed
+    // Estimation Mode & Customization Flag
+    estimateMode: 'quick' as const,
+    isCustomRooms: false,
+
+    // Space Requirements: initialized with standard sample home configuration
     rooms: {
-      bedrooms: 0,
-      bathrooms: 0,
-      kitchen: 0,
-      dining: 0,
-      living: 0,
-      balcony: 0,
-      commonToilets: 0,
-      office: 0,
-      pooja: 0,
-      utility: 0,
-      storeRoom: 0,
+      ...SAMPLE_ROOM_CONFIG,
     },
     liftRequired: false,
 
@@ -335,6 +355,14 @@ export const useWizardStore = create<ConfiguratorState>()(
         set({ city, authority, hasStartedSelection: true });
       },
 
+      setAuthority: (authority) => {
+        set({ authority: authority as any, hasStartedSelection: true });
+      },
+
+      setStartTimeline: (startTimeline) => {
+        set({ startTimeline, hasStartedSelection: true });
+      },
+
       setPlotDimensions: (length, width) => {
         const plotLength = Math.max(0, Number.isFinite(Number(length)) ? Math.round(Number(length) * 10) / 10 : 0);
         const plotWidth = Math.max(0, Number.isFinite(Number(width)) ? Math.round(Number(width) * 10) / 10 : 0);
@@ -404,13 +432,37 @@ export const useWizardStore = create<ConfiguratorState>()(
         set({ parkingType, carCount, bikeCount, evCharging, floors, hasStartedSelection: true });
       },
 
+      setEstimateMode: (mode: 'quick' | 'custom') => {
+        if (mode === 'quick') {
+          // If returning to quick estimate mode, reset to sample config if not explicitly custom
+          if (!get().isCustomRooms) {
+            set({ estimateMode: 'quick', rooms: { ...SAMPLE_ROOM_CONFIG } });
+          } else {
+            set({ estimateMode: 'quick' });
+          }
+        } else {
+          set({ estimateMode: 'custom', isCustomRooms: true });
+        }
+      },
+
+      applySampleRoomConfig: () => {
+        set({
+          estimateMode: 'quick',
+          isCustomRooms: false,
+          rooms: { ...SAMPLE_ROOM_CONFIG },
+          hasStartedSelection: true,
+        });
+      },
+
       updateRoomCount: (room, delta) => {
         set((state) => {
-          const maxCount = (room === 'bedrooms' || room === 'bathrooms') ? 10 : 10;
-          const currentVal = state.rooms[room] || 0;
+          const maxCount = 10;
+          const currentVal = state.rooms[room] ?? 0;
           const newVal = Math.max(0, Math.min(maxCount, currentVal + delta));
           return {
             hasStartedSelection: true,
+            estimateMode: 'custom',
+            isCustomRooms: true,
             rooms: {
               ...state.rooms,
               [room]: newVal,
@@ -421,10 +473,12 @@ export const useWizardStore = create<ConfiguratorState>()(
 
       setRoomCount: (room, count) => {
         set((state) => {
-          const maxCount = (room === 'bedrooms' || room === 'bathrooms') ? 10 : 10;
+          const maxCount = 10;
           const newVal = Math.max(0, Math.min(maxCount, count));
           return {
             hasStartedSelection: true,
+            estimateMode: 'custom',
+            isCustomRooms: true,
             rooms: {
               ...state.rooms,
               [room]: newVal,

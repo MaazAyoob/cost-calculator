@@ -1,880 +1,404 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { pageFadeVariant } from '../../animations/variants';
 import { useWizardStore } from '../../store/useWizardStore';
 import { useBudgetResult, useArea, useCalculationStore } from '../../store/useCalculationStore';
 import { formatCurrency } from '../../utils/cn';
 import { LivePreviewPanel } from './LivePreviewPanel';
-import { HuttyLogo } from '../../components/common/HuttyLogo';
+import { HuttyLogo } from '../../components/brand/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
-import {
-  getCustomizationDiff,
-  getPackageConfig,
-} from '../../calculation-engine/data/packageConfig';
+import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 
-import { Step0Onboarding } from './steps/Step0Onboarding';
-import { Step1BasicInfo } from './steps/Step1BasicInfo';
-import { Step2SpaceRequirements } from './steps/Step2SpaceRequirements';
-import { Step3CoreMaterials } from './steps/Step3CoreMaterials';
-import { Step4Flooring } from './steps/Step4Flooring';
-import { Step5WallCladding } from './steps/Step5WallCladding';
-import { Step6Doors } from './steps/Step6Doors';
-import { Step7Windows } from './steps/Step7Windows';
-import { Step8Electrical } from './steps/Step8Electrical';
-import { Step9BathroomFittings } from './steps/Step9BathroomFittings';
-import { Step10Painting } from './steps/Step10Painting';
-import { Step10LoadingExperience } from './steps/Step10LoadingExperience';
+// 8 Stages Components
+import { Stage1Plot } from './stages/Stage1Plot';
+import { Stage2Home } from './stages/Stage2Home';
+import { Stage3Rooms } from './stages/Stage3Rooms';
+import { Stage4BuildableSpace } from './stages/Stage4BuildableSpace';
+import { Stage5ConstructionStyle } from './stages/Stage5ConstructionStyle';
+import { Stage6FinishesMaterials } from './stages/Stage6FinishesMaterials';
+import { Stage7Estimate } from './stages/Stage7Estimate';
+import { Stage8DetailedBOQ } from './stages/Stage8DetailedBOQ';
+import { DetailsAndAssumptions } from '../../components/common/DetailsAndAssumptions';
 
 import {
   ArrowLeft,
   ArrowRight,
-  Save,
   RotateCcw,
-  X,
-  HelpCircle,
-  Share2,
-  Check,
-  Copy,
-  Sliders,
-  Box,
   Sparkles,
-  Edit2,
-  FileCheck2,
+  User,
+  Check,
+  Compass,
+  Home,
+  Bed,
+  Maximize2,
+  Building2,
+  Layers,
+  Calculator,
+  FileText,
+  Save,
+  Clock,
+  Eye,
 } from 'lucide-react';
-import { SavedEstimationsModal } from '../../components/modals/SavedEstimationsModal';
-import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
-import { Modal } from '../../components/ui/Modal';
 import { analytics } from '../../utils/analytics';
-import { useProjectAutoSave } from '../../hooks/useProjectAutoSave';
 import { ProjectSaveStatusBadge } from '../../components/common/ProjectSaveStatusBadge';
+import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
 
-const STEP_METADATA = [
-  {
-    step: 0,
-    title: 'Choose your construction package',
-    subtitle: 'Choose the overall quality and finish level for your home.',
-    help: 'You can customise individual structural materials, finishes, and fixtures later.',
-    shortTitle: 'Package',
-  },
-  {
-    step: 1,
-    title: 'Tell us about your plot & planning',
-    subtitle: 'Your plot details help estimate how much you can build.',
-    help: 'Enter dimensions from your plot documents where possible. Municipal bylaws determine buildable area.',
-    shortTitle: 'Plot',
-  },
-  {
-    step: 2,
-    title: 'Choose your rooms & living spaces',
-    subtitle: 'Configure how many rooms and circulation spaces you need.',
-    help: 'Quantities for doors, windows, and electrical points adjust automatically based on room counts.',
-    shortTitle: 'Space',
-  },
-  {
-    step: 3,
-    title: 'Steel, cement & core materials',
-    subtitle: 'Choose preferred brands and structural material categories.',
-    help: 'Concrete, steel, and masonry block quantities are calculated directly from your house plan.',
-    shortTitle: 'Structure',
-  },
-  {
-    step: 4,
-    title: 'Flooring & surface finishes',
-    subtitle: 'Choose finishes for living, bedrooms, and common areas.',
-    help: 'Vitrified tiles, granite, Italian marble, or wooden flooring options with live price updates.',
-    shortTitle: 'Flooring',
-  },
-  {
-    step: 5,
-    title: 'Wall cladding & dado tiles',
-    subtitle: 'Configure wall tiles for bathrooms, kitchens, and utilities.',
-    help: 'Wall dado height options determine exact tile coverage and wet area waterproofing.',
-    shortTitle: 'Cladding',
-  },
-  {
-    step: 6,
-    title: 'Doors & internal joinery',
-    subtitle: 'Choose main door styles and internal flush doors.',
-    help: 'Door frame joinery and hardware sets are calculated per room opening.',
-    shortTitle: 'Doors',
-  },
-  {
-    step: 7,
-    title: 'Windows & glazing systems',
-    subtitle: 'Choose window materials and glazing preferences.',
-    help: 'Window surface area and lintel framing follow NBC lighting & ventilation norms.',
-    shortTitle: 'Windows',
-  },
-  {
-    step: 8,
-    title: 'Electrical points & MEP services',
-    subtitle: 'Configure electrical points, wiring grades, and circuit protections.',
-    help: 'Point counts for lights, fans, power sockets, ACs, and geysers are calculated per space.',
-    shortTitle: 'Services',
-  },
-  {
-    step: 9,
-    title: 'Bathroom fixtures & plumbing',
-    subtitle: 'Choose sanitaryware tiers and CPVC plumbing standards.',
-    help: 'Fixture sets, pipes, and drainage lines are verified against attached and powder washrooms.',
-    shortTitle: 'Sanitary',
-  },
-  {
-    step: 10,
-    title: 'Paint & surface finishes',
-    subtitle: 'Select your interior and exterior finish preferences.',
-    help: 'Review your choices before preparing your detailed report and BOQ dossier.',
-    shortTitle: 'Finishes',
-  },
+export const STAGE_CONFIG = [
+  { stage: 1, label: 'Your Plot', shortLabel: 'Plot', icon: Compass },
+  { stage: 2, label: 'Your Home', shortLabel: 'Home', icon: Home },
+  { stage: 3, label: 'Your Rooms', shortLabel: 'Rooms', icon: Bed },
+  { stage: 4, label: 'Buildable Space', shortLabel: 'Setbacks', icon: Maximize2 },
+  { stage: 5, label: 'Construction Style', shortLabel: 'Style', icon: Building2 },
+  { stage: 6, label: 'Finishes & Materials', shortLabel: 'Finishes', icon: Layers },
+  { stage: 7, label: 'Your Estimate', shortLabel: 'Estimate', icon: Calculator },
+  { stage: 8, label: 'Detailed BOQ', shortLabel: 'BOQ', icon: FileText },
 ];
 
 export const PlannerPage: React.FC = () => {
   const navigate = useNavigate();
   const store = useWizardStore();
+  const { isAuthenticated, user } = useCustomerAuthStore();
+  const budget = useBudgetResult();
+  const area = useArea();
+
   const {
     currentStep,
-    nextStep,
-    prevStep,
     setStep,
     startNewProject,
     selectedPackage,
     plotLength,
     plotWidth,
-    city,
-    houseType,
     floors,
-    rooms,
-    materialBrands,
-    flooringZones,
-    wallCladding,
-    doors,
-    windows,
-    electrical,
-    bathroomFittings,
-    painting,
   } = store;
 
-  const budget = useBudgetResult();
-  const area = useArea();
-  const { result } = useCalculationStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const stageParam = searchParams.get('stage');
 
-  const [showSavedModal, setShowSavedModal] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [showCompareModal, setShowCompareModal] = useState(false);
-  const [showReviewSummary, setShowReviewSummary] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
+  useEffect(() => {
+    if (stageParam) {
+      const parsed = parseInt(stageParam, 10);
+      if (parsed >= 1 && parsed <= 8 && parsed !== currentStep) {
+        setStep(parsed);
+      }
+    }
+  }, [stageParam, currentStep, setStep]);
 
-  // Mobile View Switcher: 'form' | 'preview'
-  const [mobileActiveTab, setMobileActiveTab] = useState<'form' | 'preview'>('form');
+  // Active stage (1 to 8). If store currentStep is 0, default to stage 1
+  const activeStage = currentStep >= 1 && currentStep <= 8 ? currentStep : 1;
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
+  const [showCompareModal, setShowCompareModal] = useState<boolean>(false);
 
-  // Customer Persistent Project Auto-Save
-  const { status: autoSaveStatus, lastSaved, errorMessage: autoSaveErrorMessage, triggerAutoSave } = useProjectAutoSave();
+  // Track initial stage entry on mount
+  useEffect(() => {
+    analytics.recordStepEnter(
+      STAGE_CONFIG[activeStage - 1]?.label || 'Plot',
+      selectedPackage,
+      undefined,
+      activeStage
+    );
+  }, []);
+
+  // Sync stage to store on change
+  const handleSetStage = (stage: number) => {
+    const bounded = Math.max(1, Math.min(8, stage));
+    setStep(bounded);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('stage', bounded.toString());
+      return next;
+    }, { replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    analytics.recordStepEnter(
+      STAGE_CONFIG[bounded - 1]?.label || 'Plot',
+      selectedPackage,
+      undefined,
+      bounded
+    );
+  };
+
+  const handleNext = () => {
+    if (activeStage < 8) {
+      handleSetStage(activeStage + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (activeStage > 1) {
+      handleSetStage(activeStage - 1);
+    }
+  };
 
   const totalCost = budget.totalProjectCost || 0;
   const buaSqFt = area.totalBUASqFt || 0;
-  const currentMeta = STEP_METADATA[currentStep] || STEP_METADATA[0];
-  const progressPct = Math.min(100, Math.round((currentStep / 10) * 100));
-
-  useEffect(() => {
-    if (currentStep >= 11) {
-      setStep(0);
-    }
-  }, []);
-
-  // Customization tracking
-  const customizations = getCustomizationDiff(selectedPackage || 'PREMIUM', store);
-  const customCount = customizations.length;
-  const pkgConfig = getPackageConfig(selectedPackage || 'PREMIUM');
-
-  const handleReset = () => {
-    startNewProject();
-    setShowResetConfirm(false);
-  };
-
-  const handleCopyShareLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
-  };
-
-  // Keyboard navigation shortcuts
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      const activeEl = document.activeElement;
-      const tagName = (e.target as HTMLElement)?.tagName;
-      const isInputFocused = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName);
-
-      if (e.key === 'Escape') {
-        setShowSavedModal(false);
-        setShowResetConfirm(false);
-        setShowHelpModal(false);
-        setShowShareModal(false);
-        setShowCompareModal(false);
-        setShowReviewSummary(false);
-        return;
-      }
-
-      if (isInputFocused) {
-        return;
-      }
-
-      // Safe Enter to continue: only when not typing and no modal is active
-      const hasActiveModal =
-        showSavedModal ||
-        showResetConfirm ||
-        showHelpModal ||
-        showShareModal ||
-        showCompareModal;
-
-      if (e.key === 'Enter' && !hasActiveModal && activeEl?.tagName !== 'BUTTON') {
-        if (currentStep === 10 || showReviewSummary) {
-          setStep(11);
-        } else if (currentStep < 10) {
-          nextStep();
-        }
-        return;
-      }
-
-      if (e.key === 'ArrowRight' && currentStep < 10) {
-        nextStep();
-      } else if (e.key === 'ArrowLeft' && currentStep > 0) {
-        prevStep();
-      }
-    },
-    [
-      currentStep,
-      nextStep,
-      prevStep,
-      setStep,
-      showReviewSummary,
-      showSavedModal,
-      showResetConfirm,
-      showHelpModal,
-      showShareModal,
-      showCompareModal,
-    ]
-  );
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
-
-  // Analytics: Record step entry and clean exit timing without double-counting
-  useEffect(() => {
-    const stepName = currentMeta.title;
-    analytics.recordStepEnter(stepName, selectedPackage || 'PREMIUM', store.city || 'Bangalore', currentStep);
-
-    return () => {
-      analytics.recordStepExit(stepName, selectedPackage || 'PREMIUM', store.city || 'Bangalore');
-    };
-  }, [currentStep, selectedPackage, store.city, currentMeta.title]);
-
-  const handleJumpToReview = () => {
-    setStep(10);
-    setShowReviewSummary(true);
-  };
+  const ratePerSqFt = totalCost > 0 && buaSqFt > 0 ? Math.round(totalCost / buaSqFt) : 0;
 
   return (
-    <motion.div
-      variants={pageFadeVariant}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="h-full max-h-screen w-full flex flex-col bg-[#F8F8F6] text-[#172722] font-sans overflow-hidden"
-    >
+    <div className="w-full h-full flex flex-col bg-[#F8F8F6] text-[#1B3D34] overflow-hidden select-none">
       <SEO
-        title={
-          currentStep === 0
-            ? 'Choose Construction Package | Hutty Calculator'
-            : `Step ${currentStep} of 10: ${currentMeta.title} | Hutty Calculator`
-        }
-        description="Configure plot dimensions, room layout, materials, and finishes to calculate your home construction estimate."
+        title={`Hutty Calculator — ${STAGE_CONFIG[activeStage - 1]?.label || 'Estimate Home Construction Cost'}`}
+        description="Plan your home, estimate construction cost, check municipal setbacks, and explore materials with Hutty."
       />
 
-      {/* ── 1. GLOBAL ARCHITECTURAL TOP HEADER ── */}
-      <header className="shrink-0 bg-white border-b border-[#E3E8E2] px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between z-30 shadow-2xs">
-        
-        {/* Left: Brand Logo & Title */}
-        <div className="flex items-center gap-4">
-          <div
-            onClick={() => navigate('/')}
-            className="cursor-pointer flex items-center"
-            role="button"
-            aria-label="Back to home"
-          >
-            <HuttyLogo variant="compact" width={92} />
-          </div>
-
-          <div className="hidden sm:block border-l border-[#E3E8E2] pl-3">
-            <span className="text-[11px] font-bold text-[#172722] tracking-wider uppercase block leading-tight">
-              HOME COST PLANNER
-            </span>
-            <span className="text-[10px] text-[#687770] block leading-tight">
-              Residential Planning &amp; Cost Estimation
-            </span>
-          </div>
-        </div>
-
-        {/* Center: Active Package Badge & Auto-Save Status */}
-        <div className="hidden md:flex items-center gap-3">
-          {currentStep > 0 && (
+      {/* ── TOP SLIM BRAND & PROGRESS HEADER ── */}
+      <header className="shrink-0 bg-white border-b border-[#E5E7EB] px-4 sm:px-6 py-2.5 z-30 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          
+          {/* Logo & Home Link */}
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setShowCompareModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#EDF3ED] text-[#1B3D34] border border-[#CBE0CD] hover:bg-[#DDF4E7] transition-colors cursor-pointer"
-              title="Click to compare construction packages"
+              onClick={() => navigate('/')}
+              className="cursor-pointer active:scale-95 transition-transform"
+              title="Return to Hutty Home"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28]" />
-              <span>{pkgConfig.title} Package</span>
-              {customCount > 0 ? (
-                <span className="text-[#F28C28]">· {customCount} custom</span>
-              ) : (
-                <span className="text-[#687770] font-normal">· Standard</span>
-              )}
+              <HuttyLogo variant="full" width={96} />
             </button>
-          )}
+            <div className="hidden md:flex items-center gap-1.5 pl-3 border-l border-[#E5E7EB] text-xs font-semibold text-[#687770]">
+              <span>Residential Construction Calculator</span>
+              <span>&bull;</span>
+              <span className="text-[#1B3D34]">Bangalore</span>
+            </div>
+          </div>
 
-          <ProjectSaveStatusBadge
-            status={autoSaveStatus}
-            lastSaved={lastSaved}
-            errorMessage={autoSaveErrorMessage}
-            onRetry={triggerAutoSave}
-          />
+          {/* Active Stage Indicator & Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm('Reset calculator to standard starting plot?')) {
+                  startNewProject();
+                  handleSetStage(1);
+                }
+              }}
+              className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[#687770] hover:text-[#1B3D34] px-2.5 py-1.5 rounded-lg hover:bg-[#F8F9F7] transition-all cursor-pointer"
+              title="Reset all inputs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Start Over</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/consult')}
+              className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] bg-[#EBF3EF] border border-[#D5E5DC] hover:bg-[#DDF0E5] px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 text-[#F28C28]" />
+              <span>Consult an Expert (₹1,499)</span>
+            </button>
+
+            {/* Mobile View Toggle */}
+            <button
+              type="button"
+              onClick={() => setMobileTab(mobileTab === 'form' ? 'preview' : 'form')}
+              className="lg:hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-[#EBF3EF] border border-[#D5E5DC] text-[#1B3D34] flex items-center gap-1.5 cursor-pointer"
+            >
+              <Eye className="w-3.5 h-3.5 text-[#F28C28]" />
+              <span>{mobileTab === 'form' ? '3D View' : 'Planner'}</span>
+            </button>
+          </div>
         </div>
 
-        {/* Right: Actions (Compare, Save, Reset, Share, Help, Close) */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <button
-            type="button"
-            onClick={() => setShowCompareModal(true)}
-            className="text-xs font-semibold text-[#172722] bg-[rgba(27,61,52,0.05)] hover:bg-[rgba(27,61,52,0.1)] p-1.5 sm:px-2.5 sm:py-1 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer border border-[#E3E8E2]"
-            title="Compare Packages"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
-            <span className="hidden xl:inline">Compare</span>
-          </button>
+        {/* 8-Stage Pill Navigation Track */}
+        <div className="max-w-7xl mx-auto pt-2.5 pb-0.5">
+          <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+            {STAGE_CONFIG.map((cfg) => {
+              const isCurrent = activeStage === cfg.stage;
+              const isPast = activeStage > cfg.stage;
+              const Icon = cfg.icon;
 
-          <button
-            type="button"
-            onClick={() => setShowSavedModal(true)}
-            className="text-xs font-semibold text-[#687770] hover:text-[#172722] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
-            title="Saved Projects"
-          >
-            <Save className="w-3.5 h-3.5 text-[#1B3D34]" />
-            <span className="hidden md:inline">Saved</span>
-          </button>
+              return (
+                <button
+                  key={cfg.stage}
+                  type="button"
+                  onClick={() => handleSetStage(cfg.stage)}
+                  className={`py-1.5 px-2.5 sm:px-3 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                    isCurrent
+                      ? 'bg-[#1B3D34] text-white shadow-2xs'
+                      : isPast
+                      ? 'bg-[#EBF3EF] text-[#1B3D34] hover:bg-[#DDF0E5]'
+                      : 'text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7]'
+                  }`}
+                  aria-label={`Jump to stage ${cfg.stage}: ${cfg.label}`}
+                >
+                  <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
+                    isCurrent
+                      ? 'bg-[#F28C28] text-white'
+                      : isPast
+                      ? 'bg-[#1B3D34] text-white'
+                      : 'bg-[#E5E7EB] text-[#4B5563]'
+                  }`}>
+                    {isPast ? <Check className="w-2.5 h-2.5" /> : cfg.stage}
+                  </span>
+                  <span className="hidden sm:inline">{cfg.label}</span>
+                  <span className="sm:hidden">{cfg.shortLabel}</span>
+                </button>
+              );
+            })}
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setShowResetConfirm(true)}
-            className="text-xs font-semibold text-[#687770] hover:text-[#172722] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
-            title="Reset Configuration"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Reset</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowShareModal(true)}
-            className="text-xs font-semibold text-[#687770] hover:text-[#172722] p-1.5 sm:px-2.5 sm:py-1 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors flex items-center gap-1.5 cursor-pointer"
-            title="Share Project"
-          >
-            <Share2 className="w-3.5 h-3.5 text-[#1B3D34]" />
-            <span className="hidden lg:inline">Share</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowHelpModal(true)}
-            className="text-xs font-semibold text-[#687770] hover:text-[#172722] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer"
-            title="Help & Shortcuts"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="text-xs font-semibold text-[#687770] hover:text-[#172722] p-1.5 rounded-lg hover:bg-[rgba(27,61,52,0.04)] transition-colors cursor-pointer ml-1"
-            title="Exit Calculator"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          {/* Thin Progress Line with Roof Accent Dot */}
+          <div className="w-full h-1 bg-[#E5E7EB] rounded-full mt-2 overflow-hidden relative">
+            <div
+              className="h-full bg-[#1B3D34] transition-all duration-300 ease-out"
+              style={{ width: `${(activeStage / 8) * 100}%` }}
+            />
+          </div>
         </div>
       </header>
 
-      {/* ── 2. GUIDED STEP JOURNEY SUB-HEADER (Prototype Style) ── */}
-      {currentStep <= 10 && (
-        <div className="shrink-0 bg-white border-b border-[#E3E8E2] px-4 sm:px-6 lg:px-8 pt-2 pb-2 sm:pt-3 sm:pb-2.5">
-          <div className="max-w-7xl mx-auto space-y-1.5 sm:space-y-2">
-            
-            {/* Top row: Eyebrow, Title & Step Count */}
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#687770] block leading-none mb-0.5 sm:mb-1">
-                  Your home journey
-                </span>
-                <h1 className="text-lg sm:text-2xl font-extrabold text-[#172722] tracking-tight font-heading leading-tight">
-                  {currentMeta.title}
-                </h1>
-              </div>
-
-              <div className="text-right shrink-0">
-                <span className="text-xs font-bold text-[#687770] font-mono">
-                  {currentStep === 0
-                    ? 'Start here'
-                    : currentStep === 10
-                    ? 'Step 10 of 10 · Review ready'
-                    : `Step ${currentStep} of 10`}
-                </span>
-              </div>
-            </div>
-
-            {/* Progress track (4px height) */}
-            <div className="h-1 w-full bg-[#E7EBE5] rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-[#1B3D34] rounded-full relative"
-                initial={false}
-                animate={{ width: `${progressPct}%` }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-              >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#F28C28] rounded-full" />
-              </motion.div>
-            </div>
-
-            {/* Horizontal Step Navigation Pills */}
-            <nav
-              className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none select-none text-xs"
-              aria-label="Calculator Steps Navigation"
-            >
-              {STEP_METADATA.map((m) => {
-                const isCurrent = currentStep === m.step;
-                const isCompleted = currentStep > m.step;
-
-                return (
-                  <button
-                    key={m.step}
-                    type="button"
-                    onClick={() => {
-                      setShowReviewSummary(false);
-                      setStep(m.step);
-                    }}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-xs transition-all cursor-pointer shrink-0 ${
-                      isCurrent
-                        ? 'bg-[#1B3D34] text-white font-bold shadow-xs'
-                        : isCompleted
-                        ? 'bg-[#EDF3ED] text-[#1B3D34] font-semibold hover:bg-[#DDF4E7]'
-                        : 'bg-transparent text-[#687770] hover:text-[#172722] hover:bg-[rgba(27,61,52,0.04)]'
-                    }`}
-                  >
-                    <span>
-                      {isCompleted ? '✓ ' : `${m.step}. `}
-                      {m.shortTitle}
-                    </span>
-                  </button>
-                );
-              })}
-
-              <button
-                type="button"
-                onClick={handleJumpToReview}
-                className={`whitespace-nowrap px-3 py-1.5 rounded-md font-bold text-xs transition-all cursor-pointer shrink-0 border ${
-                  currentStep === 10 && showReviewSummary
-                    ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                    : 'bg-transparent text-[#1B3D34] border-[#E3E8E2] hover:bg-[#EDF3ED]'
-                }`}
-              >
-                <span>✓ Review</span>
-              </button>
-            </nav>
-
-          </div>
-        </div>
-      )}
-
-      {/* ── 3. MAIN WORKSPACE (Form Panel & Home Snapshot Sidebar) ── */}
-      <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col">
-        {currentStep === 11 ? (
-          <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
-            <Step10LoadingExperience
-              autoSaveStatus={autoSaveStatus}
-              errorMessage={autoSaveErrorMessage}
-              onRetryAutoSave={triggerAutoSave}
-            />
-          </div>
-        ) : (
-          <div className="max-w-7xl mx-auto w-full h-full flex flex-col p-4 sm:p-5 lg:p-6 min-h-0 overflow-hidden pb-16 lg:pb-6">
-            
-            {/* Mobile View Switcher Tab Bar (Configure Form vs 3D & Estimate) */}
-            <div className="lg:hidden flex items-center bg-white p-1 rounded-xl border border-[#E3E8E2] mb-3 shrink-0 shadow-2xs">
-              <button
-                type="button"
-                onClick={() => setMobileActiveTab('form')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  mobileActiveTab === 'form'
-                    ? 'bg-[#1B3D34] text-white shadow-xs'
-                    : 'text-[#687770]'
-                }`}
-              >
-                <Sliders className="w-3.5 h-3.5" />
-                <span>Configure Form</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileActiveTab('preview')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  mobileActiveTab === 'preview'
-                    ? 'bg-[#1B3D34] text-white shadow-xs'
-                    : 'text-[#687770]'
-                }`}
-              >
-                <Box className="w-3.5 h-3.5 text-[#F28C28]" />
-                <span>Home Snapshot ({totalCost > 0 ? formatCurrency(totalCost) : '₹0'})</span>
-              </button>
-            </div>
-
-            {/* Layout Grid: Main Column (Flexible Form) + Sidebar (Home Snapshot) */}
-            <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_330px] xl:grid-cols-[minmax(0,1fr)_350px] gap-5 items-start min-h-0 overflow-hidden">
+      {/* ── MAIN WORKSPACE CONTAINER (Balanced Split Desktop / Stacked Mobile) ── */}
+      <div className="flex-1 w-full min-h-0 overflow-hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-0 items-start">
+          
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* LEFT 7/12: GUIDED STAGE FORM CONTAINER                            */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div
+            className={`w-full h-full min-h-0 lg:col-span-7 xl:col-span-8 flex flex-col bg-white rounded-3xl border border-[#E5E7EB] shadow-xs overflow-hidden ${
+              mobileTab === 'preview' ? 'hidden lg:flex' : 'flex'
+            }`}
+          >
+            {/* Scrollable Stage Content Area */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-7 md:p-8 space-y-6 scrollbar-thin">
               
-              {/* ── LEFT COLUMN: MAIN FORM PANEL (Spacious, White, 14px Radius) ── */}
-              <section
-                className={`h-full min-h-0 bg-white rounded-[14px] border border-[#E3E8E2] shadow-xs flex flex-col overflow-hidden ${
-                  mobileActiveTab === 'form' ? 'flex' : 'hidden lg:flex'
-                }`}
-              >
-                
-                {/* Scrollable Form Body */}
-                <div
-                  id="step-content-scroll-container"
-                  className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-7 pb-28 sm:pb-24 lg:pb-12 space-y-4 sm:space-y-5 scrollbar-thin"
-                >
-                  {/* Step Subtitle & Plain-Language Help Guidance */}
-                  {currentStep > 0 && !showReviewSummary && (
-                    <div className="space-y-1 pb-2.5 border-b border-[#E3E8E2]">
-                      <h2 className="text-sm sm:text-base font-bold text-[#172722]">
-                        {currentMeta.subtitle}
-                      </h2>
-                      <p className="text-xs text-[#687770] leading-relaxed">
-                        {currentMeta.help}
-                      </p>
+              {/* ── LIVE PRELIMINARY ESTIMATE BANNER (Early Feedback for Homeowners) ── */}
+              {totalCost > 0 && (
+                <div className="bg-[#EBF3EF] border border-[#D5E5DC] rounded-2xl px-4 py-3 flex items-center justify-between gap-3 shadow-2xs">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                    <div className="min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#687770]">
+                          Live Preliminary Estimate:
+                        </span>
+                        <span className="text-base sm:text-lg font-black text-[#1B3D34] font-heading tabular-nums">
+                          ₹ {totalCost.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-xs text-[#687770] hidden xs:inline">
+                          (~₹{ratePerSqFt.toLocaleString()}/sq.ft &bull; {buaSqFt.toLocaleString()} sq.ft BUA)
+                        </span>
+                      </div>
                     </div>
-                  )}
+                  </div>
 
-                  {/* Active Step Content */}
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={showReviewSummary ? 'review' : currentStep}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className="w-full"
+                  {activeStage < 7 && (
+                    <button
+                      type="button"
+                      onClick={() => handleSetStage(7)}
+                      className="shrink-0 bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-xs flex items-center gap-1 active:scale-95"
+                      title="Jump directly to your preliminary estimate"
                     >
-                      {showReviewSummary ? (
-                        /* ── FULL SELECTIONS REVIEW SUMMARY ── */
-                        <div className="space-y-4 text-left">
-                          <div className="p-3.5 bg-[#EDF3ED] rounded-xl border border-[#CBE0CD] space-y-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B3D34] block">
-                              Review Your Home Plan
-                            </span>
-                            <h3 className="text-sm font-bold text-[#172722]">
-                              Your selections are saved. Review before preparing the dossier.
-                            </h3>
-                            <p className="text-xs text-[#687770]">
-                              Use the Edit button beside any section to return and modify specifications.
-                            </p>
-                          </div>
-
-                          <div className="divide-y divide-[#E3E8E2] border border-[#E3E8E2] rounded-xl overflow-hidden bg-white">
-                            {[
-                              { label: 'Package Standard', value: `${pkgConfig.title} Package`, step: 0 },
-                              { label: 'Plot & Dimensions', value: `${plotLength || 40} × ${plotWidth || 30} ft · ${city || 'Bengaluru'}`, step: 1 },
-                              { label: 'House & Floors', value: `${houseType || 'Independent house'} · ${floors === 1 ? 'Ground' : `G+${(floors || 1) - 1}`}`, step: 1 },
-                              { label: 'Rooms & Spaces', value: `${rooms.bedrooms || 3} Bed · ${rooms.bathrooms || 3} Bath · ${rooms.kitchen || 1} Kitchen`, step: 2 },
-                              { label: 'Core Structural Materials', value: `${materialBrands?.steel || 'Tata Tiscon'} · ${materialBrands?.cement || 'UltraTech'}`, step: 3 },
-                              { label: 'Main Flooring', value: `${flooringZones?.living || 'Vitrified tiles'} in living area`, step: 4 },
-                              { label: 'Wall Cladding', value: `${wallCladding?.bathroomTileHeight || '7 ft'} bathroom tiles`, step: 5 },
-                              { label: 'Doors & Joinery', value: `${doors?.mainDoor || 'Teak finish'} main door`, step: 6 },
-                              { label: 'Windows & Glazing', value: `${windows?.primaryMaterial || 'uPVC'} soundproof windows`, step: 7 },
-                              { label: 'Electrical & MEP', value: `${electrical?.wireTier || 'Finolex'} · ${result.quantities.totalElectricalPoints || 120} points`, step: 8 },
-                              { label: 'Bathroom Fixtures', value: `${bathroomFittings?.sanitaryTier || 'Premium'} sanitary fittings`, step: 9 },
-                              { label: 'Paint & Finishes', value: `${painting?.brand || 'Asian Paints'} · ${painting?.internalPaint || 'Premium Emulsion'}`, step: 10 },
-                            ].map((row, idx) => (
-                              <div key={idx} className="p-3.5 flex items-center justify-between gap-3 text-xs hover:bg-[#F8F8F6] transition-colors">
-                                <div className="min-w-0 flex-1 pr-2">
-                                  <b className="text-[#172722] block font-semibold">{row.label}</b>
-                                  <span className="text-[#687770] text-[11px] block mt-0.5 break-words">{row.value}</span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowReviewSummary(false);
-                                    setStep(row.step);
-                                  }}
-                                  className="text-xs font-bold text-[#1B3D34] hover:text-[#142F28] flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EDF3ED] hover:bg-[#DDF4E7] transition-colors cursor-pointer shrink-0"
-                                >
-                                  <Edit2 className="w-3 h-3" />
-                                  <span>Edit</span>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] text-xs text-[#687770] flex items-center gap-2">
-                            <FileCheck2 className="w-4 h-4 text-[#1B3D34] shrink-0" />
-                            <span>
-                              Ready for full cost report preparation: itemized work list, materials needed, and payment plan.
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          {currentStep === 0 && <Step0Onboarding />}
-                          {currentStep === 1 && <Step1BasicInfo />}
-                          {currentStep === 2 && <Step2SpaceRequirements />}
-                          {currentStep === 3 && <Step3CoreMaterials />}
-                          {currentStep === 4 && <Step4Flooring />}
-                          {currentStep === 5 && <Step5WallCladding />}
-                          {currentStep === 6 && <Step6Doors />}
-                          {currentStep === 7 && <Step7Windows />}
-                          {currentStep === 8 && <Step8Electrical />}
-                          {currentStep === 9 && <Step9BathroomFittings />}
-                          {currentStep === 10 && <Step10Painting />}
-                        </>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
+                      <span>See Estimate</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                    </button>
+                  )}
                 </div>
+              )}
 
-                {/* ── STICKY / DOCKED FOOTER ACTIONS (Short Viewport Reachable) ── */}
-                <div className="hidden lg:flex sticky bottom-0 shrink-0 py-2.5 sm:py-3 px-4 sm:px-6 bg-white/95 backdrop-blur-md border-t border-[#E3E8E2] items-center justify-between gap-3 z-20 shadow-2xs">
-                  <button
-                    type="button"
-                    disabled={currentStep === 0 && !showReviewSummary}
-                    onClick={() => {
-                      if (showReviewSummary) {
-                        setShowReviewSummary(false);
-                      } else if (currentStep > 0) {
-                        prevStep();
-                      }
-                    }}
-                    className={`hutty-btn-secondary text-xs font-bold px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
-                      currentStep === 0 && !showReviewSummary ? 'opacity-40 cursor-not-allowed' : ''
-                    }`}
-                    id="step-nav-prev-btn"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Back</span>
-                  </button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStage}
+                  variants={pageFadeVariant}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="w-full"
+                >
+                  {activeStage === 1 && <Stage1Plot />}
+                  {activeStage === 2 && <Stage2Home />}
+                  {activeStage === 3 && <Stage3Rooms />}
+                  {activeStage === 4 && <Stage4BuildableSpace />}
+                  {activeStage === 5 && <Stage5ConstructionStyle />}
+                  {activeStage === 6 && <Stage6FinishesMaterials />}
+                  {activeStage === 7 && (
+                    <Stage7Estimate
+                      onAdjustSelections={(step) => handleSetStage(step || 1)}
+                      onProceedToDetailedBOQ={() => handleSetStage(8)}
+                    />
+                  )}
+                  {activeStage === 8 && (
+                    <Stage8DetailedBOQ onBackToEstimate={() => handleSetStage(7)} />
+                  )}
+                </motion.div>
+              </AnimatePresence>
 
-                  <span className="hidden sm:inline text-[11px] text-[#687770]">
-                    Selections stay saved as you navigate.
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (currentStep === 10 || showReviewSummary) {
-                        setStep(11);
-                      } else {
-                        nextStep();
-                      }
-                    }}
-                    className="hutty-btn-primary text-xs font-bold px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 cursor-pointer shadow-xs hover:shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34]"
-                    id="step-nav-next-btn"
-                  >
-                    <span>
-                      {currentStep === 10 || showReviewSummary
-                        ? 'Generate Full Dossier'
-                        : `Continue →`}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
-                  </button>
-                </div>
-
-              </section>
-
-              {/* ── RIGHT COLUMN: HOME SNAPSHOT SIDEBAR (Compact, Informative) ── */}
-              <div
-                className={`w-full h-full min-h-0 overflow-y-auto pb-16 lg:pb-0 scrollbar-thin ${
-                  mobileActiveTab === 'preview' ? 'flex flex-col' : 'hidden lg:block'
-                }`}
-              >
-                <LivePreviewPanel
-                  onOpenPackageComparison={() => setShowCompareModal(true)}
-                  onReviewAllSelections={handleJumpToReview}
+              {/* Consistent Progressive Disclosure: Details & assumptions */}
+              <div className="pt-2 border-t border-[#E5E7EB]">
+                <DetailsAndAssumptions
+                  activeStage={activeStage}
+                  initialOpen={searchParams.get('details') === 'open'}
                 />
               </div>
-
             </div>
+
+            {/* Docked Sticky Bottom Navigation Bar (Stages 1-6) */}
+            {activeStage <= 6 && (
+              <div className="shrink-0 p-3.5 sm:p-4 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] flex items-center justify-between gap-3 z-20">
+                <button
+                  type="button"
+                  data-testid="stage-prev-btn"
+                  disabled={activeStage === 1}
+                  onClick={handlePrev}
+                  className="px-4 py-2.5 rounded-xl border border-[#CBD5CB] text-[#1B3D34] bg-white hover:bg-[#F8F9F7] text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <span className="hidden md:inline text-[11px] text-[#687770]">
+                    Selections save automatically as you plan.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSetStage(7)}
+                    className="text-xs font-bold text-[#1B3D34] hover:text-[#F28C28] underline underline-offset-4 cursor-pointer"
+                  >
+                    Skip to Estimate (Stage 7) →
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  data-testid="stage-next-btn"
+                  onClick={handleNext}
+                  className="px-6 py-2.5 sm:py-3 rounded-xl bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-xs flex items-center gap-2 active:scale-95"
+                >
+                  <span>
+                    {activeStage === 6 ? 'View Estimate →' : `Next: ${STAGE_CONFIG[activeStage]?.shortLabel || 'Continue'} →`}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                </button>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* RIGHT 5/12: HOME SNAPSHOT & 3D MASSING PREVIEW                    */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div
+            className={`w-full h-full min-h-0 lg:col-span-5 xl:col-span-4 overflow-y-auto pb-16 lg:pb-0 scrollbar-thin ${
+              mobileTab === 'preview' ? 'block' : 'hidden lg:block'
+            }`}
+          >
+            <LivePreviewPanel
+              onOpenPackageComparison={() => setShowCompareModal(true)}
+              onReviewAllSelections={() => handleSetStage(7)}
+            />
+          </div>
+
+        </div>
       </div>
 
-      {/* ── MOBILE STICKY BOTTOM ESTIMATE & CONTROLS ── */}
-      {currentStep <= 10 && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E3E8E2] px-4 py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg flex items-center justify-between gap-3">
-          <div
-            onClick={() => setMobileActiveTab(mobileActiveTab === 'form' ? 'preview' : 'form')}
-            className="flex-1 text-left cursor-pointer"
-          >
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#687770] block">
-              Estimated Total &bull; {selectedPackage}
-            </span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-extrabold text-[#1B3D34] font-heading leading-tight">
-                {totalCost > 0 ? formatCurrency(totalCost) : '₹0'}
-              </span>
-              <span className="text-[10px] text-[#F28C28] font-bold underline">
-                {mobileActiveTab === 'form' ? 'View 3D Snapshot →' : 'Edit Form →'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              disabled={currentStep === 0 && !showReviewSummary}
-              onClick={() => {
-                if (showReviewSummary) {
-                  setShowReviewSummary(false);
-                } else if (currentStep > 0) {
-                  prevStep();
-                }
-              }}
-              className="p-2.5 rounded-lg border border-[#E3E8E2] bg-white text-[#172722] cursor-pointer disabled:opacity-30"
-              aria-label="Previous step"
-              id="mobile-step-nav-prev-btn"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (currentStep === 10 || showReviewSummary) {
-                  setStep(11);
-                } else {
-                  nextStep();
-                }
-              }}
-              className="hutty-btn-primary px-4 py-2.5 rounded-lg text-xs font-bold shadow-xs cursor-pointer"
-              id="mobile-step-nav-next-btn"
-            >
-              <span>{currentStep === 10 || showReviewSummary ? 'Dossier →' : 'Continue →'}</span>
-            </button>
-          </div>
-        </div>
+      {/* Package comparison modal */}
+      {showCompareModal && (
+        <PackageComparisonModal
+          isOpen={showCompareModal}
+          onClose={() => setShowCompareModal(false)}
+        />
       )}
-
-      {/* Package Comparison Modal */}
-      <PackageComparisonModal
-        isOpen={showCompareModal}
-        onClose={() => setShowCompareModal(false)}
-      />
-
-      {/* Share Modal */}
-      <Modal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-        title="Share Construction Plan"
-        description="Share your live interactive 3D plan and BOQ estimate with your family, architect, or contractor."
-        maxWidth="sm"
-      >
-        <div className="space-y-4">
-          <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] flex items-center justify-between gap-2">
-            <span className="text-xs font-mono text-[#172722] truncate">{window.location.href}</span>
-            <button
-              type="button"
-              onClick={handleCopyShareLink}
-              className="hutty-btn-primary px-3 py-1.5 text-xs rounded-md shrink-0 flex items-center gap-1 cursor-pointer"
-            >
-              {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedLink ? 'Copied' : 'Copy'}</span>
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Reset Confirmation Modal */}
-      <Modal
-        isOpen={showResetConfirm}
-        onClose={() => setShowResetConfirm(false)}
-        title="Reset configuration to zero?"
-        description="This will clear all plot dimensions, room allocations, and selected materials."
-        maxWidth="sm"
-      >
-        <div className="space-y-4 pt-1">
-          <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setShowResetConfirm(false)}
-              className="hutty-btn-secondary px-3 py-1.5 text-xs rounded-md cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="bg-[#1B3D34] text-white hover:bg-[#142F28] font-bold px-4 py-1.5 text-xs rounded-md cursor-pointer transition-colors"
-            >
-              Confirm Reset
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Help & Shortcuts Modal */}
-      <Modal
-        isOpen={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-        title="Hutty Planning Methodology"
-        description="Architectural guidelines, engineering standards, and calculator interaction shortcuts."
-        maxWidth="md"
-      >
-        <div className="space-y-3 text-xs text-[#687770] leading-relaxed">
-          <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1">
-            <span className="font-bold text-[#172722] block">3-Tier Construction Standards</span>
-            <p>Start with Standard, Premium, or Luxury specifications, then customize individual structural, finish, and MEP items as needed.</p>
-          </div>
-
-          <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1">
-            <span className="font-bold text-[#172722] block">How We Calculate Your Estimate</span>
-            <p>We calculate the concrete, steel needed, and masonry counts based on your plot size, floor plans, and local building bylaws.</p>
-          </div>
-
-          <div className="p-3 bg-[#F8F8F6] rounded-lg border border-[#E3E8E2] space-y-1">
-            <span className="font-bold text-[#172722] block">Keyboard Navigation Shortcuts</span>
-            <div className="grid grid-cols-2 gap-1.5 pt-1 font-mono text-[11px] text-[#172722]">
-              <div><kbd className="bg-white px-1.5 py-0.5 rounded border border-[#E3E8E2]">←</kbd> Previous Step</div>
-              <div><kbd className="bg-white px-1.5 py-0.5 rounded border border-[#E3E8E2]">→</kbd> Next Step</div>
-              <div><kbd className="bg-white px-1.5 py-0.5 rounded border border-[#E3E8E2]">Enter</kbd> Continue</div>
-              <div><kbd className="bg-white px-1.5 py-0.5 rounded border border-[#E3E8E2]">Esc</kbd> Close Modals</div>
-            </div>
-          </div>
-
-          <div className="pt-2 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setShowHelpModal(false)}
-              className="hutty-btn-primary px-4 py-2 text-xs rounded-md cursor-pointer"
-            >
-              Got It
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Saved Estimations Modal */}
-      <SavedEstimationsModal
-        isOpen={showSavedModal}
-        onClose={() => setShowSavedModal(false)}
-      />
-    </motion.div>
+    </div>
   );
 };

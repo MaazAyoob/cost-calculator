@@ -1,10 +1,3 @@
-// ==============================================================================
-// Hutty Authentication Route Guard
-// Protects customer-only routes (calculator, planner, account, reports)
-// by redirecting unauthenticated visitors to login while safely preserving
-// their intended destination.
-// ==============================================================================
-
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
@@ -41,3 +34,4 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   return <>{children}</>;
 };
+

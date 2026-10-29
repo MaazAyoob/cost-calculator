@@ -20,7 +20,7 @@ export interface GeneratedPdfResult {
 }
 
 /**
- * Basic Estimate PDF Generation Engine (₹99 Product).
+ * Basic Estimate PDF Generation Engine (Summary Product).
  * Generates a concise, executive 1-page summary of project dimensions, estimated cost,
  * high-level breakdown (materials, labour, fixtures), and statutory estimate disclaimer.
  * Excludes itemized BOQ, material takeoff schedules, and contractor audits.
@@ -50,7 +50,7 @@ export async function generateBasicEstimatePdfBlob(options: GeneratePdfOptions):
 }
 
 /**
- * Download Basic Estimate PDF (₹99 deliverable)
+ * Download Basic Estimate PDF (Summary deliverable)
  */
 export async function generateAndDownloadBasicEstimatePdf(options: GeneratePdfOptions): Promise<void> {
   const { url, filename } = await generateBasicEstimatePdfBlob(options);

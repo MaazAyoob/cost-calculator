@@ -390,13 +390,29 @@ export const BasicEstimatePdfDocument: React.FC<BasicEstimatePdfDocumentProps> =
             <Text style={styles.gridValue}>
               {input?.houseType || 'Residential Villa'} (G+{Math.max(0, (input?.floors || 1) - 1)})
             </Text>
-            <Text style={styles.gridNote}>Estimated Execution: {timeline?.totalMonths || 8} Months</Text>
+            <Text style={styles.gridNote}>
+              Mode: {input?.estimateMode === 'custom' || input?.isCustomRooms ? 'Custom Configuration' : 'Quick Estimate (Sample Assumptions)'}
+            </Text>
           </View>
 
           <View style={styles.gridCell}>
             <Text style={styles.gridLabel}>Specification Standards</Text>
             <Text style={styles.gridValue}>{specificationTier.toUpperCase()}</Text>
-            <Text style={styles.gridNote}>Bangalore Q1 2026 Material Benchmark</Text>
+            <Text style={styles.gridNote}>
+              Catalog: {data?.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'} ({data?.rateSourceMetadata?.isLive ? 'Live Feed' : 'Verified Baseline'})
+            </Text>
+          </View>
+
+          <View style={[styles.gridCell, { width: '100%' }]}>
+            <Text style={styles.gridLabel}>Configured Spaces &amp; Room Schedule</Text>
+            <Text style={styles.gridValue}>
+              {input?.rooms?.bedrooms ?? 3} Beds &bull; {input?.rooms?.bathrooms ?? 3} Baths &bull; {input?.rooms?.living ?? 1} Living &bull; {input?.rooms?.kitchen ?? 1} Kitchen &bull; {input?.rooms?.balcony ?? 1} Balcony &bull; {input?.rooms?.pooja ?? 1} Pooja
+            </Text>
+            <Text style={styles.gridNote}>
+              {input?.estimateMode === 'custom' || input?.isCustomRooms
+                ? 'Personalized layout specified by client.'
+                : 'Derived from standard 3BHK residential sample home assumptions.'}
+            </Text>
           </View>
         </View>
 
@@ -440,7 +456,7 @@ export const BasicEstimatePdfDocument: React.FC<BasicEstimatePdfDocumentProps> =
           </View>
         </View>
 
-        {/* Scope Notice: Distinguishes ₹99 summary from ₹499 Detailed BOQ */}
+        {/* Scope Notice: Distinguishes summary estimate from ₹499 Detailed BOQ */}
         <View style={styles.scopeBox}>
           <Text style={styles.scopeTitle}>Report Deliverables Notice</Text>
           <Text style={styles.scopeText}>

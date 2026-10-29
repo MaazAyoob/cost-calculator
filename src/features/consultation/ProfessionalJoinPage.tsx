@@ -28,6 +28,7 @@ import {
 } from '../../config/consultation';
 import { useConsultationStore } from '../../store/useConsultationStore';
 import { consultationAnalytics } from '../../utils/consultationAnalytics';
+import professionalEngineerImg from '../../assets/professional-engineer.jpg';
 
 export const ProfessionalJoinPage: React.FC = () => {
   const navigate = useNavigate();
@@ -231,34 +232,67 @@ export const ProfessionalJoinPage: React.FC = () => {
         ) : (
           /* Application Form */
           <div className="space-y-8">
-            {/* Header Card */}
-            <div className="bg-white rounded-3xl border border-[#E3E8E2] p-8 sm:p-10 shadow-xs space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.08)] border border-[rgba(27,61,52,0.12)] text-[#1B3D34] text-xs font-bold uppercase tracking-wider">
-                <Briefcase className="w-3.5 h-3.5 text-[#F28C28]" />
-                <span>Professional Practitioner Registration</span>
-              </div>
+            {/* Header Card with Authentic Indian Engineer Photography */}
+            <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 lg:p-10 shadow-xs space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.08)] border border-[rgba(27,61,52,0.12)] text-[#1B3D34] text-xs font-bold uppercase tracking-wider">
+                    <Briefcase className="w-3.5 h-3.5 text-[#F28C28]" />
+                    <span>Professional Practitioner Registration</span>
+                  </div>
 
-              <h1 className="text-3xl sm:text-4xl font-black text-[#1B3D34] tracking-tight font-heading">
-                Apply to Join Hutty as a Construction Professional
-              </h1>
+                  <h1 className="text-3xl sm:text-4xl font-black text-[#1B3D34] tracking-tight font-heading leading-tight">
+                    Apply to Join Hutty as a Construction Professional
+                  </h1>
 
-              <p className="text-sm sm:text-base text-[#687770] leading-relaxed max-w-2xl">
-                Join our verified network of residential architects, structural engineers, cost specialists, and contractors. Showcase your expertise to pre-screened homeowners seeking independent paid advisory.
-              </p>
+                  <p className="text-sm sm:text-base text-[#687770] leading-relaxed">
+                    Join our verified network of residential architects, structural engineers, cost specialists, and contractors. Showcase your expertise to pre-screened homeowners seeking independent paid advisory.
+                  </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-[#E3E8E2] text-xs text-[#1B3D34]">
-                <div className="flex items-center gap-2 font-semibold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <span>Genuine Homeowners</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#E3E8E2] text-xs text-[#1B3D34]">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span>Genuine Homeowners</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-semibold">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span>Fixed Fee ({LAUNCH_CONSULTATION_PRICE_DISPLAY})</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-semibold">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span>Vetted Quality Network</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 font-semibold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <span>Fixed Launch Fee ({LAUNCH_CONSULTATION_PRICE_DISPLAY})</span>
+
+                {/* Right Column: Professional Engineer Photo */}
+                <div className="lg:col-span-5 relative">
+                  <div className="relative rounded-2xl overflow-hidden border border-[#E3E8E2] shadow-sm bg-slate-100 group">
+                    <div className="h-60 sm:h-64 w-full overflow-hidden">
+                      <img
+                        src={professionalEngineerImg}
+                        alt="Indian civil and structural engineer reviewing 3D building plans on a tablet at a residential site in Bengaluru"
+                        className="w-full h-full object-cover object-top group-hover:scale-102 transition-transform duration-500 ease-out"
+                        loading="eager"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#112821]/80 via-transparent to-black/20 pointer-events-none" />
+
+                      <div className="absolute bottom-3 left-3 right-3 text-left text-white space-y-0.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28] bg-black/40 px-2 py-0.5 rounded">
+                          COA &bull; Chartered Engineers
+                        </span>
+                        <h4 className="text-xs font-bold leading-tight">
+                          Independent Technical Review
+                        </h4>
+                        <p className="text-[10px] text-white/80 line-clamp-1">
+                          Protecting homeowners with unbiased structural &amp; cost oversight.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 font-semibold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <span>Administrative Review Before Public Listing</span>
-                </div>
+
               </div>
             </div>
 

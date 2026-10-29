@@ -144,7 +144,17 @@ export const PaymentStatusPage: React.FC = () => {
                   : 'Estimate Report Unlocked!'}
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Your payment of ₹1,499 has been authoritatively verified with Cashfree PG.
+                Your payment of{' '}
+                {state.data?.purchase?.amountMinorUnits
+                  ? formatCurrency(state.data.purchase.amountMinorUnits / 100)
+                  : state.data?.payment?.amountMinorUnits
+                  ? formatCurrency(state.data.payment.amountMinorUnits / 100)
+                  : state.data?.request?.amountMinorUnits
+                  ? formatCurrency(state.data.request.amountMinorUnits / 100)
+                  : state.data?.amount
+                  ? formatCurrency(Number(state.data.amount))
+                  : '₹1,499'}{' '}
+                has been authoritatively verified with Cashfree PG.
               </p>
             </div>
 

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { Loader } from '../components/common/Skeleton';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
@@ -52,6 +52,9 @@ const NotFoundPage = lazy(() =>
 );
 const PaymentStatusPage = lazy(() =>
   import('../features/payment/PaymentStatusPage').then((m) => ({ default: m.PaymentStatusPage }))
+);
+const HowItWorksPage = lazy(() =>
+  import('../features/how-it-works/HowItWorksPage').then((m) => ({ default: m.HowItWorksPage }))
 );
 
 const PageFallback = () => (
@@ -118,15 +121,13 @@ export const router = createBrowserRouter([
         ),
       },
 
-      // Login-Gated Calculator & Planner Routes
+      // Calculator & Planner Routes (Guest Accessible)
       {
         path: 'planner',
         element: (
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
-              <AuthGuard>
-                <PlannerPage />
-              </AuthGuard>
+              <PlannerPage />
             </Suspense>
           </ErrorBoundary>
         ),
@@ -136,15 +137,13 @@ export const router = createBrowserRouter([
         element: (
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
-              <AuthGuard>
-                <PlannerPage />
-              </AuthGuard>
+              <PlannerPage />
             </Suspense>
           </ErrorBoundary>
         ),
       },
 
-      // Customer Account Dashboard
+      // Customer Account Dashboard (Protected)
       {
         path: 'account',
         element: (
@@ -289,6 +288,16 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
               <PricingPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'how-it-works',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <HowItWorksPage />
             </Suspense>
           </ErrorBoundary>
         ),

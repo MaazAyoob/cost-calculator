@@ -99,10 +99,18 @@ export const WebsiteFooter: React.FC = () => {
                 </li>
                 <li>
                   <button
+                    onClick={() => navigate('/how-it-works')}
+                    className="hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    How It Works
+                  </button>
+                </li>
+                <li>
+                  <button
                     onClick={() => navigate('/consult')}
                     className="hover:text-white transition-colors cursor-pointer text-left"
                   >
-                    Book Consultant
+                    Consult an Expert
                   </button>
                 </li>
                 <li>
@@ -115,10 +123,10 @@ export const WebsiteFooter: React.FC = () => {
                 </li>
                 <li>
                   <button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/professionals/join')}
                     className="hover:text-white transition-colors cursor-pointer text-left"
                   >
-                    My Project Dashboard
+                    For Professionals
                   </button>
                 </li>
               </ul>
@@ -146,13 +154,24 @@ export const WebsiteFooter: React.FC = () => {
             </div>
           </div>
 
+          {/* Mandatory Disclaimer */}
+          <div className="mt-10 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-white/60 leading-relaxed">
+            <strong className="text-white/80 block mb-1">Planning Disclaimer:</strong>
+            This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked. Hutty does not guarantee municipal sanction or bank loan approval.
+          </div>
+
           {/* Bottom Bar */}
-          <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+          <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
             <p>© {new Date().getFullYear()} Hutty. All rights reserved.</p>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center gap-6">
               <span>Privacy Policy</span>
               <span>Terms of Service</span>
-              <span>Transparent Quantity Estimation</span>
+              <button
+                onClick={() => navigate('/how-it-works')}
+                className="hover:text-white/90 transition-colors cursor-pointer text-white/50"
+              >
+                How It Works
+              </button>
               <button
                 onClick={() => navigate('/admin')}
                 className="hover:text-white/90 transition-colors cursor-pointer text-white/40 hover:underline"

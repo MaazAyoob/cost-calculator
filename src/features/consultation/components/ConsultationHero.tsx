@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   ShieldCheck,
@@ -8,10 +9,11 @@ import {
   UserPlus,
   CheckCircle2,
   Compass,
-  Building,
   Award,
+  Sparkles,
 } from 'lucide-react';
 import { LAUNCH_CONSULTATION_PRICE_DISPLAY } from '../../../config/consultation';
+import consultationArchitectImg from '../../../assets/consultation-architect.jpg';
 
 interface ConsultationHeroProps {
   onFindExpertClick: () => void;
@@ -28,7 +30,12 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
           {/* Left Column: Core Message & Actions */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-7 space-y-6 text-left"
+          >
             {/* Tagline */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(27,61,52,0.08)] border border-[rgba(27,61,52,0.12)] text-[#1B3D34] text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-[#F28C28] animate-pulse" />
@@ -82,70 +89,63 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
                 <span>Join as a Professional</span>
               </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right Column: Architectural Visual Card */}
-          <div className="lg:col-span-5">
-            <div className="bg-white rounded-3xl border-2 border-[#E3E8E2] p-6 sm:p-7 shadow-sm space-y-5 text-left relative overflow-hidden">
-              {/* Subtle architectural decorative accent */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[rgba(27,61,52,0.03)] rounded-bl-full pointer-events-none" />
+          {/* Right Column: Authentic Human Photography Showcase */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 relative"
+          >
+            <div className="relative rounded-3xl overflow-hidden border-2 border-[#E3E8E2] shadow-md bg-white group">
+              {/* Authentic Human Photography of Indian Architect & Homeowners */}
+              <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-100">
+                <img
+                  src={consultationArchitectImg}
+                  alt="Indian architect warmly consulting with homeowners over residential floor plans in Bangalore studio"
+                  className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500 ease-out"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#112821]/80 via-transparent to-black/20 pointer-events-none" />
 
-              {/* Header inside visual card */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-white flex items-center justify-center">
-                    <Compass className="w-5 h-5 text-[#F28C28]" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28] block">
-                      Independent Session
-                    </span>
-                    <h3 className="text-sm font-bold text-[#1B3D34]">
-                      1-on-1 Construction Advisory
-                    </h3>
-                  </div>
-                </div>
-                <div className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-mono text-xs font-bold">
-                  {LAUNCH_CONSULTATION_PRICE_DISPLAY}
-                </div>
-              </div>
-
-              {/* Key Highlights list */}
-              <div className="space-y-3 pt-1">
-                <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <div className="text-xs">
-                    <span className="font-bold text-[#1B3D34] block">House Plan &amp; Spatial Review</span>
-                    <span className="text-[#687770]">Room layout, ventilation &amp; Vastu alignment</span>
-                  </div>
+                {/* Floating Top-Right Fee Badge */}
+                <div className="absolute top-3.5 right-3.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-sm flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                  <span className="font-heading font-black text-xs text-[#1B3D34]">
+                    {LAUNCH_CONSULTATION_PRICE_DISPLAY}
+                  </span>
+                  <span className="text-[10px] text-[#687770]">/ 45 min</span>
                 </div>
 
-                <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <div className="text-xs">
-                    <span className="font-bold text-[#1B3D34] block">BOQ &amp; Contractor Quote Audit</span>
-                    <span className="text-[#687770]">Identify hidden exclusions &amp; rate variance</span>
+                {/* Floating Bottom Info Overlay */}
+                <div className="absolute bottom-3.5 left-3.5 right-3.5 text-left text-white space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white">
+                    <Award className="w-3 h-3 text-[#F28C28]" />
+                    <span>COA &amp; Chartered Specialists</span>
                   </div>
-                </div>
-
-                <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <div className="text-xs">
-                    <span className="font-bold text-[#1B3D34] block">Structural &amp; Setback Sanity</span>
-                    <span className="text-[#687770]">BBMP/BDA bylaws &amp; RCC soil suitability</span>
-                  </div>
+                  <h3 className="text-sm font-bold leading-tight">
+                    Independent, 1-on-1 Plan &amp; Cost Review
+                  </h3>
+                  <p className="text-[11px] text-white/80 line-clamp-1">
+                    Drawings, BBMP setbacks, structural sanity &amp; contractor BOQ audits.
+                  </p>
                 </div>
               </div>
 
-              {/* Bottom Trust Note */}
-              <div className="pt-3 border-t border-[#E3E8E2] flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-[#687770]">
-                <span className="flex items-center gap-1.5 font-medium">
-                  <Award className="w-3.5 h-3.5 text-emerald-700 shrink-0" /> Vetted CoA &amp; Chartered Specialists
-                </span>
-                <span className="font-medium text-[#1B3D34] shrink-0">45-Minute Focused Call</span>
+              {/* Bottom Quick Feature Strip */}
+              <div className="p-3.5 bg-[#F8F9F7] border-t border-[#E3E8E2] grid grid-cols-2 gap-2 text-left">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span className="text-xs font-semibold text-[#1B3D34]">No Builder Bias</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span className="text-xs font-semibold text-[#1B3D34]">Direct Video Session</span>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </div>

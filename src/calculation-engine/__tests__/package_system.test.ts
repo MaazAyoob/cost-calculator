@@ -280,13 +280,14 @@ describe('Hutty 3-Package Construction Standards System', () => {
     expect(comparison.recommendation.rationale).toContain('rental');
   });
 
-  it('10. Fresh zero state initializes on Step 0 with default Premium package and zeroed inputs', () => {
+  it('10. Fresh zero state initializes on Step 0 with default Premium package and sample quick estimate configuration', () => {
     const fresh = getFreshZeroState();
     expect(fresh.currentStep).toBe(0);
     expect(fresh.selectedPackage).toBe('PREMIUM');
     expect(fresh.plotLength).toBe(0);
     expect(fresh.plotWidth).toBe(0);
-    expect(fresh.rooms.bedrooms).toBe(0);
+    expect(fresh.rooms.bedrooms).toBe(3);
+    expect(fresh.estimateMode).toBe('quick');
     expect(fresh.hasStartedSelection).toBe(false);
   });
 });

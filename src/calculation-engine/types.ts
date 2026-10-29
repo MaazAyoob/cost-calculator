@@ -113,6 +113,8 @@ export interface EngineInput {
   contractorMode?: 'independent' | 'contractor';
   contractorMarginRate?: number; // Configurable contractor margin (e.g. 0.08 to 0.15, default 0.10)
   applyContractorGST?: boolean;
+  estimateMode?: 'quick' | 'custom';
+  isCustomRooms?: boolean;
 }
 
 // ────────────────────────────────────────────────────────────
