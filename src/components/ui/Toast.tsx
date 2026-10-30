@@ -43,11 +43,11 @@ export const ToastContainer: React.FC = () => {
             <div className="shrink-0 mt-0.5">{iconMap[toast.type]}</div>
             <div className="flex-1 min-w-0">
               <div className="font-bold leading-tight font-heading">{toast.title}</div>
-              {toast.message && <div className="text-[11px] text-[#4B5563] mt-0.5 leading-snug">{toast.message}</div>}
+              {toast.message && <div className="text-[11px] text-[#707873] mt-0.5 leading-snug">{toast.message}</div>}
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="shrink-0 p-1 rounded-md text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+              className="shrink-0 p-1 rounded-md text-[#707873] hover:text-[#18211E] transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>

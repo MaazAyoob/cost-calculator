@@ -113,31 +113,31 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
 
       {/* ── 2. DRAFT & REVIEW STATUS BAR ── */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className={`border rounded-2xl ${changedCount > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-white border-slate-200'}`}>
+        <Card className={`border rounded-2xl ${changedCount > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-white border-[#E5E7EB]'}`}>
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">Draft Changes</p>
-              <p className="text-2xl font-bold text-slate-900 mt-0.5">
+              <p className="text-xs font-medium text-[#707873]">Draft Changes</p>
+              <p className="text-2xl font-bold text-[#18211E] mt-0.5">
                 {changedCount}
               </p>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#707873] mt-1">
                 {changedCount > 0 ? 'Awaiting test & publication' : 'All parameters synced'}
               </p>
             </div>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${changedCount > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${changedCount > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-[#707873]'}`}>
               <Sparkles className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-slate-200 bg-white rounded-2xl">
+        <Card className="border border-[#E5E7EB] bg-white rounded-2xl">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">Rate Overrides</p>
-              <p className="text-2xl font-bold text-slate-900 mt-0.5">
+              <p className="text-xs font-medium text-[#707873]">Rate Overrides</p>
+              <p className="text-2xl font-bold text-[#18211E] mt-0.5">
                 {overrides.length}
               </p>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#707873] mt-1">
                 Across {rates.length} tracked items
               </p>
             </div>
@@ -147,14 +147,14 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
           </CardContent>
         </Card>
 
-        <Card className="border border-slate-200 bg-white rounded-2xl">
+        <Card className="border border-[#E5E7EB] bg-white rounded-2xl">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">Pending Review</p>
-              <p className="text-2xl font-bold text-slate-900 mt-0.5">
+              <p className="text-xs font-medium text-[#707873]">Pending Review</p>
+              <p className="text-2xl font-bold text-[#18211E] mt-0.5">
                 {changedCount > 0 ? '1' : '0'}
               </p>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#707873] mt-1">
                 {changedCount > 0 ? 'Review before activation' : 'Production is up to date'}
               </p>
             </div>
@@ -164,15 +164,15 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
           </CardContent>
         </Card>
 
-        <Card className="border border-slate-200 bg-white rounded-2xl">
+        <Card className="border border-[#E5E7EB] bg-white rounded-2xl">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">Engine Status</p>
+              <p className="text-xs font-medium text-[#707873]">Engine Status</p>
               <p className="text-base font-bold text-emerald-700 mt-1 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Single Source Active</span>
               </p>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#707873] mt-1">
                 Zero duplicate engines
               </p>
             </div>
@@ -185,14 +185,14 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
 
       {/* ── 3. MAJOR CONTROL DOMAINS CARDS ── */}
       <div>
-        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-bold text-[#18211E] uppercase tracking-wider mb-3">
           Quick Access Construction Settings
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Card 1: Project & BUA */}
           <div
             onClick={() => onNavigate('project-bua')}
-            className="p-5 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
+            className="p-5 bg-white border border-[#E5E7EB] rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#1B3D34] flex items-center justify-center group-hover:bg-[#1B3D34] group-hover:text-white transition-colors">
@@ -200,11 +200,11 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h3 className="font-bold text-slate-900 mt-3 text-base">Project & Built-up Area</h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <h3 className="font-bold text-[#18211E] mt-3 text-base">Project & Built-up Area</h3>
+            <p className="text-xs text-[#707873] mt-1">
               Plot dimensions, floor counts, circulation %, balcony %, and BUA calculation methods.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-[#707873]">
               <span>Standard Footprint</span>
               <span className="font-bold text-[#1B3D34]">60% Coverage</span>
             </div>
@@ -213,7 +213,7 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
           {/* Card 2: Rooms & Spaces */}
           <div
             onClick={() => onNavigate('rooms-spaces')}
-            className="p-5 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
+            className="p-5 bg-white border border-[#E5E7EB] rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -221,11 +221,11 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h3 className="font-bold text-slate-900 mt-3 text-base">Rooms & Spaces</h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <h3 className="font-bold text-[#18211E] mt-3 text-base">Rooms & Spaces</h3>
+            <p className="text-xs text-[#707873] mt-1">
               Bedroom, Living, and Kitchen dimensions, plus dedicated Bathroom Master and custom room creation.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-[#707873]">
               <span>Templates Configured</span>
               <span className="font-bold text-blue-700">12 Room Types</span>
             </div>
@@ -234,7 +234,7 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
           {/* Card 3: RCC & Structure */}
           <div
             onClick={() => onNavigate('rcc-structure')}
-            className="p-5 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
+            className="p-5 bg-white border border-[#E5E7EB] rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors">
@@ -242,11 +242,11 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h3 className="font-bold text-slate-900 mt-3 text-base">RCC & Structure</h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <h3 className="font-bold text-[#18211E] mt-3 text-base">RCC & Structure</h3>
+            <p className="text-xs text-[#707873] mt-1">
               Steel factor per sq.ft (2.8 kg), floor increments, cement consumption (0.40 bags/sqft), sand, and aggregates.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-[#707873]">
               <span>Ground Steel</span>
               <span className="font-bold text-amber-700">2.80 kg/sq.ft</span>
             </div>
@@ -255,7 +255,7 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
           {/* Card 4: Material Prices */}
           <div
             onClick={() => onNavigate('material-prices')}
-            className="p-5 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
+            className="p-5 bg-white border border-[#E5E7EB] rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
@@ -263,11 +263,11 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h3 className="font-bold text-slate-900 mt-3 text-base">Material Prices</h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <h3 className="font-bold text-[#18211E] mt-3 text-base">Material Prices</h3>
+            <p className="text-xs text-[#707873] mt-1">
               Authoritative Rate Master for steel, cement, blocks, tiles, paints, and electrical supplies.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-[#707873]">
               <span>Invariance</span>
               <span className="font-bold text-emerald-700">Rates Never Alter Quantities</span>
             </div>
@@ -276,7 +276,7 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
           {/* Card 5: Calculation Methods */}
           <div
             onClick={() => onNavigate('calculation-methods')}
-            className="p-5 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
+            className="p-5 bg-white border border-[#E5E7EB] rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
@@ -284,11 +284,11 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h3 className="font-bold text-slate-900 mt-3 text-base">Calculation Methods</h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <h3 className="font-bold text-[#18211E] mt-3 text-base">Calculation Methods</h3>
+            <p className="text-xs text-[#707873] mt-1">
               Switch safe registered calculation formulas for Steel, Paint, Flooring, Masonry, MEP, and Labour.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-[#707873]">
               <span>Safety</span>
               <span className="font-bold text-purple-700">Zero Arbitrary Code</span>
             </div>
@@ -305,8 +305,8 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
               </div>
               <ArrowRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h3 className="font-bold text-slate-900 mt-3 text-base">In-Admin Test Calculator</h3>
-            <p className="text-xs text-slate-600 mt-1">
+            <h3 className="font-bold text-[#18211E] mt-3 text-base">In-Admin Test Calculator</h3>
+            <p className="text-xs text-[#707873] mt-1">
               Run real calculations and inspect Active vs Draft differences without affecting customers.
             </p>
             <div className="mt-4 pt-3 border-t border-amber-200/60 flex items-center justify-between text-xs font-medium text-amber-800">

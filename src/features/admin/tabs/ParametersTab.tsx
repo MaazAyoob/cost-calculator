@@ -317,13 +317,13 @@ export const ParametersTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER & SEARCH ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#18211E] font-heading flex items-center gap-2">
             <Sliders className="w-5 h-5 text-[#1B3D34]" />
             Central Construction Parameters
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Client-controlled calculation factors, wastage percentages, and physical dimensional rules.
           </p>
         </div>
@@ -336,14 +336,14 @@ export const ParametersTab: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search parameter (e.g. wall height, steel)..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+              className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
             />
           </div>
 
           <select
             value={selectedCat}
             onChange={(e) => setSelectedCat(e.target.value)}
-            className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-700"
+            className="px-3 py-1.5 text-xs bg-slate-50 border border-[#E5E7EB] rounded-xl font-medium text-slate-700"
           >
             {categories.map((c) => (
               <option key={c} value={c}>
@@ -381,14 +381,14 @@ export const ParametersTab: React.FC = () => {
             <Card
               key={param.key}
               className={`border transition-all ${
-                isOverridden ? 'border-[#F28C28] bg-amber-50/20' : 'border-slate-200 bg-white hover:border-slate-300'
+                isOverridden ? 'border-[#F28C28] bg-amber-50/20' : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
               }`}
             >
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900 font-heading">
+                      <span className="text-xs font-bold text-[#18211E] font-heading">
                         {param.name}
                       </span>
                       {impact.severity === 'CRITICAL' && (
@@ -411,7 +411,7 @@ export const ParametersTab: React.FC = () => {
                     <span className="text-base font-bold font-mono text-[#1B3D34]">
                       {effectiveVal}
                     </span>
-                    <span className="text-xs text-slate-500 ml-1 font-medium">
+                    <span className="text-xs text-[#707873] ml-1 font-medium">
                       {param.unit}
                     </span>
                     {isOverridden && (
@@ -422,14 +422,14 @@ export const ParametersTab: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-600 line-clamp-2">
+                <p className="text-xs text-[#707873] line-clamp-2">
                   {param.description}
                 </p>
 
                 {/* Impact Summary */}
-                <div className="pt-2 border-t border-slate-100 text-[11px] flex items-center justify-between text-slate-500">
+                <div className="pt-2 border-t border-slate-100 text-[11px] flex items-center justify-between text-[#707873]">
                   <div className="flex items-center gap-1.5">
-                    <span className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium text-slate-600">
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-medium text-[#707873]">
                       {param.sourceType}
                     </span>
                     {param.min !== undefined && param.max !== undefined && (
@@ -444,7 +444,7 @@ export const ParametersTab: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleRevertParam(param.key)}
-                        className="text-xs text-slate-500 hover:text-red-600 font-semibold cursor-pointer"
+                        className="text-xs text-[#707873] hover:text-red-600 font-semibold cursor-pointer"
                         title="Revert to baseline"
                       >
                         Revert
@@ -468,7 +468,7 @@ export const ParametersTab: React.FC = () => {
       {/* ── EDIT PARAMETER MODAL (Part 43 & 44) ── */}
       {editingParam && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-lg w-full bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 space-y-4">
+          <div className="max-w-lg w-full bg-white rounded-2xl p-6 shadow-2xl border border-[#E5E7EB] space-y-4">
             <div>
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -478,10 +478,10 @@ export const ParametersTab: React.FC = () => {
                   {editingParam.key}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-slate-900 font-heading mt-2">
+              <h3 className="text-lg font-bold text-[#18211E] font-heading mt-2">
                 Configure {editingParam.name}
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-[#707873] mt-1">
                 {editingParam.description}
               </p>
             </div>
@@ -493,20 +493,20 @@ export const ParametersTab: React.FC = () => {
                 <div className={`p-3 rounded-xl border text-xs space-y-1.5 ${
                   impact.severity === 'CRITICAL'
                     ? 'bg-red-50/70 border-red-200 text-red-900'
-                    : 'bg-slate-50 border-slate-200 text-slate-700'
+                    : 'bg-slate-50 border-[#E5E7EB] text-slate-700'
                 }`}>
                   <div className="flex items-center gap-1.5 font-bold">
                     {impact.severity === 'CRITICAL' ? (
                       <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
                     ) : (
-                      <HelpCircle className="w-4 h-4 text-slate-500 shrink-0" />
+                      <HelpCircle className="w-4 h-4 text-[#707873] shrink-0" />
                     )}
                     <span>What this parameter controls:</span>
                   </div>
                   <p className="text-[11px]">
                     {impact.explanation}
                   </p>
-                  <div className="pt-1 text-[11px] flex items-center gap-1 text-slate-500">
+                  <div className="pt-1 text-[11px] flex items-center gap-1 text-[#707873]">
                     <strong>Downstream effects:</strong> {impact.affectedBOQLines.slice(0, 3).join(', ')}...
                   </div>
                 </div>
@@ -522,9 +522,9 @@ export const ParametersTab: React.FC = () => {
                   type="text"
                   value={tempValue}
                   onChange={(e) => setTempValue(e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm font-mono font-bold text-slate-900 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                  className="flex-1 px-3 py-2 text-sm font-mono font-bold text-[#18211E] border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                 />
-                <span className="px-3 py-2 text-xs bg-slate-100 rounded-xl text-slate-600 font-medium">
+                <span className="px-3 py-2 text-xs bg-slate-100 rounded-xl text-[#707873] font-medium">
                   {editingParam.unit}
                 </span>
               </div>
@@ -553,7 +553,7 @@ export const ParametersTab: React.FC = () => {
                   setEditingParam(null);
                   setShowWarningModal(false);
                 }}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-[#707873] hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               >
                 Cancel
               </button>

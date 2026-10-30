@@ -63,14 +63,14 @@ export const LoginPage: React.FC = () => {
         <h2 className="mt-4 text-3xl font-black text-[#1B3D34] tracking-tight font-heading">
           Welcome back.
         </h2>
-        <p className="mt-1.5 text-sm text-[#52605B] max-w-sm mx-auto leading-relaxed">
+        <p className="mt-1.5 text-sm text-[#707873] max-w-sm mx-auto leading-relaxed">
           Your home project is saved. Log in to continue where you left off.
         </p>
       </div>
 
       {/* Main Card Container */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E2E8E3] shadow-sm">
+        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E5E7EB] shadow-sm">
           
           {/* Error Banner */}
           {(error || clientError) && (
@@ -155,7 +155,7 @@ export const LoginPage: React.FC = () => {
 
           {/* Sign Up Redirect Link */}
           <div className="mt-6 pt-5 border-t border-[#EDF2EE] text-center">
-            <p className="text-xs text-[#52605B]">
+            <p className="text-xs text-[#707873]">
               Don&apos;t have an account yet?{' '}
               <Link
                 to={`/signup?redirect=${encodeURIComponent(redirectDestination)}`}

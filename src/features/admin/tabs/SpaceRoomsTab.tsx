@@ -323,29 +323,29 @@ export const SpaceRoomsTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#18211E] font-heading flex items-center gap-2">
             <Home className="w-5 h-5 text-[#1B3D34]" />
             Space & Room Archetypes
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Admin configuration for standard room dimensions, dado tile heights, fixture counts, and MEP point templates.
           </p>
         </div>
 
         {/* Global Space Calculation Rules (Part 5) */}
-        <div className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 text-xs">
+        <div className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-xl border border-[#E5E7EB] text-xs">
           <div>
-            <span className="text-[11px] text-slate-500 block">Circulation Allowance</span>
-            <strong className="font-mono text-slate-800">
+            <span className="text-[11px] text-[#707873] block">Circulation Allowance</span>
+            <strong className="font-mono text-[#18211E]">
               {draftParameters['space.circulation_percent'] || 10}%
             </strong>
           </div>
           <div className="h-6 w-px bg-slate-200" />
           <div>
-            <span className="text-[11px] text-slate-500 block">Staircase Floor Area</span>
-            <strong className="font-mono text-slate-800">
+            <span className="text-[11px] text-[#707873] block">Staircase Floor Area</span>
+            <strong className="font-mono text-[#18211E]">
               {draftParameters['space.staircase_area_sqft'] || 180} sqft
             </strong>
           </div>
@@ -356,7 +356,7 @@ export const SpaceRoomsTab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Template Selector List */}
         <div className="space-y-2">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block px-1">
+          <span className="text-xs font-bold text-[#707873] uppercase tracking-wider block px-1">
             Room Archetypes ({CANONICAL_ROOM_TEMPLATES.length})
           </span>
           <div className="space-y-1.5">
@@ -374,7 +374,7 @@ export const SpaceRoomsTab: React.FC = () => {
                   className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                     isSelected
                       ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                      : 'bg-white text-slate-700 border-[#E5E7EB] hover:border-[#CBD5CB]'
                   }`}
                 >
                   <div>
@@ -388,7 +388,7 @@ export const SpaceRoomsTab: React.FC = () => {
 
                   {hasDraft && (
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                      isSelected ? 'bg-amber-400 text-slate-900' : 'bg-amber-100 text-[#F28C28]'
+                      isSelected ? 'bg-amber-400 text-[#18211E]' : 'bg-amber-100 text-[#F28C28]'
                     }`}>
                       DRAFT
                     </span>
@@ -401,19 +401,19 @@ export const SpaceRoomsTab: React.FC = () => {
 
         {/* Right: Detailed Template Editor */}
         <div className="lg:col-span-2">
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-start justify-between border-b border-slate-100 pb-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-slate-900 font-heading">
+                    <h3 className="text-lg font-bold text-[#18211E] font-heading">
                       {selectedTemplate.name}
                     </h3>
-                    <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-600">
+                    <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-[#707873]">
                       {selectedTemplate.category}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-[#707873] mt-0.5">
                     Controls synthesized default dimensions when client adds a {selectedTemplate.name.toLowerCase()} in Wizard.
                   </p>
                 </div>
@@ -422,7 +422,7 @@ export const SpaceRoomsTab: React.FC = () => {
                   <Button
                     type="button"
                     onClick={() => setIsEditing(true)}
-                    className="px-3 py-1.5 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl"
+                    className="px-3 py-1.5 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-[#18211E] rounded-xl"
                   >
                     <Edit2 className="w-3.5 h-3.5 mr-1" />
                     Modify Defaults
@@ -432,7 +432,7 @@ export const SpaceRoomsTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                      className="px-3 py-1.5 text-xs font-semibold text-[#707873] hover:bg-slate-100 rounded-xl cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -450,14 +450,14 @@ export const SpaceRoomsTab: React.FC = () => {
               {/* Grid of Room Parameters */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {/* Width */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase">Default Width</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase">Default Width</span>
                   {isEditing ? (
                     <input
                       type="number"
                       value={formState.defaultWidthFt}
                       onChange={(e) => setFormState({ ...formState, defaultWidthFt: Number(e.target.value) })}
-                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-slate-300 rounded-lg"
+                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg"
                     />
                   ) : (
                     <span className="text-base font-bold font-mono text-[#1B3D34] block">
@@ -470,14 +470,14 @@ export const SpaceRoomsTab: React.FC = () => {
                 </div>
 
                 {/* Length */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase">Default Length</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase">Default Length</span>
                   {isEditing ? (
                     <input
                       type="number"
                       value={formState.defaultLengthFt}
                       onChange={(e) => setFormState({ ...formState, defaultLengthFt: Number(e.target.value) })}
-                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-slate-300 rounded-lg"
+                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg"
                     />
                   ) : (
                     <span className="text-base font-bold font-mono text-[#1B3D34] block">
@@ -501,14 +501,14 @@ export const SpaceRoomsTab: React.FC = () => {
                 </div>
 
                 {/* Wall Height */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase">Wall Height</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase">Wall Height</span>
                   {isEditing ? (
                     <input
                       type="number"
                       value={formState.wallHeightFt}
                       onChange={(e) => setFormState({ ...formState, wallHeightFt: Number(e.target.value) })}
-                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-slate-300 rounded-lg"
+                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg"
                     />
                   ) : (
                     <span className="text-base font-bold font-mono text-[#1B3D34] block">
@@ -520,14 +520,14 @@ export const SpaceRoomsTab: React.FC = () => {
 
                 {/* Dado Height (if applicable) */}
                 {selectedTemplate.dadoHeightFt !== undefined && (
-                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase">Dado Tile Height</span>
+                  <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                    <span className="text-[11px] font-bold text-[#707873] uppercase">Dado Tile Height</span>
                     {isEditing ? (
                       <input
                         type="number"
                         value={formState.dadoHeightFt}
                         onChange={(e) => setFormState({ ...formState, dadoHeightFt: Number(e.target.value) })}
-                        className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-slate-300 rounded-lg"
+                        className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg"
                       />
                     ) : (
                       <span className="text-base font-bold font-mono text-[#1B3D34] block">
@@ -539,8 +539,8 @@ export const SpaceRoomsTab: React.FC = () => {
                 )}
 
                 {/* Electrical Points */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1">
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase flex items-center gap-1">
                     <Zap className="w-3 h-3 text-amber-500" />
                     Electrical Points
                   </span>
@@ -549,7 +549,7 @@ export const SpaceRoomsTab: React.FC = () => {
                       type="number"
                       value={formState.electricalPoints}
                       onChange={(e) => setFormState({ ...formState, electricalPoints: Number(e.target.value) })}
-                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-slate-300 rounded-lg"
+                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg"
                     />
                   ) : (
                     <span className="text-base font-bold font-mono text-[#1B3D34] block">
@@ -560,8 +560,8 @@ export const SpaceRoomsTab: React.FC = () => {
                 </div>
 
                 {/* Plumbing Points */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1">
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase flex items-center gap-1">
                     <Droplets className="w-3 h-3 text-cyan-500" />
                     Plumbing Points
                   </span>
@@ -570,7 +570,7 @@ export const SpaceRoomsTab: React.FC = () => {
                       type="number"
                       value={formState.plumbingPoints}
                       onChange={(e) => setFormState({ ...formState, plumbingPoints: Number(e.target.value) })}
-                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-slate-300 rounded-lg"
+                      className="w-full px-2 py-1 text-sm font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg"
                     />
                   ) : (
                     <span className="text-base font-bold font-mono text-[#1B3D34] block">
@@ -581,9 +581,9 @@ export const SpaceRoomsTab: React.FC = () => {
                 </div>
 
                 {/* Floor Wastage */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase">Floor Tile Wastage</span>
-                  <span className="text-base font-bold font-mono text-slate-800 block">
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-[#E5E7EB]/80 space-y-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase">Floor Tile Wastage</span>
+                  <span className="text-base font-bold font-mono text-[#18211E] block">
                     {formState.floorWastagePercent}%
                   </span>
                   <span className="text-[10px] text-slate-400">Cutting and edge allowance</span>
@@ -598,8 +598,8 @@ export const SpaceRoomsTab: React.FC = () => {
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(selectedTemplate.fixtures).map(([name, qty]) => (
-                      <div key={name} className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs flex items-center justify-between">
-                        <span className="text-slate-600 font-medium">{name}</span>
+                      <div key={name} className="p-2.5 bg-slate-50 rounded-xl border border-[#E5E7EB] text-xs flex items-center justify-between">
+                        <span className="text-[#707873] font-medium">{name}</span>
                         <strong className="font-mono text-[#1B3D34]">{qty} No.</strong>
                       </div>
                     ))}

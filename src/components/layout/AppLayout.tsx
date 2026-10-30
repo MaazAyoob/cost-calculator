@@ -28,7 +28,7 @@ export const AppLayout: React.FC = () => {
   // Calculator wizard manages its own minimalist top bar & sticky bottom bar
   if (isCalculatorRoute) {
     return (
-      <div className="h-screen max-h-screen overflow-hidden bg-[#F8F8F6] flex flex-col font-sans antialiased text-[#1B3D34]">
+      <div className="h-screen max-h-screen overflow-hidden bg-[#F8F8F6] flex flex-col font-sans antialiased text-[#18211E]">
         <main className="flex-1 min-h-0 w-full min-w-0 flex flex-col overflow-hidden">
           <Outlet />
         </main>
@@ -39,7 +39,7 @@ export const AppLayout: React.FC = () => {
 
   // All other pages (Landing, Dashboard, Report, etc.) share the clean architectural header & footer
   return (
-    <div className="min-h-screen bg-[#F8F8F6] flex flex-col font-sans antialiased text-[#1B3D34]">
+    <div className="min-h-screen bg-[#F8F8F6] flex flex-col font-sans antialiased text-[#18211E]">
       <WebsiteHeader />
       <main className="flex-1 w-full min-w-0">
         <motion.div

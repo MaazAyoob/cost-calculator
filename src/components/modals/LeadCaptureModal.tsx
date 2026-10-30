@@ -75,11 +75,11 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
         <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
           <div>
             <h3 className="text-base font-bold text-[#1B3D34] font-heading">Access Construction Dossier</h3>
-            <p className="text-xs text-[#4B5563]">Enter details to download complete BOQ &amp; report</p>
+            <p className="text-xs text-[#707873]">Enter details to download complete BOQ &amp; report</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md hover:bg-[rgba(27,61,52,0.04)] text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-[rgba(27,61,52,0.04)] text-[#707873] hover:text-[#1B3D34] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -90,7 +90,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             <FileText className="w-5 h-5 text-[#1B3D34] shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <h4 className="font-bold text-[#1B3D34] text-xs">Detailed Construction Cost Report</h4>
-              <p className="text-[#4B5563] text-[11px]">
+              <p className="text-[#707873] text-[11px]">
                 Receive the itemized 13-stage cost schedule, materials needed, and stage-by-stage payment plan.
               </p>
             </div>
@@ -108,7 +108,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 Full Name
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                <User className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                 <input
                   type="text"
                   required
@@ -125,7 +125,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 Phone Number
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                <Phone className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                 <input
                   type="tel"
                   required
@@ -142,7 +142,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                <Mail className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                 <input
                   type="email"
                   required
@@ -166,7 +166,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             </div>
           </form>
 
-          <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#4B5563] pt-1">
+          <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#707873] pt-1">
             <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34]" />
             <span>Your contact details are strictly confidential.</span>
           </div>

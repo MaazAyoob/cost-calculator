@@ -97,16 +97,16 @@ export const TestCalculatorSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold mb-1">
             <Play className="w-3.5 h-3.5 fill-amber-700 text-amber-700" />
             <span>Calculator: Interactive Test Sandbox</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 font-heading">
+          <h2 className="text-xl font-bold text-[#18211E] font-heading">
             Test Residential Calculator
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Test residential assumptions against the production calculation engine with Active vs Draft comparison.
           </p>
         </div>
@@ -134,13 +134,13 @@ export const TestCalculatorSection: React.FC = () => {
       </div>
 
       {/* ── INPUT BENCHMARK CONFIGURATION ── */}
-      <Card className="border border-slate-200 bg-white rounded-2xl">
+      <Card className="border border-[#E5E7EB] bg-white rounded-2xl">
         <CardContent className="p-5 space-y-3">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#18211E] uppercase tracking-wider">
               Test Project Parameters
             </h3>
-            <span className="text-[11px] text-slate-500 font-medium">
+            <span className="text-[11px] text-[#707873] font-medium">
               Runs Canonical Production Engine
             </span>
           </div>
@@ -157,7 +157,7 @@ export const TestCalculatorSection: React.FC = () => {
                   max="20000"
                   value={testInputs.bua}
                   onChange={(e) => setTestInputs({ bua: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
                 <span className="text-[11px] text-slate-400">sqft</span>
               </div>
@@ -169,7 +169,7 @@ export const TestCalculatorSection: React.FC = () => {
               <select
                 value={testInputs.floors}
                 onChange={(e) => setTestInputs({ floors: Number(e.target.value) })}
-                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-white"
+                className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-white"
               >
                 <option value="1">Ground Only (G)</option>
                 <option value="2">G + 1 (2 Floors)</option>
@@ -188,7 +188,7 @@ export const TestCalculatorSection: React.FC = () => {
                 max="10"
                 value={testInputs.bedrooms}
                 onChange={(e) => setTestInputs({ bedrooms: Number(e.target.value) })}
-                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
               />
             </div>
 
@@ -201,7 +201,7 @@ export const TestCalculatorSection: React.FC = () => {
                 max="10"
                 value={testInputs.bathrooms}
                 onChange={(e) => setTestInputs({ bathrooms: Number(e.target.value) })}
-                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
               />
             </div>
 
@@ -211,7 +211,7 @@ export const TestCalculatorSection: React.FC = () => {
               <select
                 value={testInputs.tier}
                 onChange={(e) => setTestInputs({ tier: e.target.value as any })}
-                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-white"
+                className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-white"
               >
                 <option value="Essential">Standard / Essential</option>
                 <option value="Premium">Premium Quality</option>
@@ -225,45 +225,45 @@ export const TestCalculatorSection: React.FC = () => {
       {/* ── COMPARISON SUMMARY CARDS (ACTIVE vs DRAFT) ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Active Cost */}
-        <Card className="border border-slate-200 bg-white rounded-2xl">
+        <Card className="border border-[#E5E7EB] bg-white rounded-2xl">
           <CardContent className="p-5 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase">Current Active Total</span>
+              <span className="text-xs font-bold text-[#707873] uppercase">Current Active Total</span>
               <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 Production
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 pt-1">
+            <p className="text-2xl font-bold text-[#18211E] pt-1">
               {formatCurrency(activeCost)}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#707873]">
               ₹{testCalculationActive?.budget?.costPerSqFt || 0} / sq.ft
             </p>
           </CardContent>
         </Card>
 
         {/* Draft Cost */}
-        <Card className={`border rounded-2xl ${changedDraftCount > 0 ? 'bg-amber-50/50 border-amber-200' : 'bg-white border-slate-200'}`}>
+        <Card className={`border rounded-2xl ${changedDraftCount > 0 ? 'bg-amber-50/50 border-amber-200' : 'bg-white border-[#E5E7EB]'}`}>
           <CardContent className="p-5 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase">Draft Simulated Total</span>
+              <span className="text-xs font-bold text-[#707873] uppercase">Draft Simulated Total</span>
               <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
                 {changedDraftCount > 0 ? `${changedDraftCount} Changes` : 'No Draft Changes'}
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 pt-1">
+            <p className="text-2xl font-bold text-[#18211E] pt-1">
               {formatCurrency(draftCost)}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#707873]">
               ₹{testCalculationDraft?.budget?.costPerSqFt || testCalculationActive?.budget?.costPerSqFt || 0} / sq.ft
             </p>
           </CardContent>
         </Card>
 
         {/* Difference Delta */}
-        <Card className="border border-slate-200 bg-white rounded-2xl">
+        <Card className="border border-[#E5E7EB] bg-white rounded-2xl">
           <CardContent className="p-5 space-y-1">
-            <span className="text-xs font-bold text-slate-500 uppercase">Impact Difference</span>
+            <span className="text-xs font-bold text-[#707873] uppercase">Impact Difference</span>
             <div className="flex items-center gap-2 pt-1">
               <p className={`text-2xl font-bold ${
                 costDelta > 0 ? 'text-amber-700' : costDelta < 0 ? 'text-emerald-700' : 'text-slate-700'
@@ -278,7 +278,7 @@ export const TestCalculatorSection: React.FC = () => {
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#707873]">
               {costDelta === 0 ? 'Draft matches active configuration' : 'Net project impact'}
             </p>
           </CardContent>
@@ -286,17 +286,17 @@ export const TestCalculatorSection: React.FC = () => {
       </div>
 
       {/* ── QUANTITY VS PRICE TRANSPARENCY TABLE (Section 7) ── */}
-      <Card className="border border-slate-200 bg-white rounded-2xl overflow-hidden">
+      <Card className="border border-[#E5E7EB] bg-white rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-sm font-bold text-slate-900">
+            <h3 className="text-sm font-bold text-[#18211E]">
               Quantity vs. Price Transparency Breakdown
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#707873]">
               Distinguishes physical material quantity adjustments from financial rate updates.
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#707873]">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             <span>Rate Changes Preserve Quantities</span>
           </div>
@@ -304,7 +304,7 @@ export const TestCalculatorSection: React.FC = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+            <thead className="bg-slate-50 text-[#707873] font-semibold border-b border-[#E5E7EB]">
               <tr>
                 <th className="py-2.5 px-4">Trade Item</th>
                 <th className="py-2.5 px-4 text-right">Active Quantity</th>
@@ -318,7 +318,7 @@ export const TestCalculatorSection: React.FC = () => {
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {/* Footing Concrete */}
               <tr className={draftFooting !== activeFooting ? 'bg-amber-50/50' : ''}>
-                <td className="py-3 px-4 font-bold text-slate-900">Footing Concrete (M25)</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Footing Concrete (M25)</td>
                 <td className="py-3 px-4 text-right font-mono">{activeFooting.toFixed(2)} m³</td>
                 <td className={`py-3 px-4 text-right font-mono ${draftFooting !== activeFooting ? 'font-bold text-amber-900 bg-amber-100/60 rounded' : ''}`}>
                   {draftFooting.toFixed(2)} m³
@@ -334,14 +334,14 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeFooting * 5800)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftFooting * 5800)}</td>
-                <td className={`py-3 px-4 text-right font-mono font-bold ${draftFooting !== activeFooting ? 'text-amber-800' : 'text-slate-900'}`}>
+                <td className={`py-3 px-4 text-right font-mono font-bold ${draftFooting !== activeFooting ? 'text-amber-800' : 'text-[#18211E]'}`}>
                   {formatCurrency((draftFooting - activeFooting) * 5800)}
                 </td>
               </tr>
 
               {/* Column Concrete */}
               <tr className={draftColumn !== activeColumn ? 'bg-amber-50/50' : ''}>
-                <td className="py-3 px-4 font-bold text-slate-900">Column Concrete (M25)</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Column Concrete (M25)</td>
                 <td className="py-3 px-4 text-right font-mono">{activeColumn.toFixed(2)} m³</td>
                 <td className={`py-3 px-4 text-right font-mono ${draftColumn !== activeColumn ? 'font-bold text-amber-900 bg-amber-100/60 rounded' : ''}`}>
                   {draftColumn.toFixed(2)} m³
@@ -357,14 +357,14 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeColumn * 5800)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftColumn * 5800)}</td>
-                <td className={`py-3 px-4 text-right font-mono font-bold ${draftColumn !== activeColumn ? 'text-amber-800' : 'text-slate-900'}`}>
+                <td className={`py-3 px-4 text-right font-mono font-bold ${draftColumn !== activeColumn ? 'text-amber-800' : 'text-[#18211E]'}`}>
                   {formatCurrency((draftColumn - activeColumn) * 5800)}
                 </td>
               </tr>
 
               {/* Slab Concrete */}
               <tr className={draftSlab !== activeSlab ? 'bg-amber-50/50' : ''}>
-                <td className="py-3 px-4 font-bold text-slate-900">Slab & Beam Concrete (M25)</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Slab & Beam Concrete (M25)</td>
                 <td className="py-3 px-4 text-right font-mono">{activeSlab.toFixed(2)} m³</td>
                 <td className={`py-3 px-4 text-right font-mono ${draftSlab !== activeSlab ? 'font-bold text-amber-900 bg-amber-100/60 rounded' : ''}`}>
                   {draftSlab.toFixed(2)} m³
@@ -380,13 +380,13 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeSlab * 5800)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftSlab * 5800)}</td>
-                <td className={`py-3 px-4 text-right font-mono font-bold ${draftSlab !== activeSlab ? 'text-amber-800' : 'text-slate-900'}`}>
+                <td className={`py-3 px-4 text-right font-mono font-bold ${draftSlab !== activeSlab ? 'text-amber-800' : 'text-[#18211E]'}`}>
                   {formatCurrency((draftSlab - activeSlab) * 5800)}
                 </td>
               </tr>
 
               {/* RCC Concrete Total */}
-              <tr className={`border-b-2 border-slate-300 font-bold ${draftRccTotal !== activeRccTotal ? 'bg-amber-100/40' : 'bg-slate-50/60'}`}>
+              <tr className={`border-b-2 border-[#CBD5CB] font-bold ${draftRccTotal !== activeRccTotal ? 'bg-amber-100/40' : 'bg-slate-50/60'}`}>
                 <td className="py-3 px-4 text-[#1B3D34]">Total RCC Concrete (Footing+Col+Slab)</td>
                 <td className="py-3 px-4 text-right font-mono">{activeRccTotal.toFixed(2)} m³</td>
                 <td className="py-3 px-4 text-right font-mono">{draftRccTotal.toFixed(2)} m³</td>
@@ -401,14 +401,14 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeRccTotal * 5800)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftRccTotal * 5800)}</td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency((draftRccTotal - activeRccTotal) * 5800)}
                 </td>
               </tr>
 
               {/* Steel */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">TMT Steel (Fe 550D)</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">TMT Steel (Fe 550D)</td>
                 <td className="py-3 px-4 text-right font-mono">{activeSteel.toFixed(2)} Tonnes</td>
                 <td className="py-3 px-4 text-right font-mono">{draftSteel.toFixed(2)} Tonnes</td>
                 <td className="py-3 px-4 text-center">
@@ -426,14 +426,14 @@ export const TestCalculatorSection: React.FC = () => {
                 <td className="py-3 px-4 text-right font-mono">
                   {formatCurrency((draftQty?.steelKg || 0) * 74)}
                 </td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency(((draftQty?.steelKg || 0) - (activeQty?.steelKg || 0)) * 74)}
                 </td>
               </tr>
 
               {/* Cement */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">Structural Cement (53G)</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Structural Cement (53G)</td>
                 <td className="py-3 px-4 text-right font-mono">{activeCement} Bags</td>
                 <td className="py-3 px-4 text-right font-mono">{draftCement} Bags</td>
                 <td className="py-3 px-4 text-center">
@@ -447,14 +447,14 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeCement * 400)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftCement * 400)}</td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency((draftCement - activeCement) * 400)}
                 </td>
               </tr>
 
               {/* Sand */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">M-Sand & P-Sand</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">M-Sand & P-Sand</td>
                 <td className="py-3 px-4 text-right font-mono">{activeSand} CFT</td>
                 <td className="py-3 px-4 text-right font-mono">{draftSand} CFT</td>
                 <td className="py-3 px-4 text-center">
@@ -468,14 +468,14 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeSand * 60)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftSand * 60)}</td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency((draftSand - activeSand) * 60)}
                 </td>
               </tr>
 
               {/* Aggregates */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">Crushed Granite Aggregate</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Crushed Granite Aggregate</td>
                 <td className="py-3 px-4 text-right font-mono">{activeAgg} CFT</td>
                 <td className="py-3 px-4 text-right font-mono">{draftAgg} CFT</td>
                 <td className="py-3 px-4 text-center">
@@ -489,14 +489,14 @@ export const TestCalculatorSection: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(activeAgg * 40)}</td>
                 <td className="py-3 px-4 text-right font-mono">{formatCurrency(draftAgg * 40)}</td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency((draftAgg - activeAgg) * 40)}
                 </td>
               </tr>
 
               {/* Masonry Blocks */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">Masonry Blockwork</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Masonry Blockwork</td>
                 <td className="py-3 px-4 text-right font-mono">{activeBlocks} Blocks</td>
                 <td className="py-3 px-4 text-right font-mono">{draftBlocks} Blocks</td>
                 <td className="py-3 px-4 text-center">
@@ -514,7 +514,7 @@ export const TestCalculatorSection: React.FC = () => {
                 <td className="py-3 px-4 text-right font-mono">
                   {formatCurrency(testCalculationDraft?.quantities?.masonryAmount || 0)}
                 </td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency(
                     (testCalculationDraft?.quantities?.masonryAmount || 0) -
                     (testCalculationActive?.quantities?.masonryAmount || 0)
@@ -524,7 +524,7 @@ export const TestCalculatorSection: React.FC = () => {
 
               {/* Flooring Tiles */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">Flooring & Wall Tiles</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Flooring & Wall Tiles</td>
                 <td className="py-3 px-4 text-right font-mono">{Math.round(activeTiles)} sq.ft</td>
                 <td className="py-3 px-4 text-right font-mono">{Math.round(draftTiles)} sq.ft</td>
                 <td className="py-3 px-4 text-center">
@@ -542,14 +542,14 @@ export const TestCalculatorSection: React.FC = () => {
                 <td className="py-3 px-4 text-right font-mono">
                   {formatCurrency(Math.round(draftTiles) * 85)}
                 </td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency((Math.round(draftTiles) - Math.round(activeTiles)) * 85)}
                 </td>
               </tr>
 
               {/* Paint */}
               <tr>
-                <td className="py-3 px-4 font-bold text-slate-900">Interior & Exterior Paint</td>
+                <td className="py-3 px-4 font-bold text-[#18211E]">Interior & Exterior Paint</td>
                 <td className="py-3 px-4 text-right font-mono">{Math.round(activePaint)} Litres</td>
                 <td className="py-3 px-4 text-right font-mono">{Math.round(draftPaint)} Litres</td>
                 <td className="py-3 px-4 text-center">
@@ -567,7 +567,7 @@ export const TestCalculatorSection: React.FC = () => {
                 <td className="py-3 px-4 text-right font-mono">
                   {formatCurrency(Math.round(draftPaint) * 380)}
                 </td>
-                <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                <td className="py-3 px-4 text-right font-mono font-bold text-[#18211E]">
                   {formatCurrency((Math.round(draftPaint) - Math.round(activePaint)) * 380)}
                 </td>
               </tr>

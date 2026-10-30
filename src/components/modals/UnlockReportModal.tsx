@@ -416,13 +416,13 @@ export const UnlockReportModal: React.FC<Props> = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative z-10 bg-white rounded-2xl border border-[#E3E8E2] max-w-lg w-full p-4 sm:p-7 space-y-5 sm:space-y-6 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
+            className="relative z-10 bg-white rounded-2xl border border-[#E5E7EB] max-w-lg w-full p-4 sm:p-7 space-y-5 sm:space-y-6 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
           >
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#707873] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -439,7 +439,7 @@ export const UnlockReportModal: React.FC<Props> = ({
               <h2 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
                 Unlock Detailed Construction Cost Report
               </h2>
-              <p className="text-xs text-[#4B5563]">
+              <p className="text-xs text-[#707873]">
                 Get a comprehensive breakdown of the work, materials needed, estimated costs, and downloadable PDF report.
               </p>
             </div>
@@ -452,7 +452,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                 className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
                   selectedTier === 'DETAILED_ESTIMATE_499'
                     ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E3E8E2] bg-[#F8F8F6] hover:bg-white'
+                    : 'border-[#E5E7EB] bg-[#F8F8F6] hover:bg-white'
                 }`}
               >
                 <span className="absolute -top-2 right-2 bg-[#F28C28] text-white text-[9px] font-bold px-1.5 py-0.2 rounded font-mono">
@@ -465,7 +465,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                   <span className="text-xs font-mono font-black text-[#1B3D34]">₹499</span>
                 </div>
                 <div className="text-xs font-bold text-[#1B3D34] mt-1">Detailed BOQ Report</div>
-                <p className="text-[10px] text-[#4B5563] mt-0.5 line-clamp-1">Works BOQ + Materials + PDF</p>
+                <p className="text-[10px] text-[#707873] mt-0.5 line-clamp-1">Works BOQ + Materials + PDF</p>
               </button>
 
               <button
@@ -474,33 +474,33 @@ export const UnlockReportModal: React.FC<Props> = ({
                 className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                   selectedTier === 'PREMIUM_1499'
                     ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E3E8E2] bg-[#F8F8F6] hover:bg-white'
+                    : 'border-[#E5E7EB] bg-[#F8F8F6] hover:bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4B5563]">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#707873]">
                     Upgraded
                   </span>
                   <span className="text-xs font-mono font-black text-[#1B3D34]">₹1,499</span>
                 </div>
                 <div className="text-xs font-bold text-[#1B3D34] mt-1">Calculator — Premium</div>
-                <p className="text-[10px] text-[#4B5563] mt-0.5 line-clamp-1">Multi-scenario compare + Full suite</p>
+                <p className="text-[10px] text-[#707873] mt-0.5 line-clamp-1">Multi-scenario compare + Full suite</p>
               </button>
             </div>
 
             {/* Pricing Banner */}
-            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center justify-between">
+            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">One-time payment</span>
+                <span className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block">One-time payment</span>
                 <span className="text-2xl font-black text-[#1B3D34] font-mono">{selectedTierPriceDisplay}</span>
-                <span className="text-[10px] text-[#4B5563] ml-1">all inclusive</span>
+                <span className="text-[10px] text-[#707873] ml-1">all inclusive</span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E3E8E2] block font-mono">
+                <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E5E7EB] block font-mono">
                   Instant PDF • Lifetime Access
                 </span>
                 {selectedTier === 'PREMIUM_1499' && (
-                  <span className="text-[9px] text-[#4B5563] block mt-0.5">
+                  <span className="text-[9px] text-[#707873] block mt-0.5">
                     *Consultation is a separate service
                   </span>
                 )}
@@ -509,7 +509,7 @@ export const UnlockReportModal: React.FC<Props> = ({
 
             {/* Deliverables Checklist */}
             <div className="space-y-2 text-xs text-[#1B3D34]">
-              <span className="font-bold text-[11px] uppercase tracking-wider text-[#4B5563] block">
+              <span className="font-bold text-[11px] uppercase tracking-wider text-[#707873] block">
                 {selectedTier === 'PREMIUM_1499'
                   ? 'Included in ₹1,499 Calculator — Premium Plan:'
                   : 'Included in ₹499 Detailed BOQ Report:'}
@@ -551,7 +551,7 @@ export const UnlockReportModal: React.FC<Props> = ({
             </div>
 
             {/* Checkout Form */}
-            <form onSubmit={handleUnlock} className="space-y-4 pt-2 border-t border-[#E3E8E2]">
+            <form onSubmit={handleUnlock} className="space-y-4 pt-2 border-t border-[#E5E7EB]">
               {formError && (
                 <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg">
                   {formError}
@@ -567,7 +567,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                     placeholder="e.g. Rahul Sharma"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
                   />
                 </div>
                 <div className="space-y-1">
@@ -578,7 +578,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                     placeholder="10-digit mobile"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -591,7 +591,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                   placeholder="rahul@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] focus:bg-white focus:outline-none focus:border-[#1B3D34]"
                 />
               </div>
 
@@ -611,7 +611,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                       className={`py-2 px-2.5 rounded-lg border font-bold text-center transition-all cursor-pointer ${
                         paymentMethod === m.id
                           ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                          : 'bg-[#F8F8F6] text-[#4B5563] border-[#E3E8E2] hover:bg-white'
+                          : 'bg-[#F8F8F6] text-[#707873] border-[#E5E7EB] hover:bg-white'
                       }`}
                     >
                       {m.label}
@@ -689,28 +689,28 @@ export const UnlockReportModal: React.FC<Props> = ({
                   ? 'Your detailed report is ready.'
                   : 'Your project estimate is confirmed.'}
               </h2>
-              <p className="text-xs text-[#4B5563] max-w-sm mx-auto leading-relaxed">
+              <p className="text-xs text-[#707873] max-w-sm mx-auto leading-relaxed">
                 Order reference: <strong>{completedOrderRef}</strong>. Linked to project ID <strong>{projectId}</strong>.
               </p>
             </div>
 
-            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] space-y-2 text-xs text-left">
+            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-2 text-xs text-left">
               <div className="flex justify-between">
-                <span className="text-[#4B5563]">Recipient:</span>
+                <span className="text-[#707873]">Recipient:</span>
                 <span className="font-bold text-[#1B3D34]">{name || 'Valued Homeowner'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#4B5563]">Amount Paid:</span>
+                <span className="text-[#707873]">Amount Paid:</span>
                 <span className="font-bold text-[#1B3D34]">{selectedTierPriceDisplay} (Inclusive of GST)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#4B5563]">Plan:</span>
+                <span className="text-[#707873]">Plan:</span>
                 <span className="font-bold text-[#1B3D34]">
                   {selectedTier === 'PREMIUM_1499' ? 'Calculator — Premium BOQ (₹1,499)' : 'Detailed BOQ Report (₹499)'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#4B5563]">Status:</span>
+                <span className="text-[#707873]">Status:</span>
                 <span className="font-bold text-[#1B3D34]">
                   Unlocked • PDF Generated
                 </span>

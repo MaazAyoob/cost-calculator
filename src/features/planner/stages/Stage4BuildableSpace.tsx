@@ -134,10 +134,10 @@ export const Stage4BuildableSpace: React.FC = () => {
           <Maximize2 className="w-3 h-3 text-[#F28C28]" />
           <span>STAGE 4 OF 8 &bull; YOUR BUILDABLE SPACE</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           Let's work out how much space you can build on.
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
           We first work out the space left after required gaps around your home. We then check whether a separate building-coverage limit reduces that space further.
         </p>
       </div>
@@ -145,11 +145,11 @@ export const Stage4BuildableSpace: React.FC = () => {
       {/* 1. Visual Footprint & Space Breakdown */}
       <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] flex items-center gap-1.5">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#18211E] flex items-center gap-1.5">
             <Compass className="w-4 h-4 text-[#F28C28]" />
             How Much of Your Plot Can You Build On?
           </span>
-          <span className="text-[11px] font-mono text-[#687770]">
+          <span className="text-[11px] font-mono text-[#707873]">
             Plot: {plotWidth || 30}' × {plotLength || 40}'
           </span>
         </div>

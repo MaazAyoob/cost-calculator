@@ -282,14 +282,14 @@ export const SignupPage: React.FC = () => {
         <h2 className="mt-4 text-3xl font-black text-[#1B3D34] tracking-tight font-heading">
           Let's get your home project started.
         </h2>
-        <p className="mt-1.5 text-sm text-[#52605B] max-w-sm mx-auto leading-relaxed">
+        <p className="mt-1.5 text-sm text-[#707873] max-w-sm mx-auto leading-relaxed">
           Create an account to save your plans, track your estimates and access your reports whenever you need them.
         </p>
       </div>
 
       {/* Main Card Container */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E2E8E3] shadow-sm">
+        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E5E7EB] shadow-sm">
           
           {/* General Error Banner */}
           {(error || clientError) && (
@@ -385,7 +385,7 @@ export const SignupPage: React.FC = () => {
               <div className="relative rounded-xl shadow-2xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#687770]">
                   <Phone className="w-4 h-4" />
-                  <span className="text-xs font-bold font-mono text-[#52605B] ml-1 border-r border-[#D5E1D8] pr-2">
+                  <span className="text-xs font-bold font-mono text-[#707873] ml-1 border-r border-[#D5E1D8] pr-2">
                     +91
                   </span>
                 </div>
@@ -448,7 +448,7 @@ export const SignupPage: React.FC = () => {
                 onChange={(e) => setConsent(e.target.checked)}
                 className="w-4 h-4 mt-0.5 rounded text-[#1B3D34] focus:ring-[#1B3D34] border-[#D5E1D8] cursor-pointer"
               />
-              <label htmlFor="consent" className="text-xs text-[#52605B] leading-tight cursor-pointer">
+              <label htmlFor="consent" className="text-xs text-[#707873] leading-tight cursor-pointer">
                 I agree to save my project plans and estimates securely with Hutty.
               </label>
             </div>
@@ -474,7 +474,7 @@ export const SignupPage: React.FC = () => {
 
           {/* Login Redirect Link */}
           <div className="mt-6 pt-5 border-t border-[#EDF2EE] text-center">
-            <p className="text-xs text-[#52605B]">
+            <p className="text-xs text-[#707873]">
               Already have a Hutty account?{' '}
               <Link
                 to={`/login?redirect=${encodeURIComponent(redirectDestination)}`}

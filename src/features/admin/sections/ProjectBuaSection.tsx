@@ -48,25 +48,25 @@ export const ProjectBuaSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold mb-1">
             <Building className="w-3.5 h-3.5 text-emerald-700" />
             <span>Group 1: Project Planning</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 font-heading">
+          <h2 className="text-xl font-bold text-[#18211E] font-heading">
             Project & Built-Up Area (BUA)
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Configure how building footprint, floor allowances, and built-up areas are calculated for residential estimates.
           </p>
         </div>
 
         {/* Current BUA Readout */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 flex items-center gap-4">
+        <div className="bg-slate-50 border border-[#E5E7EB] rounded-xl px-4 py-2.5 flex items-center gap-4">
           <div>
             <p className="text-[10px] uppercase font-bold text-slate-400">Sample Scenario</p>
-            <p className="text-sm font-bold text-slate-800">
+            <p className="text-sm font-bold text-[#18211E]">
               {plotLength} × {plotWidth} ft ({plotArea} sq.ft, {floors} Floors)
             </p>
           </div>
@@ -74,7 +74,7 @@ export const ProjectBuaSection: React.FC = () => {
           <div>
             <p className="text-[10px] uppercase font-bold text-emerald-700">Estimated Total BUA</p>
             <p className="text-lg font-bold text-[#1B3D34]">
-              {totalBua.toLocaleString('en-IN')} <span className="text-xs font-normal text-slate-500">sq.ft</span>
+              {totalBua.toLocaleString('en-IN')} <span className="text-xs font-normal text-[#707873]">sq.ft</span>
             </p>
           </div>
         </div>
@@ -91,24 +91,24 @@ export const ProjectBuaSection: React.FC = () => {
             <strong className="text-emerald-800 font-semibold">✓ Affects:</strong> Total Built-up Area, structural steel tonnage, total cement bags, concrete volume, and structural cost.
           </p>
           <p>
-            <strong className="text-slate-600 font-semibold">✗ Does not affect:</strong> Clear wall height, individual tile wastage %, or material unit rates.
+            <strong className="text-[#707873] font-semibold">✗ Does not affect:</strong> Clear wall height, individual tile wastage %, or material unit rates.
           </p>
         </div>
       </div>
 
       {/* ── BUA CALCULATION METHOD SELECTOR ── */}
-      <Card className="border border-slate-200 bg-white">
+      <Card className="border border-[#E5E7EB] bg-white">
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm font-bold text-[#18211E]">
                 Built-up Area Calculation Method
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#707873] mt-0.5">
                 Choose how the calculator derives built-up area from user drawings or room configurations.
               </p>
             </div>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-[#707873] font-medium">
               Client Friendly Method
             </span>
           </div>
@@ -120,18 +120,18 @@ export const ProjectBuaSection: React.FC = () => {
               className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
                 buaCalculationMethod === 'CARPET_CIRCULATION'
                   ? 'border-[#1B3D34] bg-emerald-50/50 shadow-xs'
-                  : 'border-slate-200 hover:border-slate-300 bg-white'
+                  : 'border-[#E5E7EB] hover:border-[#CBD5CB] bg-white'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-xs text-slate-900">Carpet + Circulation</span>
+                <span className="font-bold text-xs text-[#18211E]">Carpet + Circulation</span>
                 {buaCalculationMethod === 'CARPET_CIRCULATION' && (
                   <span className="w-4 h-4 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-[10px]">
                     <Check className="w-3 h-3" />
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-[#707873]">
                 Calculates BUA from livable carpet area plus hallway, corridor, and wall thickness allowances. Recommended for residential floorplans.
               </p>
             </div>
@@ -142,18 +142,18 @@ export const ProjectBuaSection: React.FC = () => {
               className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
                 buaCalculationMethod === 'ROOM_BASED'
                   ? 'border-[#1B3D34] bg-emerald-50/50 shadow-xs'
-                  : 'border-slate-200 hover:border-slate-300 bg-white'
+                  : 'border-[#E5E7EB] hover:border-[#CBD5CB] bg-white'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-xs text-slate-900">Room Based</span>
+                <span className="font-bold text-xs text-[#18211E]">Room Based</span>
                 {buaCalculationMethod === 'ROOM_BASED' && (
                   <span className="w-4 h-4 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-[10px]">
                     <Check className="w-3 h-3" />
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-[#707873]">
                 Built-up area is calculated directly by summing configured room dimensions (Bedrooms + Living + Kitchen + Bathrooms).
               </p>
             </div>
@@ -164,18 +164,18 @@ export const ProjectBuaSection: React.FC = () => {
               className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
                 buaCalculationMethod === 'MANUAL'
                   ? 'border-[#1B3D34] bg-emerald-50/50 shadow-xs'
-                  : 'border-slate-200 hover:border-slate-300 bg-white'
+                  : 'border-[#E5E7EB] hover:border-[#CBD5CB] bg-white'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-xs text-slate-900">Plot Footprint (Manual)</span>
+                <span className="font-bold text-xs text-[#18211E]">Plot Footprint (Manual)</span>
                 {buaCalculationMethod === 'MANUAL' && (
                   <span className="w-4 h-4 rounded-full bg-[#1B3D34] text-white flex items-center justify-center text-[10px]">
                     <Check className="w-3 h-3" />
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-[#707873]">
                 Calculates BUA by applying maximum ground coverage and super built-up multiplier directly to plot dimensions.
               </p>
             </div>
@@ -186,10 +186,10 @@ export const ProjectBuaSection: React.FC = () => {
       {/* ── CORE PLANNING PARAMETERS ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Ground Coverage Ratio */}
-        <Card className="border border-slate-200 bg-white">
+        <Card className="border border-[#E5E7EB] bg-white">
           <CardContent className="p-5 space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                 <span>Ground Coverage Ratio</span>
                 <span className="text-slate-400 cursor-help" title="Percentage of plot footprint permitted for ground construction under municipal bylaws.">
                   <HelpCircle className="w-3.5 h-3.5" />
@@ -199,7 +199,7 @@ export const ProjectBuaSection: React.FC = () => {
                 {(coverageRatio * 100).toFixed(0)}%
               </span>
             </div>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-[#707873]">
               Default maximum ground construction footprint (BBMP / BDA standard is 60%).
             </p>
             <div className="flex items-center gap-3 pt-2">
@@ -219,19 +219,19 @@ export const ProjectBuaSection: React.FC = () => {
                   max="85"
                   value={Math.round(coverageRatio * 100)}
                   onChange={(e) => updateDraftParameter('config.planning.default_coverage_ratio', Number(e.target.value) / 100)}
-                  className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                  className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                 />
-                <span className="text-xs text-slate-500">%</span>
+                <span className="text-xs text-[#707873]">%</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Super Built-up Multiplier */}
-        <Card className="border border-slate-200 bg-white">
+        <Card className="border border-[#E5E7EB] bg-white">
           <CardContent className="p-5 space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                 <span>Super Built-up Multiplier</span>
                 <span className="text-slate-400 cursor-help" title="Multiplier converting net plinth area to super built-up area accounting for external walls and shafts.">
                   <HelpCircle className="w-3.5 h-3.5" />
@@ -241,7 +241,7 @@ export const ProjectBuaSection: React.FC = () => {
                 {superBuaFactor.toFixed(2)}x
               </span>
             </div>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-[#707873]">
               Standard factor accounting for external wall offsets and structural columns.
             </p>
             <div className="flex items-center gap-3 pt-2">
@@ -262,9 +262,9 @@ export const ProjectBuaSection: React.FC = () => {
                   max="1.35"
                   value={superBuaFactor}
                   onChange={(e) => updateDraftParameter('config.planning.super_bua_multiplier', Number(e.target.value))}
-                  className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                  className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                 />
-                <span className="text-xs text-slate-500">ratio</span>
+                <span className="text-xs text-[#707873]">ratio</span>
               </div>
             </div>
           </CardContent>
@@ -273,14 +273,14 @@ export const ProjectBuaSection: React.FC = () => {
 
       {/* ── ADVANCED PLANNING CONTROLS ── */}
       {adminViewMode === 'ADVANCED' && (
-        <Card className="border border-slate-200 bg-white">
+        <Card className="border border-[#E5E7EB] bg-white">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-[#18211E] uppercase tracking-wider">
                   Advanced Circulation & Floor Allowances
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-[#707873]">
                   Granular area factors for corridors, balconies, utilities, and vertical staircase risers.
                 </p>
               </div>
@@ -300,9 +300,9 @@ export const ProjectBuaSection: React.FC = () => {
                     max="20"
                     value={circulationPct}
                     onChange={(e) => updateDraftParameter('config.flooring.circulation_allowance_pct', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
-                  <span className="text-xs text-slate-500">%</span>
+                  <span className="text-xs text-[#707873]">%</span>
                 </div>
                 <p className="text-[10px] text-slate-400">Hallway & corridor area</p>
               </div>
@@ -317,9 +317,9 @@ export const ProjectBuaSection: React.FC = () => {
                     max="15"
                     value={balconyAllowancePct}
                     onChange={(e) => updateDraftParameter('config.planning.balcony_allowance_pct', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
-                  <span className="text-xs text-slate-500">%</span>
+                  <span className="text-xs text-[#707873]">%</span>
                 </div>
                 <p className="text-[10px] text-slate-400">External sit-out balcony</p>
               </div>
@@ -334,9 +334,9 @@ export const ProjectBuaSection: React.FC = () => {
                     max="10"
                     value={utilityAllowancePct}
                     onChange={(e) => updateDraftParameter('config.planning.utility_allowance_pct', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
-                  <span className="text-xs text-slate-500">%</span>
+                  <span className="text-xs text-[#707873]">%</span>
                 </div>
                 <p className="text-[10px] text-slate-400">Washing & service balcony</p>
               </div>
@@ -351,9 +351,9 @@ export const ProjectBuaSection: React.FC = () => {
                     max="260"
                     value={staircaseAreaSqFt}
                     onChange={(e) => updateDraftParameter('config.flooring.staircase_granite_sqft', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
-                  <span className="text-xs text-slate-500">sqft/flr</span>
+                  <span className="text-xs text-[#707873]">sqft/flr</span>
                 </div>
                 <p className="text-[10px] text-slate-400">Treads, risers & landings</p>
               </div>

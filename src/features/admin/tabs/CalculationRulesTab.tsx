@@ -35,13 +35,13 @@ export const CalculationRulesTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#18211E] font-heading flex items-center gap-2">
             <Cpu className="w-5 h-5 text-[#1B3D34]" />
             Calculation Methods & Structured Rule Engine
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Admin selection between supported calculation methodologies and structured mathematical AST rules.
           </p>
         </div>
@@ -68,7 +68,7 @@ export const CalculationRulesTab: React.FC = () => {
       </div>
 
       {/* ── CATEGORY SELECTOR ── */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-[#E5E7EB] pb-2">
         {(['STEEL', 'PAINT', 'FLOORING'] as const).map((cat) => (
           <button
             key={cat}
@@ -77,7 +77,7 @@ export const CalculationRulesTab: React.FC = () => {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedCategory === cat
                 ? 'bg-[#1B3D34] text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                : 'bg-slate-100 text-[#707873] hover:bg-slate-200'
             }`}
           >
             {cat === 'STEEL' && 'Reinforcement Steel'}
@@ -91,7 +91,7 @@ export const CalculationRulesTab: React.FC = () => {
       {supportedDef && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 font-heading">
+            <h3 className="text-sm font-bold text-[#18211E] font-heading">
               Select Active Calculation Method for {supportedDef.name}
             </h3>
             <span className="text-xs text-slate-400">
@@ -109,13 +109,13 @@ export const CalculationRulesTab: React.FC = () => {
                   className={`border transition-all cursor-pointer ${
                     isActive
                       ? 'border-[#1B3D34] bg-emerald-50/20 shadow-xs'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                      : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
                   }`}
                   onClick={() => setActiveMethod(selectedCategory, m.methodId)}
                 >
                   <CardContent className="p-5 space-y-3">
                     <div className="flex items-start justify-between">
-                      <h4 className="text-sm font-bold text-slate-900 font-heading">
+                      <h4 className="text-sm font-bold text-[#18211E] font-heading">
                         {m.displayName}
                       </h4>
                       {isActive ? (
@@ -123,13 +123,13 @@ export const CalculationRulesTab: React.FC = () => {
                           ACTIVE
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-[#707873]">
                           AVAILABLE
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-slate-600">
+                    <p className="text-xs text-[#707873]">
                       {m.description}
                     </p>
 
@@ -141,7 +141,7 @@ export const CalculationRulesTab: React.FC = () => {
                         {m.requiredParameters.map((p: any) => (
                           <span
                             key={p}
-                            className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-mono text-slate-600"
+                            className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-mono text-[#707873]"
                           >
                             {p.split('.').pop()}
                           </span>
@@ -157,15 +157,15 @@ export const CalculationRulesTab: React.FC = () => {
       )}
 
       {/* ── STRUCTURED RULE BUILDER VISUALIZATION (Part 8 & 9) ── */}
-      <Card className="border border-slate-200 bg-white">
+      <Card className="border border-[#E5E7EB] bg-white">
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 font-heading flex items-center gap-2">
+              <h3 className="text-sm font-bold text-[#18211E] font-heading flex items-center gap-2">
                 <GitBranch className="w-4 h-4 text-[#F28C28]" />
                 Structured AST Rule Visualization (Deterministic & Safe)
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#707873] mt-0.5">
                 No code execution (no eval/Function). Rules evaluate as structured mathematical expression trees.
               </p>
             </div>
@@ -175,15 +175,15 @@ export const CalculationRulesTab: React.FC = () => {
           </div>
 
           {/* Rule Flow Tree */}
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 font-mono text-xs text-slate-700">
+          <div className="bg-slate-50 p-4 rounded-xl border border-[#E5E7EB] space-y-3 font-mono text-xs text-slate-700">
             {selectedCategory === 'STEEL' && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-slate-800">STEP 1</span>
+                <div className="flex items-center gap-2 text-[#707873]">
+                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-[#18211E]">STEP 1</span>
                   <span>Ground Steel = groundFloorArea × steel_base_factor_kg_sqft</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-500">
-                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-slate-800">STEP 2</span>
+                <div className="flex items-center gap-2 text-[#707873]">
+                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-[#18211E]">STEP 2</span>
                   <span>Upper Floors Steel = (floors - 1) × upperFloorArea × (steel_base_factor_kg_sqft + steel_floor_increment_kg_sqft)</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#1B3D34] font-bold">
@@ -195,12 +195,12 @@ export const CalculationRulesTab: React.FC = () => {
 
             {selectedCategory === 'PAINT' && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-slate-800">STEP 1</span>
+                <div className="flex items-center gap-2 text-[#707873]">
+                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-[#18211E]">STEP 1</span>
                   <span>Gross Paint Area = internalWallArea + ceilingArea - openingsDeduction</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-500">
-                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-slate-800">STEP 2</span>
+                <div className="flex items-center gap-2 text-[#707873]">
+                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-[#18211E]">STEP 2</span>
                   <span>Base Litres = Gross Paint Area ÷ interior_coverage_sqft_per_litre</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#1B3D34] font-bold">
@@ -212,8 +212,8 @@ export const CalculationRulesTab: React.FC = () => {
 
             {selectedCategory === 'FLOORING' && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-slate-800">STEP 1</span>
+                <div className="flex items-center gap-2 text-[#707873]">
+                  <span className="px-2 py-0.5 bg-slate-200 rounded text-[11px] font-bold text-[#18211E]">STEP 1</span>
                   <span>Gross Carpet Area = sum(room_areas) × (1 + circulation_allowance_percent ÷ 100)</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#1B3D34] font-bold">

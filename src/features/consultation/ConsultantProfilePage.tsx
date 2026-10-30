@@ -93,7 +93,7 @@ export const ConsultantProfilePage: React.FC = () => {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3 bg-[#F8F8F6]">
         <div className="w-10 h-10 border-3 border-[#1B3D34] border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-[#4B5563] font-medium">Loading Expert Profile...</p>
+        <p className="text-xs text-[#707873] font-medium">Loading Expert Profile...</p>
       </div>
     );
   }
@@ -101,15 +101,15 @@ export const ConsultantProfilePage: React.FC = () => {
   if (notFound || !consultant) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center p-4 bg-[#F8F8F6]">
-        <div className="max-w-md w-full p-8 bg-white border border-[#E3E8E2] rounded-3xl shadow-sm text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#F8F8F6] border border-[#E3E8E2] flex items-center justify-center mx-auto text-[#4B5563]">
+        <div className="max-w-md w-full p-8 bg-white border border-[#E5E7EB] rounded-3xl shadow-sm text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-[#F8F8F6] border border-[#E5E7EB] flex items-center justify-center mx-auto text-[#707873]">
             <UserX className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-[#1B3D34] font-heading">
               Expert Not Available
             </h2>
-            <p className="text-xs text-[#4B5563] mt-1.5 leading-relaxed">
+            <p className="text-xs text-[#707873] mt-1.5 leading-relaxed">
               This professional profile is either inactive or does not exist. Please return to the consultant directory
               to view currently active experts.
             </p>
@@ -139,7 +139,7 @@ export const ConsultantProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate('/consult')}
-          className="inline-flex items-center gap-2 text-xs font-bold text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-bold text-[#707873] hover:text-[#1B3D34] transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to All Experts</span>
@@ -152,10 +152,10 @@ export const ConsultantProfilePage: React.FC = () => {
           {/* Left 2 Cols: Main Dossier */}
           <div className="lg:col-span-2 space-y-6">
             {/* Profile Overview Card */}
-            <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
               <div className="flex flex-col sm:flex-row items-start gap-6">
                 {/* Photo */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden bg-[#F8F8F6] border border-[#E3E8E2] shrink-0">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden bg-[#F8F8F6] border border-[#E5E7EB] shrink-0">
                   {consultant.profileImage ? (
                     <img
                       src={consultant.profileImage}
@@ -185,11 +185,11 @@ export const ConsultantProfilePage: React.FC = () => {
                     {consultant.name}
                   </h1>
 
-                  <p className="text-sm font-semibold text-[#4B5563]">
+                  <p className="text-sm font-semibold text-[#707873]">
                     {consultant.title}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs text-[#4B5563] pt-1">
+                  <div className="flex items-center gap-4 text-xs text-[#707873] pt-1">
                     <span className="flex items-center gap-1">
                       <Briefcase className="w-4 h-4 text-[#1B3D34]/70" />
                       <span>{consultant.experienceYears}+ Years Practical Experience</span>
@@ -205,11 +205,11 @@ export const ConsultantProfilePage: React.FC = () => {
 
               {/* Service Areas */}
               {consultant.serviceAreas && consultant.serviceAreas.length > 0 && (
-                <div className="pt-4 border-t border-[#E3E8E2] text-xs">
+                <div className="pt-4 border-t border-[#E5E7EB] text-xs">
                   <span className="font-bold text-[#1B3D34] block mb-1">Service Areas &amp; Site Visits:</span>
                   <div className="flex flex-wrap gap-1.5">
                     {consultant.serviceAreas.map((area, idx) => (
-                      <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-[#F8F8F6] border border-[#E3E8E2] text-[#4B5563]">
+                      <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-[#F8F8F6] border border-[#E5E7EB] text-[#707873]">
                         {area}
                       </span>
                     ))}
@@ -219,18 +219,18 @@ export const ConsultantProfilePage: React.FC = () => {
             </div>
 
             {/* About & Philosophy Card */}
-            <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-4">
+            <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
               <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
                 About the Expert
               </h3>
-              <p className="text-sm text-[#4B5563] leading-relaxed whitespace-pre-line">
+              <p className="text-sm text-[#707873] leading-relaxed whitespace-pre-line">
                 {consultant.about}
               </p>
             </div>
 
             {/* Specializations & Core Competencies */}
             {consultant.specializations && consultant.specializations.length > 0 && (
-              <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-4">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
                 <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
                   Specializations &amp; Advisory Focus
                 </h3>
@@ -238,7 +238,7 @@ export const ConsultantProfilePage: React.FC = () => {
                   {consultant.specializations.map((spec, idx) => (
                     <div
                       key={idx}
-                      className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] text-xs font-semibold text-[#1B3D34] flex items-center gap-2"
+                      className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] text-xs font-semibold text-[#1B3D34] flex items-center gap-2"
                     >
                       <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{spec}</span>
@@ -250,11 +250,11 @@ export const ConsultantProfilePage: React.FC = () => {
 
             {/* Services Offered Card */}
             {consultant.services && consultant.services.length > 0 && (
-              <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-4">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
                 <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
                   Consultation Services Covered
                 </h3>
-                <ul className="space-y-2.5 text-xs sm:text-sm text-[#4B5563]">
+                <ul className="space-y-2.5 text-xs sm:text-sm text-[#707873]">
                   {consultant.services.map((svc, idx) => (
                     <li key={idx} className="flex items-start gap-2.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28] mt-2 shrink-0" />
@@ -268,7 +268,7 @@ export const ConsultantProfilePage: React.FC = () => {
 
           {/* Right Col: Fixed Fee & Booking Card (Sticky) */}
           <div className="space-y-6">
-            <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-7 shadow-sm sticky top-24 space-y-6">
+            <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-7 shadow-sm sticky top-24 space-y-6">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
                   TRANSPARENT PRICING
@@ -277,15 +277,15 @@ export const ConsultantProfilePage: React.FC = () => {
                   <span className="text-3xl font-mono font-extrabold text-[#1B3D34]">
                     {LAUNCH_CONSULTATION_PRICE_DISPLAY}
                   </span>
-                  <span className="text-xs text-[#4B5563]">/ consultation</span>
+                  <span className="text-xs text-[#707873]">/ consultation</span>
                 </div>
-                <p className="text-xs text-[#4B5563] mt-1">
+                <p className="text-xs text-[#707873] mt-1">
                   Flat launch rate. No hidden platform surcharges or commissions.
                 </p>
               </div>
 
               {/* Consultation Inclusions */}
-              <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-2 text-xs">
+              <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-2 text-xs">
                 <div className="flex items-center gap-2 text-[#1B3D34] font-semibold">
                   <Clock className="w-3.5 h-3.5 text-[#1B3D34]" />
                   <span>45–60 Minutes Focused Advisory</span>
@@ -329,9 +329,9 @@ export const ConsultantProfilePage: React.FC = () => {
       </div>
 
       {/* Mobile Sticky Bottom Booking CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E3E8E2] p-3.5 shadow-lg flex items-center justify-between gap-4">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] p-3.5 shadow-lg flex items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-bold text-[#4B5563] uppercase block">Fee</span>
+          <span className="text-[10px] font-bold text-[#707873] uppercase block">Fee</span>
           <span className="text-base font-extrabold text-[#1B3D34] font-mono leading-tight">
             {LAUNCH_CONSULTATION_PRICE_DISPLAY}
           </span>

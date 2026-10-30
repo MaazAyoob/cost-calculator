@@ -208,7 +208,7 @@ export const ReportPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-1.5 text-xs font-bold text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-bold text-[#707873] hover:text-[#1B3D34] transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Dashboard
             </button>
@@ -218,7 +218,7 @@ export const ReportPage: React.FC = () => {
                 useWizardStore.getState().startNewProject();
                 navigate('/calculator');
               }}
-              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] px-3 py-1.5 rounded-lg border border-[#E3E8E2] bg-white transition-colors cursor-pointer shadow-2xs"
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:bg-[rgba(27,61,52,0.06)] px-3 py-1.5 rounded-lg border border-[#E5E7EB] bg-white transition-colors cursor-pointer shadow-2xs"
             >
               <RotateCcw className="w-3.5 h-3.5 text-[#F28C28]" /> Start New Project
             </button>
@@ -235,7 +235,7 @@ export const ReportPage: React.FC = () => {
                 }
                 setShowTraceModal(true);
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
             >
               <Calculator className="w-3.5 h-3.5 text-[#F28C28]" /> How Calculated
             </button>
@@ -245,7 +245,7 @@ export const ReportPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePrintRequest}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E3E8E2] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold text-[#1B3D34] transition-colors cursor-pointer shadow-2xs"
                 >
                   <Printer className="w-3.5 h-3.5 text-[#1B3D34]" /> Print
                 </button>
@@ -317,7 +317,7 @@ export const ReportPage: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xs font-bold text-[#1B3D34]">Your detailed report is ready.</h3>
-                <p className="text-[11px] text-[#4B5563]">
+                <p className="text-[11px] text-[#707873]">
                   All construction works, materials needed, and stage-by-stage cost schedules are fully unlocked.
                 </p>
               </div>
@@ -335,7 +335,7 @@ export const ReportPage: React.FC = () => {
 
         {/* ── FREE ESTIMATE SUMMARY BANNER (Section 3) ── */}
         {!isUnlocked && (
-          <div className="p-4 sm:p-5 bg-white border border-[#E3E8E2] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs print:hidden">
+          <div className="p-4 sm:p-5 bg-white border border-[#E5E7EB] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs print:hidden">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1B3D34] bg-[#F0F5F3] px-2 py-0.5 rounded border border-[#1B3D34]/15">
@@ -345,7 +345,7 @@ export const ReportPage: React.FC = () => {
                   You can view your estimate here for free.
                 </span>
               </div>
-              <p className="text-xs text-[#4B5563] leading-relaxed max-w-2xl">
+              <p className="text-xs text-[#707873] leading-relaxed max-w-2xl">
                 Your full house configuration, estimated built-up area, and preliminary cost breakdown are visible below. Unlock the complete contractor-grade Detailed BOQ report for ₹499 to get work-wise quantities, material schedules, and downloadable PDF.
               </p>
             </div>
@@ -363,8 +363,8 @@ export const ReportPage: React.FC = () => {
         )}
 
         {/* ── GRAND ARCHITECTURAL HERO BANNER ── */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E3E8E2] shadow-xs space-y-6 arch-bracketed print:hidden text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E3E8E2] pb-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs space-y-6 arch-bracketed print:hidden text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
             <div className="space-y-1">
               <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#F28C28]">
                 YOUR HOME &bull; ESTIMATED CONSTRUCTION PICTURE
@@ -382,36 +382,36 @@ export const ReportPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
             <div className="md:col-span-6 lg:col-span-6 space-y-1.5 min-w-0">
-              <span className="font-mono text-xs text-[#4B5563] block uppercase tracking-wider">
+              <span className="font-mono text-xs text-[#707873] block uppercase tracking-wider">
                 TOTAL ESTIMATED CONSTRUCTION BUDGET
               </span>
               <div className="arch-stat-hero text-[#1B3D34]">
                 {formatCurrency(budget.totalProjectCost || budget.directConstructionBudget)}
               </div>
-              <p className="text-xs text-[#4B5563] max-w-lg">
+              <p className="text-xs text-[#707873] max-w-lg">
                 Includes civil structural frame, material finishes, MEP services, and verified statutory margins.
               </p>
             </div>
 
             <div className="md:col-span-6 lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] min-w-0">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] min-w-0">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#707873] block">
                   GROSS BUILT-UP AREA
                 </span>
                 <span className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
-                  {area.totalBUASqFt.toLocaleString()} <span className="text-xs font-normal text-[#4B5563]">sq.ft</span>
+                  {area.totalBUASqFt.toLocaleString()} <span className="text-xs font-normal text-[#707873]">sq.ft</span>
                 </span>
                 <span className="text-[11px] font-mono text-[#1B3D34] block whitespace-nowrap">
                   Effective: ₹{(budget.costPerSqFt || budget.directCostPerSqFt).toLocaleString()} / sq.ft
                 </span>
               </div>
 
-              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] min-w-0">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[#4B5563] block">
+              <div className="space-y-1 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] min-w-0">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#707873] block">
                   ESTIMATED TIMELINE
                 </span>
                 <span className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading block tabular-nums">
-                  {timeline.totalMonths} <span className="text-xs font-normal text-[#4B5563]">Months</span>
+                  {timeline.totalMonths} <span className="text-xs font-normal text-[#707873]">Months</span>
                 </span>
                 <span className="text-[11px] font-mono text-[#F28C28] font-bold block whitespace-nowrap">
                   {specificationTier?.toUpperCase() || 'PREMIUM'} STANDARDS
@@ -438,18 +438,18 @@ export const ReportPage: React.FC = () => {
         </div>
 
         {/* Document Sheet */}
-        <div className="bg-white border border-[#E3E8E2] rounded-3xl p-8 sm:p-12 shadow-xs space-y-10 print:border-none print:shadow-none print:p-0 arch-bracketed">
+        <div className="bg-white border border-[#E5E7EB] rounded-3xl p-8 sm:p-12 shadow-xs space-y-10 print:border-none print:shadow-none print:p-0 arch-bracketed">
 
           {/* 1. Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b-2 border-[#1B3D34]">
             <div className="space-y-1">
               <HuttyLogo variant="full" width={140} />
-              <p className="text-xs text-[#4B5563] mt-1 font-mono">
+              <p className="text-xs text-[#707873] mt-1 font-mono">
                 {isUnlocked ? 'Authoritative Construction Dossier & BOQ' : 'High-Level Construction Cost Estimate'}
               </p>
             </div>
 
-            <div className="text-xs text-left sm:text-right space-y-0.5 text-[#4B5563] font-mono">
+            <div className="text-xs text-left sm:text-right space-y-0.5 text-[#707873] font-mono">
               <p><strong className="text-[#1B3D34]">Project ID:</strong> {projectId}</p>
               <p><strong className="text-[#1B3D34]">Date:</strong> {currentDate}</p>
               <p><strong className="text-[#1B3D34]">Specification:</strong> {(specificationTier || 'Premium').toUpperCase()}</p>
@@ -472,47 +472,47 @@ export const ReportPage: React.FC = () => {
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                <span className="text-[#4B5563] block">Direct Construction Budget</span>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                <span className="text-[#707873] block">Direct Construction Budget</span>
                 <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">{formatCurrency(budget.directConstructionBudget || budget.totalProjectCost)}</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                <span className="text-[#4B5563] block">Built-Up Area (BUA)</span>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                <span className="text-[#707873] block">Built-Up Area (BUA)</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                <span className="text-[#4B5563] block">Direct Execution Rate</span>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                <span className="text-[#707873] block">Direct Execution Rate</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">₹{(budget.directCostPerSqFt || budget.costPerSqFt).toLocaleString()} / sq.ft</span>
               </div>
-              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                <span className="text-[#4B5563] block">Estimated Timeline</span>
+              <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                <span className="text-[#707873] block">Estimated Timeline</span>
                 <span className="text-base font-bold text-[#1B3D34] font-heading block mt-0.5">{timeline.totalMonths} Months</span>
               </div>
             </div>
 
             {/* High-Level Cost Distribution Summary (Basic PDF Content Boundary) */}
             <div className="space-y-2 pt-2">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#4B5563] block">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#707873] block">
                 High-Level Cost Distribution
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
-                  <span className="text-[#4B5563] block text-[11px]">1. Construction Materials</span>
+                  <span className="text-[#707873] block text-[11px]">1. Construction Materials</span>
                   <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(materialCost)}</span>
                   <span className="text-[10px] text-[#6B7280] block mt-0.5">Cement, steel, sand &amp; blocks</span>
                 </div>
                 <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
-                  <span className="text-[#4B5563] block text-[11px]">2. Trade Labour</span>
+                  <span className="text-[#707873] block text-[11px]">2. Trade Labour</span>
                   <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(labourCost)}</span>
                   <span className="text-[10px] text-[#6B7280] block mt-0.5">RCC framing, masonry &amp; trades</span>
                 </div>
                 <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
-                  <span className="text-[#4B5563] block text-[11px]">3. Fixtures &amp; Finishes</span>
+                  <span className="text-[#707873] block text-[11px]">3. Fixtures &amp; Finishes</span>
                   <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(fixtureCost)}</span>
                   <span className="text-[10px] text-[#6B7280] block mt-0.5">Doors, windows, tiles &amp; MEP</span>
                 </div>
                 <div className="p-3 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[rgba(27,61,52,0.12)]">
-                  <span className="text-[#4B5563] block text-[11px]">4. Commercial Reserves</span>
+                  <span className="text-[#707873] block text-[11px]">4. Commercial Reserves</span>
                   <span className="text-sm font-bold text-[#1B3D34] font-mono">{formatCurrency(commercialReserves)}</span>
                   <span className="text-[10px] text-[#6B7280] block mt-0.5">Prelims, margin &amp; contingency</span>
                 </div>
@@ -525,7 +525,7 @@ export const ReportPage: React.FC = () => {
             <>
               {/* 2. Key Quantities Summary */}
               <section className="space-y-3">
-                <div className="flex items-center justify-between border-b border-[#E3E8E2] pb-1.5">
+                <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-1.5">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
                     2. Key Structural Quantities
                   </h2>
@@ -538,38 +538,38 @@ export const ReportPage: React.FC = () => {
                   </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                    <span className="text-[#4B5563] block">Structural Steel</span>
+                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#707873] block">Structural Steel</span>
                     <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.steelTonnes} Tonnes</span>
                   </div>
-                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                    <span className="text-[#4B5563] block">Portland Cement</span>
+                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#707873] block">Portland Cement</span>
                     <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.cementBags?.toLocaleString()} Bags</span>
                   </div>
-                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                    <span className="text-[#4B5563] block">Total RCC Concrete</span>
+                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#707873] block">Total RCC Concrete</span>
                     <span className="text-sm font-bold text-[#1B3D34] font-mono">{quantities.rccConcreteTotalCuM || 0} m³</span>
                   </div>
-                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
-                    <span className="text-[#4B5563] block">Block Wall Coverage</span>
+                  <div className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
+                    <span className="text-[#707873] block">Block Wall Coverage</span>
                     <span className="text-sm font-bold text-[#1B3D34] font-mono">{(quantities.blockWallCoverageSqFt || quantities.netWallAreaSqFt)?.toLocaleString()} sq.ft</span>
-                    <span className="text-[10px] text-[#4B5563] block">{quantities.masonryUnitsCount?.toLocaleString()} Nos</span>
+                    <span className="text-[10px] text-[#707873] block">{quantities.masonryUnitsCount?.toLocaleString()} Nos</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
-                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
+                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
                     <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Footing Concrete</span>
                     <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.footingConcreteCuM || 0} m³</span>
                   </div>
-                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
+                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
                     <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Column Concrete</span>
                     <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.columnConcreteCuM || 0} m³</span>
                   </div>
-                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
+                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
                     <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Slab Concrete</span>
                     <span className="text-xs font-bold text-[#1B3D34] font-mono">{quantities.slabConcreteCuM || 0} m³</span>
                   </div>
-                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E3E8E2]/80">
+                  <div className="p-2.5 bg-[rgba(27,61,52,0.02)] rounded-lg border border-[#E5E7EB]/80">
                     <span className="text-[10px] text-[#6B7280] block uppercase tracking-wider font-semibold">Sand &amp; Aggregates</span>
                     <span className="text-xs font-bold text-[#1B3D34] font-mono">{((quantities.mSandCuFt || 0) + (quantities.pSandCuFt || 0) + (quantities.coarseAggregateCuFt || 0))?.toLocaleString()} CFT</span>
                   </div>
@@ -586,13 +586,13 @@ export const ReportPage: React.FC = () => {
                         WHAT WE BUILD &bull; CONSTRUCTION WORKS BOQ
                       </h2>
                     </div>
-                    <span className="text-xs text-[#4B5563] font-mono font-bold">{boq.length} Line Items</span>
+                    <span className="text-xs text-[#707873] font-mono font-bold">{boq.length} Line Items</span>
                   </div>
                   
                   <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
                     <table className="w-full text-left text-xs border-collapse min-w-[560px]">
                       <thead>
-                        <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
+                        <tr className="border-b border-[#E5E7EB] text-[#687770] font-mono">
                           <th className="py-2.5 font-bold uppercase w-10">Sl</th>
                           <th className="py-2.5 font-bold uppercase">Activity / Work Description</th>
                           <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
@@ -600,7 +600,7 @@ export const ReportPage: React.FC = () => {
                           <th className="py-2.5 font-bold uppercase text-right">Amount</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#E3E8E2]">
+                      <tbody className="divide-y divide-[#E5E7EB]">
                         {boq.map((item) => (
                           <tr key={item.code || item.slNo} className="hover:bg-[#F8F8F6]/60 transition-colors">
                             <td className="py-2.5 font-mono text-[#687770]">{item.slNo}</td>
@@ -629,12 +629,12 @@ export const ReportPage: React.FC = () => {
                         WHAT WE CONSUME &bull; MATERIALS NEEDED
                       </h2>
                     </div>
-                    <span className="text-xs text-[#4B5563] font-mono font-bold">{materialSchedule.length} Physical Materials</span>
+                    <span className="text-xs text-[#707873] font-mono font-bold">{materialSchedule.length} Physical Materials</span>
                   </div>
                   <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
                     <table className="w-full text-left text-xs border-collapse min-w-[560px]">
                       <thead>
-                        <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
+                        <tr className="border-b border-[#E5E7EB] text-[#687770] font-mono">
                           <th className="py-2.5 font-bold uppercase w-10">Sl</th>
                           <th className="py-2.5 font-bold uppercase">Physical Material &amp; Brand</th>
                           <th className="py-2.5 font-bold uppercase text-right">Quantity</th>
@@ -642,7 +642,7 @@ export const ReportPage: React.FC = () => {
                           <th className="py-2.5 font-bold uppercase text-right">Total</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#E3E8E2]">
+                      <tbody className="divide-y divide-[#E5E7EB]">
                         {materialSchedule.map((mat) => (
                           <tr key={mat.slNo} className="hover:bg-[#F8F8F6]/60 transition-colors">
                             <td className="py-2.5 font-mono text-[#687770]">{mat.slNo}</td>
@@ -676,7 +676,7 @@ export const ReportPage: React.FC = () => {
                   <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
                     <table className="w-full text-left text-xs border-collapse min-w-[560px]">
                       <thead>
-                        <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
+                        <tr className="border-b border-[#E5E7EB] text-[#687770] font-mono">
                           <th className="py-2.5 font-bold uppercase w-10">Sl</th>
                           <th className="py-2.5 font-bold uppercase">Installed Fixture / Equipment</th>
                           <th className="py-2.5 font-bold uppercase">Location</th>
@@ -685,7 +685,7 @@ export const ReportPage: React.FC = () => {
                           <th className="py-2.5 font-bold uppercase text-right">Amount</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#E3E8E2]">
+                      <tbody className="divide-y divide-[#E5E7EB]">
                         {fixtureSchedule.map((fix) => (
                           <tr key={fix.slNo} className="hover:bg-[#F8F8F6]/60 transition-colors">
                             <td className="py-2.5 font-mono text-[#687770]">{fix.slNo}</td>
@@ -719,21 +719,21 @@ export const ReportPage: React.FC = () => {
 
                 {/* 4 Summary Cards: Materials, Labour, Other Costs, Total Estimated Cost */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">Materials</span>
                     <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
                       {formatCurrency(budget.baseConstructionCost ? Math.round(budget.baseConstructionCost * 0.65) : Math.round((budget.totalProjectCost || 0) * 0.55))}
                     </span>
                     <span className="text-[10px] text-[#687770] block">Civil materials, steel, cement &amp; finishes</span>
                   </div>
-                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">Labour</span>
                     <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
                       {formatCurrency(budget.baseConstructionCost ? Math.round(budget.baseConstructionCost * 0.35) : Math.round((budget.totalProjectCost || 0) * 0.25))}
                     </span>
                     <span className="text-[10px] text-[#687770] block">Execution trades &amp; workmanship</span>
                   </div>
-                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2]">
+                  <div className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB]">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">Other Costs</span>
                     <span className="text-base font-extrabold text-[#1B3D34] font-heading block mt-0.5">
                       {formatCurrency((budget.contractorMargin || 0) + (budget.contingency || 0) + (budget.gstAmount || 0))}
@@ -750,11 +750,11 @@ export const ReportPage: React.FC = () => {
                 </div>
 
                 {/* Proportional Trade Allocation Horizontal Bar */}
-                <div className="space-y-2 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2]">
+                <div className="space-y-2 p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB]">
                   <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#687770] block">
                     WHERE YOUR MONEY GOES (PROPORTIONAL DISTRIBUTION)
                   </span>
-                  <div className="h-6 w-full rounded-xl overflow-hidden flex border border-[#E3E8E2] bg-white p-0.5">
+                  <div className="h-6 w-full rounded-xl overflow-hidden flex border border-[#E5E7EB] bg-white p-0.5">
                     {budget.heads.map((head, idx) => (
                       <div
                         key={head.id}
@@ -773,13 +773,13 @@ export const ReportPage: React.FC = () => {
                   <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
                     <table className="w-full text-left text-xs border-collapse min-w-[500px]">
                       <thead>
-                        <tr className="border-b border-[#E3E8E2] text-[#687770] font-mono">
+                        <tr className="border-b border-[#E5E7EB] text-[#687770] font-mono">
                           <th className="py-2.5 font-bold uppercase">Trade Category</th>
                           <th className="py-2.5 font-bold uppercase text-right">Amount (INR)</th>
                           <th className="py-2.5 font-bold uppercase text-right">% of Total</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#E3E8E2]">
+                      <tbody className="divide-y divide-[#E5E7EB]">
                         {budget.heads.map((head) => (
                           <tr key={head.id} className="hover:bg-[#F8F8F6]/60 transition-colors">
                             <td className="py-2.5 font-medium text-[#172722]">{head.name}</td>
@@ -803,19 +803,19 @@ export const ReportPage: React.FC = () => {
               {/* 5. Milestone Payment Schedule */}
               {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
                 <section className="space-y-3">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E3E8E2] pb-1.5 font-heading">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] border-b border-[#E5E7EB] pb-1.5 font-heading">
                     5. Payment Plan (Milestone Schedule)
                   </h2>
                   <div className="space-y-2">
                     {paymentPlan.map((stage) => (
-                      <div key={stage.stage} className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center justify-between text-xs">
+                      <div key={stage.stage} className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between text-xs">
                         <div>
                           <span className="font-bold text-[#1B3D34] block">Stage {stage.stage}: {stage.title}</span>
-                          <span className="text-[10px] text-[#4B5563]">{stage.description}</span>
+                          <span className="text-[10px] text-[#707873]">{stage.description}</span>
                         </div>
                         <div className="text-right">
                           <span className="font-bold text-[#1B3D34] font-mono block">{formatCurrency(stage.amount)}</span>
-                          <span className="text-[10px] text-[#4B5563]">{stage.percentage}%</span>
+                          <span className="text-[10px] text-[#707873]">{stage.percentage}%</span>
                         </div>
                       </div>
                     ))}
@@ -827,46 +827,46 @@ export const ReportPage: React.FC = () => {
             /* Locked Teaser Banner for Detailed BOQ Deliverables */
             <div className="p-8 bg-[#F8F8F6] rounded-2xl border-2 border-dashed border-[#1B3D34]/30 space-y-6 text-center">
               <div className="space-y-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] bg-white px-3 py-1 rounded-md border border-[#E3E8E2] inline-block">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] bg-white px-3 py-1 rounded-md border border-[#E5E7EB] inline-block">
                   DETAILED DELIVERABLES &bull; ₹499
                 </span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading">
                   Want to see the complete contractor-grade bill of quantities?
                 </h3>
-                <p className="text-xs sm:text-sm text-[#4B5563] max-w-lg mx-auto leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#707873] max-w-lg mx-auto leading-relaxed">
                   Unlock the full itemized Works BOQ, structural steel and cement schedules, doors and windows schedule, and milestone payment roadmap.
                 </p>
               </div>
 
               {/* Teaser Points */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left max-w-3xl mx-auto">
-                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <FileText className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section 01 &bull; Works BOQ</span>
                   </div>
-                  <p className="text-[10px] text-[#4B5563]">Itemized trade activities with verified quantities, unit rates, and totals.</p>
+                  <p className="text-[10px] text-[#707873]">Itemized trade activities with verified quantities, unit rates, and totals.</p>
                 </div>
-                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section 02 &bull; Materials</span>
                   </div>
-                  <p className="text-[10px] text-[#4B5563]">Exact steel tonnage, cement bag counts, sand volumes &amp; masonry blocks.</p>
+                  <p className="text-[10px] text-[#707873]">Exact steel tonnage, cement bag counts, sand volumes &amp; masonry blocks.</p>
                 </div>
-                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section 03 &bull; Fixtures</span>
                   </div>
-                  <p className="text-[10px] text-[#4B5563]">Door schedule, window areas, sanitary suites &amp; CPVC plumbing lengths.</p>
+                  <p className="text-[10px] text-[#707873]">Door schedule, window areas, sanitary suites &amp; CPVC plumbing lengths.</p>
                 </div>
-                <div className="p-3.5 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1B3D34]">
                     <Calculator className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Section 04/05 &bull; Costs</span>
                   </div>
-                  <p className="text-[10px] text-[#4B5563]">Contractor margins, contingency, and milestone payment roadmap.</p>
+                  <p className="text-[10px] text-[#707873]">Contractor margins, contingency, and milestone payment roadmap.</p>
                 </div>
               </div>
 
@@ -925,7 +925,7 @@ export const ReportPage: React.FC = () => {
           {isPremiumUnlocked ? (
             <div className="space-y-8 pt-4 border-t-2 border-[#1B3D34]">
               {/* Premium Plan Unlocked Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-[#E3E8E2]">
+              <div className="flex items-center justify-between pb-2 border-b border-[#E5E7EB]">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-black text-white bg-[#1B3D34] px-2.5 py-1 rounded">
                     PREMIUM TIER DELIVERABLES
@@ -948,7 +948,7 @@ export const ReportPage: React.FC = () => {
                       <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
                         CONTRACTOR QUOTE AUDIT &bull; REDLINE CHECKLIST
                       </h2>
-                      <p className="text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] text-[#707873]">
                         Compare your contractor's quotation against Bangalore benchmark trade rates and verify high-risk exclusions.
                       </p>
                     </div>
@@ -956,14 +956,14 @@ export const ReportPage: React.FC = () => {
                 </div>
 
                 {/* Trade Tolerance Benchmarks Table */}
-                <div className="border border-[#E3E8E2] rounded-2xl overflow-hidden bg-white shadow-2xs">
-                  <div className="p-3 bg-[#F8F8F6] border-b border-[#E3E8E2] flex items-center justify-between">
+                <div className="border border-[#E5E7EB] rounded-2xl overflow-hidden bg-white shadow-2xs">
+                  <div className="p-3 bg-[#F8F8F6] border-b border-[#E5E7EB] flex items-center justify-between">
                     <span className="text-xs font-bold text-[#1B3D34]">Trade Rate Tolerance Benchmarks (Bangalore Q1 2026)</span>
-                    <span className="text-[10px] text-[#4B5563] font-mono">Acceptable Market Tolerances</span>
+                    <span className="text-[10px] text-[#707873] font-mono">Acceptable Market Tolerances</span>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs font-mono">
-                      <thead className="bg-[#F8F8F6]/60 border-b border-[#E3E8E2] text-[10px] text-[#4B5563] uppercase">
+                      <thead className="bg-[#F8F8F6]/60 border-b border-[#E5E7EB] text-[10px] text-[#707873] uppercase">
                         <tr>
                           <th className="py-2.5 px-4">Material / Trade Item</th>
                           <th className="py-2.5 px-4">Standard Unit</th>
@@ -971,40 +971,40 @@ export const ReportPage: React.FC = () => {
                           <th className="py-2.5 px-4 text-right">Allowable Variance</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#E3E8E2]">
+                      <tbody className="divide-y divide-[#E5E7EB]">
                         <tr className="hover:bg-[#F8F8F6]">
                           <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Structural TMT Steel (Fe 550D)</td>
-                          <td className="py-2.5 px-4 text-[#4B5563]">Per Kg</td>
+                          <td className="py-2.5 px-4 text-[#707873]">Per Kg</td>
                           <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹68 – ₹76</td>
                           <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±5% max</td>
                         </tr>
                         <tr className="hover:bg-[#F8F8F6]">
                           <td className="py-2.5 px-4 font-bold text-[#1B3D34]">53-Grade Portland Cement</td>
-                          <td className="py-2.5 px-4 text-[#4B5563]">50kg Bag</td>
+                          <td className="py-2.5 px-4 text-[#707873]">50kg Bag</td>
                           <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹380 – ₹420</td>
                           <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±4% max</td>
                         </tr>
                         <tr className="hover:bg-[#F8F8F6]">
                           <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Solid Concrete Masonry Blocks (6")</td>
-                          <td className="py-2.5 px-4 text-[#4B5563]">Per Block</td>
+                          <td className="py-2.5 px-4 text-[#707873]">Per Block</td>
                           <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹42 – ₹48</td>
                           <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±5% max</td>
                         </tr>
                         <tr className="hover:bg-[#F8F8F6]">
                           <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Civil RCC Labour (Framed Structure)</td>
-                          <td className="py-2.5 px-4 text-[#4B5563]">Per sq.ft BUA</td>
+                          <td className="py-2.5 px-4 text-[#707873]">Per sq.ft BUA</td>
                           <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹240 – ₹280</td>
                           <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±6% max</td>
                         </tr>
                         <tr className="hover:bg-[#F8F8F6]">
                           <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Tile Laying &amp; Grouting Labour</td>
-                          <td className="py-2.5 px-4 text-[#4B5563]">Per sq.ft</td>
+                          <td className="py-2.5 px-4 text-[#707873]">Per sq.ft</td>
                           <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹35 – ₹45</td>
                           <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±8% max</td>
                         </tr>
                         <tr className="hover:bg-[#F8F8F6]">
                           <td className="py-2.5 px-4 font-bold text-[#1B3D34]">Interior Emulsion (2 Coats + Putty)</td>
-                          <td className="py-2.5 px-4 text-[#4B5563]">Per sq.ft</td>
+                          <td className="py-2.5 px-4 text-[#707873]">Per sq.ft</td>
                           <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">₹18 – ₹26</td>
                           <td className="py-2.5 px-4 text-right text-emerald-700 font-semibold">±7% max</td>
                         </tr>
@@ -1063,17 +1063,17 @@ export const ReportPage: React.FC = () => {
                       <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
                         MATERIAL FINISH SENSITIVITY &bull; PRICE MATRIX
                       </h2>
-                      <p className="text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] text-[#707873]">
                         Trade-off analysis across Standard, Premium, and Luxury specifications on your {area.totalBUASqFt.toLocaleString()} sq.ft gross BUA.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="border border-[#E3E8E2] rounded-2xl overflow-hidden bg-white shadow-2xs">
+                <div className="border border-[#E5E7EB] rounded-2xl overflow-hidden bg-white shadow-2xs">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs font-mono min-w-[560px]">
-                    <thead className="bg-[#F8F8F6] border-b border-[#E3E8E2] text-[10px] text-[#4B5563] uppercase">
+                    <thead className="bg-[#F8F8F6] border-b border-[#E5E7EB] text-[10px] text-[#707873] uppercase">
                       <tr>
                         <th className="py-2.5 px-4">Finish Package</th>
                         <th className="py-2.5 px-4">Material Specification Scope</th>
@@ -1081,10 +1081,10 @@ export const ReportPage: React.FC = () => {
                         <th className="py-2.5 px-4 text-right">Total Project Delta</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#E3E8E2]">
+                    <tbody className="divide-y divide-[#E5E7EB]">
                       <tr className="hover:bg-[#F8F8F6]">
                         <td className="py-3 px-4 font-bold text-[#1B3D34]">Standard Package</td>
-                        <td className="py-3 px-4 text-[#4B5563]">Vitrified 2x2, standard 3-track UPVC, OBD paint, baseline CP fixtures</td>
+                        <td className="py-3 px-4 text-[#707873]">Vitrified 2x2, standard 3-track UPVC, OBD paint, baseline CP fixtures</td>
                         <td className="py-3 px-4 text-right font-bold text-[#1B3D34]">₹1,950 / sq.ft</td>
                         <td className="py-3 px-4 text-right font-bold text-emerald-700">
                           - {formatCurrency(Math.max(0, (budget.costPerSqFt || 2250) - 1950) * area.totalBUASqFt)}
@@ -1101,7 +1101,7 @@ export const ReportPage: React.FC = () => {
                       </tr>
                       <tr className="hover:bg-[#F8F8F6]">
                         <td className="py-3 px-4 font-bold text-[#1B3D34]">Luxury Package</td>
-                        <td className="py-3 px-4 text-[#4B5563]">Italian marble/engineered wood, thermal-break aluminium, Grohe/Kohler, smart home</td>
+                        <td className="py-3 px-4 text-[#707873]">Italian marble/engineered wood, thermal-break aluminium, Grohe/Kohler, smart home</td>
                         <td className="py-3 px-4 text-right font-bold text-[#1B3D34]">₹2,850 / sq.ft</td>
                         <td className="py-3 px-4 text-right font-bold text-red-700">
                           + {formatCurrency(Math.max(0, 2850 - (budget.costPerSqFt || 2250)) * area.totalBUASqFt)}
@@ -1122,7 +1122,7 @@ export const ReportPage: React.FC = () => {
                       <h2 className="text-base font-extrabold uppercase tracking-wider text-[#1B3D34] font-heading">
                         MULTI-SCENARIO PROJECT COMPARISON
                       </h2>
-                      <p className="text-[11px] text-[#4B5563]">
+                      <p className="text-[11px] text-[#707873]">
                         Compare alternative floor configurations on your {result.input?.plotLength || 30}' × {result.input?.plotWidth || 40}' plot.
                       </p>
                     </div>
@@ -1130,19 +1130,19 @@ export const ReportPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-4 bg-[#F8F8F6] border border-[#E3E8E2] rounded-2xl space-y-2">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#4B5563] block">Scenario A</span>
+                  <div className="p-4 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl space-y-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#707873] block">Scenario A</span>
                     <h3 className="text-sm font-bold text-[#1B3D34]">Single Floor (Compact)</h3>
                     <div className="text-xs space-y-1 pt-1 font-mono">
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Gross BUA:</span>
                         <span className="font-bold text-[#1B3D34]">{(area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (result.input?.floors || 1))).toLocaleString()} sq.ft</span>
                       </div>
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Budget:</span>
                         <span className="font-bold text-[#1B3D34]">{formatCurrency((area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (result.input?.floors || 1))) * (budget.costPerSqFt || 2250))}</span>
                       </div>
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Rate:</span>
                         <span>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}/sqft</span>
                       </div>
@@ -1156,34 +1156,34 @@ export const ReportPage: React.FC = () => {
                     </div>
                     <h3 className="text-sm font-bold text-[#1B3D34]">G+{Math.max(0, (result.input?.floors || 1) - 1)} Design ({result.input?.floors || 1} Floors)</h3>
                     <div className="text-xs space-y-1 pt-1 font-mono">
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Gross BUA:</span>
                         <span className="font-bold text-[#1B3D34]">{area.totalBUASqFt.toLocaleString()} sq.ft</span>
                       </div>
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Budget:</span>
                         <span className="font-bold text-[#1B3D34]">{formatCurrency(budget.totalProjectCost || budget.directConstructionBudget)}</span>
                       </div>
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Rate:</span>
                         <span>₹{Math.round(budget.costPerSqFt || budget.directCostPerSqFt).toLocaleString('en-IN')}/sqft</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-[#F8F8F6] border border-[#E3E8E2] rounded-2xl space-y-2">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#4B5563] block">Scenario C</span>
+                  <div className="p-4 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl space-y-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#707873] block">Scenario C</span>
                     <h3 className="text-sm font-bold text-[#1B3D34]">+1 Floor (Rental Unit)</h3>
                     <div className="text-xs space-y-1 pt-1 font-mono">
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Gross BUA:</span>
                         <span className="font-bold text-[#1B3D34]">{(area.totalBUASqFt + Math.round(area.totalBUASqFt / (result.input?.floors || 1))).toLocaleString()} sq.ft</span>
                       </div>
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Budget:</span>
                         <span className="font-bold text-[#1B3D34]">{formatCurrency((budget.totalProjectCost || budget.directConstructionBudget) + Math.round(area.totalBUASqFt / (result.input?.floors || 1)) * (budget.costPerSqFt || 2250) * 0.88)}</span>
                       </div>
-                      <div className="flex justify-between text-[#4B5563]">
+                      <div className="flex justify-between text-[#707873]">
                         <span>Rate:</span>
                         <span>₹{Math.round((budget.costPerSqFt || 2250) * 0.96).toLocaleString('en-IN')}/sqft</span>
                       </div>
@@ -1206,7 +1206,7 @@ export const ReportPage: React.FC = () => {
                   <h3 className="text-base font-bold text-[#1B3D34]">
                     Contractor Quote Audit, Finish Sensitivity &amp; Multi-Scenario Comparison
                   </h3>
-                  <p className="text-xs text-[#4B5563]">
+                  <p className="text-xs text-[#707873]">
                     Upgrade your calculator package to unlock benchmark rate vetting, high-risk contractor redlines, and 1-floor vs multi-floor plot scenarios.
                   </p>
                 </div>
@@ -1225,33 +1225,33 @@ export const ReportPage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-                <div className="p-3 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
                     <Check className="w-3.5 h-3.5 text-[#F28C28]" />
                     Contractor Quote Audit
                   </span>
-                  <p className="text-[10px] text-[#4B5563]">Bangalore market tolerance benchmarks for steel, cement, masonry, and civil labour.</p>
+                  <p className="text-[10px] text-[#707873]">Bangalore market tolerance benchmarks for steel, cement, masonry, and civil labour.</p>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
                     <Check className="w-3.5 h-3.5 text-[#F28C28]" />
                     Finish Sensitivity Matrix
                   </span>
-                  <p className="text-[10px] text-[#4B5563]">Live INR cost delta across Standard, Premium, and Luxury brand specifications.</p>
+                  <p className="text-[10px] text-[#707873]">Live INR cost delta across Standard, Premium, and Luxury brand specifications.</p>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-[#E3E8E2] space-y-1">
+                <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
                   <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
                     <Check className="w-3.5 h-3.5 text-[#F28C28]" />
                     Multi-Scenario Comparison
                   </span>
-                  <p className="text-[10px] text-[#4B5563]">Side-by-side plot area and budget comparison for single floor vs multi-floor variants.</p>
+                  <p className="text-[10px] text-[#707873]">Side-by-side plot area and budget comparison for single floor vs multi-floor variants.</p>
                 </div>
               </div>
             </section>
           )}
 
           {/* 7. Preliminary Estimate Disclaimers & Engineering Notice */}
-          <section className="space-y-2 text-xs text-[#4B5563] border-t border-[#E3E8E2] pt-4">
+          <section className="space-y-2 text-xs text-[#707873] border-t border-[#E5E7EB] pt-4">
             <h3 className="font-bold text-[#1B3D34]">IMPORTANT — PRELIMINARY ESTIMATE &amp; ENGINEERING NOTICE</h3>
             <p>
               * Generated using Hutty's preliminary estimation rules; final structural design is by the appointed engineer.
@@ -1268,7 +1268,7 @@ export const ReportPage: React.FC = () => {
           </section>
 
           {/* Document Footer */}
-          <div className="pt-6 border-t border-[#E3E8E2] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[#4B5563]">
+          <div className="pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[#707873]">
             <span>Hutty &bull; Construction Estimate &amp; BOQ &bull; Engine {result.rateSourceMetadata?.calculationEngineVersion || 'v2.6.0'}</span>
             <span>Rate Master: {result.rateSourceMetadata?.datasetVersion || 'HUTTY-RM-2026.1'} &bull; https://hutty.in</span>
           </div>

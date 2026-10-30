@@ -130,10 +130,10 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-[#E3E8E2] my-8 text-left space-y-6"
+            className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-[#E5E7EB] my-8 text-left space-y-6"
           >
             {/* Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-[#E3E8E2]">
+            <div className="flex items-start justify-between pb-4 border-b border-[#E5E7EB]">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28] block">
                   TALK TO A HUTTY EXPERT &bull; DIRECT ASSISTANCE
@@ -141,7 +141,7 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                 <h2 className="text-xl font-bold text-[#1B3D34] mt-1 font-heading">
                   {confirmationRef ? 'Enquiry Confirmed' : 'Request Expert Guidance'}
                 </h2>
-                <p className="text-xs text-[#4B5563] mt-0.5">
+                <p className="text-xs text-[#707873] mt-0.5">
                   {confirmationRef
                     ? 'Our senior engineering review desk has received your request.'
                     : 'Tell us about your project question and our team will match you with the right specialist.'}
@@ -150,7 +150,7 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1 rounded-lg text-[#4B5563] hover:text-[#1B3D34] hover:bg-black/5 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-[#707873] hover:text-[#1B3D34] hover:bg-black/5 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -171,7 +171,7 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                   </div>
                 </div>
 
-                <div className="p-4 bg-[#F8F8F6] border border-[#E3E8E2] rounded-2xl text-xs space-y-2 text-[#4B5563]">
+                <div className="p-4 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl text-xs space-y-2 text-[#707873]">
                   <div className="flex justify-between font-mono text-[11px]">
                     <span>Name:</span>
                     <strong className="text-[#1B3D34]">{name}</strong>
@@ -213,7 +213,7 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#E3E8E2] rounded-xl text-xs text-[#1B3D34] bg-white focus:outline-none focus:border-[#1B3D34]"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl text-xs text-[#1B3D34] bg-white focus:outline-none focus:border-[#1B3D34]"
                   >
                     {REASONS.map((r) => (
                       <option key={r} value={r}>
@@ -227,14 +227,14 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-[#1B3D34] block">Your Name</label>
                     <div className="relative">
-                      <User className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                      <User className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                       <input
                         type="text"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Ramesh Kumar"
-                        className="w-full pl-9 pr-3 py-2 border border-[#E3E8E2] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
+                        className="w-full pl-9 pr-3 py-2 border border-[#E5E7EB] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
                       />
                     </div>
                   </div>
@@ -242,14 +242,14 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-[#1B3D34] block">Mobile Number</label>
                     <div className="relative">
-                      <Phone className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                      <Phone className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                       <input
                         type="tel"
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="10-digit mobile"
-                        className="w-full pl-9 pr-3 py-2 border border-[#E3E8E2] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
+                        className="w-full pl-9 pr-3 py-2 border border-[#E5E7EB] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
                       />
                     </div>
                   </div>
@@ -259,14 +259,14 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-[#1B3D34] block">Email Address</label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                      <Mail className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                       <input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full pl-9 pr-3 py-2 border border-[#E3E8E2] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
+                        className="w-full pl-9 pr-3 py-2 border border-[#E5E7EB] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
                       />
                     </div>
                   </div>
@@ -274,13 +274,13 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-[#1B3D34] block">Project City / Area</label>
                     <div className="relative">
-                      <MapPin className="w-4 h-4 text-[#4B5563] absolute left-3 top-2.5" />
+                      <MapPin className="w-4 h-4 text-[#707873] absolute left-3 top-2.5" />
                       <input
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="e.g. Bangalore (Whitefield)"
-                        className="w-full pl-9 pr-3 py-2 border border-[#E3E8E2] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
+                        className="w-full pl-9 pr-3 py-2 border border-[#E5E7EB] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34]"
                       />
                     </div>
                   </div>
@@ -296,7 +296,7 @@ export const ExpertFallbackModal: React.FC<ExpertFallbackModalProps> = ({
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Briefly describe your site location, drawings available, or contractor quote doubt..."
-                    className="w-full p-3 border border-[#E3E8E2] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34] resize-none"
+                    className="w-full p-3 border border-[#E5E7EB] rounded-xl text-xs text-[#1B3D34] focus:outline-none focus:border-[#1B3D34] resize-none"
                   />
                 </div>
 

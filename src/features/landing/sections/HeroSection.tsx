@@ -125,17 +125,17 @@ export const HeroSection: React.FC = () => {
             {/* 1. Location Eyebrow Badge */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-xs font-semibold text-[#1B3D34]">
               <MapPin className="w-3.5 h-3.5 text-[#F28C28] fill-[#F28C28]" />
-              <span>Residential Cost Calculator &bull; Bangalore</span>
+              <span>Residential Construction Intelligence &bull; Bangalore</span>
             </div>
 
             {/* 2. Main Headline */}
-            <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl lg:text-[2.65rem] xl:text-[3rem] font-black text-[#1B3D34] tracking-tight leading-[1.12]">
-                Understand your home <br />
-                <span className="text-[#F28C28]">before</span> you build.
+            <div className="space-y-3">
+              <h1 className="text-3.5xl sm:text-4xl lg:text-[2.85rem] xl:text-[3.25rem] font-extrabold text-[#18211E] font-heading tracking-tight leading-[1.12]">
+                Your home begins with a <br className="hidden sm:inline" />
+                <span className="text-[#1B3D34] underline decoration-[#F28C28] decoration-4 underline-offset-8">clearer plan.</span>
               </h1>
-              <p className="text-[#52605B] text-sm sm:text-base font-normal leading-relaxed max-w-lg">
-                Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need it.
+              <p className="text-[#707873] text-base sm:text-lg font-normal leading-relaxed max-w-lg">
+                Understand construction costs, material quantities, and the journey ahead before you build.
               </p>
             </div>
 
@@ -145,10 +145,10 @@ export const HeroSection: React.FC = () => {
               {/* Section A: Plot Size Selection */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-sm font-bold text-[#1B3D34]">
+                  <span className="text-sm font-bold text-[#18211E]">
                     1. Select plot size
                   </span>
-                  <span className="text-xs text-[#687770]">
+                  <span className="text-xs text-[#707873]">
                     Area:{' '}
                     <strong className="text-[#F28C28] font-bold">
                       {PRESET_PLOTS[activePlotIdx].desc}
@@ -168,13 +168,13 @@ export const HeroSection: React.FC = () => {
                         className={`py-2.5 px-2 rounded-xl text-center transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
                           isSelected
                             ? 'bg-[#1B3D34] text-white shadow-xs border border-[#1B3D34]'
-                            : 'bg-[#F8F9F7] text-[#42524C] border border-[#E2E8E3] hover:border-[#1B3D34]/40 hover:bg-[#EFF3F0]'
+                            : 'bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] hover:border-[#1B3D34]/40 hover:bg-[#F2F4F2]'
                         }`}
                       >
-                        <span className={`block text-xs sm:text-sm font-bold leading-tight ${isSelected ? 'text-white' : 'text-[#1B3D34]'}`}>
+                        <span className={`block text-xs sm:text-sm font-bold leading-tight ${isSelected ? 'text-white' : 'text-[#18211E]'}`}>
                           {plot.label}
                         </span>
-                        <span className={`block text-[10px] sm:text-[11px] mt-0.5 leading-tight ${isSelected ? 'text-white/80' : 'text-[#687770]'}`}>
+                        <span className={`block text-[10px] sm:text-[11px] mt-0.5 leading-tight ${isSelected ? 'text-white/80' : 'text-[#707873]'}`}>
                           {plot.desc}
                         </span>
                       </button>
@@ -186,7 +186,7 @@ export const HeroSection: React.FC = () => {
               {/* Section B: Floors Selection */}
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-sm font-bold text-[#1B3D34]">
+                  <span className="text-sm font-bold text-[#18211E]">
                     2. Select floors
                   </span>
                 </div>
@@ -202,10 +202,10 @@ export const HeroSection: React.FC = () => {
                         className={`py-2.5 px-2 rounded-xl text-center transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
                           isSelected
                             ? 'bg-[#1B3D34] text-white shadow-xs border border-[#1B3D34]'
-                            : 'bg-[#F8F9F7] text-[#42524C] border border-[#E2E8E3] hover:border-[#1B3D34]/40 hover:bg-[#EFF3F0]'
+                            : 'bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] hover:border-[#1B3D34]/40 hover:bg-[#F2F4F2]'
                         }`}
                       >
-                        <span className={`block text-xs sm:text-sm font-bold leading-tight ${isSelected ? 'text-white' : 'text-[#1B3D34]'}`}>
+                        <span className={`block text-xs sm:text-sm font-bold leading-tight ${isSelected ? 'text-white' : 'text-[#18211E]'}`}>
                           {f.label}
                         </span>
                       </button>
@@ -221,17 +221,23 @@ export const HeroSection: React.FC = () => {
                   onClick={() => handleStartEstimate('PREMIUM')}
                   className="flex-1 bg-[#1B3D34] hover:bg-[#142E27] text-white font-bold text-sm py-3.5 px-6 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
                 >
-                  <span>Start Free Estimate</span>
+                  <span>Start House Calculation</span>
                   <ArrowRight className="w-4 h-4 text-[#F28C28]" />
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => navigate('/consult')}
-                  className="bg-white hover:bg-[#F8F9F7] text-[#1B3D34] border border-[#D7DFD9] font-semibold text-sm py-3.5 px-5 rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
+                  onClick={() => {
+                    const el = document.getElementById('how-it-works');
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      navigate('/how-it-works');
+                    }
+                  }}
+                  className="bg-white hover:bg-[#F8F9F7] text-[#18211E] border border-[#E5E7EB] font-semibold text-sm py-3.5 px-5 rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
                 >
-                  <User className="w-4 h-4 text-[#1B3D34]" />
-                  <span>Consult an Expert — ₹1,499</span>
+                  <span>How Hutty Works</span>
                 </button>
               </div>
 

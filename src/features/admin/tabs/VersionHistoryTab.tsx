@@ -64,13 +64,13 @@ export const VersionHistoryTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#18211E] font-heading flex items-center gap-2">
             <History className="w-5 h-5 text-[#1B3D34]" />
             Configuration Version History & System Health
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Immutable version catalog, rollback controls, configuration health diagnostics, and JSON import/export.
           </p>
         </div>
@@ -80,7 +80,7 @@ export const VersionHistoryTab: React.FC = () => {
             type="button"
             onClick={handleExportJson}
             disabled={isExporting}
-            className="px-3.5 py-1.5 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl flex items-center gap-1.5"
+            className="px-3.5 py-1.5 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-[#18211E] rounded-xl flex items-center gap-1.5"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export Config JSON</span>
@@ -89,12 +89,12 @@ export const VersionHistoryTab: React.FC = () => {
       </div>
 
       {/* ── CONFIGURATION HEALTH DASHBOARD (Part 45) ── */}
-      <Card className="border border-slate-200 bg-white">
+      <Card className="border border-[#E5E7EB] bg-white">
         <CardContent className="p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#1B3D34]" />
-              <h3 className="text-sm font-bold text-slate-900 font-heading">
+              <h3 className="text-sm font-bold text-[#18211E] font-heading">
                 Configuration Health Diagnostic
               </h3>
             </div>
@@ -111,7 +111,7 @@ export const VersionHistoryTab: React.FC = () => {
 
           {configHealth.conflicts.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-slate-100">
-              <span className="text-[11px] font-bold text-slate-500 uppercase block">
+              <span className="text-[11px] font-bold text-[#707873] uppercase block">
                 Detected Baseline Conflicts Awaiting Administrative Clarification:
               </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -136,7 +136,7 @@ export const VersionHistoryTab: React.FC = () => {
 
       {/* ── VERSIONS CATALOG (Part 27 & 39) ── */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-slate-900 font-heading">
+        <h3 className="text-sm font-bold text-[#18211E] font-heading">
           Published Configuration Versions
         </h3>
 
@@ -148,13 +148,13 @@ export const VersionHistoryTab: React.FC = () => {
               <Card
                 key={v.id}
                 className={`border transition-all ${
-                  isActive ? 'border-[#1B3D34] bg-emerald-50/20 shadow-xs' : 'border-slate-200 bg-white'
+                  isActive ? 'border-[#1B3D34] bg-emerald-50/20 shadow-xs' : 'border-[#E5E7EB] bg-white'
                 }`}
               >
                 <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold font-mono text-slate-900">
+                      <span className="text-sm font-bold font-mono text-[#18211E]">
                         {v.versionLabel || v.versionNumber || (v.id ? `ver-${String(v.id).slice(0, 8)}` : 'v1.0')}
                       </span>
                       {isActive ? (
@@ -162,12 +162,12 @@ export const VersionHistoryTab: React.FC = () => {
                           PRODUCTION / ACTIVE
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-[#707873]">
                           {v.status || 'ARCHIVED'}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-600">
+                    <p className="text-xs text-[#707873]">
                       {v.changeSummary || v.changeNote || v.description || 'Approved production baseline configuration'}
                     </p>
                     <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono pt-1">
@@ -203,15 +203,15 @@ export const VersionHistoryTab: React.FC = () => {
       {/* ── ROLLBACK CONFIRMATION MODAL (Part 39) ── */}
       {selectedVersionForRollback !== null && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 space-y-4">
+          <div className="max-w-md w-full bg-white rounded-2xl p-6 shadow-2xl border border-[#E5E7EB] space-y-4">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">
                 Safe Rollback Operation
               </span>
-              <h3 className="text-lg font-bold text-slate-900 font-heading mt-2">
+              <h3 className="text-lg font-bold text-[#18211E] font-heading mt-2">
                 Rollback to Version #{selectedVersionForRollback}
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-[#707873] mt-1">
                 This action creates a <strong>NEW</strong> active version containing the parameters of version #{selectedVersionForRollback}. Old versions remain completely immutable and unmutated.
               </p>
             </div>
@@ -220,7 +220,7 @@ export const VersionHistoryTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedVersionForRollback(null)}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-[#707873] hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               >
                 Cancel
               </button>

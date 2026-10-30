@@ -29,7 +29,7 @@ export const PopularConsultationsSection: React.FC<PopularConsultationsSectionPr
   onSelectService,
 }) => {
   return (
-    <section className="bg-white border-y border-[#E3E8E2] py-12 sm:py-16">
+    <section className="bg-white border-y border-[#E5E7EB] py-12 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left space-y-8">
         
         {/* Header */}
@@ -54,11 +54,11 @@ export const PopularConsultationsSection: React.FC<PopularConsultationsSectionPr
             return (
               <div
                 key={srv.id}
-                className="bg-[#F8F8F6] hover:bg-white rounded-2xl border-2 border-[#E3E8E2] hover:border-[#1B3D34] hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 group"
+                className="bg-[#F8F8F6] hover:bg-white rounded-2xl border-2 border-[#E5E7EB] hover:border-[#1B3D34] hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 group"
               >
                 <div className="space-y-3.5">
                   <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-[#E3E8E2] text-[#1B3D34] flex items-center justify-center group-hover:bg-[#1B3D34] group-hover:text-white transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-[#E5E7EB] text-[#1B3D34] flex items-center justify-center group-hover:bg-[#1B3D34] group-hover:text-white transition-colors">
                       <IconComponent className="w-5 h-5" />
                     </div>
                     <div className="px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-900 font-mono text-xs font-bold">
@@ -81,11 +81,11 @@ export const PopularConsultationsSection: React.FC<PopularConsultationsSectionPr
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#E3E8E2]/80">
+                <div className="pt-3 border-t border-[#E5E7EB]/80">
                   <button
                     type="button"
                     onClick={() => onSelectService(srv.title, srv.category)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-[#1B3D34] text-[#1B3D34] hover:text-white border border-[#E3E8E2] hover:border-[#1B3D34] text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-xs cursor-pointer"
+                    className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-[#1B3D34] text-[#1B3D34] hover:text-white border border-[#E5E7EB] hover:border-[#1B3D34] text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-xs cursor-pointer"
                   >
                     <span>Book Session</span>
                     <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />

@@ -172,15 +172,15 @@ export const AdminUsersSection: React.FC = () => {
   return (
     <div className="space-y-6 text-left">
       {/* ── HEADER & TITLE ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E5E7EB]">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-slate-900 font-heading">User Management</h2>
+            <h2 className="text-xl font-bold text-[#18211E] font-heading">User Management</h2>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
               Admin Protected
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Manage customer accounts, inspect project/consultation activity, disable logins, and safely decommission users.
           </p>
         </div>
@@ -188,7 +188,7 @@ export const AdminUsersSection: React.FC = () => {
         <button
           onClick={loadUsers}
           disabled={isLoading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 shadow-2xs transition-all self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-[#CBD5CB] shadow-2xs transition-all self-start sm:self-auto cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-emerald-700' : ''}`} />
           Refresh
@@ -222,20 +222,20 @@ export const AdminUsersSection: React.FC = () => {
 
       {/* ── SUMMARY METRICS CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Total Registered Customers</span>
-            <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+            <span className="text-xs font-medium text-[#707873]">Total Registered Customers</span>
+            <div className="w-8 h-8 rounded-xl bg-slate-100 text-[#707873] flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2 font-mono">{summary.totalUsers}</div>
+          <div className="text-2xl font-bold text-[#18211E] mt-2 font-mono">{summary.totalUsers}</div>
           <div className="text-[11px] text-slate-400 mt-0.5">Database & in-memory accounts</div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Active Accounts</span>
+            <span className="text-xs font-medium text-[#707873]">Active Accounts</span>
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
               <ShieldCheck className="w-4 h-4" />
             </div>
@@ -244,9 +244,9 @@ export const AdminUsersSection: React.FC = () => {
           <div className="text-[11px] text-emerald-600 mt-0.5">Permitted to log in & book</div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Disabled Accounts</span>
+            <span className="text-xs font-medium text-[#707873]">Disabled Accounts</span>
             <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
               <ShieldAlert className="w-4 h-4" />
             </div>
@@ -257,7 +257,7 @@ export const AdminUsersSection: React.FC = () => {
       </div>
 
       {/* ── SEARCH & FILTER CONTROLS ── */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+      <div className="bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-2xs space-y-3">
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -269,7 +269,7 @@ export const AdminUsersSection: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by customer name, email address, or phone number..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-emerald-800 transition-colors"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs text-[#18211E] focus:bg-white focus:outline-emerald-800 transition-colors"
             />
             {searchQuery && (
               <button
@@ -277,7 +277,7 @@ export const AdminUsersSection: React.FC = () => {
                   setSearchQuery('');
                   setPage(1);
                 }}
-                className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs"
+                className="absolute right-2.5 top-2.5 text-slate-400 hover:text-[#707873] text-xs"
               >
                 Clear
               </button>
@@ -291,7 +291,7 @@ export const AdminUsersSection: React.FC = () => {
                 setStatusFilter(e.target.value as any);
                 setPage(1);
               }}
-              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium cursor-pointer"
+              className="px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs text-slate-700 font-medium cursor-pointer"
             >
               <option value="ALL">All Account Statuses</option>
               <option value="ACTIVE">Active Only</option>
@@ -301,7 +301,7 @@ export const AdminUsersSection: React.FC = () => {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as any)}
-              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium cursor-pointer"
+              className="px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs text-slate-700 font-medium cursor-pointer"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -312,11 +312,11 @@ export const AdminUsersSection: React.FC = () => {
       </div>
 
       {/* ── USERS TABLE ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+              <tr className="bg-slate-50/80 border-b border-[#E5E7EB] text-[#707873] font-semibold uppercase tracking-wider text-[10px]">
                 <th className="py-3 px-4">Customer Details</th>
                 <th className="py-3 px-4">Contact & Verification</th>
                 <th className="py-3 px-4">Role</th>
@@ -347,12 +347,12 @@ export const AdminUsersSection: React.FC = () => {
                   return (
                     <tr
                       key={user.id}
-                      className={`hover:bg-slate-50/60 transition-colors ${user.disabled ? 'bg-slate-50/40 text-slate-500' : ''}`}
+                      className={`hover:bg-slate-50/60 transition-colors ${user.disabled ? 'bg-slate-50/40 text-[#707873]' : ''}`}
                     >
                       {/* Name & Email */}
                       <td className="py-3 px-4">
-                        <div className="font-semibold text-slate-900">{user.name}</div>
-                        <div className="text-slate-500 font-mono text-[11px] truncate max-w-[200px]" title={user.email}>
+                        <div className="font-semibold text-[#18211E]">{user.name}</div>
+                        <div className="text-[#707873] font-mono text-[11px] truncate max-w-[200px]" title={user.email}>
                           {user.email}
                         </div>
                       </td>
@@ -361,7 +361,7 @@ export const AdminUsersSection: React.FC = () => {
                       <td className="py-3 px-4">
                         {user.phone ? (
                           <div className="space-y-0.5">
-                            <span className="font-mono text-slate-800">{user.phoneFormatted || user.phone}</span>
+                            <span className="font-mono text-[#18211E]">{user.phoneFormatted || user.phone}</span>
                             <div>
                               {user.phoneVerified ? (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
@@ -411,7 +411,7 @@ export const AdminUsersSection: React.FC = () => {
 
                       {/* Activity Counts */}
                       <td className="py-3 px-4">
-                        <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-slate-600">
+                        <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-[#707873]">
                           <span title="Projects count" className="flex items-center gap-1">
                             <Building className="w-3 h-3 text-slate-400" />
                             {user.counts.projects}
@@ -428,7 +428,7 @@ export const AdminUsersSection: React.FC = () => {
                       </td>
 
                       {/* Created At */}
-                      <td className="py-3 px-4 text-slate-500 text-[11px]">
+                      <td className="py-3 px-4 text-[#707873] text-[11px]">
                         {new Date(user.createdAt).toLocaleDateString('en-IN', {
                           day: '2-digit',
                           month: 'short',
@@ -486,17 +486,17 @@ export const AdminUsersSection: React.FC = () => {
         </div>
 
         {/* ── PAGINATION CONTROLS ── */}
-        <div className="p-3 bg-slate-50/60 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div className="p-3 bg-slate-50/60 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#707873]">
           <div>
-            Showing <span className="font-semibold text-slate-800">{users.length}</span> of{' '}
-            <span className="font-semibold text-slate-800">{pagination.total}</span> customers
+            Showing <span className="font-semibold text-[#18211E]">{users.length}</span> of{' '}
+            <span className="font-semibold text-[#18211E]">{pagination.total}</span> customers
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || isLoading}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              className="p-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -506,7 +506,7 @@ export const AdminUsersSection: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page >= pagination.totalPages || isLoading}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              className="p-1.5 rounded-lg border border-[#E5E7EB] bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -517,25 +517,25 @@ export const AdminUsersSection: React.FC = () => {
       {/* ── MODAL: DISABLE ACCOUNT ── */}
       {userToDisable && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full shadow-2xl space-y-4 animate-scaleIn text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 max-w-md w-full shadow-2xl space-y-4 animate-scaleIn text-left">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center">
                   <Lock className="w-4 h-4" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 font-heading">Disable Customer Account</h3>
+                <h3 className="text-sm font-bold text-[#18211E] font-heading">Disable Customer Account</h3>
               </div>
               <button
                 onClick={() => setUserToDisable(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#707873] p-1 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-[#707873] leading-relaxed">
               Are you sure you want to disable the account for{' '}
-              <strong className="text-slate-900">{userToDisable.name}</strong> ({userToDisable.email})?
+              <strong className="text-[#18211E]">{userToDisable.name}</strong> ({userToDisable.email})?
             </p>
 
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 space-y-1">
@@ -560,7 +560,7 @@ export const AdminUsersSection: React.FC = () => {
                 value={disableReason}
                 onChange={(e) => setDisableReason(e.target.value)}
                 placeholder="e.g. Chargeback investigation, suspicious activity, customer request"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-emerald-800"
+                className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs focus:bg-white focus:outline-emerald-800"
               />
             </div>
 
@@ -588,24 +588,24 @@ export const AdminUsersSection: React.FC = () => {
       {/* ── MODAL: RESTORE ACCOUNT ── */}
       {userToRestore && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full shadow-2xl space-y-4 animate-scaleIn text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 max-w-md w-full shadow-2xl space-y-4 animate-scaleIn text-left">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center">
                   <Unlock className="w-4 h-4" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 font-heading">Restore Customer Account</h3>
+                <h3 className="text-sm font-bold text-[#18211E] font-heading">Restore Customer Account</h3>
               </div>
               <button
                 onClick={() => setUserToRestore(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#707873] p-1 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Restore login access for <strong className="text-slate-900">{userToRestore.name}</strong> (
+            <p className="text-xs text-[#707873] leading-relaxed">
+              Restore login access for <strong className="text-[#18211E]">{userToRestore.name}</strong> (
               {userToRestore.email})?
             </p>
 
@@ -654,7 +654,7 @@ export const AdminUsersSection: React.FC = () => {
               </div>
               <button
                 onClick={() => setUserToDelete(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#707873] p-1 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -663,11 +663,11 @@ export const AdminUsersSection: React.FC = () => {
             <div className="text-xs text-slate-700 space-y-2">
               <p>
                 You are initiating permanent removal for{' '}
-                <strong className="text-slate-900">{userToDelete.name}</strong> ({userToDelete.email}).
+                <strong className="text-[#18211E]">{userToDelete.name}</strong> ({userToDelete.email}).
               </p>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-[11px]">
-                <div className="font-bold text-slate-800">Associated Customer Records:</div>
+              <div className="p-3 bg-slate-50 border border-[#E5E7EB] rounded-xl space-y-1 text-[11px]">
+                <div className="font-bold text-[#18211E]">Associated Customer Records:</div>
                 <div className="grid grid-cols-3 gap-2 font-mono text-slate-700 pt-1">
                   <div>Projects: {userToDelete.counts.projects}</div>
                   <div>Consultations: {userToDelete.counts.consultations}</div>
@@ -696,7 +696,7 @@ export const AdminUsersSection: React.FC = () => {
                   value={deleteReason}
                   onChange={(e) => setDeleteReason(e.target.value)}
                   placeholder="e.g. GDPR customer deletion request, duplicate account purge"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-emerald-800"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs focus:bg-white focus:outline-emerald-800"
                 />
               </div>
 
@@ -705,9 +705,9 @@ export const AdminUsersSection: React.FC = () => {
                   type="checkbox"
                   checked={deleteConfirmationChecked}
                   onChange={(e) => setDeleteConfirmationChecked(e.target.checked)}
-                  className="mt-0.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                  className="mt-0.5 rounded border-[#CBD5CB] text-rose-600 focus:ring-rose-500"
                 />
-                <span className="text-[11px] font-medium text-slate-800 select-none">
+                <span className="text-[11px] font-medium text-[#18211E] select-none">
                   I confirm that I want to remove this account. I understand that identity data will be scrubbed and this
                   action cannot be undone.
                 </span>

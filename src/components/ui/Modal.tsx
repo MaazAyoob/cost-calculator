@@ -119,21 +119,21 @@ export const Modal: React.FC<ModalProps> = ({
             animate="animate"
             exit="exit"
             className={cn(
-              'relative w-full bg-white rounded-t-2xl sm:rounded-[14px] shadow-xl z-10 flex flex-col max-h-[92vh] sm:max-h-[85vh] overflow-hidden border border-[#E3E8E2]',
+              'relative w-full bg-white rounded-t-2xl sm:rounded-xl shadow-xl z-10 flex flex-col max-h-[92vh] sm:max-h-[85vh] overflow-hidden border border-[#E5E7EB]',
               maxWidths[maxWidth],
               className
             )}
           >
             {/* Header */}
-            <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#E3E8E2] shrink-0">
+            <div className="flex items-start justify-between p-5 sm:p-6 border-b border-[#E5E7EB] shrink-0">
               <div className="space-y-1 pr-4">
                 {title && (
-                  <h2 id="modal-title" className="text-base sm:text-lg font-bold text-[#172722] font-heading">
+                  <h2 id="modal-title" className="text-base sm:text-lg font-bold text-[#18211E] font-heading">
                     {title}
                   </h2>
                 )}
                 {description && (
-                  <p className="text-xs sm:text-sm text-[#687770] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
                     {description}
                   </p>
                 )}

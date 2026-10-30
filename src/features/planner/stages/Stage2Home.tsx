@@ -103,10 +103,10 @@ export const Stage2Home: React.FC = () => {
           <Home className="w-3 h-3 text-[#F28C28]" />
           <span>STAGE 2 OF 8 &bull; YOUR HOME</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           What kind of home are you planning?
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Choose the number of floors, home purpose, and parking. Your floor count stays synchronized with your estimate and buildable area.
         </p>
       </div>
@@ -114,10 +114,10 @@ export const Stage2Home: React.FC = () => {
       {/* 1. Floor Count Visual Selection Cards */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#18211E]">
             1. How many floors would you like?
           </label>
-          <span className="text-[11px] text-[#687770]">Ground to Ground + 4</span>
+          <span className="text-[11px] text-[#707873]">Ground to Ground + 4</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">

@@ -191,7 +191,7 @@ export const AdminPricingTiersSection: React.FC = () => {
     <div className="space-y-8 text-left select-none">
       
       {/* Header Banner */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-2 py-0.5 rounded border border-[#F28C28]/20">
@@ -207,13 +207,13 @@ export const AdminPricingTiersSection: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+          <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-[#E5E7EB] text-xs">
             <span className="text-[#4B5563]">Active Tiers: </span>
             <span className="font-bold text-[#1B3D34]">
               {tiers.filter((t) => t.active).length} / {tiers.length}
             </span>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+          <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-[#E5E7EB] text-xs">
             <span className="text-[#4B5563]">Purchasable: </span>
             <span className="font-bold text-[#1B3D34]">
               {tiers.filter((t) => t.purchasable).length}
@@ -253,8 +253,8 @@ export const AdminPricingTiersSection: React.FC = () => {
             key={tier.id}
             className={`bg-white rounded-2xl border p-5 flex flex-col justify-between space-y-4 shadow-2xs relative ${
               tier.code === 'COMPLETE_PACKAGE' && !tier.purchasable
-                ? 'border-dashed border-slate-300 bg-slate-50/50'
-                : 'border-slate-200'
+                ? 'border-dashed border-[#CBD5CB] bg-slate-50/50'
+                : 'border-[#E5E7EB]'
             }`}
           >
             <div className="space-y-3">
@@ -297,7 +297,7 @@ export const AdminPricingTiersSection: React.FC = () => {
 
               <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Status:</span>
+                  <span className="text-[#707873]">Status:</span>
                   <span
                     className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${
                       tier.active ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
@@ -307,17 +307,17 @@ export const AdminPricingTiersSection: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Purchasable:</span>
+                  <span className="text-[#707873]">Purchasable:</span>
                   <span
                     className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${
-                      tier.purchasable ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'
+                      tier.purchasable ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-[#707873]'
                     }`}
                   >
                     {tier.purchasable ? 'YES' : 'NO'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Features Granted:</span>
+                  <span className="text-[#707873]">Features Granted:</span>
                   <span className="font-bold text-[#1B3D34]">{tier.features.length}</span>
                 </div>
               </div>
@@ -326,7 +326,7 @@ export const AdminPricingTiersSection: React.FC = () => {
             <button
               type="button"
               onClick={() => openEditModal(tier)}
-              className="w-full py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-[#1B3D34] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-2 px-3 rounded-xl border border-[#E5E7EB] hover:bg-slate-50 text-xs font-bold text-[#1B3D34] transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <Edit3 className="w-3.5 h-3.5 text-[#F28C28]" />
               <span>Configure Tier</span>
@@ -336,7 +336,7 @@ export const AdminPricingTiersSection: React.FC = () => {
       </div>
 
       {/* ── PRICE AUDIT LOG TABLE ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 space-y-4">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs p-5 space-y-4">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
           <History className="w-4 h-4 text-[#F28C28]" />
           <h3 className="text-sm font-extrabold text-[#1B3D34] font-heading">
@@ -351,7 +351,7 @@ export const AdminPricingTiersSection: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-[#4B5563] border-b border-slate-200">
+              <thead className="bg-slate-50 text-[#4B5563] border-b border-[#E5E7EB]">
                 <tr>
                   <th className="py-2.5 px-3 font-bold">Timestamp</th>
                   <th className="py-2.5 px-3 font-bold">Tier</th>
@@ -365,7 +365,7 @@ export const AdminPricingTiersSection: React.FC = () => {
               <tbody className="divide-y divide-slate-100">
                 {auditLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-slate-50/50">
-                    <td className="py-2.5 px-3 text-slate-500 whitespace-nowrap">
+                    <td className="py-2.5 px-3 text-[#707873] whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString('en-IN', {
                         dateStyle: 'short',
                         timeStyle: 'short',
@@ -377,7 +377,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                     <td className="py-2.5 px-3 font-semibold text-slate-700">
                       {log.action}
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">
+                    <td className="py-2.5 px-3 font-mono text-[#707873]">
                       {log.oldValue?.priceMinorUnits !== undefined
                         ? formatPaiseToINR(log.oldValue.priceMinorUnits)
                         : '-'}
@@ -387,8 +387,8 @@ export const AdminPricingTiersSection: React.FC = () => {
                         ? formatPaiseToINR(log.newValue.priceMinorUnits)
                         : '-'}
                     </td>
-                    <td className="py-2.5 px-3 text-slate-600">{log.actorEmail}</td>
-                    <td className="py-2.5 px-3 text-slate-500">{log.reason || '-'}</td>
+                    <td className="py-2.5 px-3 text-[#707873]">{log.actorEmail}</td>
+                    <td className="py-2.5 px-3 text-[#707873]">{log.reason || '-'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -400,7 +400,7 @@ export const AdminPricingTiersSection: React.FC = () => {
       {/* ── EDIT TIER MODAL ── */}
       {editingTier && (
         <div className="fixed inset-0 z-50 bg-[#1B3D34]/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-2xl w-full p-6 space-y-5 shadow-2xl text-left relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-[#E5E7EB] max-w-2xl w-full p-6 space-y-5 shadow-2xl text-left relative max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-mono font-bold uppercase text-[#F28C28]">
@@ -413,7 +413,7 @@ export const AdminPricingTiersSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setEditingTier(null)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-[#707873] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -428,7 +428,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                     required
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-slate-200 font-semibold"
+                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-[#E5E7EB] font-semibold"
                   />
                 </div>
 
@@ -439,7 +439,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                     placeholder="e.g. Popular, Recommended, Coming Soon"
                     value={editBadge}
                     onChange={(e) => setEditBadge(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-slate-200"
+                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-[#E5E7EB]"
                   />
                 </div>
               </div>
@@ -451,7 +451,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                   required
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-slate-200"
+                  className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-[#E5E7EB]"
                 />
               </div>
 
@@ -459,7 +459,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="font-bold text-[#1B3D34] block">Authoritative Price (INR ₹)</label>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-[#707873]">
                       Converted to integer minor units paise on save ({editPriceINR * 100} paise)
                     </span>
                   </div>
@@ -471,7 +471,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                       required
                       value={editPriceINR}
                       onChange={(e) => setEditPriceINR(parseInt(e.target.value, 10) || 0)}
-                      className="w-full px-3 py-2 border rounded-xl bg-white border-slate-300 font-mono font-bold text-right text-sm"
+                      className="w-full px-3 py-2 border rounded-xl bg-white border-[#CBD5CB] font-mono font-bold text-right text-sm"
                     />
                   </div>
                 </div>
@@ -487,7 +487,7 @@ export const AdminPricingTiersSection: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
-                <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                <label className="flex items-center gap-2 p-3 rounded-xl border border-[#E5E7EB] bg-slate-50 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={editActive}
@@ -495,12 +495,12 @@ export const AdminPricingTiersSection: React.FC = () => {
                     className="w-4 h-4 text-[#1B3D34] rounded"
                   />
                   <div>
-                    <span className="font-bold text-slate-800 block">Active Status</span>
-                    <span className="text-[10px] text-slate-500">Visible to public users</span>
+                    <span className="font-bold text-[#18211E] block">Active Status</span>
+                    <span className="text-[10px] text-[#707873]">Visible to public users</span>
                   </div>
                 </label>
 
-                <label className="flex items-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                <label className="flex items-center gap-2 p-3 rounded-xl border border-[#E5E7EB] bg-slate-50 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={editPurchasable}
@@ -508,8 +508,8 @@ export const AdminPricingTiersSection: React.FC = () => {
                     className="w-4 h-4 text-[#1B3D34] rounded"
                   />
                   <div>
-                    <span className="font-bold text-slate-800 block">Purchasable Status</span>
-                    <span className="text-[10px] text-slate-500">Allowed in checkout</span>
+                    <span className="font-bold text-[#18211E] block">Purchasable Status</span>
+                    <span className="text-[10px] text-[#707873]">Allowed in checkout</span>
                   </div>
                 </label>
               </div>
@@ -517,7 +517,7 @@ export const AdminPricingTiersSection: React.FC = () => {
               {/* ── FEATURE MATRIX CHECKBOX LIST ── */}
               <div className="space-y-2 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-800 block">
+                  <span className="font-bold text-[#18211E] block">
                     Feature Entitlements ({editFeatures.length} unlocked)
                   </span>
                   <span className="text-[10px] text-slate-400">Map tier deliverables</span>
@@ -534,7 +534,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                         className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer flex items-start gap-2 ${
                           isChecked
                             ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)]'
-                            : 'border-slate-200 bg-slate-50 hover:bg-white'
+                            : 'border-[#E5E7EB] bg-slate-50 hover:bg-white'
                         }`}
                       >
                         <input
@@ -564,7 +564,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                   placeholder="e.g. Adjusted price tier for launch / updated feature entitlement"
                   value={editReason}
                   onChange={(e) => setEditReason(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-slate-200"
+                  className="w-full px-3 py-2 border rounded-xl bg-slate-50 focus:bg-white border-[#E5E7EB]"
                 />
               </div>
 
@@ -572,7 +572,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingTier(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-[#E5E7EB] text-[#707873] font-bold hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>

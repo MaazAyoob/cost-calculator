@@ -31,9 +31,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const variants = {
       primary: 'bg-[#1B3D34] text-white hover:bg-[#142F28] active:bg-[#112821] border border-[#1B3D34] shadow-xs hover:shadow-sm',
       accent: 'bg-[#F28C28] text-white hover:bg-[#D9771A] active:bg-[#C26715] border border-[#F28C28] shadow-xs hover:shadow-sm font-bold',
-      secondary: 'bg-[rgba(27,61,52,0.06)] text-[#172722] hover:bg-[rgba(27,61,52,0.12)] active:bg-[rgba(27,61,52,0.18)] border border-[rgba(27,61,52,0.15)]',
-      outline: 'border border-[#E3E8E2] bg-white text-[#172722] hover:bg-[#F8F8F6] hover:border-[#CBD5CB] active:bg-[#EDF3ED] shadow-2xs',
-      ghost: 'bg-transparent text-[#687770] hover:text-[#172722] hover:bg-[rgba(27,61,52,0.05)] active:bg-[rgba(27,61,52,0.1)]',
+      secondary: 'bg-[rgba(27,61,52,0.06)] text-[#18211E] hover:bg-[rgba(27,61,52,0.12)] active:bg-[rgba(27,61,52,0.18)] border border-[rgba(27,61,52,0.15)]',
+      outline: 'border border-[#E5E7EB] bg-white text-[#18211E] hover:bg-[#F8F8F6] hover:border-[#CBD5CB] active:bg-[#EDF3ED] shadow-2xs',
+      ghost: 'bg-transparent text-[#707873] hover:text-[#18211E] hover:bg-[rgba(27,61,52,0.05)] active:bg-[rgba(27,61,52,0.1)]',
       danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-xs',
     };
 

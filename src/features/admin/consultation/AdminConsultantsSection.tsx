@@ -166,13 +166,13 @@ export const AdminConsultantsSection: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
         <div>
-          <h2 className="text-xl font-bold font-heading text-slate-900 flex items-center gap-2">
+          <h2 className="text-xl font-bold font-heading text-[#18211E] flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-[#1B3D34]" />
             <span>Consultant Directory Management</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Manually add, update, activate, and feature Hutty-approved architects, engineers, and specialists.
           </p>
         </div>
@@ -209,7 +209,7 @@ export const AdminConsultantsSection: React.FC = () => {
       )}
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-xs">
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -217,7 +217,7 @@ export const AdminConsultantsSection: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by consultant name, title, or city..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
           />
         </div>
 
@@ -226,7 +226,7 @@ export const AdminConsultantsSection: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#1B3D34] font-medium cursor-pointer"
+            className="text-xs bg-slate-50 border border-[#E5E7EB] rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#1B3D34] font-medium cursor-pointer"
           >
             <option value="ALL">All Categories</option>
             {LAUNCH_CONSULTATION_CATEGORIES.map((cat) => (
@@ -239,11 +239,11 @@ export const AdminConsultantsSection: React.FC = () => {
       </div>
 
       {/* Consultants Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="bg-slate-50/80 border-b border-[#E5E7EB] text-[#707873] font-bold uppercase tracking-wider text-[10px]">
                 <th className="py-3 px-4">Expert Details</th>
                 <th className="py-3 px-4">Category</th>
                 <th className="py-3 px-4">Experience</th>
@@ -265,7 +265,7 @@ export const AdminConsultantsSection: React.FC = () => {
                   <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-[#E5E7EB]">
                           {c.profileImage ? (
                             <img src={c.profileImage} alt={c.name} className="w-full h-full object-cover" />
                           ) : (
@@ -276,20 +276,20 @@ export const AdminConsultantsSection: React.FC = () => {
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-slate-900">{c.name}</span>
+                            <span className="font-bold text-[#18211E]">{c.name}</span>
                             {c.featured && (
                               <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#F28C28]/20 text-[#F28C28]">
                                 Featured
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-slate-500 block">{c.title}</span>
+                          <span className="text-[11px] text-[#707873] block">{c.title}</span>
                         </div>
                       </div>
                     </td>
 
                     <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-[#E5E7EB]">
                         {c.category}
                       </span>
                     </td>
@@ -298,11 +298,11 @@ export const AdminConsultantsSection: React.FC = () => {
                       {c.experienceYears} Years
                     </td>
 
-                    <td className="py-3 px-4 text-slate-600">
+                    <td className="py-3 px-4 text-[#707873]">
                       {c.city}
                     </td>
 
-                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                    <td className="py-3 px-4 font-mono font-bold text-[#18211E]">
                       {LAUNCH_CONSULTATION_PRICE_DISPLAY}
                     </td>
 
@@ -326,7 +326,7 @@ export const AdminConsultantsSection: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenEditModal(c)}
-                          className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-[#707873] hover:text-[#18211E] hover:bg-slate-100 transition-colors cursor-pointer"
                           title="Edit Profile"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -335,7 +335,7 @@ export const AdminConsultantsSection: React.FC = () => {
                           href={`/consult/${c.slug}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                          className="p-1.5 rounded-lg text-[#707873] hover:text-[#18211E] hover:bg-slate-100 transition-colors"
                           title="View Public Profile"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -353,9 +353,9 @@ export const AdminConsultantsSection: React.FC = () => {
       {/* Add / Edit Consultant Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-slate-200 my-8 text-left space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-              <h3 className="text-lg font-bold text-slate-900 font-heading">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-[#E5E7EB] my-8 text-left space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
+              <h3 className="text-lg font-bold text-[#18211E] font-heading">
                 {editingConsultant ? `Edit Consultant: ${editingConsultant.name}` : 'Add New Consultant'}
               </h3>
               <button
@@ -383,7 +383,7 @@ export const AdminConsultantsSection: React.FC = () => {
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="e.g. Ar. Ramesh Nambiar"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                    className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   />
                 </div>
 
@@ -392,7 +392,7 @@ export const AdminConsultantsSection: React.FC = () => {
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] bg-white"
+                    className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] bg-white"
                   >
                     {LAUNCH_CONSULTATION_CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -412,7 +412,7 @@ export const AdminConsultantsSection: React.FC = () => {
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
                     placeholder="e.g. Principal Residential Architect"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                    className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   />
                 </div>
 
@@ -425,7 +425,7 @@ export const AdminConsultantsSection: React.FC = () => {
                     required
                     value={formExperienceYears}
                     onChange={(e) => setFormExperienceYears(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                    className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -439,7 +439,7 @@ export const AdminConsultantsSection: React.FC = () => {
                     value={formCity}
                     onChange={(e) => setFormCity(e.target.value)}
                     placeholder="e.g. Bangalore"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                    className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   />
                 </div>
 
@@ -450,7 +450,7 @@ export const AdminConsultantsSection: React.FC = () => {
                     value={formProfileImage}
                     onChange={(e) => setFormProfileImage(e.target.value)}
                     placeholder="https://... (Unsplash or secure CDN URL)"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                    className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   />
                 </div>
               </div>
@@ -462,7 +462,7 @@ export const AdminConsultantsSection: React.FC = () => {
                   value={formServiceAreas}
                   onChange={(e) => setFormServiceAreas(e.target.value)}
                   placeholder="e.g. Indiranagar, Koramangala, Whitefield, All Bangalore"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                  className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                 />
               </div>
 
@@ -474,7 +474,7 @@ export const AdminConsultantsSection: React.FC = () => {
                   value={formAbout}
                   onChange={(e) => setFormAbout(e.target.value)}
                   placeholder="Detailed credentials, background, and practical philosophy..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] resize-none"
+                  className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] resize-none"
                 />
               </div>
 
@@ -485,7 +485,7 @@ export const AdminConsultantsSection: React.FC = () => {
                   value={formSpecializations}
                   onChange={(e) => setFormSpecializations(e.target.value)}
                   placeholder="e.g. Luxury Villas, Vastu Compliance, Setback Optimization"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                  className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                 />
               </div>
 
@@ -496,7 +496,7 @@ export const AdminConsultantsSection: React.FC = () => {
                   value={formServices}
                   onChange={(e) => setFormServices(e.target.value)}
                   placeholder="e.g. Architectural Plan Review, BOQ Rate Verification"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                  className="w-full px-3 py-2 border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                 />
               </div>
 
@@ -522,11 +522,11 @@ export const AdminConsultantsSection: React.FC = () => {
                 </label>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-3 border-t border-[#E5E7EB] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-xl font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-[#CBD5CB] rounded-xl font-bold text-[#707873] hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>

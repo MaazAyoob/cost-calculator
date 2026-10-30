@@ -216,7 +216,7 @@ export const ConsultationPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowHistoryModal(true)}
-              className="px-4 py-2.5 bg-white hover:bg-[#F8F8F6] text-xs font-bold text-[#1B3D34] border border-[#E3E8E2] rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 bg-white hover:bg-[#F8F8F6] text-xs font-bold text-[#1B3D34] border border-[#E5E7EB] rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <Clock className="w-3.5 h-3.5 text-[#1B3D34]" />
               <span>Track My Consultation</span>
@@ -241,18 +241,18 @@ export const ConsultationPage: React.FC = () => {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-[#E3E8E2] p-6 space-y-4 animate-pulse h-72"
+                className="bg-white rounded-2xl border border-[#E5E7EB] p-6 space-y-4 animate-pulse h-72"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-[#E3E8E2]" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#E5E7EB]" />
                   <div className="space-y-2 flex-1">
-                    <div className="h-4 bg-[#E3E8E2] rounded w-3/4" />
-                    <div className="h-3 bg-[#E3E8E2] rounded w-1/2" />
+                    <div className="h-4 bg-[#E5E7EB] rounded w-3/4" />
+                    <div className="h-3 bg-[#E5E7EB] rounded w-1/2" />
                   </div>
                 </div>
                 <div className="space-y-2 pt-2">
-                  <div className="h-3 bg-[#E3E8E2] rounded w-full" />
-                  <div className="h-3 bg-[#E3E8E2] rounded w-5/6" />
+                  <div className="h-3 bg-[#E5E7EB] rounded w-full" />
+                  <div className="h-3 bg-[#E5E7EB] rounded w-5/6" />
                 </div>
               </div>
             ))}
@@ -261,7 +261,7 @@ export const ConsultationPage: React.FC = () => {
           <div className="bg-white p-8 rounded-2xl border border-red-200 text-center space-y-3 shadow-xs">
             <SearchX className="w-8 h-8 text-red-500 mx-auto" />
             <h3 className="text-base font-bold text-slate-800">Unable to load consultants</h3>
-            <p className="text-xs text-[#4B5563] max-w-md mx-auto">{error}</p>
+            <p className="text-xs text-[#707873] max-w-md mx-auto">{error}</p>
             <button
               type="button"
               onClick={() => fetchConsultants()}
@@ -272,7 +272,7 @@ export const ConsultationPage: React.FC = () => {
             </button>
           </div>
         ) : consultants.length === 0 ? (
-          <div className="bg-white p-10 sm:p-12 rounded-3xl border border-[#E3E8E2] text-center space-y-4 shadow-xs">
+          <div className="bg-white p-10 sm:p-12 rounded-3xl border border-[#E5E7EB] text-center space-y-4 shadow-xs">
             <SearchX className="w-10 h-10 text-[#687770]/60 mx-auto" />
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
@@ -292,7 +292,7 @@ export const ConsultationPage: React.FC = () => {
                   setSearchQuery('');
                   setSelectedCity('ALL');
                 }}
-                className="px-4 py-2.5 bg-[#F8F8F6] hover:bg-[#E3E8E2] text-[#1B3D34] border border-[#E3E8E2] text-xs font-bold rounded-xl cursor-pointer transition-colors"
+                className="px-4 py-2.5 bg-[#F8F8F6] hover:bg-[#E5E7EB] text-[#1B3D34] border border-[#E5E7EB] text-xs font-bold rounded-xl cursor-pointer transition-colors"
               >
                 Clear All Filters
               </button>

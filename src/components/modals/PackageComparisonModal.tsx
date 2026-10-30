@@ -109,7 +109,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
               <h2 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] tracking-tight font-heading">
                 Compare Construction Standards
               </h2>
-              <p className="text-xs text-[#4B5563]">
+              <p className="text-xs text-[#707873]">
                 Cost estimates computed for your {buaSqFt > 0 ? `${buaSqFt.toLocaleString()} sq.ft` : ''} house based on plot bylaws and current market rates.
               </p>
             </div>
@@ -117,7 +117,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-[#4B5563] hover:text-[#1B3D34] hover:bg-white border border-transparent hover:border-[#E5E7EB] transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#707873] hover:text-[#1B3D34] hover:bg-white border border-transparent hover:border-[#E5E7EB] transition-colors cursor-pointer"
               aria-label="Close comparison modal"
             >
               <X className="w-5 h-5" />
@@ -137,10 +137,10 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
                   • {comparison.recommendation.title} Package
                 </span>
               </div>
-              <p className="text-xs text-[#4B5563] leading-relaxed">
+              <p className="text-xs text-[#707873] leading-relaxed">
                 {comparison.recommendation.rationale}
               </p>
-              <div className="text-[11px] text-[#4B5563] pt-1">
+              <div className="text-[11px] text-[#707873] pt-1">
                 * You can switch to any construction package at any time, or customize specific materials in the calculator steps.
               </div>
             </div>
@@ -180,7 +180,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
                           <div
                             className={cn(
                               'w-9 h-9 rounded-xl flex items-center justify-center',
-                              isSelected ? 'bg-[#1B3D34] text-white' : 'bg-[#F8F8F6] text-[#4B5563]'
+                              isSelected ? 'bg-[#1B3D34] text-white' : 'bg-[#F8F8F6] text-[#707873]'
                             )}
                           >
                             <Icon className="w-4 h-4" />
@@ -189,7 +189,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
                             <h3 className="text-base font-extrabold text-[#1B3D34] font-heading">
                               {pkg.title}
                             </h3>
-                            <span className="text-[10px] text-[#4B5563] font-medium block">
+                            <span className="text-[10px] text-[#707873] font-medium block">
                               {pkg.subtitle}
                             </span>
                           </div>
@@ -207,21 +207,21 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
 
                       {/* Large Deterministic Price */}
                       <div className="space-y-0.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#4B5563] block">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#707873] block">
                           Estimated Total
                         </span>
                         <div className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading tracking-tight">
                           {cost > 0 ? formatCurrency(cost) : '₹0'}
                         </div>
                         {rate > 0 && (
-                          <span className="text-xs font-mono font-bold text-[#4B5563] block">
+                          <span className="text-xs font-mono font-bold text-[#707873] block">
                             ₹{rate.toLocaleString()} / sq.ft BUA
                           </span>
                         )}
                       </div>
 
                       {/* Description */}
-                      <p className="text-xs text-[#4B5563] leading-relaxed">
+                      <p className="text-xs text-[#707873] leading-relaxed">
                         {pkg.description}
                       </p>
 
@@ -234,7 +234,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
                           {pkg.keyHighlights.slice(0, 5).map((hl, idx) => (
                             <div key={idx} className="flex items-start gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28] mt-1.5 shrink-0" />
-                              <span className="text-[11px] leading-snug text-[#4B5563]">{hl}</span>
+                              <span className="text-[11px] leading-snug text-[#707873]">{hl}</span>
                             </div>
                           ))}
                         </div>
@@ -265,7 +265,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
             </div>
 
             {/* Invariance note */}
-            <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] text-xs text-[#4B5563] space-y-1">
+            <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] text-xs text-[#707873] space-y-1">
               <span className="font-bold text-[#1B3D34] block">
                 How We Calculate Your Estimate:
               </span>
@@ -278,7 +278,7 @@ export const PackageComparisonModal: React.FC<PackageComparisonModalProps> = ({
 
           {/* ── FOOTER ── */}
           <div className="p-4 sm:p-5 bg-white border-t border-[#E5E7EB] flex items-center justify-between shrink-0">
-            <span className="text-xs text-[#4B5563]">
+            <span className="text-xs text-[#707873]">
               Active Package: <strong className="text-[#1B3D34] font-heading">{selectedPackage}</strong>
             </span>
             <button

@@ -45,15 +45,15 @@ export const Stage3Rooms: React.FC = () => {
           <span>STAGE 3 OF 8 &bull; YOUR ROOMS</span>
         </div>
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
             What rooms would you like in your home?
           </h2>
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#1B3D34] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-2xs">
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#18211E] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-2xs">
             <span>Total Spaces:</span>
             <strong className="text-[#F28C28]">{totalRoomCount}</strong>
           </span>
         </div>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Adjust your room counts with a single tap. Doors, windows, and electrical switch points calculate automatically to match your layout.
         </p>
       </div>

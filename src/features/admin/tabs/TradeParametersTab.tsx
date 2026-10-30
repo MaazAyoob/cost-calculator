@@ -504,13 +504,13 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#18211E] font-heading flex items-center gap-2">
             {section.icon}
             {section.title}
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             {section.subtitle}
           </p>
         </div>
@@ -528,14 +528,14 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
             <Card
               key={field.key}
               className={`border transition-all ${
-                isOverridden ? 'border-[#F28C28] bg-amber-50/20' : 'border-slate-200 bg-white hover:border-slate-300'
+                isOverridden ? 'border-[#F28C28] bg-amber-50/20' : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
               }`}
             >
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900 font-heading">
+                      <span className="text-xs font-bold text-[#18211E] font-heading">
                         {field.label}
                       </span>
                       {isOverridden && (
@@ -553,7 +553,7 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
                     <span className="text-base font-bold font-mono text-[#1B3D34]">
                       {effectiveVal}
                     </span>
-                    <span className="text-xs text-slate-500 ml-1 font-medium">
+                    <span className="text-xs text-[#707873] ml-1 font-medium">
                       {field.unit}
                     </span>
                     {isOverridden && (
@@ -564,7 +564,7 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-[#707873]">
                   {field.explanation}
                 </p>
 
@@ -575,13 +575,13 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
                       type="text"
                       value={tempVal}
                       onChange={(e) => setTempVal(e.target.value)}
-                      className="flex-1 px-3 py-1.5 text-xs font-mono font-bold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                      className="flex-1 px-3 py-1.5 text-xs font-mono font-bold bg-white border border-[#CBD5CB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
                       autoFocus
                     />
                     <button
                       type="button"
                       onClick={() => setEditingKey(null)}
-                      className="px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+                      className="px-2.5 py-1.5 text-xs font-semibold text-[#707873] hover:bg-slate-100 rounded-lg cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -594,7 +594,7 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#707873]">
                     <span className="truncate max-w-[240px] text-[10px] text-slate-400">
                       Source: {field.source}
                     </span>

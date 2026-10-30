@@ -30,24 +30,24 @@ export const FaqSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq" className="py-20 lg:py-24 bg-white border-b border-[#E3E8E2] select-none">
+    <section id="faq" className="py-20 lg:py-24 bg-white border-b border-[#E5E7EB] select-none">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         
         {/* Section Header */}
         <div className="space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-xs font-semibold text-[#1B3D34]">
             Frequently Asked Questions
           </div>
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#18211E] font-heading tracking-tight leading-[1.12]">
             Everything you need to know.
           </h2>
-          <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
-            Common questions regarding your estimate, materials, and cost reports.
+          <p className="text-sm sm:text-base text-[#707873] leading-relaxed font-normal">
+            Common questions regarding your estimate, material quantities, and cost reports.
           </p>
         </div>
 
         {/* Minimal Accordion with Thin Dividers and Plus/Minus Icons */}
-        <div className="divide-y divide-[#E3E8E2] border-y border-[#E3E8E2] text-left">
+        <div className="divide-y divide-[#E5E7EB] border-y border-[#E5E7EB] text-left">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
@@ -57,10 +57,10 @@ export const FaqSection: React.FC = () => {
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
                   className="w-full flex items-center justify-between text-left gap-6 cursor-pointer group"
                 >
-                  <span className="text-base sm:text-lg font-bold text-[#1B3D34] group-hover:text-[#132C25] transition-colors leading-snug font-heading">
+                  <span className="text-base sm:text-lg font-bold text-[#18211E] group-hover:text-[#1B3D34] transition-colors leading-snug font-heading">
                     {faq.q}
                   </span>
-                  <div className="w-8 h-8 rounded-full border border-[#E3E8E2] flex items-center justify-center text-[#1B3D34] shrink-0 group-hover:border-[#1B3D34] transition-colors">
+                  <div className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[#18211E] shrink-0 group-hover:border-[#1B3D34] transition-colors">
                     {isOpen ? <Minus className="w-4 h-4 text-[#F28C28]" /> : <Plus className="w-4 h-4" />}
                   </div>
                 </button>
@@ -74,7 +74,7 @@ export const FaqSection: React.FC = () => {
                       exit="exit"
                       className="overflow-hidden"
                     >
-                      <p className="mt-4 text-xs sm:text-sm text-[#4B5563] leading-relaxed font-normal pr-10">
+                      <p className="mt-4 text-xs sm:text-sm text-[#707873] leading-relaxed font-normal pr-10">
                         {faq.a}
                       </p>
                     </motion.div>

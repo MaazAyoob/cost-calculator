@@ -19,7 +19,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div
       className={cn(
-        'w-full py-12 px-6 flex flex-col items-center justify-center text-center bg-white rounded-2xl border border-[#E5E7EB] shadow-2xs',
+        'w-full py-12 px-6 flex flex-col items-center justify-center text-center bg-white rounded-xl border border-[#E5E7EB] shadow-xs',
         className
       )}
     >
@@ -28,8 +28,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           {icon}
         </div>
       )}
-      <h3 className="text-base font-bold text-[#1B3D34] font-heading mb-1.5">{title}</h3>
-      <p className="text-xs sm:text-sm text-[#4B5563] max-w-sm mb-6 leading-relaxed">
+      <h3 className="text-base font-bold text-[#18211E] font-heading mb-1.5">{title}</h3>
+      <p className="text-xs sm:text-sm text-[#707873] max-w-sm mb-6 leading-relaxed">
         {description}
       </p>
       {action && <div>{action}</div>}

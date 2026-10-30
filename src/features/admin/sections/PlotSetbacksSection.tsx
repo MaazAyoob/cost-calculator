@@ -273,7 +273,7 @@ export const PlotSetbacksSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER BANNER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
@@ -287,10 +287,10 @@ export const PlotSetbacksSection: React.FC = () => {
               RESIDENTIAL SCOPE: UP TO G+4 (≤ 12M)
             </span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 font-heading">
+          <h2 className="text-xl font-bold text-[#18211E] font-heading">
             Plot Setbacks
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
+          <p className="text-xs text-[#707873] mt-0.5 max-w-2xl">
             Configure boundary setbacks, percentage-of-depth/width rules, and permissible buildable envelopes. Persisted to PostgreSQL under the active calculation lifecycle.
           </p>
         </div>
@@ -380,7 +380,7 @@ export const PlotSetbacksSection: React.FC = () => {
       {/* ═════════════════════════════════════════════════════════ */}
       {/* SECTION 6: TEST SETBACK RULES WORKFLOW (INTERACTIVE PANEL) */}
       {/* ═════════════════════════════════════════════════════════ */}
-      <Card className="border border-slate-200 bg-white shadow-xs overflow-hidden">
+      <Card className="border border-[#E5E7EB] bg-white shadow-xs overflow-hidden">
         <div className="bg-slate-900 text-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-bold text-xs border border-emerald-500/30">
@@ -421,13 +421,13 @@ export const PlotSetbacksSection: React.FC = () => {
                     className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center gap-2 border ${
                       isSelected
                         ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs font-bold'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        : 'bg-slate-50 text-slate-700 border-[#E5E7EB] hover:bg-slate-100'
                     }`}
                   >
                     <span>{preset.label}</span>
                     <span
                       className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
-                        isSelected ? 'bg-emerald-900 text-emerald-200' : 'bg-slate-200 text-slate-600'
+                        isSelected ? 'bg-emerald-900 text-emerald-200' : 'bg-slate-200 text-[#707873]'
                       }`}
                     >
                       {preset.area} sq.ft
@@ -439,7 +439,7 @@ export const PlotSetbacksSection: React.FC = () => {
           </div>
 
           {/* Dimension Controls & Conditions Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] text-xs">
             {/* Width (Frontage) */}
             <div className="space-y-1">
               <label className="font-bold text-slate-700 flex items-center justify-between">
@@ -452,7 +452,7 @@ export const PlotSetbacksSection: React.FC = () => {
                 onChange={(e) => setTestWidth(Math.max(1, parseFloat(e.target.value) || 0))}
                 min="10"
                 max="500"
-                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
               />
             </div>
 
@@ -468,7 +468,7 @@ export const PlotSetbacksSection: React.FC = () => {
                 onChange={(e) => setTestLength(Math.max(1, parseFloat(e.target.value) || 0))}
                 min="10"
                 max="500"
-                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono text-xs focus:ring-1 focus:ring-[#1B3D34]"
               />
             </div>
 
@@ -476,12 +476,12 @@ export const PlotSetbacksSection: React.FC = () => {
             <div className="space-y-1">
               <label className="font-bold text-slate-700 flex items-center justify-between">
                 <span>Road Width</span>
-                <span className="font-mono text-slate-500">{testRoadWidth} ft</span>
+                <span className="font-mono text-[#707873]">{testRoadWidth} ft</span>
               </label>
               <select
                 value={testRoadWidth}
                 onChange={(e) => setTestRoadWidth(parseFloat(e.target.value) || 30)}
-                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs cursor-pointer"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl text-xs cursor-pointer"
               >
                 <option value={24}>&lt; 30 ft (Narrow)</option>
                 <option value={30}>30 ft (Standard 9m)</option>
@@ -503,7 +503,7 @@ export const PlotSetbacksSection: React.FC = () => {
                 min="0"
                 step="0.5"
                 placeholder="0 ft"
-                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono text-xs"
               />
             </div>
 
@@ -511,7 +511,7 @@ export const PlotSetbacksSection: React.FC = () => {
             <div className="space-y-1">
               <label className="font-bold text-slate-700 flex items-center justify-between">
                 <span>Prescribed Building Line</span>
-                <span className="font-mono text-slate-600">{testPrescribedBuildingLineFt} ft</span>
+                <span className="font-mono text-[#707873]">{testPrescribedBuildingLineFt} ft</span>
               </label>
               <input
                 type="number"
@@ -520,7 +520,7 @@ export const PlotSetbacksSection: React.FC = () => {
                 min="0"
                 step="0.5"
                 placeholder="0 ft"
-                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono text-xs"
               />
             </div>
 
@@ -546,7 +546,7 @@ export const PlotSetbacksSection: React.FC = () => {
                       className={`px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer border ${
                         isChecked
                           ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                          : 'bg-white text-[#707873] border-[#E5E7EB] hover:bg-slate-50'
                       }`}
                     >
                       {b} Boundary {isChecked && '✓'}
@@ -558,10 +558,10 @@ export const PlotSetbacksSection: React.FC = () => {
 
             {/* Total Plot Area Badge */}
             <div className="flex flex-col justify-end">
-              <div className="bg-white border border-slate-200 rounded-xl p-2.5 text-center">
+              <div className="bg-white border border-[#E5E7EB] rounded-xl p-2.5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Calculated Site Area</span>
-                <span className="text-base font-extrabold font-mono text-slate-900">
-                  {testPlotArea.toLocaleString()} <span className="text-xs font-normal text-slate-500">sq.ft</span>
+                <span className="text-base font-extrabold font-mono text-[#18211E]">
+                  {testPlotArea.toLocaleString()} <span className="text-xs font-normal text-[#707873]">sq.ft</span>
                 </span>
               </div>
             </div>
@@ -744,60 +744,60 @@ export const PlotSetbacksSection: React.FC = () => {
             <div className="lg:col-span-8 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* ── ACTIVE CONFIGURATION COLUMN ── */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div className="bg-slate-50 border border-[#E5E7EB] rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-slate-400" />
-                      <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Active Configuration</span>
+                      <span className="text-xs font-bold text-[#18211E] uppercase tracking-wider">Active Configuration</span>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[10px] font-mono text-[#707873] bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
                       Production Rules
                     </span>
                   </div>
 
                   <div className="space-y-1 text-xs">
-                    <span className="text-slate-500 block text-[10px] uppercase font-bold">Matched Rule</span>
-                    <span className="font-bold text-slate-900 block truncate">
+                    <span className="text-[#707873] block text-[10px] uppercase font-bold">Matched Rule</span>
+                    <span className="font-bold text-[#18211E] block truncate">
                       {activeSimulation.matchedRule?.name || 'Default Baseline'}
                     </span>
-                    <span className="text-[11px] text-slate-500 block">
+                    <span className="text-[11px] text-[#707873] block">
                       Range: {activeSimulation.matchedRule?.minPlotAreaSqFt} - {activeSimulation.matchedRule?.maxPlotAreaSqFt} sq.ft
                     </span>
                   </div>
 
                   {/* Setback Values */}
                   <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-                    <div className="bg-white p-2 rounded-xl border border-slate-200">
+                    <div className="bg-white p-2 rounded-xl border border-[#E5E7EB]">
                       <span className="text-[10px] text-slate-400 block font-bold">Front Setback</span>
-                      <span className="font-mono font-bold text-slate-900">{activeSimulation.appliedFrontFt.toFixed(2)} ft</span>
+                      <span className="font-mono font-bold text-[#18211E]">{activeSimulation.appliedFrontFt.toFixed(2)} ft</span>
                     </div>
-                    <div className="bg-white p-2 rounded-xl border border-slate-200">
+                    <div className="bg-white p-2 rounded-xl border border-[#E5E7EB]">
                       <span className="text-[10px] text-slate-400 block font-bold">Rear Setback</span>
-                      <span className="font-mono font-bold text-slate-900">
+                      <span className="font-mono font-bold text-[#18211E]">
                         {activeSimulation.appliedRearFt > 0 ? `${activeSimulation.appliedRearFt.toFixed(2)} ft` : 'Unspecified'}
                       </span>
                     </div>
-                    <div className="bg-white p-2 rounded-xl border border-slate-200">
+                    <div className="bg-white p-2 rounded-xl border border-[#E5E7EB]">
                       <span className="text-[10px] text-slate-400 block font-bold">Left Side</span>
-                      <span className="font-mono font-bold text-slate-900">{activeSimulation.appliedLeftFt.toFixed(2)} ft</span>
+                      <span className="font-mono font-bold text-[#18211E]">{activeSimulation.appliedLeftFt.toFixed(2)} ft</span>
                     </div>
-                    <div className="bg-white p-2 rounded-xl border border-slate-200">
+                    <div className="bg-white p-2 rounded-xl border border-[#E5E7EB]">
                       <span className="text-[10px] text-slate-400 block font-bold">Right Side</span>
-                      <span className="font-mono font-bold text-slate-900">{activeSimulation.appliedRightFt.toFixed(2)} ft</span>
+                      <span className="font-mono font-bold text-[#18211E]">{activeSimulation.appliedRightFt.toFixed(2)} ft</span>
                     </div>
                   </div>
 
                   {/* Output Envelope */}
-                  <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                  <div className="bg-white p-3 rounded-xl border border-[#E5E7EB] text-xs space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Buildable Envelope:</span>
-                      <span className="font-mono font-bold text-slate-800">
+                      <span className="text-[#707873]">Buildable Envelope:</span>
+                      <span className="font-mono font-bold text-[#18211E]">
                         {activeSimulation.buildableWidthFt} × {activeSimulation.buildableLengthFt} ft (Width × Depth)
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Footprint Area:</span>
-                      <span className="font-mono font-bold text-slate-900">
+                      <span className="text-[#707873]">Footprint Area:</span>
+                      <span className="font-mono font-bold text-[#18211E]">
                         {activeSimulation.buildableFootprintSqFt} sq.ft
                       </span>
                     </div>
@@ -828,10 +828,10 @@ export const PlotSetbacksSection: React.FC = () => {
 
                   <div className="space-y-1 text-xs">
                     <span className="text-emerald-700 block text-[10px] uppercase font-bold">Matched Rule</span>
-                    <span className="font-bold text-slate-900 block truncate">
+                    <span className="font-bold text-[#18211E] block truncate">
                       {draftSimulation.matchedRule?.name || 'Default Baseline'}
                     </span>
-                    <span className="text-[11px] text-slate-500 block">
+                    <span className="text-[11px] text-[#707873] block">
                       Range: {draftSimulation.matchedRule?.minPlotAreaSqFt} - {draftSimulation.matchedRule?.maxPlotAreaSqFt} sq.ft
                     </span>
                   </div>
@@ -848,7 +848,7 @@ export const PlotSetbacksSection: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-slate-900">{draftSimulation.appliedFrontFt.toFixed(2)} ft</span>
+                      <span className="font-mono font-bold text-[#18211E]">{draftSimulation.appliedFrontFt.toFixed(2)} ft</span>
                     </div>
 
                     <div className="bg-white p-2 rounded-xl border border-emerald-200">
@@ -861,7 +861,7 @@ export const PlotSetbacksSection: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-slate-900">
+                      <span className="font-mono font-bold text-[#18211E]">
                         {draftSimulation.appliedRearFt > 0 ? `${draftSimulation.appliedRearFt.toFixed(2)} ft` : 'Unspecified'}
                       </span>
                     </div>
@@ -876,7 +876,7 @@ export const PlotSetbacksSection: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-slate-900">{draftSimulation.appliedLeftFt.toFixed(2)} ft</span>
+                      <span className="font-mono font-bold text-[#18211E]">{draftSimulation.appliedLeftFt.toFixed(2)} ft</span>
                     </div>
 
                     <div className="bg-white p-2 rounded-xl border border-emerald-200">
@@ -889,20 +889,20 @@ export const PlotSetbacksSection: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-slate-900">{draftSimulation.appliedRightFt.toFixed(2)} ft</span>
+                      <span className="font-mono font-bold text-[#18211E]">{draftSimulation.appliedRightFt.toFixed(2)} ft</span>
                     </div>
                   </div>
 
                   {/* Output Envelope */}
                   <div className="bg-white p-3 rounded-xl border border-emerald-200 text-xs space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Buildable Envelope:</span>
+                      <span className="text-[#707873]">Buildable Envelope:</span>
                       <span className="font-mono font-bold text-emerald-900">
                         {draftSimulation.buildableWidthFt} × {draftSimulation.buildableLengthFt} ft (Width × Depth)
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Footprint Area:</span>
+                      <span className="text-[#707873]">Footprint Area:</span>
                       <span className="font-mono font-bold text-[#1B3D34]">
                         {draftSimulation.buildableFootprintSqFt} sq.ft
                         {draftSimulation.buildableFootprintSqFt !== activeSimulation.buildableFootprintSqFt && (
@@ -931,18 +931,18 @@ export const PlotSetbacksSection: React.FC = () => {
               </div>
 
               {/* Explanatory Steps Breakdown */}
-              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs space-y-2">
-                <span className="font-bold text-slate-800 block text-[11px] uppercase tracking-wider">
+              <div className="bg-slate-50 p-3.5 rounded-2xl border border-[#E5E7EB] text-xs space-y-2">
+                <span className="font-bold text-[#18211E] block text-[11px] uppercase tracking-wider">
                   Calculation Formula Explanations &amp; Substituted Values:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                   {draftSimulation.explanationSteps.map((step) => (
-                    <div key={step.boundary} className="bg-white p-2.5 rounded-xl border border-slate-200 space-y-0.5">
+                    <div key={step.boundary} className="bg-white p-2.5 rounded-xl border border-[#E5E7EB] space-y-0.5">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-900">{step.boundary} Setback ({step.method})</span>
+                        <span className="font-bold text-[#18211E]">{step.boundary} Setback ({step.method})</span>
                         <span className="font-mono font-bold text-emerald-700">{step.valueFt} ft</span>
                       </div>
-                      <div className="font-mono text-[10px] text-slate-500">{step.substitutions}</div>
+                      <div className="font-mono text-[10px] text-[#707873]">{step.substitutions}</div>
                       {step.notes && <div className="text-[10px] text-slate-400 italic">{step.notes}</div>}
                     </div>
                   ))}
@@ -958,17 +958,17 @@ export const PlotSetbacksSection: React.FC = () => {
       {/* ═════════════════════════════════════════════════════════ */}
       <div className="space-y-4">
         {/* Search, Filter & Actions Strip */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-xs">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-slate-900 font-heading">
+              <h3 className="text-base font-bold text-[#18211E] font-heading">
                 Setback Rule Library
               </h3>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">
+              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-100 text-[#707873] font-bold">
                 {currentRules.length} RULES
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#707873] mt-0.5">
               Editable municipal rules library. Changes are drafted locally and persisted to PostgreSQL upon saving.
             </p>
           </div>
@@ -979,12 +979,12 @@ export const PlotSetbacksSection: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search rule name..."
-              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-[#1B3D34]"
+              className="px-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs focus:ring-1 focus:ring-[#1B3D34]"
             />
             <select
               value={selectedJurisdiction}
               onChange={(e) => setSelectedJurisdiction(e.target.value)}
-              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs cursor-pointer"
+              className="px-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs cursor-pointer"
             >
               <option value="ALL">All Jurisdictions</option>
               <option value="Bangalore">Bengaluru / Greater Bengaluru</option>
@@ -993,7 +993,7 @@ export const PlotSetbacksSection: React.FC = () => {
             <button
               type="button"
               onClick={handleResetToGazetteDefaults}
-              className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors cursor-pointer flex items-center gap-1"
+              className="px-3 py-1.5 text-xs text-[#707873] hover:text-[#18211E] border border-[#E5E7EB] rounded-xl bg-white hover:bg-slate-50 transition-colors cursor-pointer flex items-center gap-1"
               title="Reset rules to Karnataka Gazette 2026 baseline"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -1003,11 +1003,11 @@ export const PlotSetbacksSection: React.FC = () => {
         </div>
 
         {/* Rules Table */}
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                <tr className="bg-slate-50 border-b border-[#E5E7EB] font-bold text-[#707873]">
                   <th className="p-3 w-8">#</th>
                   <th className="p-3">Rule Name &amp; Jurisdiction</th>
                   <th className="p-3">Plot Area Range</th>
@@ -1037,19 +1037,19 @@ export const PlotSetbacksSection: React.FC = () => {
                       </td>
 
                       <td className="p-3">
-                        <div className="font-bold text-slate-900">{rule.name}</div>
-                        <div className="text-[10px] text-slate-500 font-mono">
+                        <div className="font-bold text-[#18211E]">{rule.name}</div>
+                        <div className="text-[10px] text-[#707873] font-mono">
                           {rule.authority} · Max Coverage: {rule.maxGroundCoveragePct}%
                         </div>
                         {rule.sideConditionNote && (
-                          <span className="inline-block mt-0.5 text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono">
+                          <span className="inline-block mt-0.5 text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-[#707873] font-mono">
                             {rule.sideConditionNote === 'one_side' ? '1 side only' : 'Both sides'}
                           </span>
                         )}
                       </td>
 
                       <td className="p-3 font-mono">
-                        <span className="font-semibold text-slate-800">
+                        <span className="font-semibold text-[#18211E]">
                           {rule.minPlotAreaSqFt.toLocaleString()} - {rule.maxPlotAreaSqFt.toLocaleString()}
                         </span>{' '}
                         <span className="text-[10px] text-slate-400">sq.ft</span>
@@ -1057,7 +1057,7 @@ export const PlotSetbacksSection: React.FC = () => {
 
                       {/* Front */}
                       <td className="p-3">
-                        <div className="font-mono font-bold text-slate-800">
+                        <div className="font-mono font-bold text-[#18211E]">
                           {rule.front.method === 'FIXED_DISTANCE' && `${rule.front.value} ft`}
                           {rule.front.method === 'PERCENT_OF_DEPTH' && `${rule.front.value}% depth`}
                           {rule.front.method === 'MINIMUM_REQUIRED' && `Min ${rule.front.value} ft`}
@@ -1068,7 +1068,7 @@ export const PlotSetbacksSection: React.FC = () => {
 
                       {/* Rear */}
                       <td className="p-3">
-                        <div className="font-mono font-bold text-slate-800">
+                        <div className="font-mono font-bold text-[#18211E]">
                           {rule.rear.method === 'FIXED_DISTANCE' && `${rule.rear.value} ft`}
                           {rule.rear.method === 'PERCENT_OF_DEPTH' && `${rule.rear.value}% depth`}
                           {rule.rear.method === 'MINIMUM_REQUIRED' && `Min ${rule.rear.value} ft`}
@@ -1083,7 +1083,7 @@ export const PlotSetbacksSection: React.FC = () => {
 
                       {/* Left */}
                       <td className="p-3">
-                        <div className="font-mono font-bold text-slate-800">
+                        <div className="font-mono font-bold text-[#18211E]">
                           {rule.left.method === 'FIXED_DISTANCE' && `${rule.left.value} ft`}
                           {rule.left.method === 'PERCENT_OF_WIDTH' && `${rule.left.value}% width`}
                           {rule.left.method === 'MINIMUM_REQUIRED' && `Min ${rule.left.value} ft`}
@@ -1094,7 +1094,7 @@ export const PlotSetbacksSection: React.FC = () => {
 
                       {/* Right */}
                       <td className="p-3">
-                        <div className="font-mono font-bold text-slate-800">
+                        <div className="font-mono font-bold text-[#18211E]">
                           {rule.right.method === 'FIXED_DISTANCE' && `${rule.right.value} ft`}
                           {rule.right.method === 'PERCENT_OF_WIDTH' && `${rule.right.value}% width`}
                           {rule.right.method === 'MINIMUM_REQUIRED' && `Min ${rule.right.value} ft`}
@@ -1134,7 +1134,7 @@ export const PlotSetbacksSection: React.FC = () => {
                               setEditingRule(rule);
                               setIsCreatingNew(false);
                             }}
-                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer"
+                            className="p-1.5 rounded-lg text-[#707873] hover:text-[#18211E] hover:bg-slate-100 cursor-pointer"
                             title="Edit rule parameters"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1143,7 +1143,7 @@ export const PlotSetbacksSection: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDuplicateRule(rule.id)}
-                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer"
+                            className="p-1.5 rounded-lg text-[#707873] hover:text-[#18211E] hover:bg-slate-100 cursor-pointer"
                             title="Duplicate rule"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -1186,10 +1186,10 @@ export const PlotSetbacksSection: React.FC = () => {
       {/* ═════════════════════════════════════════════════════════ */}
       {editingRule && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 text-left">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-bold text-slate-900 font-heading">
+                <h3 className="text-base font-bold text-[#18211E] font-heading">
                   {isCreatingNew ? 'Create New Setback Rule' : `Edit Setback Rule: ${editingRule.name}`}
                 </h3>
                 <span className="text-[11px] font-mono text-slate-400">{editingRule.id}</span>
@@ -1212,7 +1212,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     type="text"
                     value={editingRule.name}
                     onChange={(e) => setEditingRule({ ...editingRule, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                     required
                   />
                 </div>
@@ -1222,14 +1222,14 @@ export const PlotSetbacksSection: React.FC = () => {
                     type="text"
                     value={editingRule.authority}
                     onChange={(e) => setEditingRule({ ...editingRule, authority: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                     required
                   />
                 </div>
               </div>
 
               {/* Area Range */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-slate-50 rounded-2xl border border-[#E5E7EB]">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Min Plot Area (sq.ft)</label>
                   <input
@@ -1239,7 +1239,7 @@ export const PlotSetbacksSection: React.FC = () => {
                       setEditingRule({ ...editingRule, minPlotAreaSqFt: parseFloat(e.target.value) || 0 })
                     }
                     min="0"
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono"
                     required
                   />
                 </div>
@@ -1252,7 +1252,7 @@ export const PlotSetbacksSection: React.FC = () => {
                       setEditingRule({ ...editingRule, maxPlotAreaSqFt: parseFloat(e.target.value) || 0 })
                     }
                     min="1"
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono"
                     required
                   />
                 </div>
@@ -1266,7 +1266,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     }
                     min="30"
                     max="90"
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono"
                   />
                 </div>
                 <div>
@@ -1277,7 +1277,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     onChange={(e) =>
                       setEditingRule({ ...editingRule, precedence: parseInt(e.target.value) || 10 })
                     }
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono"
+                    className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono"
                     title="Higher precedence resolves overlapping plot area ranges"
                   />
                 </div>
@@ -1285,7 +1285,7 @@ export const PlotSetbacksSection: React.FC = () => {
 
               {/* ── BOUNDARY CALCULATIONS (FRONT, REAR, LEFT, RIGHT) ── */}
               <div className="space-y-3">
-                <span className="font-bold text-slate-800 block text-xs">
+                <span className="font-bold text-[#18211E] block text-xs">
                   Boundary Requirements (Front, Rear, Left, Right):
                 </span>
 
@@ -1293,9 +1293,9 @@ export const PlotSetbacksSection: React.FC = () => {
                   const req = editingRule[b] as BoundaryRequirement;
 
                   return (
-                    <div key={b} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                    <div key={b} className="p-3 bg-slate-50 border border-[#E5E7EB] rounded-2xl space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-900 capitalize text-xs">{b} Setback</span>
+                        <span className="font-bold text-[#18211E] capitalize text-xs">{b} Setback</span>
                         <select
                           value={req.method}
                           onChange={(e) => {
@@ -1311,7 +1311,7 @@ export const PlotSetbacksSection: React.FC = () => {
                               },
                             });
                           }}
-                          className="px-2.5 py-1 bg-white border border-slate-200 rounded-xl text-xs cursor-pointer font-medium"
+                          className="px-2.5 py-1 bg-white border border-[#E5E7EB] rounded-xl text-xs cursor-pointer font-medium"
                         >
                           <option value="FIXED_DISTANCE">Fixed Distance (ft)</option>
                           <option value="PERCENT_OF_DEPTH">% of Plot Depth</option>
@@ -1324,7 +1324,7 @@ export const PlotSetbacksSection: React.FC = () => {
                       {req.method !== 'UNSPECIFIED' ? (
                         <div className="grid grid-cols-2 gap-3 pt-1">
                           <div>
-                            <label className="text-[10px] text-slate-500 font-bold block mb-0.5">
+                            <label className="text-[10px] text-[#707873] font-bold block mb-0.5">
                               {req.method === 'PERCENT_OF_DEPTH' || req.method === 'PERCENT_OF_WIDTH'
                                 ? 'Percentage (%)'
                                 : 'Distance (ft)'}
@@ -1340,12 +1340,12 @@ export const PlotSetbacksSection: React.FC = () => {
                               }
                               step="0.01"
                               min="0"
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl font-mono text-xs"
+                              className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl font-mono text-xs"
                               required
                             />
                           </div>
                           <div>
-                            <label className="text-[10px] text-slate-500 font-bold block mb-0.5">Description Note</label>
+                            <label className="text-[10px] text-[#707873] font-bold block mb-0.5">Description Note</label>
                             <input
                               type="text"
                               value={req.description || ''}
@@ -1356,7 +1356,7 @@ export const PlotSetbacksSection: React.FC = () => {
                                 })
                               }
                               placeholder="e.g. 12% of plot depth"
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                              className="w-full px-2.5 py-1.5 bg-white border border-[#E5E7EB] rounded-xl text-xs"
                             />
                           </div>
                         </div>
@@ -1382,7 +1382,7 @@ export const PlotSetbacksSection: React.FC = () => {
                         sideConditionNote: e.target.value as any,
                       })
                     }
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl cursor-pointer"
                   >
                     <option value="both_sides">Both Sides (Each Side Required)</option>
                     <option value="one_side">One Side Only (e.g. 2.30 ft on 1 side)</option>
@@ -1399,7 +1399,7 @@ export const PlotSetbacksSection: React.FC = () => {
                         verificationStatus: e.target.value as any,
                       })
                     }
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl cursor-pointer"
                   >
                     <option value="OFFICIAL_GAZETTE_PENDING_CONFIRMATION">Official Gazette (Pending Confirmation)</option>
                     <option value="INDEPENDENTLY_VERIFIED">Independently Verified</option>
@@ -1417,7 +1417,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     type="text"
                     value={editingRule.sourceDocument}
                     onChange={(e) => setEditingRule({ ...editingRule, sourceDocument: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                   />
                 </div>
                 <div>
@@ -1426,7 +1426,7 @@ export const PlotSetbacksSection: React.FC = () => {
                     type="text"
                     value={editingRule.adminNotes || ''}
                     onChange={(e) => setEditingRule({ ...editingRule, adminNotes: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                   />
                 </div>
               </div>
@@ -1435,7 +1435,7 @@ export const PlotSetbacksSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingRule(null)}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                  className="px-4 py-2 text-[#707873] hover:bg-slate-100 rounded-xl cursor-pointer"
                 >
                   Cancel
                 </button>

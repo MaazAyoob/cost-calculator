@@ -14,54 +14,61 @@
   :root {
     color-scheme: light;
 
-    /* Backgrounds */
+    /* Hutty 3.0 Brand Core Palette */
     --cc-bg:             #F8F8F6;
     --cc-surface:        #FFFFFF;
-    --cc-surface-muted:  rgba(27, 61, 52, 0.04);
+    --cc-surface-muted:  #F2F2EE;
+    --cc-surface-elevated: #FFFFFF;
 
-    /* Text */
-    --cc-text-primary:   #172722;
-    --cc-text-secondary: #687770;
+    /* Hutty 3.0 Typography & Text */
+    --cc-text-primary:   #18211E;
+    --cc-text-secondary: #707873;
     --cc-text-disabled:  #9CA3AF;
+    --cc-text-inverse:   #FFFFFF;
 
-    /* Hutty Brand Colors */
+    /* Hutty 3.0 Brand Forest Green */
     --cc-brand:          #1B3D34;
     --cc-brand-hover:    #142F28;
+    --cc-brand-active:   #0F241F;
     --cc-brand-soft:     rgba(27, 61, 52, 0.08);
     --cc-brand-light:    rgba(27, 61, 52, 0.04);
+    --cc-brand-muted:    rgba(27, 61, 52, 0.025);
     
-    /* Roof Accent Orange */
+    /* Hutty 3.0 Roof Accent Orange (Used with architectural purpose) */
     --cc-accent:         #F28C28;
     --cc-accent-hover:   #D9771A;
-    --cc-accent-soft:    rgba(242, 140, 40, 0.10);
+    --cc-accent-active:  #C26715;
+    --cc-accent-soft:    rgba(242, 140, 40, 0.12);
     --cc-accent-light:   rgba(242, 140, 40, 0.05);
 
-    /* Semantic Feedback Surfaces */
+    /* Semantic Status Surfaces */
     --cc-success-surface:#E7F3E8;
+    --cc-success-border: #C5E3C8;
     --cc-soft-mint:      #DDF4E7;
     --cc-soft-lavender:  #EEE8FF;
-    --cc-info-blue:      #4285F4;
+    --cc-info-blue:      #2563EB;
 
-    /* Neutral Border */
-    --cc-border:         #E3E8E2;
+    /* Neutral Architectural Borders */
+    --cc-border:         #E5E7EB;
+    --cc-border-light:   #EEF0F2;
     --cc-border-strong:  #CBD5CB;
 
-    /* Overlay */
+    /* Architectural Overlays */
     --cc-overlay:        rgba(27, 61, 52, 0.40);
 
-    /* Architectural Radii System */
-    --cc-radius-panel:   14px;
-    --cc-radius-card:    10px;
+    /* Architectural Radii System — Clean, Non-Bubbly */
+    --cc-radius-panel:   16px;
+    --cc-radius-card:    12px;
     --cc-radius-btn:     8px;
     --cc-radius-input:   8px;
     --cc-radius-badge:   6px;
     --cc-radius-pill:    9999px;
 
-    /* Shadows: Subtle, derived strictly from Hutty Green */
-    --cc-shadow-xs:      0 1px 2px 0 rgba(27, 61, 52, 0.03);
-    --cc-shadow-sm:      0 1px 3px 0 rgba(27, 61, 52, 0.05), 0 1px 2px -1px rgba(27, 61, 52, 0.03);
-    --cc-shadow-md:      0 4px 10px -2px rgba(27, 61, 52, 0.06), 0 2px 4px -2px rgba(27, 61, 52, 0.03);
-    --cc-shadow-lg:      0 10px 22px -4px rgba(27, 61, 52, 0.08), 0 4px 6px -2px rgba(27, 61, 52, 0.03);
+    /* Shadows: Subtle, derived strictly from Hutty Forest Green */
+    --cc-shadow-xs:      0 1px 2px 0 rgba(27, 61, 52, 0.04);
+    --cc-shadow-sm:      0 1px 3px 0 rgba(27, 61, 52, 0.06), 0 1px 2px -1px rgba(27, 61, 52, 0.03);
+    --cc-shadow-md:      0 4px 12px -2px rgba(27, 61, 52, 0.07), 0 2px 4px -2px rgba(27, 61, 52, 0.03);
+    --cc-shadow-lg:      0 12px 28px -4px rgba(27, 61, 52, 0.09), 0 4px 8px -2px rgba(27, 61, 52, 0.04);
     --cc-shadow-brand:   0 4px 14px 0 rgba(27, 61, 52, 0.20);
   }
 
@@ -71,13 +78,13 @@
 
   html {
     background-color: #F8F8F6;
-    color: #1B3D34;
+    color: #18211E;
   }
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #F8F8F6;
-    color: #1B3D34;
+    color: #18211E;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
@@ -90,11 +97,11 @@
 }
 
 /* ============================================================
-   TYPOGRAPHY UTILITIES — Plus Jakarta Sans & Inter
+   TYPOGRAPHY UTILITIES — Manrope (Headings) & Inter (Body/UI)
    ============================================================ */
-.font-heading {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  letter-spacing: -0.02em;
+.font-heading, .font-display {
+  font-family: 'Manrope', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.025em;
 }
 
 .font-sans {
@@ -107,69 +114,69 @@
 }
 
 .heading-display {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2.5rem, 5.5vw, 4.25rem);
   line-height: 1.06;
   font-weight: 800;
   letter-spacing: -0.035em;
-  color: #1B3D34;
+  color: #18211E;
 }
 
 .heading-xl {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2rem, 3.5vw, 3rem);
   line-height: 1.12;
   font-weight: 800;
   letter-spacing: -0.025em;
-  color: #1B3D34;
+  color: #18211E;
 }
 
 .heading-lg {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: 1.875rem;
   line-height: 1.20;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #1B3D34;
+  color: #18211E;
 }
 
 .heading-md {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: 1.375rem;
   line-height: 1.30;
   font-weight: 700;
   letter-spacing: -0.015em;
-  color: #1B3D34;
+  color: #18211E;
 }
 
 .heading-sm {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: 1.125rem;
   line-height: 1.40;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #1B3D34;
+  color: #18211E;
 }
 
 .body-lg {
   font-size: 1.125rem;
   line-height: 1.60;
   font-weight: 400;
-  color: #4B5563;
+  color: #707873;
 }
 
 .body-base {
   font-size: 1rem;
   line-height: 1.60;
   font-weight: 400;
-  color: #4B5563;
+  color: #707873;
 }
 
 .body-sm {
   font-size: 0.875rem;
   line-height: 1.50;
   font-weight: 400;
-  color: #4B5563;
+  color: #707873;
 }
 
 /* ============================================================
@@ -317,25 +324,27 @@
 
 /* Giant Stat Numerals */
 .arch-stat-giant {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2rem, 3.5vw, 3.25rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
-  color: #1B3D34;
+  color: #18211E;
   font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
   max-width: 100%;
   overflow-wrap: break-word;
 }
 
 .arch-stat-hero {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif;
   font-size: clamp(2.25rem, 4.5vw, 3.75rem);
   font-weight: 900;
   letter-spacing: -0.035em;
   line-height: 1.05;
-  color: #1B3D34;
+  color: #18211E;
   font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
   max-width: 100%;
   overflow-wrap: break-word;
 }
@@ -424,11 +433,11 @@
   padding: 0.75rem 1.5rem;
   border-radius: var(--cc-radius-btn);
   background-color: #FFFFFF;
-  color: #172722;
+  color: #18211E;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: -0.01em;
-  border: 1px solid #E3E8E2;
+  border: 1px solid #E5E7EB;
   cursor: pointer;
   box-shadow: var(--cc-shadow-xs);
   transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
@@ -463,7 +472,7 @@
    ============================================================ */
 .hutty-tactile-card {
   background-color: #FFFFFF;
-  border: 1px solid #E3E8E2;
+  border: 1px solid #E5E7EB;
   border-radius: var(--cc-radius-card);
   padding: 0.875rem 1rem;
   transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
@@ -490,13 +499,13 @@
 
 /* Prototype Choice Button */
 .hutty-choice-btn {
-  border: 1px solid #E3E8E2;
+  border: 1px solid #E5E7EB;
   border-radius: 10px;
   background-color: #FFFFFF;
   padding: 14px;
   text-align: left;
   min-height: 65px;
-  color: #172722;
+  color: #18211E;
   transition: all 0.15s ease;
   cursor: pointer;
 }
@@ -512,12 +521,12 @@
   display: block;
   font-size: 13px;
   margin-bottom: 4px;
-  color: #172722;
+  color: #18211E;
 }
 .hutty-choice-btn small {
   font-size: 11px;
   line-height: 1.4;
-  color: #687770;
+  color: #707873;
 }
 
 /* Stepper Counter */
@@ -529,10 +538,10 @@
 .hutty-counter-control button {
   width: 28px;
   height: 28px;
-  border: 1px solid #E3E8E2;
+  border: 1px solid #E5E7EB;
   border-radius: 6px;
   background: white;
-  color: #172722;
+  color: #18211E;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -568,7 +577,7 @@
   font-weight: 700;
   font-size: 13px;
   background: transparent;
-  color: #172722;
+  color: #18211E;
 }
 
 /* Tactile Numeric Input Box */
@@ -596,7 +605,7 @@ input[type="range"].hutty-slider {
   appearance: none;
   width: 100%;
   height: 6px;
-  background: linear-gradient(to right, #1B3D34 var(--range-progress, 0%), #E3E8E2 var(--range-progress, 0%));
+  background: linear-gradient(to right, #1B3D34 var(--range-progress, 0%), #E5E7EB var(--range-progress, 0%));
   border-radius: 9999px;
   outline: none;
   cursor: pointer;
@@ -647,7 +656,7 @@ input[type="range"].hutty-slider::-webkit-slider-thumb:active {
 input[type="range"].hutty-slider::-moz-range-track {
   height: 6px;
   border-radius: 9999px;
-  background: #E3E8E2;
+  background: #E5E7EB;
 }
 
 input[type="range"].hutty-slider::-moz-range-progress {

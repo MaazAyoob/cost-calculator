@@ -25,7 +25,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
   const navigate = useNavigate();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#1B3D34]/[0.06] via-[#1B3D34]/[0.02] to-transparent border-b border-[#E3E8E2] pt-12 pb-14 sm:py-16 lg:py-20">
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#1B3D34]/[0.06] via-[#1B3D34]/[0.02] to-transparent border-b border-[#E5E7EB] pt-12 pb-14 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
@@ -49,7 +49,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
             </h1>
 
             {/* Exact Supporting Copy from Developer Brief */}
-            <p className="text-base sm:text-lg text-[#4B5563] leading-relaxed max-w-2xl font-normal">
+            <p className="text-base sm:text-lg text-[#707873] leading-relaxed max-w-2xl font-normal">
               Get practical guidance for your home construction—from planning and approvals to structure, materials and interiors.
             </p>
 
@@ -83,7 +83,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
               <button
                 type="button"
                 onClick={() => navigate('/professionals/join')}
-                className="px-6 py-3.5 bg-white hover:bg-[#F8F8F6] text-[#1B3D34] text-sm font-bold rounded-xl border border-[#E3E8E2] hover:border-[#1B3D34] transition-all flex items-center justify-center gap-2 shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                className="px-6 py-3.5 bg-white hover:bg-[#F8F8F6] text-[#1B3D34] text-sm font-bold rounded-xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex items-center justify-center gap-2 shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
               >
                 <UserPlus className="w-4 h-4 text-[#1B3D34]" />
                 <span>Join as a Professional</span>
@@ -98,7 +98,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
             transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 relative"
           >
-            <div className="relative rounded-3xl overflow-hidden border-2 border-[#E3E8E2] shadow-md bg-white group">
+            <div className="relative rounded-3xl overflow-hidden border-2 border-[#E5E7EB] shadow-md bg-white group">
               {/* Authentic Human Photography of Indian Architect & Homeowners */}
               <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-100">
                 <img
@@ -134,7 +134,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
               </div>
 
               {/* Bottom Quick Feature Strip */}
-              <div className="p-3.5 bg-[#F8F9F7] border-t border-[#E3E8E2] grid grid-cols-2 gap-2 text-left">
+              <div className="p-3.5 bg-[#F8F9F7] border-t border-[#E5E7EB] grid grid-cols-2 gap-2 text-left">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                   <span className="text-xs font-semibold text-[#1B3D34]">No Builder Bias</span>

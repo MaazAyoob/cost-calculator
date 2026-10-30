@@ -234,16 +234,16 @@ export const RoomsSpacesSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold mb-1">
             <Layers className="w-3.5 h-3.5 text-emerald-700" />
             <span>Group 1: Spaces & Dimensions</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 font-heading">
+          <h2 className="text-xl font-bold text-[#18211E] font-heading">
             Rooms, Spaces & Bathroom Master
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Configure standard room templates, bathroom waterproofing allowances, and custom client rooms.
           </p>
         </div>
@@ -269,7 +269,7 @@ export const RoomsSpacesSection: React.FC = () => {
             <strong className="text-emerald-800 font-semibold">✓ Affects:</strong> Carpet area, internal wall masonry volume, plaster area, floor tile quantities, paintable surfaces, doors, windows, and electrical points.
           </p>
           <p>
-            <strong className="text-slate-600 font-semibold">✗ Does not affect:</strong> Plot setbacks, foundation excavation depth, or municipal authority fee limits.
+            <strong className="text-[#707873] font-semibold">✗ Does not affect:</strong> Plot setbacks, foundation excavation depth, or municipal authority fee limits.
           </p>
         </div>
       </div>
@@ -283,10 +283,10 @@ export const RoomsSpacesSection: React.FC = () => {
                 <Droplets className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-bold text-[#18211E]">
                   Bathroom Master Control
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#707873]">
                   Standard Template: 6 × 5 ft • 7 ft Lintel Dado • 1 ft Waterproofing Upturn
                 </p>
               </div>
@@ -308,9 +308,9 @@ export const RoomsSpacesSection: React.FC = () => {
                   max="14.0"
                   value={bathLength}
                   onChange={(e) => updateDraftParameter('space.room.bathroom.length_ft', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">ft</span>
+                <span className="text-xs text-[#707873]">ft</span>
               </div>
             </div>
 
@@ -325,9 +325,9 @@ export const RoomsSpacesSection: React.FC = () => {
                   max="12.0"
                   value={bathWidth}
                   onChange={(e) => updateDraftParameter('space.room.bathroom.width_ft', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">ft</span>
+                <span className="text-xs text-[#707873]">ft</span>
               </div>
             </div>
 
@@ -337,7 +337,7 @@ export const RoomsSpacesSection: React.FC = () => {
               <select
                 value={bathDadoHeight >= 9.5 ? '10' : '7'}
                 onChange={(e) => updateDraftParameter('config.cladding.bathroom_dado_standard_ft', Number(e.target.value))}
-                className="w-full px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-lg bg-white"
+                className="w-full px-3 py-1.5 text-xs font-medium border border-[#E5E7EB] rounded-lg bg-white"
               >
                 <option value="7">7 ft (Standard Lintel Level)</option>
                 <option value="10">10 ft (Full Ceiling Height)</option>
@@ -350,7 +350,7 @@ export const RoomsSpacesSection: React.FC = () => {
               <select
                 value={bathWpMethod}
                 onChange={(e) => updateDraftParameter('config.waterproofing.bathroom_method', e.target.value)}
-                className="w-full px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-lg bg-white"
+                className="w-full px-3 py-1.5 text-xs font-medium border border-[#E5E7EB] rounded-lg bg-white"
               >
                 <option value="FLOOR_UPTURN">Floor + 1 ft Upturn Flashing</option>
                 <option value="FLOOR_ONLY">Floor Slab Only</option>
@@ -362,7 +362,7 @@ export const RoomsSpacesSection: React.FC = () => {
           {/* Fixtures Checklist */}
           <div className="pt-2">
             <p className="text-xs font-semibold text-slate-700 mb-2">Default Bathroom Fixture Points</p>
-            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-[#707873]">
               <label className="flex items-center gap-1.5 cursor-pointer">
                 <input
                   type="checkbox"
@@ -424,7 +424,7 @@ export const RoomsSpacesSection: React.FC = () => {
 
       {/* ── STANDARD ROOM CARDS GRID ── */}
       <div>
-        <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
+        <h3 className="text-sm font-bold text-[#18211E] uppercase tracking-wider mb-3">
           Standard Room Templates ({DEFAULT_ROOM_CARDS.length})
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -434,11 +434,11 @@ export const RoomsSpacesSection: React.FC = () => {
             const areaSqFt = currentL * currentW;
 
             return (
-              <Card key={room.key} className="border border-slate-200 bg-white rounded-2xl hover:border-slate-300 transition-all">
+              <Card key={room.key} className="border border-[#E5E7EB] bg-white rounded-2xl hover:border-[#CBD5CB] transition-all">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">{room.name}</h4>
+                      <h4 className="font-bold text-[#18211E] text-sm">{room.name}</h4>
                       <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                         {room.category}
                       </span>
@@ -450,7 +450,7 @@ export const RoomsSpacesSection: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <div>
-                      <label className="text-[11px] font-medium text-slate-500">Length</label>
+                      <label className="text-[11px] font-medium text-[#707873]">Length</label>
                       <div className="flex items-center gap-1">
                         <input
                           type="number"
@@ -459,13 +459,13 @@ export const RoomsSpacesSection: React.FC = () => {
                           max="30"
                           value={currentL}
                           onChange={(e) => updateDraftParameter(`space.room.${room.key}.length_ft`, Number(e.target.value))}
-                          className="w-full px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg"
+                          className="w-full px-2.5 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                         />
                         <span className="text-xs text-slate-400">ft</span>
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] font-medium text-slate-500">Width</label>
+                      <label className="text-[11px] font-medium text-[#707873]">Width</label>
                       <div className="flex items-center gap-1">
                         <input
                           type="number"
@@ -474,7 +474,7 @@ export const RoomsSpacesSection: React.FC = () => {
                           max="25"
                           value={currentW}
                           onChange={(e) => updateDraftParameter(`space.room.${room.key}.width_ft`, Number(e.target.value))}
-                          className="w-full px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg"
+                          className="w-full px-2.5 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                         />
                         <span className="text-xs text-slate-400">ft</span>
                       </div>
@@ -482,9 +482,9 @@ export const RoomsSpacesSection: React.FC = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] font-medium text-slate-500">Flooring Type</label>
+                    <label className="text-[11px] font-medium text-[#707873]">Flooring Type</label>
                     <select
-                      className="w-full px-2.5 py-1 text-xs font-medium border border-slate-200 rounded-lg bg-slate-50/50"
+                      className="w-full px-2.5 py-1 text-xs font-medium border border-[#E5E7EB] rounded-lg bg-slate-50/50"
                       defaultValue={room.flooringDefault}
                     >
                       <option>{room.flooringDefault}</option>
@@ -495,7 +495,7 @@ export const RoomsSpacesSection: React.FC = () => {
                     </select>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-xs text-[#707873] pt-2 border-t border-slate-100">
                     <span className="flex items-center gap-1">
                       <Zap className="w-3.5 h-3.5 text-amber-500" />
                       {room.electricalPoints} Points
@@ -513,7 +513,7 @@ export const RoomsSpacesSection: React.FC = () => {
       {/* ── CUSTOM ROOMS SECTION ── */}
       {customRooms.length > 0 && (
         <div className="pt-2">
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
+          <h3 className="text-sm font-bold text-[#18211E] uppercase tracking-wider mb-3">
             Custom Configured Rooms ({customRooms.length})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -522,7 +522,7 @@ export const RoomsSpacesSection: React.FC = () => {
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">{room.name}</h4>
+                      <h4 className="font-bold text-[#18211E] text-sm">{room.name}</h4>
                       <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">
                         Custom Room
                       </span>
@@ -542,14 +542,14 @@ export const RoomsSpacesSection: React.FC = () => {
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-[#707873]">
                     Dimensions: {room.lengthFt} × {room.widthFt} ft (Height: {room.heightFt} ft)
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[#707873]">
                     Flooring: {room.flooring}
                   </p>
 
-                  <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-200/60">
+                  <div className="flex items-center justify-between text-xs text-[#707873] pt-2 border-t border-[#E5E7EB]/60">
                     <span>⚡ {room.electricalPoints} Points</span>
                     <span>💧 {room.plumbingPoints} Plumbing</span>
                     <span>🚪 {room.doors} Door(s)</span>
@@ -564,20 +564,20 @@ export const RoomsSpacesSection: React.FC = () => {
       {/* ── MODAL: ADD CUSTOM ROOM TYPE ── */}
       {showAddRoomModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-bold text-slate-900 font-heading">
+                <h3 className="text-base font-bold text-[#18211E] font-heading">
                   Add New Custom Room Type
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#707873]">
                   New rooms automatically propagate into the residential calculation model.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAddRoomModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-400 hover:text-[#707873]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -592,7 +592,7 @@ export const RoomsSpacesSection: React.FC = () => {
                   placeholder="e.g. Home Theatre, Gym, Library"
                   value={newRoomName}
                   onChange={(e) => setNewRoomName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs font-bold border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#1B3D34]"
+                  className="w-full px-3 py-2 text-xs font-bold border border-[#E5E7EB] rounded-xl focus:ring-1 focus:ring-[#1B3D34]"
                 />
               </div>
 
@@ -606,7 +606,7 @@ export const RoomsSpacesSection: React.FC = () => {
                     max="40"
                     value={newRoomLength}
                     onChange={(e) => setNewRoomLength(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-xl"
                   />
                 </div>
                 <div>
@@ -618,7 +618,7 @@ export const RoomsSpacesSection: React.FC = () => {
                     max="30"
                     value={newRoomWidth}
                     onChange={(e) => setNewRoomWidth(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-xl"
                   />
                 </div>
                 <div>
@@ -630,7 +630,7 @@ export const RoomsSpacesSection: React.FC = () => {
                     max="14"
                     value={newRoomHeight}
                     onChange={(e) => setNewRoomHeight(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-xl"
                   />
                 </div>
               </div>
@@ -641,7 +641,7 @@ export const RoomsSpacesSection: React.FC = () => {
                   <select
                     value={newRoomFlooring}
                     onChange={(e) => setNewRoomFlooring(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-xl bg-white"
+                    className="w-full px-3 py-1.5 text-xs font-medium border border-[#E5E7EB] rounded-xl bg-white"
                   >
                     <option>Vitrified Tiles (800x800mm)</option>
                     <option>Glazed Vitrified (800x1600mm)</option>
@@ -656,7 +656,7 @@ export const RoomsSpacesSection: React.FC = () => {
                   <select
                     value={newRoomWallFinish}
                     onChange={(e) => setNewRoomWallFinish(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-xl bg-white"
+                    className="w-full px-3 py-1.5 text-xs font-medium border border-[#E5E7EB] rounded-xl bg-white"
                   >
                     <option>Premium Acrylic Emulsion</option>
                     <option>Royale Luxury Sheen</option>
@@ -668,47 +668,47 @@ export const RoomsSpacesSection: React.FC = () => {
 
               <div className="grid grid-cols-4 gap-2 pt-1">
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-600 block mb-1">Electrical</label>
+                  <label className="text-[11px] font-semibold text-[#707873] block mb-1">Electrical</label>
                   <input
                     type="number"
                     min="0"
                     max="30"
                     value={newRoomElectrical}
                     onChange={(e) => setNewRoomElectrical(Number(e.target.value))}
-                    className="w-full px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-2.5 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-600 block mb-1">Plumbing</label>
+                  <label className="text-[11px] font-semibold text-[#707873] block mb-1">Plumbing</label>
                   <input
                     type="number"
                     min="0"
                     max="10"
                     value={newRoomPlumbing}
                     onChange={(e) => setNewRoomPlumbing(Number(e.target.value))}
-                    className="w-full px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-2.5 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-600 block mb-1">Doors</label>
+                  <label className="text-[11px] font-semibold text-[#707873] block mb-1">Doors</label>
                   <input
                     type="number"
                     min="0"
                     max="4"
                     value={newRoomDoors}
                     onChange={(e) => setNewRoomDoors(Number(e.target.value))}
-                    className="w-full px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-2.5 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-slate-600 block mb-1">Windows</label>
+                  <label className="text-[11px] font-semibold text-[#707873] block mb-1">Windows</label>
                   <input
                     type="number"
                     min="0"
                     max="6"
                     value={newRoomWindows}
                     onChange={(e) => setNewRoomWindows(Number(e.target.value))}
-                    className="w-full px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg"
+                    className="w-full px-2.5 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                   />
                 </div>
               </div>
@@ -717,7 +717,7 @@ export const RoomsSpacesSection: React.FC = () => {
                 <Button
                   type="button"
                   onClick={() => setShowAddRoomModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-bold text-[#707873] hover:bg-slate-100 rounded-xl"
                 >
                   Cancel
                 </Button>

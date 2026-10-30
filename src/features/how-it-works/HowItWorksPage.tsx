@@ -107,7 +107,7 @@ export const HowItWorksPage: React.FC = () => {
               one step at a time.
             </h1>
 
-            <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed max-w-xl">
+            <p className="text-sm sm:text-base text-[#707873] leading-relaxed max-w-xl">
               Hutty demystifies residential construction. We combine statutory bylaws, structural quantity algorithms, and verified local market rates into an intuitive journey designed for first-time homebuilders.
             </p>
 
@@ -137,7 +137,7 @@ export const HowItWorksPage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 relative"
           >
-            <div className="relative rounded-3xl overflow-hidden border-2 border-[#E3E8E2] shadow-md bg-white group">
+            <div className="relative rounded-3xl overflow-hidden border-2 border-[#E5E7EB] shadow-md bg-white group">
               <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-100">
                 <img
                   src={familyHomeImg}
@@ -163,7 +163,7 @@ export const HowItWorksPage: React.FC = () => {
               </div>
 
               {/* Bottom Quick Metric */}
-              <div className="p-3.5 bg-[#F8F9F7] border-t border-[#E3E8E2] flex items-center justify-between text-xs text-[#1B3D34]">
+              <div className="p-3.5 bg-[#F8F9F7] border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#1B3D34]">
                 <span className="font-semibold">Average Homeowner Clarity</span>
                 <span className="font-bold text-[#F28C28]">₹21.4L+ In Decisions Planned</span>
               </div>
@@ -204,7 +204,7 @@ export const HowItWorksPage: React.FC = () => {
                     </h3>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -230,7 +230,7 @@ export const HowItWorksPage: React.FC = () => {
               Independent, Transparent &amp; Code-Compliant
             </h4>
           </div>
-          <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
             Hutty does not take contractor kickbacks or inflate material rates. All calculations are derived from published engineering standards (IS 456:2000, IS 1786 Fe550D, NBC 2016) and active Bengaluru retail material benchmarks.
           </p>
           <p className="text-[11px] text-[#687770] italic pt-1 border-t border-[#D5E1D8]">

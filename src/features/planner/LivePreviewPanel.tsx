@@ -117,29 +117,29 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
   const floorDesc = (floors || 1) === 1 ? 'Ground floor' : `G+${(floors || 1) - 1}`;
 
   return (
-    <aside className="w-full bg-white rounded-[14px] border border-[#E3E8E2] p-4 sm:p-5 shadow-xs flex flex-col space-y-4 text-left relative">
+    <aside className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-4 sm:p-5 shadow-xs flex flex-col space-y-4 text-left relative">
       
       {/* ── 1. SNAPSHOT HEADER ── */}
-      <div className="flex items-center justify-between pb-3 border-b border-[#E3E8E2]">
+      <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770] block">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#707873] block">
             YOUR HOME SNAPSHOT
           </span>
-          <span className="text-xs font-bold text-[#172722]">
+          <span className="text-xs font-bold text-[#18211E]">
             {city || 'Bengaluru'} Project
           </span>
         </div>
 
         <div className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#1B3D34] animate-pulse" />
-          <span className="text-[9px] font-mono font-bold text-[#1B3D34] bg-[#EDF3ED] px-2 py-0.5 rounded-md border border-[#CBE0CD]">
+          <span className="text-[9px] font-mono font-bold text-[#1B3D34] bg-[#EBF3EF] px-2 py-0.5 rounded-md border border-[#D5E5DC]">
             LIVE ENGINE
           </span>
         </div>
       </div>
 
       {/* ── 2. 3D ARCHITECTURAL HOUSE PREVIEW (Properly Proportioned) ── */}
-      <div className="w-full h-44 sm:h-48 lg:h-52 rounded-xl overflow-hidden border border-[#E3E8E2] relative bg-[#112821] shrink-0 shadow-inner group">
+      <div className="w-full h-44 sm:h-48 lg:h-52 rounded-xl overflow-hidden border border-[#E5E7EB] relative bg-[#112821] shrink-0 shadow-inner group">
         <Architectural3DViewer
           city={city}
           plotLength={plotLength || 30}

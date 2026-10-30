@@ -399,12 +399,12 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative z-10 bg-white rounded-2xl border border-[#E3E8E2] max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
+            className="relative z-10 bg-white rounded-2xl border border-[#E5E7EB] max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl text-left max-h-[90vh] overflow-y-auto"
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-[#707873] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -421,23 +421,23 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                   <h2 id="unlock-basic-pdf-title" className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
                     Download Basic Estimate PDF
                   </h2>
-                  <p className="text-xs text-[#4B5563]">
+                  <p className="text-xs text-[#707873]">
                     Unlock and download a concise, executive summary of your current estimate in PDF format.
                   </p>
                 </div>
 
                 {/* Product & Price Summary Card */}
-                <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E3E8E2] flex items-center justify-between">
+                <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">Product: Basic Estimate PDF</span>
+                    <span className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block">Product: Basic Estimate PDF</span>
                     <span className="text-2xl font-black text-[#1B3D34] font-mono">₹99</span>
-                    <span className="text-[10px] text-[#4B5563] ml-1">one-time payment</span>
+                    <span className="text-[10px] text-[#707873] ml-1">one-time payment</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E3E8E2] block font-mono">
+                    <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E5E7EB] block font-mono">
                       Instant PDF Download
                     </span>
-                    <span className="text-[9px] text-[#4B5563] block mt-0.5">
+                    <span className="text-[9px] text-[#707873] block mt-0.5">
                       Single project entitlement
                     </span>
                   </div>
@@ -445,7 +445,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
 
                 {/* Scope Included */}
                 <div className="space-y-2 text-xs text-[#1B3D34]">
-                  <span className="font-bold text-[11px] uppercase tracking-wider text-[#4B5563] block">
+                  <span className="font-bold text-[11px] uppercase tracking-wider text-[#707873] block">
                     What's Included in the ₹99 PDF:
                   </span>
                   <div className="grid grid-cols-1 gap-1.5 text-xs text-[#1B3D34]">
@@ -469,7 +469,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                 </div>
 
                 {/* Transparent Exclusions Notice */}
-                <div className="p-3 bg-[rgba(27,61,52,0.04)] border border-[#E3E8E2] rounded-xl text-[11px] text-[#4B5563] space-y-1">
+                <div className="p-3 bg-[rgba(27,61,52,0.04)] border border-[#E5E7EB] rounded-xl text-[11px] text-[#707873] space-y-1">
                   <div className="font-bold text-[#1B3D34] flex items-center gap-1.5">
                     <AlertCircle className="w-3.5 h-3.5 text-[#F28C28]" />
                     <span>Please Note:</span>
@@ -490,7 +490,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block mb-1">
+                      <label className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block mb-1">
                         Your Name
                       </label>
                       <input
@@ -499,11 +499,11 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Ramesh Kumar"
-                        className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] focus:border-[#1B3D34] focus:outline-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] focus:border-[#1B3D34] focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block mb-1">
+                      <label className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block mb-1">
                         Phone Number
                       </label>
                       <input
@@ -512,13 +512,13 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="e.g. 9876543210"
-                        className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] focus:border-[#1B3D34] focus:outline-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] focus:border-[#1B3D34] focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block mb-1">
+                    <label className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block mb-1">
                       Email Address
                     </label>
                     <input
@@ -527,7 +527,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="e.g. ramesh@example.com"
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-[#E3E8E2] focus:border-[#1B3D34] focus:outline-none"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E7EB] focus:border-[#1B3D34] focus:outline-none"
                     />
                   </div>
 
@@ -549,7 +549,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                         </>
                       )}
                     </button>
-                    <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#4B5563] mt-2">
+                    <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#707873] mt-2">
                       <ShieldCheck className="w-3.5 h-3.5 text-[#1B3D34]" />
                       <span>256-bit encrypted checkout &bull; Instant delivery</span>
                     </div>
@@ -569,7 +569,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                   <h3 className="text-xl font-bold text-[#1B3D34] font-heading">
                     Basic Estimate PDF Unlocked!
                   </h3>
-                  <p className="text-xs text-[#4B5563] max-w-sm mx-auto">
+                  <p className="text-xs text-[#707873] max-w-sm mx-auto">
                     Your payment of ₹99 was verified. Your Basic Estimate PDF has been generated and downloaded.
                   </p>
                 </div>
@@ -586,7 +586,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                   <button
                     type="button"
                     onClick={handlePreviewInTab}
-                    className="px-4 py-2.5 rounded-xl border border-[#E3E8E2] text-xs font-bold text-[#1B3D34] hover:bg-[#F8F8F6] flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl border border-[#E5E7EB] text-xs font-bold text-[#1B3D34] hover:bg-[#F8F8F6] flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <FileText className="w-4 h-4" />
                     <span>Preview in Tab</span>
@@ -597,7 +597,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="text-xs text-[#4B5563] hover:text-[#1B3D34] font-bold underline cursor-pointer"
+                    className="text-xs text-[#707873] hover:text-[#1B3D34] font-bold underline cursor-pointer"
                   >
                     Back to Estimate
                   </button>

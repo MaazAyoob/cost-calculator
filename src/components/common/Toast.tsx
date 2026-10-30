@@ -22,16 +22,16 @@ export const ToastContainer: React.FC = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="pointer-events-auto flex items-start gap-3 p-4 bg-white rounded-xl shadow-soft-lg border border-slate-200/80"
+            className="pointer-events-auto flex items-start gap-3 p-4 bg-white rounded-xl shadow-md border border-[#E5E7EB]"
           >
             {icons[toast.type]}
             <div className="flex-1 min-w-0">
-              <h4 className="text-xs font-semibold text-slate-900">{toast.title}</h4>
-              {toast.description && <p className="text-xs text-slate-500 mt-0.5">{toast.description}</p>}
+              <h4 className="text-xs font-semibold text-[#18211E] font-heading">{toast.title}</h4>
+              {toast.description && <p className="text-xs text-[#707873] mt-0.5">{toast.description}</p>}
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-slate-600 p-0.5 rounded-lg"
+              className="text-[#707873] hover:text-[#18211E] p-0.5 rounded-lg cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>

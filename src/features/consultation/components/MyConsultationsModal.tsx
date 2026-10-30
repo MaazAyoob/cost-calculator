@@ -111,9 +111,9 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative z-10 bg-white rounded-3xl p-5 sm:p-7 max-w-2xl w-full shadow-2xl border border-[#E3E8E2] my-8 text-left space-y-5 max-h-[88vh] overflow-y-auto"
+            className="relative z-10 bg-white rounded-3xl p-5 sm:p-7 max-w-2xl w-full shadow-2xl border border-[#E5E7EB] my-8 text-left space-y-5 max-h-[88vh] overflow-y-auto"
           >
-        <div className="flex items-center justify-between pb-3 border-b border-[#E3E8E2]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
               HOMEOWNER PORTAL
@@ -125,7 +125,7 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-[#F8F8F6] text-[#4B5563] hover:text-[#1B3D34] transition-colors cursor-pointer"
+            className="p-2 rounded-xl hover:bg-[#F8F8F6] text-[#707873] hover:text-[#1B3D34] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -139,7 +139,7 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
             value={lookupEmail}
             onChange={(e) => setLookupEmail(e.target.value)}
             placeholder="Enter your booking email (e.g. rahul@example.com)..."
-            className="flex-1 px-3.5 py-2 text-xs border border-[#E3E8E2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-[#F8F8F6]"
+            className="flex-1 px-3.5 py-2 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34] bg-[#F8F8F6]"
           />
           <button
             type="submit"
@@ -152,16 +152,16 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
         {/* Requests List */}
         <div className="space-y-3 pt-2">
           {isLoadingMyConsultations ? (
-            <div className="py-8 text-center text-xs text-[#4B5563]">
+            <div className="py-8 text-center text-xs text-[#707873]">
               Loading your consultation requests...
             </div>
           ) : myConsultations.length === 0 ? (
-            <div className="p-8 text-center bg-[#F8F8F6] rounded-2xl border border-dashed border-[#E3E8E2] space-y-2">
-              <ShieldCheck className="w-8 h-8 text-[#4B5563]/50 mx-auto" />
+            <div className="p-8 text-center bg-[#F8F8F6] rounded-2xl border border-dashed border-[#E5E7EB] space-y-2">
+              <ShieldCheck className="w-8 h-8 text-[#707873]/50 mx-auto" />
               <p className="text-xs font-semibold text-[#1B3D34]">
                 {hasSearched ? 'No consultation requests found for this email.' : 'Look up your requests using your booking email.'}
               </p>
-              <p className="text-[11px] text-[#4B5563]">
+              <p className="text-[11px] text-[#707873]">
                 Consultations booked with fixed {LAUNCH_CONSULTATION_PRICE_DISPLAY} will show here after payment verification.
               </p>
             </div>
@@ -169,11 +169,11 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
             myConsultations.map((req) => (
               <div
                 key={req.id}
-                className="bg-[#F8F8F6] p-4 rounded-2xl border border-[#E3E8E2] space-y-2.5 text-xs text-[#1B3D34]"
+                className="bg-[#F8F8F6] p-4 rounded-2xl border border-[#E5E7EB] space-y-2.5 text-xs text-[#1B3D34]"
               >
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-xs bg-white px-2 py-0.5 rounded border border-[#E3E8E2]">
+                    <span className="font-mono font-bold text-xs bg-white px-2 py-0.5 rounded border border-[#E5E7EB]">
                       {req.publicReference}
                     </span>
                     <span className="text-xs font-bold text-[#1B3D34]">
@@ -183,17 +183,17 @@ export const MyConsultationsModal: React.FC<MyConsultationsModalProps> = ({ isOp
                   {getStatusBadge(req.status)}
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-[#E3E8E2]/70 text-[11px]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-[#E5E7EB]/70 text-[11px]">
                   <div>
-                    <span className="text-[#4B5563] block">Topic</span>
+                    <span className="text-[#707873] block">Topic</span>
                     <span className="font-semibold truncate block">{req.consultationTopic}</span>
                   </div>
                   <div>
-                    <span className="text-[#4B5563] block">Preferred Schedule</span>
+                    <span className="text-[#707873] block">Preferred Schedule</span>
                     <span className="font-semibold block">{req.preferredDate} ({req.preferredTime})</span>
                   </div>
                   <div>
-                    <span className="text-[#4B5563] block">Payment</span>
+                    <span className="text-[#707873] block">Payment</span>
                     {req.payments?.some((p) => p.status === 'PAID') ? (
                       <span className="font-mono font-bold text-emerald-800">{LAUNCH_CONSULTATION_PRICE_DISPLAY} (Paid)</span>
                     ) : req.payments?.some((p) => p.status === 'FAILED') ? (

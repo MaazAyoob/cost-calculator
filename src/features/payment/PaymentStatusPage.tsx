@@ -105,22 +105,22 @@ export const PaymentStatusPage: React.FC = () => {
   }, [orderId]);
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50">
+    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F8F8F6]">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-lg w-full bg-white rounded-3xl border border-slate-200/80 shadow-xl p-8 text-center space-y-6"
+        className="max-w-lg w-full bg-white rounded-3xl border border-[#E5E7EB] shadow-xs p-8 text-center space-y-6"
       >
         {/* Loading State */}
         {state.status === 'LOADING' && (
           <div className="space-y-4 py-8">
-            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-              <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin" />
+            <div className="w-16 h-16 mx-auto rounded-full bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center">
+              <RefreshCw className="w-8 h-8 text-[#1B3D34] animate-spin" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900 font-heading">Verifying Transaction</h2>
-            <p className="text-sm text-slate-600 max-w-sm mx-auto">{state.message}</p>
+            <h2 className="text-xl font-bold text-[#18211E] font-heading">Verifying Transaction</h2>
+            <p className="text-sm text-[#707873] max-w-sm mx-auto">{state.message}</p>
             {orderId && (
-              <span className="inline-block text-[11px] font-mono bg-slate-100 text-slate-500 px-3 py-1 rounded-full">
+              <span className="inline-block text-[11px] font-mono bg-[#F8F8F6] text-[#707873] px-3 py-1 rounded-full border border-[#E5E7EB]">
                 Order: {orderId}
               </span>
             )}
@@ -130,59 +130,61 @@ export const PaymentStatusPage: React.FC = () => {
         {/* Paid / Confirmed State */}
         {state.status === 'PAID' && (
           <div className="space-y-5">
-            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600">
-              <CheckCircle2 className="w-10 h-10" />
+            <div className="w-16 h-16 mx-auto rounded-full bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34]">
+              <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             </div>
 
             <div>
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-[#1B3D34] bg-[#EBF3EF] px-3 py-1 rounded-full border border-[#D5E5DC] uppercase tracking-wider">
                 Payment Confirmed
               </span>
-              <h2 className="text-2xl font-bold text-slate-900 mt-2 font-heading">
+              <h2 className="text-2xl font-black text-[#18211E] mt-2 font-heading tracking-tight">
                 {state.type === 'CONSULTATION'
                   ? 'Consultation Booking Confirmed!'
                   : 'Estimate Report Unlocked!'}
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-[#707873] mt-1">
                 Your payment of{' '}
-                {state.data?.purchase?.amountMinorUnits
-                  ? formatCurrency(state.data.purchase.amountMinorUnits / 100)
-                  : state.data?.payment?.amountMinorUnits
-                  ? formatCurrency(state.data.payment.amountMinorUnits / 100)
-                  : state.data?.request?.amountMinorUnits
-                  ? formatCurrency(state.data.request.amountMinorUnits / 100)
-                  : state.data?.amount
-                  ? formatCurrency(Number(state.data.amount))
-                  : '₹1,499'}{' '}
+                <strong className="text-[#18211E] font-bold">
+                  {state.data?.purchase?.amountMinorUnits
+                    ? formatCurrency(state.data.purchase.amountMinorUnits / 100)
+                    : state.data?.payment?.amountMinorUnits
+                    ? formatCurrency(state.data.payment.amountMinorUnits / 100)
+                    : state.data?.request?.amountMinorUnits
+                    ? formatCurrency(state.data.request.amountMinorUnits / 100)
+                    : state.data?.amount
+                    ? formatCurrency(Number(state.data.amount))
+                    : '₹1,499'}
+                </strong>{' '}
                 has been authoritatively verified with Cashfree PG.
               </p>
             </div>
 
             {state.data?.request && (
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-left space-y-2 text-xs">
+              <div className="p-4 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl text-left space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Booking Reference:</span>
-                  <span className="font-mono font-bold text-slate-900">
+                  <span className="text-[#707873]">Booking Reference:</span>
+                  <span className="font-mono font-bold text-[#18211E]">
                     {state.data.request.publicReference}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Consultant / Desk:</span>
-                  <span className="font-semibold text-slate-800">
+                  <span className="text-[#707873]">Consultant / Desk:</span>
+                  <span className="font-semibold text-[#18211E]">
                     {state.data.request.consultantNameSnapshot || 'Hutty Expert Review'}
                   </span>
                 </div>
                 {state.data.request.preferredDate && (
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Preferred Slot:</span>
-                    <span className="text-slate-700">
+                    <span className="text-[#707873]">Preferred Slot:</span>
+                    <span className="text-[#18211E]">
                       {state.data.request.preferredDate} {state.data.request.preferredTime || ''}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between border-t border-slate-200 pt-2">
-                  <span className="text-slate-500">Review Status:</span>
-                  <span className="font-bold text-emerald-700">Awaiting Admin Review</span>
+                <div className="flex justify-between border-t border-[#E5E7EB] pt-2">
+                  <span className="text-[#707873]">Review Status:</span>
+                  <span className="font-bold text-emerald-700">Awaiting Specialist Review</span>
                 </div>
               </div>
             )}
@@ -192,14 +194,14 @@ export const PaymentStatusPage: React.FC = () => {
                 <>
                   <Link
                     to="/consult"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1B3D34] hover:bg-[#142E27] text-white rounded-xl text-xs font-bold shadow-xs transition-all"
                   >
-                    <UserCheck className="w-4 h-4" />
+                    <UserCheck className="w-4 h-4 text-[#F28C28]" />
                     Back to Consultations
                   </Link>
                   <Link
                     to="/account"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] rounded-xl text-xs font-bold transition-all"
                   >
                     View Account
                   </Link>
@@ -207,9 +209,9 @@ export const PaymentStatusPage: React.FC = () => {
               ) : (
                 <Link
                   to="/report"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1B3D34] hover:bg-[#142E27] text-white rounded-xl text-xs font-bold shadow-xs transition-all"
                 >
-                  <FileText className="w-4 h-4" />
+                  <FileText className="w-4 h-4 text-[#F28C28]" />
                   View Estimate Report
                 </Link>
               )}
@@ -228,21 +230,21 @@ export const PaymentStatusPage: React.FC = () => {
               <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 uppercase tracking-wider">
                 Awaiting Confirmation
               </span>
-              <h2 className="text-xl font-bold text-slate-900 mt-2 font-heading">Payment In Progress</h2>
-              <p className="text-xs text-slate-600 mt-1">{state.message}</p>
+              <h2 className="text-xl font-bold text-[#18211E] mt-2 font-heading">Payment In Progress</h2>
+              <p className="text-xs text-[#707873] mt-1">{state.message}</p>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={checkStatus}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1B3D34] hover:bg-[#142E27] text-white rounded-xl text-xs font-bold shadow-xs transition-all"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 text-[#F28C28]" />
                 Check Status Again
               </button>
               <Link
                 to="/consult"
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] rounded-xl text-xs font-bold transition-all"
               >
                 Return to Consultations
               </Link>
@@ -250,42 +252,43 @@ export const PaymentStatusPage: React.FC = () => {
           </div>
         )}
 
-        {/* Failed State */}
+        {/* Failed / Cancelled State */}
         {state.status === 'FAILED' && (
           <div className="space-y-5">
-            <div className="w-16 h-16 mx-auto rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-red-600">
               <AlertTriangle className="w-9 h-9" />
             </div>
 
             <div>
-              <span className="text-[11px] font-bold text-rose-800 bg-rose-100 px-3 py-1 rounded-full border border-rose-200 uppercase tracking-wider">
-                Verification Note
+              <span className="text-[11px] font-bold text-red-800 bg-red-100 px-3 py-1 rounded-full border border-red-200 uppercase tracking-wider">
+                Transaction Incomplete
               </span>
-              <h2 className="text-xl font-bold text-slate-900 mt-2 font-heading">Payment Not Confirmed</h2>
-              <p className="text-xs text-slate-600 mt-1">{state.message}</p>
+              <h2 className="text-xl font-bold text-[#18211E] mt-2 font-heading">Payment Could Not Be Verified</h2>
+              <p className="text-xs text-[#707873] mt-1 max-w-sm mx-auto">{state.message}</p>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={checkStatus}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1B3D34] hover:bg-[#142E27] text-white rounded-xl text-xs font-bold shadow-xs transition-all"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 text-[#F28C28]" />
                 Retry Verification
               </button>
               <Link
-                to="/consult"
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all"
+                to="/calculator"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] rounded-xl text-xs font-bold transition-all"
               >
-                Return Home
+                <Home className="w-4 h-4" />
+                Return to Calculator
               </Link>
             </div>
           </div>
         )}
 
-        <div className="border-t border-slate-100 pt-4 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+        <div className="border-t border-[#E5E7EB] pt-4 flex items-center justify-center gap-1.5 text-[11px] text-[#707873]">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Hutty Authoritative Verification · 256-bit SSL Encrypted</span>
+          <span>Hutty Authoritative Verification &bull; 256-bit SSL Encrypted</span>
         </div>
       </motion.div>
     </div>

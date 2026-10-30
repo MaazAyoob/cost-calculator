@@ -63,10 +63,10 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
           <FileText className="w-3 h-3 text-[#F28C28]" />
           <span>STAGE 8 OF 8 &bull; DETAILED BOQ &amp; REPORT PLANS</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           See what your home may need, work by work.
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Preview your itemized work-wise BOQ, material takeoff schedules, and trade labour milestones before choosing a report plan.
         </p>
       </div>

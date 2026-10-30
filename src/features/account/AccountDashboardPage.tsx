@@ -240,7 +240,7 @@ export const AccountDashboardPage: React.FC = () => {
         {/* ═══════════════════════════════════════════════════════════════ */}
         {/* TOP PROFILE BANNER                                              */}
         {/* ═══════════════════════════════════════════════════════════════ */}
-        <div className="bg-white rounded-3xl border border-[#E2E8E3] p-5 sm:p-8 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-left">
+        <div className="bg-white rounded-3xl border border-[#E5E7EB] p-5 sm:p-8 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-left">
           <div className="flex items-center gap-4 min-w-0 flex-1">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] font-black text-lg sm:text-xl shadow-2xs shrink-0">
               {user?.name?.charAt(0)?.toUpperCase() || 'H'}
@@ -254,7 +254,7 @@ export const AccountDashboardPage: React.FC = () => {
                   Verified Account
                 </span>
               </div>
-              <p className="text-xs text-[#52605B] mt-0.5 font-medium truncate">
+              <p className="text-xs text-[#707873] mt-0.5 font-medium truncate">
                 Your home projects and reports, all in one place. &bull; {user?.email}
               </p>
             </div>
@@ -275,7 +275,7 @@ export const AccountDashboardPage: React.FC = () => {
                 logout();
                 navigate('/');
               }}
-              className="inline-flex items-center justify-center p-3 rounded-xl border border-[#D7DFD9] text-[#52605B] hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-all cursor-pointer"
+              className="inline-flex items-center justify-center p-3 rounded-xl border border-[#E5E7EB] text-[#707873] hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-all cursor-pointer"
               title="Log Out"
             >
               <LogOut className="w-4 h-4" />
@@ -286,7 +286,7 @@ export const AccountDashboardPage: React.FC = () => {
         {/* ═══════════════════════════════════════════════════════════════ */}
         {/* TABS NAVIGATION                                                 */}
         {/* ═══════════════════════════════════════════════════════════════ */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none border-b border-[#E2E8E3]">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none border-b border-[#E5E7EB]">
           <button
             type="button"
             onClick={() => handleTabChange('projects')}
@@ -359,7 +359,7 @@ export const AccountDashboardPage: React.FC = () => {
         {activeTab === 'projects' && (
           <div className="space-y-4">
             {projects.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-[#E2E8E3] p-12 text-center max-w-lg mx-auto shadow-xs space-y-4">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-12 text-center max-w-lg mx-auto shadow-xs space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] mx-auto shadow-2xs">
                   <Building2 className="w-8 h-8 text-[#1B3D34]" />
                 </div>
@@ -367,7 +367,7 @@ export const AccountDashboardPage: React.FC = () => {
                   <h3 className="text-lg font-black text-[#1B3D34] font-heading">
                     Your home project starts here.
                   </h3>
-                  <p className="text-xs text-[#52605B] mt-1 max-w-xs mx-auto leading-relaxed">
+                  <p className="text-xs text-[#707873] mt-1 max-w-xs mx-auto leading-relaxed">
                     Create your first project to explore the cost, save your choices and return whenever you're ready.
                   </p>
                 </div>
@@ -393,7 +393,7 @@ export const AccountDashboardPage: React.FC = () => {
                   return (
                     <div
                       key={proj.id}
-                      className="bg-white rounded-2xl border border-[#E2E8E3] p-5 shadow-xs flex flex-col justify-between hover:border-[#1B3D34]/40 transition-all duration-200 group"
+                      className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-xs flex flex-col justify-between hover:border-[#1B3D34]/40 transition-all duration-200 group"
                     >
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
@@ -417,7 +417,7 @@ export const AccountDashboardPage: React.FC = () => {
                         </div>
 
                         {/* Metrics grid */}
-                        <div className="grid grid-cols-2 gap-2 p-3 bg-[#FAFBF9] rounded-xl border border-[#EDF2EE]">
+                        <div className="grid grid-cols-2 gap-2 p-3 bg-[#FAFBF9] rounded-xl border border-[#E5E7EB]">
                           <div>
                             <span className="text-[10px] font-semibold text-[#687770] block leading-tight">
                               Plot Dimensions
@@ -448,7 +448,7 @@ export const AccountDashboardPage: React.FC = () => {
                       </div>
 
                       {/* Card actions */}
-                      <div className="pt-4 mt-4 border-t border-[#EDF2EE] flex items-center justify-between gap-2">
+                      <div className="pt-4 mt-4 border-t border-[#E5E7EB] flex items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => handleContinueProject(proj)}
@@ -464,7 +464,7 @@ export const AccountDashboardPage: React.FC = () => {
                             setRenamingProject(proj);
                             setNewProjectName(proj.name);
                           }}
-                          className="p-2.5 rounded-xl border border-[#E2E8E3] text-[#52605B] hover:text-[#1B3D34] hover:bg-[#FAFBF9] transition-colors cursor-pointer"
+                          className="p-2.5 rounded-xl border border-[#E5E7EB] text-[#707873] hover:text-[#1B3D34] hover:bg-[#FAFBF9] transition-colors cursor-pointer"
                           title="Rename Project"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -473,7 +473,7 @@ export const AccountDashboardPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDeletingProject(proj)}
-                          className="p-2.5 rounded-xl border border-[#E2E8E3] text-[#52605B] hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer"
+                          className="p-2.5 rounded-xl border border-[#E5E7EB] text-[#707873] hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer"
                           title="Archive Project"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -494,10 +494,10 @@ export const AccountDashboardPage: React.FC = () => {
         {activeTab === 'reports' && (
           <div className="space-y-4">
             {reports.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-[#E2E8E3] p-12 text-center max-w-lg mx-auto shadow-xs space-y-3">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-12 text-center max-w-lg mx-auto shadow-xs space-y-3">
                 <FileCheck className="w-12 h-12 text-[#687770] mx-auto opacity-70" />
                 <h3 className="text-base font-bold text-[#1B3D34]">Reports you unlock will appear here</h3>
-                <p className="text-xs text-[#52605B] leading-relaxed max-w-xs mx-auto">
+                <p className="text-xs text-[#707873] leading-relaxed max-w-xs mx-auto">
                   When you unlock the ₹499 Detailed BOQ dossier or ₹1,499 Premium package, your permanent PDF documents are preserved here.
                 </p>
                 <button
@@ -514,14 +514,14 @@ export const AccountDashboardPage: React.FC = () => {
                 {reports.map((rep) => (
                   <div
                     key={rep.id}
-                    className="bg-white rounded-2xl border border-[#E2E8E3] p-5 shadow-xs flex items-start justify-between gap-4"
+                    className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-xs flex items-start justify-between gap-4"
                   >
                     <div className="space-y-1">
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF3EF] text-[#1B3D34] border border-[#D5E5DC]">
                         {rep.tierCode === 'PREMIUM_1499' ? '₹1,499 Premium Package' : rep.tierCode === 'ESTIMATE_99' || rep.tierCode === 'BASIC_ESTIMATE_PDF' ? 'Basic Estimate PDF' : '₹499 Detailed Dossier'}
                       </span>
                       <h4 className="font-bold text-sm text-[#1B3D34] mt-1">{rep.reportTitle}</h4>
-                      <p className="text-xs text-[#52605B]">Project: {rep.projectName} ({rep.city})</p>
+                      <p className="text-xs text-[#707873]">Project: {rep.projectName} ({rep.city})</p>
                       <span className="text-[11px] text-[#687770] block">
                         Unlocked on {new Date(rep.unlockedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
@@ -547,9 +547,9 @@ export const AccountDashboardPage: React.FC = () => {
         {/* TAB 3: PAYMENT HISTORY                                          */}
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'purchases' && (
-          <div className="bg-white rounded-3xl border border-[#E2E8E3] shadow-xs overflow-hidden text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-xs overflow-hidden text-left">
             {purchases.length === 0 ? (
-              <div className="p-12 text-center text-[#52605B] text-xs space-y-2">
+              <div className="p-12 text-center text-[#707873] text-xs space-y-2">
                 <CreditCard className="w-10 h-10 text-[#687770] mx-auto opacity-70" />
                 <p className="font-semibold text-sm text-[#1B3D34]">No payment transactions found</p>
                 <p>All completed purchases and verified receipts will appear here automatically.</p>
@@ -557,7 +557,7 @@ export const AccountDashboardPage: React.FC = () => {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-[#FAFBF9] border-b border-[#E2E8E3] text-[#1B3D34] font-bold">
+                  <thead className="bg-[#FAFBF9] border-b border-[#E5E7EB] text-[#1B3D34] font-bold">
                     <tr>
                       <th className="py-3 px-4">Order Reference</th>
                       <th className="py-3 px-4">Product / Service</th>
@@ -567,7 +567,7 @@ export const AccountDashboardPage: React.FC = () => {
                       <th className="py-3 px-4 text-right">Gateway</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EDF2EE]">
+                  <tbody className="divide-y divide-[#E5E7EB]">
                     {purchases.map((order) => (
                       <tr key={order.id} className="hover:bg-[#FAFBF9]/80 transition-colors">
                         <td className="py-3 px-4 font-mono font-medium text-[#1B3D34]">{order.reference}</td>
@@ -586,7 +586,7 @@ export const AccountDashboardPage: React.FC = () => {
                             {formatPaymentStatus(order.status)}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-[#52605B]">
+                        <td className="py-3 px-4 text-[#707873]">
                           {new Date(order.date).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
@@ -609,10 +609,10 @@ export const AccountDashboardPage: React.FC = () => {
         {activeTab === 'consultations' && (
           <div className="space-y-4">
             {consultations.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-[#E2E8E3] p-12 text-center max-w-lg mx-auto shadow-xs space-y-3">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-12 text-center max-w-lg mx-auto shadow-xs space-y-3">
                 <Calendar className="w-12 h-12 text-[#687770] mx-auto opacity-70" />
                 <h3 className="text-base font-bold text-[#1B3D34]">Your consultation requests will appear here</h3>
-                <p className="text-xs text-[#52605B] leading-relaxed max-w-xs mx-auto">
+                <p className="text-xs text-[#707873] leading-relaxed max-w-xs mx-auto">
                   Connect with vetted structural engineers, architects, and quantity surveyors for personal guidance (₹1,499).
                 </p>
                 <button
@@ -629,7 +629,7 @@ export const AccountDashboardPage: React.FC = () => {
                 {consultations.map((c) => (
                   <div
                     key={c.id}
-                    className="bg-white rounded-2xl border border-[#E2E8E3] p-5 shadow-xs space-y-3"
+                    className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-xs space-y-3"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -641,7 +641,7 @@ export const AccountDashboardPage: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className="p-3 bg-[#FAFBF9] rounded-xl border border-[#EDF2EE] text-xs space-y-1">
+                    <div className="p-3 bg-[#FAFBF9] rounded-xl border border-[#E5E7EB] text-xs space-y-1">
                       <div className="flex justify-between">
                         <span className="text-[#687770]">Specialist:</span>
                         <span className="font-bold text-[#1B3D34]">{c.consultant?.name}</span>
@@ -662,9 +662,9 @@ export const AccountDashboardPage: React.FC = () => {
         {/* TAB 5: PROFILE & SETTINGS                                       */}
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-3xl border border-[#E2E8E3] p-6 sm:p-8 max-w-xl mx-auto shadow-xs text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 max-w-xl mx-auto shadow-xs text-left">
             <h3 className="text-lg font-bold text-[#1B3D34] mb-1">Account &amp; Contact Details</h3>
-            <p className="text-xs text-[#52605B] mb-5">
+            <p className="text-xs text-[#707873] mb-5">
               Keep your contact information updated for receiving calculation reports and consultation updates.
             </p>
 
@@ -697,7 +697,7 @@ export const AccountDashboardPage: React.FC = () => {
                   type="email"
                   disabled
                   value={user?.email || ''}
-                  className="block w-full px-3.5 py-2.5 border border-[#E2E8E3] rounded-xl text-sm text-[#687770] bg-gray-50 cursor-not-allowed"
+                  className="block w-full px-3.5 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-[#687770] bg-gray-50 cursor-not-allowed"
                 />
               </div>
 
@@ -733,7 +733,7 @@ export const AccountDashboardPage: React.FC = () => {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {renamingProject && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-[#E2E8E3] shadow-lg max-w-sm w-full p-6 text-left space-y-4">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-lg max-w-sm w-full p-6 text-left space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-base text-[#1B3D34]">Rename Project</h3>
               <button
@@ -759,7 +759,7 @@ export const AccountDashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setRenamingProject(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#52605B] hover:bg-gray-100"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#707873] hover:bg-gray-100"
                 >
                   Cancel
                 </button>
@@ -780,13 +780,13 @@ export const AccountDashboardPage: React.FC = () => {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {deletingProject && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-[#E2E8E3] shadow-lg max-w-sm w-full p-6 text-left space-y-4">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-lg max-w-sm w-full p-6 text-left space-y-4">
             <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-base text-[#1B3D34]">Archive &ldquo;{deletingProject.name}&rdquo;?</h3>
-              <p className="text-xs text-[#52605B] mt-1 leading-relaxed">
+              <p className="text-xs text-[#707873] mt-1 leading-relaxed">
                 This project will be removed from your active workspace. Any purchased reports associated with this project will remain safely accessible in My Reports.
               </p>
             </div>
@@ -794,7 +794,7 @@ export const AccountDashboardPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setDeletingProject(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#52605B] hover:bg-gray-100"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#707873] hover:bg-gray-100"
               >
                 Cancel
               </button>

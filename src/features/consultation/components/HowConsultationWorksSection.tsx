@@ -21,7 +21,7 @@ export const HowConsultationWorksSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-10 shadow-xs space-y-8 text-left">
+    <section className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-10 shadow-xs space-y-8 text-left">
       <div className="max-w-2xl space-y-2">
         <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
           SIMPLE &bull; TRANSPARENT JOURNEY
@@ -38,7 +38,7 @@ export const HowConsultationWorksSection: React.FC = () => {
         {steps.map((step) => (
           <div
             key={step.number}
-            className="p-6 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] space-y-3 relative overflow-hidden"
+            className="p-6 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-3 relative overflow-hidden"
           >
             <div className="w-10 h-10 rounded-xl bg-[#1B3D34] text-[#F28C28] flex items-center justify-center font-bold text-base shadow-xs">
               {step.number}

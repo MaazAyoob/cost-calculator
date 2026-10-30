@@ -120,17 +120,17 @@ export const Stage5ConstructionStyle: React.FC = () => {
           <Building2 className="w-3 h-3 text-[#F28C28]" />
           <span>STAGE 5 OF 8 &bull; CONSTRUCTION STYLE</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           What type of construction are you considering?
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Choose your structural framing system, walling materials, and finish level. You can choose "Not sure" if you want our recommended defaults.
         </p>
       </div>
 
       {/* 1. Structural Engineering System */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#18211E]">
           1. What structural frame would you prefer?
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

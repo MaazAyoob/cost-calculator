@@ -170,7 +170,7 @@ export const AdminConsultationsSection: React.FC = () => {
         );
       case 'COMPLETED':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-[#18211E] border border-[#CBD5CB]">
             Completed
           </span>
         );
@@ -194,12 +194,12 @@ export const AdminConsultationsSection: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* ── TOP COUNTERS ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Total</span>
-          <span className="text-xl font-extrabold text-slate-900 font-mono mt-0.5 block">{adminStats.total}</span>
+          <span className="text-xl font-extrabold text-[#18211E] font-mono mt-0.5 block">{adminStats.total}</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Paid</span>
           <span className="text-xl font-extrabold text-emerald-700 font-mono mt-0.5 block">{adminStats.paid}</span>
         </div>
@@ -209,22 +209,22 @@ export const AdminConsultationsSection: React.FC = () => {
           <span className="text-xl font-extrabold text-amber-900 font-mono mt-0.5 block">{adminStats.awaitingReview}</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Assigned</span>
           <span className="text-xl font-extrabold text-blue-800 font-mono mt-0.5 block">{adminStats.assigned}</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Scheduled</span>
           <span className="text-xl font-extrabold text-emerald-800 font-mono mt-0.5 block">{adminStats.scheduled}</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Completed</span>
           <span className="text-xl font-extrabold text-slate-700 font-mono mt-0.5 block">{adminStats.completed}</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Cancelled</span>
           <span className="text-xl font-extrabold text-red-700 font-mono mt-0.5 block">{adminStats.cancelled}</span>
         </div>
@@ -252,7 +252,7 @@ export const AdminConsultationsSection: React.FC = () => {
       )}
 
       {/* Search and Status Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-xs">
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -260,7 +260,7 @@ export const AdminConsultationsSection: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by Reference (HT-CON-...), Homeowner name, email, or phone..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
           />
         </div>
 
@@ -269,7 +269,7 @@ export const AdminConsultationsSection: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#1B3D34] font-medium cursor-pointer"
+            className="text-xs bg-slate-50 border border-[#E5E7EB] rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#1B3D34] font-medium cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="AWAITING_REVIEW">Awaiting Review</option>
@@ -282,11 +282,11 @@ export const AdminConsultationsSection: React.FC = () => {
       </div>
 
       {/* Requests Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="bg-slate-50/80 border-b border-[#E5E7EB] text-[#707873] font-bold uppercase tracking-wider text-[10px]">
                 <th className="py-3 px-4">Reference</th>
                 <th className="py-3 px-4">Homeowner</th>
                 <th className="py-3 px-4">Topic &amp; Consultant</th>
@@ -306,25 +306,25 @@ export const AdminConsultationsSection: React.FC = () => {
               ) : (
                 adminRequests.map((req) => (
                   <tr key={req.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                    <td className="py-3 px-4 font-mono font-bold text-[#18211E]">
                       {req.publicReference}
                     </td>
 
                     <td className="py-3 px-4">
-                      <span className="font-bold text-slate-900 block">{req.homeownerName}</span>
-                      <span className="text-[11px] text-slate-500 block">{req.homeownerPhone}</span>
+                      <span className="font-bold text-[#18211E] block">{req.homeownerName}</span>
+                      <span className="text-[11px] text-[#707873] block">{req.homeownerPhone}</span>
                     </td>
 
                     <td className="py-3 px-4">
-                      <span className="font-semibold text-slate-800 block truncate max-w-xs">{req.consultationTopic}</span>
-                      <span className="text-[11px] text-slate-500 block truncate">
+                      <span className="font-semibold text-[#18211E] block truncate max-w-xs">{req.consultationTopic}</span>
+                      <span className="text-[11px] text-[#707873] block truncate">
                         {req.consultant?.name ? `Expert: ${req.consultant.name}` : 'Unassigned'}
                       </span>
                     </td>
 
                     <td className="py-3 px-4 text-slate-700">
                       <span className="font-medium block">{req.preferredDate}</span>
-                      <span className="text-[11px] text-slate-500 block">{req.preferredTime}</span>
+                      <span className="text-[11px] text-[#707873] block">{req.preferredTime}</span>
                     </td>
 
                     <td className="py-3 px-4">
@@ -365,12 +365,12 @@ export const AdminConsultationsSection: React.FC = () => {
       {/* ── MANAGE CONSULTATION MODAL ── */}
       {selectedRequestId && adminSelectedRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full shadow-2xl border border-slate-200 my-8 text-left space-y-6 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full shadow-2xl border border-[#E5E7EB] my-8 text-left space-y-6 max-h-[92vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-slate-200">
+            <div className="flex items-start justify-between pb-3 border-b border-[#E5E7EB]">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  <span className="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded border border-[#E5E7EB]">
                     {adminSelectedRequest.publicReference}
                   </span>
                   {getStatusBadge(adminSelectedRequest.status)}
@@ -388,7 +388,7 @@ export const AdminConsultationsSection: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mt-1 font-heading">
+                <h3 className="text-xl font-bold text-[#18211E] mt-1 font-heading">
                   Consultation Request Review
                 </h3>
               </div>
@@ -436,57 +436,57 @@ export const AdminConsultationsSection: React.FC = () => {
             {/* Dossier Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {/* Homeowner & Request Details */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                <span className="font-bold text-slate-900 uppercase tracking-wider text-[10px] block">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-[#E5E7EB] space-y-2">
+                <span className="font-bold text-[#18211E] uppercase tracking-wider text-[10px] block">
                   Customer &amp; Location
                 </span>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Name:</span>
-                  <strong className="text-slate-900">{adminSelectedRequest.homeownerName}</strong>
+                  <span className="text-[#707873]">Name:</span>
+                  <strong className="text-[#18211E]">{adminSelectedRequest.homeownerName}</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Phone:</span>
-                  <span className="font-mono text-slate-900">{adminSelectedRequest.homeownerPhone}</span>
+                  <span className="text-[#707873]">Phone:</span>
+                  <span className="font-mono text-[#18211E]">{adminSelectedRequest.homeownerPhone}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Email:</span>
-                  <span className="text-slate-900">{adminSelectedRequest.homeownerEmail}</span>
+                  <span className="text-[#707873]">Email:</span>
+                  <span className="text-[#18211E]">{adminSelectedRequest.homeownerEmail}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Location:</span>
-                  <span className="text-slate-900">{adminSelectedRequest.projectLocation}</span>
+                  <span className="text-[#707873]">Location:</span>
+                  <span className="text-[#18211E]">{adminSelectedRequest.projectLocation}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Project Type:</span>
-                  <span className="text-slate-900">{adminSelectedRequest.projectType}</span>
+                  <span className="text-[#707873]">Project Type:</span>
+                  <span className="text-[#18211E]">{adminSelectedRequest.projectType}</span>
                 </div>
               </div>
 
               {/* Consultation Topic & Schedule */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                <span className="font-bold text-slate-900 uppercase tracking-wider text-[10px] block">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-[#E5E7EB] space-y-2">
+                <span className="font-bold text-[#18211E] uppercase tracking-wider text-[10px] block">
                   Topic &amp; Preferred Time
                 </span>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Topic:</span>
-                  <strong className="text-slate-900 truncate max-w-[200px]">{adminSelectedRequest.consultationTopic}</strong>
+                  <span className="text-[#707873]">Topic:</span>
+                  <strong className="text-[#18211E] truncate max-w-[200px]">{adminSelectedRequest.consultationTopic}</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Preferred Date:</span>
-                  <span className="text-slate-900 font-medium">{adminSelectedRequest.preferredDate}</span>
+                  <span className="text-[#707873]">Preferred Date:</span>
+                  <span className="text-[#18211E] font-medium">{adminSelectedRequest.preferredDate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Preferred Slot:</span>
-                  <span className="text-slate-900">{adminSelectedRequest.preferredTime}</span>
+                  <span className="text-[#707873]">Preferred Slot:</span>
+                  <span className="text-[#18211E]">{adminSelectedRequest.preferredTime}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Assigned Expert:</span>
+                  <span className="text-[#707873]">Assigned Expert:</span>
                   <strong className="text-[#1B3D34]">
                     {adminSelectedRequest.consultant?.name || 'Unassigned'}
                   </strong>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Confirmed Schedule:</span>
+                  <span className="text-[#707873]">Confirmed Schedule:</span>
                   <span className="text-emerald-800 font-bold">
                     {adminSelectedRequest.confirmedDateTime
                       ? new Date(adminSelectedRequest.confirmedDateTime).toLocaleString('en-IN')
@@ -504,19 +504,19 @@ export const AdminConsultationsSection: React.FC = () => {
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-700">
                   <div>
-                    <span className="text-[10px] text-slate-500 block">House Type</span>
+                    <span className="text-[10px] text-[#707873] block">House Type</span>
                     <strong>{adminSelectedRequest.projectSnapshot.houseType || 'Residential'}</strong>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block">Floors</span>
+                    <span className="text-[10px] text-[#707873] block">Floors</span>
                     <strong>{adminSelectedRequest.projectSnapshot.floors || 'N/A'}</strong>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block">Built-up Area</span>
+                    <span className="text-[10px] text-[#707873] block">Built-up Area</span>
                     <strong>{adminSelectedRequest.projectSnapshot.totalBUASqFt} sq.ft</strong>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block">Calculated Cost</span>
+                    <span className="text-[10px] text-[#707873] block">Calculated Cost</span>
                     <strong className="font-mono text-emerald-800">
                       {formatCurrency(adminSelectedRequest.projectSnapshot.estimatedTotalCostINR || 0)}
                     </strong>
@@ -527,8 +527,8 @@ export const AdminConsultationsSection: React.FC = () => {
 
             {/* Customer Message */}
             {adminSelectedRequest.message && (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700">
-                <span className="font-bold text-slate-900 block mb-1">Homeowner Note:</span>
+              <div className="p-3 bg-slate-50 rounded-xl border border-[#E5E7EB] text-xs text-slate-700">
+                <span className="font-bold text-[#18211E] block mb-1">Homeowner Note:</span>
                 <p className="italic">"{adminSelectedRequest.message}"</p>
               </div>
             )}
@@ -536,12 +536,12 @@ export const AdminConsultationsSection: React.FC = () => {
             {/* ── ADMIN WORKFLOW ACTIONS ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               {/* Action 1: Assign Consultant */}
-              <form onSubmit={handleAssignSubmit} className="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
-                <span className="font-bold text-slate-900 text-xs block">1. Assign Consultant</span>
+              <form onSubmit={handleAssignSubmit} className="p-4 bg-white rounded-2xl border border-[#E5E7EB] space-y-3">
+                <span className="font-bold text-[#18211E] text-xs block">1. Assign Consultant</span>
                 <select
                   value={newConsultantId}
                   onChange={(e) => setNewConsultantId(e.target.value)}
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white"
+                  className="w-full text-xs p-2 border border-[#CBD5CB] rounded-xl bg-white"
                 >
                   <option value="">Select consultant...</option>
                   {adminConsultants.map((c) => (
@@ -565,14 +565,14 @@ export const AdminConsultationsSection: React.FC = () => {
               </form>
 
               {/* Action 2: Confirm Appointment Schedule */}
-              <form onSubmit={handleScheduleSubmit} className="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
-                <span className="font-bold text-slate-900 text-xs block">2. Confirm Schedule</span>
+              <form onSubmit={handleScheduleSubmit} className="p-4 bg-white rounded-2xl border border-[#E5E7EB] space-y-3">
+                <span className="font-bold text-[#18211E] text-xs block">2. Confirm Schedule</span>
                 <input
                   type="datetime-local"
                   required
                   value={confirmedScheduleInput}
                   onChange={(e) => setConfirmedScheduleInput(e.target.value)}
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white"
+                  className="w-full text-xs p-2 border border-[#CBD5CB] rounded-xl bg-white"
                 />
                 <button
                   type="submit"
@@ -589,12 +589,12 @@ export const AdminConsultationsSection: React.FC = () => {
               </form>
 
               {/* Action 3: Transition Status */}
-              <form onSubmit={handleStatusSubmit} className="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
-                <span className="font-bold text-slate-900 text-xs block">3. Update Status</span>
+              <form onSubmit={handleStatusSubmit} className="p-4 bg-white rounded-2xl border border-[#E5E7EB] space-y-3">
+                <span className="font-bold text-[#18211E] text-xs block">3. Update Status</span>
                 <select
                   value={newStatusInput}
                   onChange={(e) => setNewStatusInput(e.target.value as ConsultationStatus)}
-                  className="w-full text-xs p-2 border border-slate-300 rounded-xl bg-white"
+                  className="w-full text-xs p-2 border border-[#CBD5CB] rounded-xl bg-white"
                 >
                   <option value="AWAITING_REVIEW">Awaiting Review</option>
                   <option value="UNDER_REVIEW">Under Review</option>
@@ -626,8 +626,8 @@ export const AdminConsultationsSection: React.FC = () => {
             </div>
 
             {/* ── INTERNAL NOTES & AUDIT TRAIL ── */}
-            <div className="space-y-3 pt-2 border-t border-slate-200 text-xs">
-              <span className="font-bold text-slate-900 uppercase tracking-wider text-[10px] block">
+            <div className="space-y-3 pt-2 border-t border-[#E5E7EB] text-xs">
+              <span className="font-bold text-[#18211E] uppercase tracking-wider text-[10px] block">
                 Internal Administrative Notes (Private to Admin)
               </span>
 
@@ -639,7 +639,7 @@ export const AdminConsultationsSection: React.FC = () => {
                   value={newInternalNote}
                   onChange={(e) => setNewInternalNote(e.target.value)}
                   placeholder="Record call discussion, scheduling constraint, or internal observation..."
-                  className="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-xs"
+                  className="flex-1 px-3 py-2 border border-[#CBD5CB] rounded-xl text-xs"
                 />
                 <button
                   type="submit"
@@ -659,7 +659,7 @@ export const AdminConsultationsSection: React.FC = () => {
                       className={`p-2.5 rounded-xl border text-[11px] ${
                         evt.internalNote
                           ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-                          : 'bg-slate-50 border-slate-200 text-slate-700'
+                          : 'bg-slate-50 border-[#E5E7EB] text-slate-700'
                       }`}
                     >
                       <div className="flex items-center justify-between font-bold">

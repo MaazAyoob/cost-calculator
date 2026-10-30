@@ -57,16 +57,16 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
     return (
       <div className="space-y-6">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold mb-1">
               <Layers className="w-3.5 h-3.5 text-amber-700" />
               <span>Construction: Walls & Masonry</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 font-heading">
+            <h2 className="text-xl font-bold text-[#18211E] font-heading">
               Walls & Masonry Parameters
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#707873] mt-0.5">
               Wall heights, thickness standards, block specifications, and opening deductions.
             </p>
           </div>
@@ -86,7 +86,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
               <strong className="text-amber-800 font-semibold">✓ Affects:</strong> Wall masonry block counts, joint mortar, 2-coat internal/external plaster, and wall paint area.
             </p>
             <p>
-              <strong className="text-slate-600 font-semibold">✗ Does not affect:</strong> Floor built-up area (BUA) or structural steel thumb rules.
+              <strong className="text-[#707873] font-semibold">✗ Does not affect:</strong> Floor built-up area (BUA) or structural steel thumb rules.
             </p>
           </div>
         </div>
@@ -94,10 +94,10 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
         {/* Basic Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Wall Height */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                   <span>Standard Wall Height</span>
                   <span className="text-slate-400 cursor-help" title="Clear floor-to-ceiling vertical height used when calculating wall surface area, blockwork, plaster, and paint.">
                     <HelpCircle className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                 </label>
                 <span className="text-xs font-mono font-bold text-[#1B3D34]">{wallHeight} ft</span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 Default residential clear height (NBC 2016 recommendation is 10 ft).
               </p>
               <div className="flex items-center gap-3 pt-2">
@@ -126,25 +126,25 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                     max="14.0"
                     value={wallHeight}
                     onChange={(e) => updateDraftParameter('config.structure.wall_height_ft', Number(e.target.value))}
-                    className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                    className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                   />
-                  <span className="text-xs text-slate-500">ft</span>
+                  <span className="text-xs text-[#707873]">ft</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Masonry Material Type */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-2">
-              <label className="text-xs font-bold text-slate-900 block">Primary Masonry Type</label>
-              <p className="text-[11px] text-slate-500">
+              <label className="text-xs font-bold text-[#18211E] block">Primary Masonry Type</label>
+              <p className="text-[11px] text-[#707873]">
                 Select block material used for external envelope and internal partition walls.
               </p>
               <select
                 value={masonryType}
                 onChange={(e) => updateDraftParameter('config.masonry.type', e.target.value)}
-                className="w-full px-3 py-2 text-xs font-bold border border-slate-200 rounded-xl bg-slate-50/50 mt-2"
+                className="w-full px-3 py-2 text-xs font-bold border border-[#E5E7EB] rounded-xl bg-slate-50/50 mt-2"
               >
                 <option value="AAC_BLOCK">Autoclaved Aerated Concrete (AAC Block 150mm)</option>
                 <option value="CONCRETE_BLOCK">Solid Concrete Block (6" / 150mm)</option>
@@ -156,10 +156,10 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
         {/* Advanced Controls */}
         {adminViewMode === 'ADVANCED' && (
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-[#18211E] uppercase tracking-wider">
                   Advanced Wall Thicknesses & Wastage Allowances
                 </h3>
                 <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
@@ -173,7 +173,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   <select
                     value={extWallThickness.toString()}
                     onChange={(e) => updateDraftParameter('config.masonry.external_wall_thickness_m', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-white"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-white"
                   >
                     <option value="0.15">6 inches (150 mm) — Standard External</option>
                     <option value="0.20">8 inches (200 mm) — Heavy Envelope</option>
@@ -186,7 +186,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   <select
                     value={intWallThickness.toString()}
                     onChange={(e) => updateDraftParameter('config.masonry.internal_wall_thickness_m', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-white"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-white"
                   >
                     <option value="0.10">4 inches (100 mm) — Standard Partition</option>
                     <option value="0.115">4.5 inches (115 mm) — Half-Brick Wall</option>
@@ -203,9 +203,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="15"
                       value={masonryWastage}
                       onChange={(e) => updateDraftParameter('config.wastage.masonry', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
-                    <span className="text-xs text-slate-500">%</span>
+                    <span className="text-xs text-[#707873]">%</span>
                   </div>
                 </div>
               </div>
@@ -241,16 +241,16 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
     return (
       <div className="space-y-6">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 text-[11px] font-bold mb-1">
               <Hammer className="w-3.5 h-3.5 text-blue-700" />
               <span>Construction: RCC & Structural Frame</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 font-heading">
+            <h2 className="text-xl font-bold text-[#18211E] font-heading">
               RCC & Structural Frame Parameters
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#707873] mt-0.5">
               Concrete volume calculation methodology, component allocations (footing, column, slab), and rebar parameters.
             </p>
           </div>
@@ -271,14 +271,14 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
             <span className="text-[11px] text-purple-700 font-medium">Configurable below</span>
           </div>
 
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+          <div className="p-3 bg-slate-50 border border-[#E5E7EB] rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-mono font-bold text-[10px]">
+              <span className="px-2 py-0.5 rounded bg-slate-200 text-[#18211E] font-mono font-bold text-[10px]">
                 PRICE / RATE
               </span>
-              <span className="text-slate-800 font-semibold">Drives ₹ Costs (Unit Rates Only)</span>
+              <span className="text-[#18211E] font-semibold">Drives ₹ Costs (Unit Rates Only)</span>
             </div>
-            <span className="text-[11px] text-slate-500 font-medium">Managed in Material Prices</span>
+            <span className="text-[11px] text-[#707873] font-medium">Managed in Material Prices</span>
           </div>
         </div>
 
@@ -300,8 +300,8 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
               </ul>
             </div>
             <div>
-              <p className="font-semibold text-slate-600 mb-1">○ NOT AFFECTED:</p>
-              <ul className="space-y-0.5 text-slate-500 pl-2">
+              <p className="font-semibold text-[#707873] mb-1">○ NOT AFFECTED:</p>
+              <ul className="space-y-0.5 text-[#707873] pl-2">
                 <li>• Built-up area (BUA) and setback geometry</li>
                 <li>• Wall area and AAC block counts</li>
                 <li>• Flooring tiles, interior paint, or plumbing fixtures</li>
@@ -311,13 +311,13 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
         </div>
 
         {/* ── CONCRETE CALCULATION METHODOLOGY (Section 3: BASIC MODE) ── */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 font-heading">
+              <h3 className="text-sm font-bold text-[#18211E] font-heading">
                 Structural Concrete Methodology & Component Allocations
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#707873]">
                 Configure how total RCC concrete is sized and apportioned between footings, columns, and slabs.
               </p>
             </div>
@@ -335,7 +335,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
               <select
                 value={concreteMethod}
                 onChange={(e) => updateDraftParameter('config.rcc.concrete_calculation_method', e.target.value)}
-                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100"
+                className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-slate-50 hover:bg-slate-100"
               >
                 <option value="BUA_FACTOR">BUA × Factor (Standard Production)</option>
                 <option value="GEOMETRY_GRID">Structural Grid & Geometry Based</option>
@@ -356,9 +356,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="0.10"
                   value={concreteFactor}
                   onChange={(e) => updateDraftParameter('config.rcc.concrete_factor_cum_sqft', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500 whitespace-nowrap">m³/sq.ft</span>
+                <span className="text-xs text-[#707873] whitespace-nowrap">m³/sq.ft</span>
               </div>
             </div>
 
@@ -370,7 +370,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
               <select
                 value={footingMethod}
                 onChange={(e) => updateDraftParameter('config.rcc.footing_method', e.target.value)}
-                className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100"
+                className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-slate-50 hover:bg-slate-100"
               >
                 <option value="PERCENTAGE">Percentage of structural concrete</option>
                 <option value="GEOMETRY">Grid geometry (Footing pits L×W×D)</option>
@@ -390,9 +390,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="45"
                   value={footingAlloc}
                   onChange={(e) => updateDraftParameter('config.rcc.footing_allocation_pct', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">%</span>
+                <span className="text-xs text-[#707873]">%</span>
               </div>
             </div>
 
@@ -409,9 +409,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="40"
                   value={columnAlloc}
                   onChange={(e) => updateDraftParameter('config.rcc.column_allocation_pct', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">%</span>
+                <span className="text-xs text-[#707873]">%</span>
               </div>
             </div>
 
@@ -428,9 +428,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="75"
                   value={slabAlloc}
                   onChange={(e) => updateDraftParameter('config.rcc.slab_allocation_pct', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">%</span>
+                <span className="text-xs text-[#707873]">%</span>
               </div>
             </div>
 
@@ -447,9 +447,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="50"
                   value={minFooting}
                   onChange={(e) => updateDraftParameter('config.rcc.min_footing_concrete_cum', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">m³</span>
+                <span className="text-xs text-[#707873]">m³</span>
               </div>
             </div>
 
@@ -466,9 +466,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="50"
                   value={minColumn}
                   onChange={(e) => updateDraftParameter('config.rcc.min_column_concrete_cum', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">m³</span>
+                <span className="text-xs text-[#707873]">m³</span>
               </div>
             </div>
 
@@ -485,9 +485,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="100"
                   value={minSlab}
                   onChange={(e) => updateDraftParameter('config.rcc.min_slab_concrete_cum', Number(e.target.value))}
-                  className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                 />
-                <span className="text-xs text-slate-500">m³</span>
+                <span className="text-xs text-[#707873]">m³</span>
               </div>
             </div>
           </div>
@@ -606,10 +606,10 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
         {/* Basic Primary Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Steel Base Factor */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                   <span>Steel Quantity Factor (Ground Floor)</span>
                   <span className="text-slate-400 cursor-help" title="Estimated steel reinforcement quantity per square foot of built-up area for the ground level structure.">
                     <HelpCircle className="w-3.5 h-3.5" />
@@ -617,7 +617,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                 </label>
                 <span className="text-xs font-mono font-bold text-[#1B3D34]">{steelBase} kg/sq.ft</span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 Baseline structural steel for ground floor frame (IS 456 standard: 2.80 kg/sq.ft).
               </p>
               <div className="flex items-center gap-3 pt-2">
@@ -637,17 +637,17 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="5.0"
                   value={steelBase}
                   onChange={(e) => updateDraftParameter('config.rcc.steel_base_factor_kg_sqft', Number(e.target.value))}
-                  className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                  className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Cement Consumption */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                   <span>Overall Cement Factor</span>
                   <span className="text-slate-400 cursor-help" title="Total structural cement bags estimated per square foot of built-up area across all concrete works.">
                     <HelpCircle className="w-3.5 h-3.5" />
@@ -655,7 +655,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                 </label>
                 <span className="text-xs font-mono font-bold text-[#1B3D34]">{cementFactor} bags/sq.ft</span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 Total cement bags per sq.ft of BUA (CPWD works manual thumb rule: 0.40 bags/sq.ft).
               </p>
               <div className="flex items-center gap-3 pt-2">
@@ -675,7 +675,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="0.60"
                   value={cementFactor}
                   onChange={(e) => updateDraftParameter('config.material.cement_bags_per_sqft', Number(e.target.value))}
-                  className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                  className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                 />
               </div>
             </CardContent>
@@ -684,10 +684,10 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
         {/* Advanced Concrete Aggregates */}
         {adminViewMode === 'ADVANCED' && (
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-[#18211E] uppercase tracking-wider">
                   Upper Floor Steel Increments & Concrete Aggregates
                 </h3>
                 <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
@@ -706,7 +706,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="0.5"
                       value={steelFloorIncr}
                       onChange={(e) => updateDraftParameter('config.rcc.steel_additional_floor_factor', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
                     <span className="text-[10px] text-slate-400">kg/flr</span>
                   </div>
@@ -722,7 +722,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="0.85"
                       value={mSandFactor}
                       onChange={(e) => updateDraftParameter('config.material.m_sand_cft_per_sqft', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
                     <span className="text-[10px] text-slate-400">CFT/sqft</span>
                   </div>
@@ -738,7 +738,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="0.85"
                       value={pSandFactor}
                       onChange={(e) => updateDraftParameter('config.material.p_sand_cft_per_sqft', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
                     <span className="text-[10px] text-slate-400">CFT/sqft</span>
                   </div>
@@ -754,7 +754,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="1.8"
                       value={aggFactor}
                       onChange={(e) => updateDraftParameter('config.material.coarse_aggregate_cft_per_sqft', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
                     <span className="text-[10px] text-slate-400">CFT/sqft</span>
                   </div>
@@ -779,16 +779,16 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
     return (
       <div className="space-y-6">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-800 text-[11px] font-bold mb-1">
               <Paintbrush className="w-3.5 h-3.5 text-purple-700" />
               <span>Finishes: Paint & Plaster</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 font-heading">
+            <h2 className="text-xl font-bold text-[#18211E] font-heading">
               Paint & Finishes Parameters
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#707873] mt-0.5">
               Interior and exterior paint spread rates, putty coats, and cutting allowances.
             </p>
           </div>
@@ -810,10 +810,10 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
         {/* Core Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Interior Paint Coverage */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                   <span>Interior Paint Coverage</span>
                   <span className="text-slate-400 cursor-help" title="Square feet of wall covered per litre of interior paint for 2 coats.">
                     <HelpCircle className="w-3.5 h-3.5" />
@@ -823,7 +823,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   {interiorCoverage} sq.ft/L
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 Approved interior emulsion spread rate.
               </p>
               <div className="flex items-center gap-3 pt-2">
@@ -842,17 +842,17 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="80"
                   value={interiorCoverage}
                   onChange={(e) => updateDraftParameter('config.paint.interior_coverage_sqft_per_litre', Number(e.target.value))}
-                  className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                  className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Exterior Paint Coverage */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-[#18211E] flex items-center gap-1.5">
                   <span>Exterior Weatherproof Coverage</span>
                   <span className="text-slate-400 cursor-help" title="Square feet covered per litre of exterior weatherproof emulsion.">
                     <HelpCircle className="w-3.5 h-3.5" />
@@ -862,7 +862,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   {exteriorCoverage} sq.ft/L
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 Exterior acrylic weatherproof paint (Standard: 60 sq.ft/L).
               </p>
               <div className="flex items-center gap-3 pt-2">
@@ -881,7 +881,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   max="90"
                   value={exteriorCoverage}
                   onChange={(e) => updateDraftParameter('config.paint.exterior_coverage_sqft_per_litre', Number(e.target.value))}
-                  className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                  className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                 />
               </div>
             </CardContent>
@@ -890,10 +890,10 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
         {/* Advanced Coats and Wastage */}
         {adminViewMode === 'ADVANCED' && (
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-[#18211E] uppercase tracking-wider">
                   Putty Consumption & Number of Coats
                 </h3>
                 <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
@@ -912,9 +912,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="1.0"
                       value={puttyConsumption}
                       onChange={(e) => updateDraftParameter('config.paint.putty_kg_per_sqft', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
-                    <span className="text-xs text-slate-500">kg/sqft</span>
+                    <span className="text-xs text-[#707873]">kg/sqft</span>
                   </div>
                 </div>
 
@@ -923,7 +923,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                   <select
                     value={paintCoats}
                     onChange={(e) => updateDraftParameter('config.paint.interior_coats', Number(e.target.value))}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg bg-white"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg bg-white"
                   >
                     <option value="1">1 Coat (Primer/Touch-up)</option>
                     <option value="2">2 Coats (Standard Finish)</option>
@@ -940,9 +940,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                       max="20"
                       value={paintWastage}
                       onChange={(e) => updateDraftParameter('config.wastage.paint', Number(e.target.value))}
-                      className="w-full px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg"
+                      className="w-full px-3 py-1.5 text-xs font-bold border border-[#E5E7EB] rounded-lg"
                     />
-                    <span className="text-xs text-slate-500">%</span>
+                    <span className="text-xs text-[#707873]">%</span>
                   </div>
                 </div>
               </div>
@@ -967,16 +967,16 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
     return (
       <div className="space-y-6">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold mb-1">
               <Percent className="w-3.5 h-3.5 text-emerald-700" />
               <span>Pricing: Commercial & Tax</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 font-heading">
+            <h2 className="text-xl font-bold text-[#18211E] font-heading">
               Commercial Margins & Tax Configuration
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#707873] mt-0.5">
               Contractor execution margins, professional design fees, contingency reserves, and GST tax rules.
             </p>
           </div>
@@ -995,7 +995,7 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Contractor Margin */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1005,11 +1005,11 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                     onChange={(e) => updateDraftParameter('config.commercial.margin_enabled', e.target.checked)}
                     className="rounded text-[#1B3D34] accent-[#1B3D34]"
                   />
-                  <label className="text-xs font-bold text-slate-900">Contractor Execution Margin</label>
+                  <label className="text-xs font-bold text-[#18211E]">Contractor Execution Margin</label>
                 </div>
                 <span className="text-xs font-mono font-bold text-[#1B3D34]">{marginPct}%</span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 General contractor overhead and execution margin applied on net cost.
               </p>
               <div className="flex items-center gap-3 pt-1">
@@ -1031,16 +1031,16 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                     disabled={!marginEnabled}
                     value={marginPct}
                     onChange={(e) => updateDraftParameter('config.commercial.contractor_margin', Number(e.target.value) / 100)}
-                    className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                    className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                   />
-                  <span className="text-xs text-slate-500">%</span>
+                  <span className="text-xs text-[#707873]">%</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Works Contract GST */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1050,11 +1050,11 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                     onChange={(e) => updateDraftParameter('config.commercial.gst_enabled', e.target.checked)}
                     className="rounded text-[#1B3D34] accent-[#1B3D34]"
                   />
-                  <label className="text-xs font-bold text-slate-900">Works Contract GST</label>
+                  <label className="text-xs font-bold text-[#18211E]">Works Contract GST</label>
                 </div>
                 <span className="text-xs font-mono font-bold text-[#1B3D34]">{gstPct}%</span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#707873]">
                 Government Works Contract GST (statutory rate: 18%).
               </p>
               <div className="flex items-center gap-3 pt-1">
@@ -1076,9 +1076,9 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
                     disabled={!gstEnabled}
                     value={gstPct}
                     onChange={(e) => updateDraftParameter('config.commercial.gst_rate', Number(e.target.value))}
-                    className="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-right"
+                    className="w-16 px-2 py-1 text-xs font-bold border border-[#E5E7EB] rounded-lg text-right"
                   />
-                  <span className="text-xs text-slate-500">%</span>
+                  <span className="text-xs text-[#707873]">%</span>
                 </div>
               </div>
             </CardContent>
@@ -1093,22 +1093,22 @@ export const TradeSections: React.FC<TradeSectionProps> = ({ sectionId }) => {
   // ────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 font-heading capitalize">
+          <h2 className="text-xl font-bold text-[#18211E] font-heading capitalize">
             {sectionId.replace(/-/g, ' ')}
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Client-friendly construction settings and rates.
           </p>
         </div>
-        <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
+        <span className="text-xs font-bold text-[#707873] bg-slate-100 px-3 py-1.5 rounded-xl">
           Active Configuration
         </span>
       </div>
 
-      <Card className="border border-slate-200 bg-white">
-        <CardContent className="p-5 space-y-3 text-xs text-slate-600">
+      <Card className="border border-[#E5E7EB] bg-white">
+        <CardContent className="p-5 space-y-3 text-xs text-[#707873]">
           <p>
             All assumptions and benchmarks in this trade are resolved dynamically through the single source of truth configuration resolver.
           </p>

@@ -178,3 +178,95 @@ export const itemFadeUpVariant: Variants = {
     },
   },
 };
+
+/**
+ * Architectural Staggered Text Container
+ */
+export const staggerTextContainerVariant: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.06,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+/**
+ * Editorial Headline Text Line / Word Reveal
+ * Small translation (8px) with natural architectural deceleration.
+ */
+export const fadeUpTextVariant: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: MOTION_DURATIONS.dialog,
+      ease: MOTION_EASINGS.natural,
+    },
+  },
+};
+
+/**
+ * Mask-based architectural image reveal
+ * Smoothly unmasks photographic assets from bottom-to-top with zero layout shift.
+ */
+export const maskImageRevealVariant: Variants = {
+  hidden: {
+    clipPath: 'inset(100% 0% 0% 0%)',
+    opacity: 0.85,
+    scale: 1.04,
+  },
+  visible: {
+    clipPath: 'inset(0% 0% 0% 0%)',
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.65,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+/**
+ * Architectural Card Interactive Hover
+ */
+export const cardHoverVariant: Variants = {
+  initial: { y: 0, boxShadow: '0 1px 3px 0 rgba(27, 61, 52, 0.06)' },
+  hover: {
+    y: -2,
+    boxShadow: '0 8px 20px -2px rgba(27, 61, 52, 0.08)',
+    transition: { duration: 0.2, ease: MOTION_EASINGS.natural },
+  },
+  tap: {
+    scale: 0.985,
+    transition: { duration: 0.1, ease: MOTION_EASINGS.natural },
+  },
+};
+
+/**
+ * Tactile Button Feedback
+ */
+export const buttonTapVariant: Variants = {
+  tap: {
+    scale: 0.985,
+    transition: { duration: 0.1, ease: MOTION_EASINGS.natural },
+  },
+};
+
+/**
+ * Subtle architectural scale & settle
+ */
+export const scaleSettleVariant: Variants = {
+  hidden: { opacity: 0, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: MOTION_DURATIONS.dialog,
+      ease: MOTION_EASINGS.natural,
+    },
+  },
+};

@@ -160,22 +160,22 @@ export const FormulaLibrarySection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── TOP HEADER ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold mb-1">
             <Calculator className="w-3.5 h-3.5 text-emerald-700" />
             <span>Calculation Engine: Formula Library V2</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 font-heading">
+          <h2 className="text-xl font-bold text-[#18211E] font-heading">
             Residential Construction Formula Library
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Transparent, human-readable calculation methodologies powering Hutty's canonical quantities and BOQ.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1.5">
+          <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-[#E5E7EB] flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>{CANONICAL_FORMULA_LIBRARY.length} Standard Formulas</span>
           </span>
@@ -183,7 +183,7 @@ export const FormulaLibrarySection: React.FC = () => {
       </div>
 
       {/* ── FILTER & SEARCH BAR ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-xs">
         {/* Domain Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
           {domains.map((d) => (
@@ -194,7 +194,7 @@ export const FormulaLibrarySection: React.FC = () => {
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedDomain === d.id
                   ? 'bg-[#1B3D34] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 text-[#707873] hover:bg-slate-200'
               }`}
             >
               {d.label}
@@ -210,7 +210,7 @@ export const FormulaLibrarySection: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search formula, output, trade..."
-            className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
+            className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] focus:bg-white"
           />
         </div>
       </div>
@@ -218,7 +218,7 @@ export const FormulaLibrarySection: React.FC = () => {
       {/* ── FORMULA CARDS GRID ── */}
       <div className="grid grid-cols-1 gap-4">
         {filteredFormulas.map((f) => (
-          <Card key={f.id} className="border border-slate-200 bg-white rounded-2xl hover:border-slate-300 transition-all shadow-2xs">
+          <Card key={f.id} className="border border-[#E5E7EB] bg-white rounded-2xl hover:border-[#CBD5CB] transition-all shadow-2xs">
             <CardContent className="p-5 space-y-4">
               {/* Header row */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
@@ -227,8 +227,8 @@ export const FormulaLibrarySection: React.FC = () => {
                     {f.domain}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 text-sm font-heading">{f.name}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">{f.purpose}</p>
+                    <h3 className="font-bold text-[#18211E] text-sm font-heading">{f.name}</h3>
+                    <p className="text-xs text-[#707873] mt-0.5">{f.purpose}</p>
                   </div>
                 </div>
 
@@ -236,7 +236,7 @@ export const FormulaLibrarySection: React.FC = () => {
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
                     {f.methodType}
                   </span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-[#707873]">
                     {f.version}
                   </span>
                 </div>
@@ -245,17 +245,17 @@ export const FormulaLibrarySection: React.FC = () => {
               {/* What is it & How is it calculated */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-50/70 p-3.5 rounded-xl border border-slate-100">
                 <div>
-                  <span className="font-bold text-slate-500 uppercase text-[10px] block mb-0.5">What is it?</span>
-                  <p className="text-slate-800 leading-relaxed">{f.whatIsIt}</p>
+                  <span className="font-bold text-[#707873] uppercase text-[10px] block mb-0.5">What is it?</span>
+                  <p className="text-[#18211E] leading-relaxed">{f.whatIsIt}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500 uppercase text-[10px] block mb-0.5">Current Calculation Method</span>
+                  <span className="font-bold text-[#707873] uppercase text-[10px] block mb-0.5">Current Calculation Method</span>
                   <p className="text-[#1B3D34] font-semibold leading-relaxed">{f.currentMethod}</p>
                 </div>
               </div>
 
               {/* Visual Formula Block Preview (Section 4) */}
-              <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
+              <div className="bg-white p-3.5 rounded-xl border border-[#E5E7EB] space-y-2">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Formula Flow:
                 </span>
@@ -270,7 +270,7 @@ export const FormulaLibrarySection: React.FC = () => {
                         [ {block.right} ]
                       </span>
                       {block.condition && (
-                        <span className="text-[10px] text-slate-500 font-normal italic px-1">
+                        <span className="text-[10px] text-[#707873] font-normal italic px-1">
                           ({block.condition})
                         </span>
                       )}
@@ -286,7 +286,7 @@ export const FormulaLibrarySection: React.FC = () => {
               {/* Inputs, Output & Impacts */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
                 <div>
-                  <span className="font-bold text-slate-500 uppercase text-[10px] block mb-1">Inputs</span>
+                  <span className="font-bold text-[#707873] uppercase text-[10px] block mb-1">Inputs</span>
                   <div className="flex flex-wrap gap-1">
                     {f.inputs.map((inp, idx) => (
                       <span key={idx} className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px]">
@@ -297,14 +297,14 @@ export const FormulaLibrarySection: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="font-bold text-slate-500 uppercase text-[10px] block mb-1">Output</span>
+                  <span className="font-bold text-[#707873] uppercase text-[10px] block mb-1">Output</span>
                   <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold text-xs inline-flex items-center gap-1">
                     {f.output} ({f.unit})
                   </span>
                 </div>
 
                 <div>
-                  <span className="font-bold text-slate-500 uppercase text-[10px] block mb-1">Affects</span>
+                  <span className="font-bold text-[#707873] uppercase text-[10px] block mb-1">Affects</span>
                   <div className="flex flex-wrap gap-1">
                     {f.affects.slice(0, 3).map((aff, idx) => (
                       <span key={idx} className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-medium">
@@ -330,7 +330,7 @@ export const FormulaLibrarySection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleOpenBuilder(f)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5E7EB] bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
                   >
                     <Edit3 className="w-3.5 h-3.5 text-blue-600" />
                     <span>Edit Formula</span>
@@ -353,14 +353,14 @@ export const FormulaLibrarySection: React.FC = () => {
       {/* ── VISUAL FORMULA BUILDER MODAL (Section 4) ── */}
       {isBuilderOpen && builderFormula && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-3xl max-w-2xl w-full border border-[#E5E7EB] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div>
                 <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-md bg-blue-100 text-blue-900 text-[10px] font-bold">
                   {builderFormula.domain} DOMAIN
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mt-1">
+                <h3 className="text-base font-bold text-[#18211E] mt-1">
                   Formula Builder: {builderFormula.name}
                 </h3>
               </div>
@@ -480,7 +480,7 @@ export const FormulaLibrarySection: React.FC = () => {
               <button
                 type="button"
                 onClick={handleValidateFormula}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-[#E5E7EB] bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
               >
                 Validate Formula
               </button>
@@ -489,7 +489,7 @@ export const FormulaLibrarySection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsBuilderOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-[#707873] hover:bg-slate-200 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -59,7 +59,7 @@ export const ConsultationCategoriesGrid: React.FC<ConsultationCategoriesGridProp
             className={`self-start md:self-auto text-xs font-bold px-4 py-2 rounded-xl border transition-all cursor-pointer ${
               activeCategory === 'ALL'
                 ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                : 'bg-white text-[#1B3D34] border-[#E3E8E2] hover:bg-[#F8F8F6]'
+                : 'bg-white text-[#1B3D34] border-[#E5E7EB] hover:bg-[#F8F8F6]'
             }`}
           >
             View All Categories
@@ -82,7 +82,7 @@ export const ConsultationCategoriesGrid: React.FC<ConsultationCategoriesGridProp
                 className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between group ${
                   isSelected
                     ? 'bg-white border-[#1B3D34] shadow-md ring-1 ring-[#1B3D34]'
-                    : 'bg-white border-[#E3E8E2] hover:border-[#1B3D34]/60 hover:shadow-sm'
+                    : 'bg-white border-[#E5E7EB] hover:border-[#1B3D34]/60 hover:shadow-sm'
                 }`}
               >
                 <div className="space-y-4">
@@ -108,7 +108,7 @@ export const ConsultationCategoriesGrid: React.FC<ConsultationCategoriesGridProp
                   </div>
 
                   {/* Concise Description from Developer Brief */}
-                  <p className="text-xs text-[#4B5563] leading-relaxed">
+                  <p className="text-xs text-[#707873] leading-relaxed">
                     {detail.description}
                   </p>
 
@@ -138,7 +138,7 @@ export const ConsultationCategoriesGrid: React.FC<ConsultationCategoriesGridProp
                 </div>
 
                 {/* Bottom CTA */}
-                <div className="pt-4 mt-4 border-t border-[#E3E8E2] flex items-center justify-between text-xs font-bold text-[#1B3D34]">
+                <div className="pt-4 mt-4 border-t border-[#E5E7EB] flex items-center justify-between text-xs font-bold text-[#1B3D34]">
                   <span>Explore Experts &rarr;</span>
                   <span className="text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
                     Verified

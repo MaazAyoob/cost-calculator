@@ -216,7 +216,7 @@ export const DashboardPage: React.FC = () => {
               <h1 className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading">
                 Your Home Construction Estimate
               </h1>
-              <p className="text-xs text-[#52605B]">
+              <p className="text-xs text-[#707873]">
                 Based on your plot, floor plan, and selected material standards.
               </p>
             </div>
@@ -364,7 +364,7 @@ export const DashboardPage: React.FC = () => {
                 <h2 className="text-base font-bold text-[#1B3D34] font-heading">
                   Cost Breakdown in 4 Familiar Groups
                 </h2>
-                <p className="text-xs text-[#52605B]">
+                <p className="text-xs text-[#707873]">
                   Click any category to inspect itemized costs and trade schedules.
                 </p>
               </div>
@@ -388,7 +388,7 @@ export const DashboardPage: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-[#1B3D34]">Materials</h3>
-                      <p className="text-[11px] text-[#52605B]">
+                      <p className="text-[11px] text-[#707873]">
                         Steel, cement, concrete, blocks, tiles, doors, windows, and fittings
                       </p>
                     </div>
@@ -398,9 +398,9 @@ export const DashboardPage: React.FC = () => {
                       {formatCurrency(materialsCost)}
                     </span>
                     {expandedSections.materials ? (
-                      <ChevronUp className="w-4 h-4 text-[#52605B]" />
+                      <ChevronUp className="w-4 h-4 text-[#707873]" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-[#52605B]" />
+                      <ChevronDown className="w-4 h-4 text-[#707873]" />
                     )}
                   </div>
                 </button>
@@ -410,7 +410,7 @@ export const DashboardPage: React.FC = () => {
                     <div className="divide-y divide-[#E3E8E2]/60">
                       {materialHeads.map((item) => (
                         <div key={item.label} className="py-2 flex items-center justify-between">
-                          <span className="text-[#52605B]">{item.label}</span>
+                          <span className="text-[#707873]">{item.label}</span>
                           <span className="font-mono font-semibold text-[#1B3D34]">
                             {formatCurrency(item.amount)}
                           </span>
@@ -434,7 +434,7 @@ export const DashboardPage: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-[#1B3D34]">Labour and Work Costs</h3>
-                      <p className="text-[11px] text-[#52605B]">
+                      <p className="text-[11px] text-[#707873]">
                         Civil framing works, masonry, bar bending, plastering, plumbing &amp; electrical labor
                       </p>
                     </div>
@@ -444,9 +444,9 @@ export const DashboardPage: React.FC = () => {
                       {formatCurrency(labourCost)}
                     </span>
                     {expandedSections.labour ? (
-                      <ChevronUp className="w-4 h-4 text-[#52605B]" />
+                      <ChevronUp className="w-4 h-4 text-[#707873]" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-[#52605B]" />
+                      <ChevronDown className="w-4 h-4 text-[#707873]" />
                     )}
                   </div>
                 </button>
@@ -454,13 +454,13 @@ export const DashboardPage: React.FC = () => {
                 {expandedSections.labour && (
                   <div className="p-4 sm:p-5 pt-0 border-t border-[#E3E8E2] bg-[#FAFBF9] space-y-2 text-xs">
                     <div className="py-2 flex items-center justify-between">
-                      <span className="text-[#52605B]">Civil Structure &amp; Masonry Execution</span>
+                      <span className="text-[#707873]">Civil Structure &amp; Masonry Execution</span>
                       <span className="font-mono font-semibold text-[#1B3D34]">
                         {formatCurrency(Math.round(labourCost * 0.65))}
                       </span>
                     </div>
                     <div className="py-2 flex items-center justify-between border-t border-[#E3E8E2]/60">
-                      <span className="text-[#52605B]">Finishing Trades (Plumbing, Electrical, Tile Laying, Painting)</span>
+                      <span className="text-[#707873]">Finishing Trades (Plumbing, Electrical, Tile Laying, Painting)</span>
                       <span className="font-mono font-semibold text-[#1B3D34]">
                         {formatCurrency(Math.round(labourCost * 0.35))}
                       </span>
@@ -482,7 +482,7 @@ export const DashboardPage: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-[#1B3D34]">Other Costs</h3>
-                      <p className="text-[11px] text-[#52605B]">
+                      <p className="text-[11px] text-[#707873]">
                         Contractor site supervision, contingency buffer, and architectural/engineering fees
                       </p>
                     </div>
@@ -492,9 +492,9 @@ export const DashboardPage: React.FC = () => {
                       {formatCurrency(otherCost)}
                     </span>
                     {expandedSections.other ? (
-                      <ChevronUp className="w-4 h-4 text-[#52605B]" />
+                      <ChevronUp className="w-4 h-4 text-[#707873]" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-[#52605B]" />
+                      <ChevronDown className="w-4 h-4 text-[#707873]" />
                     )}
                   </div>
                 </button>
@@ -502,19 +502,19 @@ export const DashboardPage: React.FC = () => {
                 {expandedSections.other && (
                   <div className="p-4 sm:p-5 pt-0 border-t border-[#E3E8E2] bg-[#FAFBF9] space-y-2 text-xs">
                     <div className="py-2 flex items-center justify-between">
-                      <span className="text-[#52605B]">Site Supervision &amp; Execution Overheads</span>
+                      <span className="text-[#707873]">Site Supervision &amp; Execution Overheads</span>
                       <span className="font-mono font-semibold text-[#1B3D34]">
                         {formatCurrency(budget.contractorMargin || Math.round(otherCost * 0.55))}
                       </span>
                     </div>
                     <div className="py-2 flex items-center justify-between border-t border-[#E3E8E2]/60">
-                      <span className="text-[#52605B]">Contingency Buffer (Unforeseen Site Expenses)</span>
+                      <span className="text-[#707873]">Contingency Buffer (Unforeseen Site Expenses)</span>
                       <span className="font-mono font-semibold text-[#1B3D34]">
                         {formatCurrency(budget.contingency || Math.round(otherCost * 0.25))}
                       </span>
                     </div>
                     <div className="py-2 flex items-center justify-between border-t border-[#E3E8E2]/60">
-                      <span className="text-[#52605B]">Architectural, Structural &amp; MEP Design Fees</span>
+                      <span className="text-[#707873]">Architectural, Structural &amp; MEP Design Fees</span>
                       <span className="font-mono font-semibold text-[#1B3D34]">
                         {formatCurrency(budget.professionalFees || Math.round(otherCost * 0.20))}
                       </span>
@@ -536,7 +536,7 @@ export const DashboardPage: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-[#1B3D34]">Taxes &amp; Commercial Charges</h3>
-                      <p className="text-[11px] text-[#52605B]">
+                      <p className="text-[11px] text-[#707873]">
                         Statutory Goods &amp; Services Tax (GST) applicable on works contract
                       </p>
                     </div>
@@ -546,9 +546,9 @@ export const DashboardPage: React.FC = () => {
                       {formatCurrency(taxesCost)}
                     </span>
                     {expandedSections.taxes ? (
-                      <ChevronUp className="w-4 h-4 text-[#52605B]" />
+                      <ChevronUp className="w-4 h-4 text-[#707873]" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-[#52605B]" />
+                      <ChevronDown className="w-4 h-4 text-[#707873]" />
                     )}
                   </div>
                 </button>
@@ -556,7 +556,7 @@ export const DashboardPage: React.FC = () => {
                 {expandedSections.taxes && (
                   <div className="p-4 sm:p-5 pt-0 border-t border-[#E3E8E2] bg-[#FAFBF9] space-y-2 text-xs">
                     <div className="py-2 flex items-center justify-between">
-                      <span className="text-[#52605B]">Statutory GST (Works Contract / Materials)</span>
+                      <span className="text-[#707873]">Statutory GST (Works Contract / Materials)</span>
                       <span className="font-mono font-semibold text-[#1B3D34]">
                         {formatCurrency(taxesCost)}
                       </span>
@@ -571,7 +571,7 @@ export const DashboardPage: React.FC = () => {
                   <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] block">
                     TOTAL ESTIMATED COST
                   </span>
-                  <span className="text-[11px] text-[#52605B] block mt-0.5">
+                  <span className="text-[11px] text-[#707873] block mt-0.5">
                     Materials + Labour + Other Costs + Statutory GST
                   </span>
                 </div>

@@ -39,10 +39,10 @@ export const Stage6FinishesMaterials: React.FC = () => {
           <Layers className="w-3 h-3 text-[#F28C28]" />
           <span>STAGE 6 OF 8 &bull; FINISHES &amp; MATERIALS</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           Choose how you'd like your home to look.
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Select your flooring, doors, windows, and fixtures. Brand choices are optional and update finish rates while keeping physical quantities unchanged.
         </p>
       </div>

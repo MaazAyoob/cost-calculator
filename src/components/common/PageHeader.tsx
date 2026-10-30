@@ -18,21 +18,21 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('pb-6 mb-6 border-b border-slate-200/80', className)}>
+    <div className={cn('pb-6 mb-6 border-b border-[#E5E7EB]', className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="flex items-center space-x-2 text-xs text-slate-500 mb-2">
+        <nav className="flex items-center space-x-2 text-xs text-[#707873] mb-2">
           {breadcrumbs.map((crumb, idx) => (
             <React.Fragment key={idx}>
-              {idx > 0 && <span className="text-slate-300">/</span>}
+              {idx > 0 && <span className="text-[#CBD5CB]">/</span>}
               {crumb.href && idx < breadcrumbs.length - 1 ? (
                 <Link
                   to={crumb.href}
-                  className="hover:text-blue-600 hover:underline cursor-pointer transition-colors font-medium"
+                  className="hover:text-[#1B3D34] hover:underline cursor-pointer transition-colors font-medium"
                 >
                   {crumb.label}
                 </Link>
               ) : (
-                <span className={cn(idx === breadcrumbs.length - 1 ? 'font-medium text-slate-800' : 'hover:text-slate-700 cursor-pointer')}>
+                <span className={cn(idx === breadcrumbs.length - 1 ? 'font-medium text-[#18211E]' : 'hover:text-[#18211E] cursor-pointer')}>
                   {crumb.label}
                 </span>
               )}
@@ -43,8 +43,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{title}</h1>
-          {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#18211E] font-heading tracking-tight">{title}</h1>
+          {subtitle && <p className="text-sm text-[#707873] mt-1 leading-relaxed">{subtitle}</p>}
         </div>
         {actions && <div className="flex items-center gap-3">{actions}</div>}
       </div>

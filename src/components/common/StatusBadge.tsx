@@ -12,19 +12,19 @@ export interface StatusBadgeProps {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, dot = true, className }) => {
   const styles = {
-    success: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
-    warning: 'bg-amber-50 text-amber-700 border-amber-200/80',
+    success: 'bg-[#E7F3E8] text-[#1B3D34] border-[#C5E3C8]',
+    warning: 'bg-[rgba(242,140,40,0.12)] text-[#D9771A] border-[rgba(242,140,40,0.30)]',
     danger: 'bg-rose-50 text-rose-700 border-rose-200/80',
     info: 'bg-blue-50 text-blue-700 border-blue-200/80',
-    neutral: 'bg-slate-100 text-slate-700 border-slate-200',
+    neutral: 'bg-[#F8F8F6] text-[#707873] border-[#E5E7EB]',
   };
 
   const dotColors = {
-    success: 'bg-emerald-500',
-    warning: 'bg-amber-500',
+    success: 'bg-[#1B3D34]',
+    warning: 'bg-[#F28C28]',
     danger: 'bg-rose-500',
     info: 'bg-blue-500',
-    neutral: 'bg-slate-400',
+    neutral: 'bg-[#9CA3AF]',
   };
 
   return (

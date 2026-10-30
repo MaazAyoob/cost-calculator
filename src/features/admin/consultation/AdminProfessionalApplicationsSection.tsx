@@ -204,17 +204,17 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-[#1B3D34]/10 text-[#1B3D34] flex items-center justify-center font-bold">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold font-heading text-slate-900">
+              <h2 className="text-lg font-bold font-heading text-[#18211E]">
                 Professional Verification Queue
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#707873]">
                 Review applicant qualifications, licenses and portfolios before approving public consultant directory listings
               </p>
             </div>
@@ -253,7 +253,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
       )}
 
       {/* ── FILTER & STATUS PILLS ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 shadow-xs space-y-4">
         {/* Status tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
           {(['ALL', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'MORE_INFO_REQUIRED', 'REJECTED'] as const).map(
@@ -268,7 +268,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                   className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
                     isActive
                       ? 'bg-[#1B3D34] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      : 'bg-slate-100 text-[#707873] hover:bg-slate-200'
                   }`}
                 >
                   <span>
@@ -306,7 +306,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name, email, phone, city or COA/licence number..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
             />
           </div>
 
@@ -314,7 +314,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+              className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
             >
               <option value="ALL">All Categories</option>
               {CANONICAL_CONSULTATION_CATEGORIES.map((cat) => (
@@ -328,14 +328,14 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
       </div>
 
       {/* ── APPLICATIONS TABLE / LIST ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs overflow-hidden">
         {filteredApplications.length === 0 ? (
           <div className="p-12 text-center space-y-3">
             <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
               <UserCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-slate-800">No applications match criteria</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <h3 className="text-sm font-bold text-[#18211E]">No applications match criteria</h3>
+            <p className="text-xs text-[#707873] max-w-md mx-auto">
               {searchQuery || statusFilter !== 'ALL' || categoryFilter !== 'ALL'
                 ? 'Try resetting the filters or clearing the search query.'
                 : 'No professional applications have been submitted yet.'}
@@ -344,7 +344,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+              <thead className="bg-slate-50 border-b border-[#E5E7EB] text-[#707873] font-bold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="p-3.5">Applicant Details</th>
                   <th className="p-3.5">Category & Experience</th>
@@ -359,8 +359,8 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                   <tr key={app.id} className="hover:bg-slate-50/70 transition-colors">
                     {/* Applicant */}
                     <td className="p-3.5">
-                      <div className="font-bold text-slate-900 text-sm">{app.fullName}</div>
-                      <div className="flex items-center gap-2 text-slate-500 font-mono text-[11px] mt-0.5">
+                      <div className="font-bold text-[#18211E] text-sm">{app.fullName}</div>
+                      <div className="flex items-center gap-2 text-[#707873] font-mono text-[11px] mt-0.5">
                         <span className="flex items-center gap-1">
                           <Mail className="w-3 h-3 text-slate-400" />
                           {app.email}
@@ -392,21 +392,21 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                           </span>
                         ))}
                       </div>
-                      <div className="text-slate-500 text-[11px] font-mono">
+                      <div className="text-[#707873] text-[11px] font-mono">
                         {app.experienceYears} Years Experience
                       </div>
                     </td>
 
                     {/* Qualifications & License */}
                     <td className="p-3.5 space-y-0.5">
-                      <div className="font-medium text-slate-800 flex items-center gap-1">
+                      <div className="font-medium text-[#18211E] flex items-center gap-1">
                         <GraduationCap className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span className="truncate max-w-[200px]" title={app.qualifications}>
                           {app.qualifications}
                         </span>
                       </div>
                       {app.licenseNumber ? (
-                        <div className="text-[11px] font-mono text-slate-600 flex items-center gap-1">
+                        <div className="text-[11px] font-mono text-[#707873] flex items-center gap-1">
                           <Award className="w-3 h-3 text-amber-600 shrink-0" />
                           <span>Reg: {app.licenseNumber}</span>
                         </div>
@@ -419,7 +419,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                     <td className="p-3.5">{getStatusBadge(app.status)}</td>
 
                     {/* Date */}
-                    <td className="p-3.5 font-mono text-slate-500 text-[11px]">
+                    <td className="p-3.5 font-mono text-[#707873] text-[11px]">
                       {new Date(app.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
@@ -449,17 +449,17 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
       {/* ── INSPECT & REVIEW MODAL ── */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl my-6 text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl my-6 text-left">
             {/* Modal Header */}
             <div className="p-6 border-b border-slate-100 flex items-start justify-between bg-slate-50/50 rounded-t-3xl">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-900 font-heading">
+                  <h3 className="text-base font-bold text-[#18211E] font-heading">
                     {selectedApp.fullName}
                   </h3>
                   {getStatusBadge(selectedApp.status)}
                 </div>
-                <div className="text-xs text-slate-500 font-mono">
+                <div className="text-xs text-[#707873] font-mono">
                   Application ID: {selectedApp.id} • Submitted on{' '}
                   {new Date(selectedApp.createdAt).toLocaleString('en-IN')}
                 </div>
@@ -484,8 +484,8 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               {/* Dossier Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Contact & Location */}
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+                <div className="p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] space-y-2">
+                  <div className="font-bold text-[#18211E] flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
                     <UserCheck className="w-3.5 h-3.5 text-[#1B3D34]" />
                     <span>Contact & Location</span>
                   </div>
@@ -507,15 +507,15 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                 </div>
 
                 {/* Professional Qualifications */}
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+                <div className="p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] space-y-2">
+                  <div className="font-bold text-[#18211E] flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
                     <GraduationCap className="w-3.5 h-3.5 text-[#1B3D34]" />
                     <span>Qualifications & Credentials</span>
                   </div>
                   <div className="space-y-1 text-[11px]">
                     <div>
                       <span className="text-slate-400 font-mono">Degrees:</span>{' '}
-                      <span className="font-semibold text-slate-900">{selectedApp.qualifications}</span>
+                      <span className="font-semibold text-[#18211E]">{selectedApp.qualifications}</span>
                     </div>
                     <div>
                       <span className="text-slate-400 font-mono">Experience:</span>{' '}
@@ -523,7 +523,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-slate-400 font-mono">License/COA:</span>{' '}
-                      <span className="font-mono font-bold text-slate-900">
+                      <span className="font-mono font-bold text-[#18211E]">
                         {selectedApp.licenseNumber || 'None / Not Applicable'}
                       </span>
                     </div>
@@ -532,8 +532,8 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               </div>
 
               {/* Categories & Expertise */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <div className="font-bold text-slate-900 text-[11px] uppercase tracking-wider">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] space-y-2">
+                <div className="font-bold text-[#18211E] text-[11px] uppercase tracking-wider">
                   Requested Consultation Categories & Specializations
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -549,7 +549,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                 {(selectedApp.specializations || selectedApp.expertise) && (selectedApp.specializations || selectedApp.expertise)!.length > 0 && (
                   <div className="pt-1">
                     <span className="text-slate-400 font-mono">Specializations: </span>
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-[#18211E]">
                       {(selectedApp.specializations || selectedApp.expertise)!.join(', ')}
                     </span>
                   </div>
@@ -557,8 +557,8 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               </div>
 
               {/* Bio & Background */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                <div className="font-bold text-slate-900 text-[11px] uppercase tracking-wider">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] space-y-1">
+                <div className="font-bold text-[#18211E] text-[11px] uppercase tracking-wider">
                   Professional Summary & Practice Background
                 </div>
                 <p className="text-slate-700 leading-relaxed whitespace-pre-line text-xs">
@@ -567,8 +567,8 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               </div>
 
               {/* Portfolio & Documents */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                <div className="font-bold text-slate-900 text-[11px] uppercase tracking-wider flex items-center justify-between">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] space-y-3">
+                <div className="font-bold text-[#18211E] text-[11px] uppercase tracking-wider flex items-center justify-between">
                   <span>Portfolio & Verification Documents</span>
                   <span className="text-[10px] text-slate-400 font-normal">Private Admin Access Only</span>
                 </div>
@@ -579,7 +579,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                       href={selectedApp.portfolioUrl || selectedApp.portfolioLinks![0]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-3 bg-white rounded-xl border border-slate-200 hover:border-[#1B3D34] flex items-center justify-between text-blue-700 hover:text-blue-900 font-medium transition-colors"
+                      className="p-3 bg-white rounded-xl border border-[#E5E7EB] hover:border-[#1B3D34] flex items-center justify-between text-blue-700 hover:text-blue-900 font-medium transition-colors"
                     >
                       <div className="flex items-center gap-2 truncate">
                         <ExternalLink className="w-4 h-4 shrink-0" />
@@ -588,25 +588,25 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                       <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                     </a>
                   ) : (
-                    <div className="p-3 bg-white rounded-xl border border-dashed border-slate-200 text-slate-400">
+                    <div className="p-3 bg-white rounded-xl border border-dashed border-[#E5E7EB] text-slate-400">
                       No external portfolio link provided
                     </div>
                   )}
 
                   {selectedApp.documentsUrl ? (
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                    <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] flex items-center justify-between">
                       <div className="flex items-center gap-2 truncate">
                         <FileText className="w-4 h-4 text-emerald-700 shrink-0" />
                         <span className="font-mono text-slate-700 truncate">
                           {selectedApp.documentsUrl}
                         </span>
                       </div>
-                      <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-mono">
+                      <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-[#707873] font-mono">
                         Protected
                       </span>
                     </div>
                   ) : (
-                    <div className="p-3 bg-white rounded-xl border border-dashed border-slate-200 text-slate-400">
+                    <div className="p-3 bg-white rounded-xl border border-dashed border-[#E5E7EB] text-slate-400">
                       No standalone file attachment
                     </div>
                   )}
@@ -614,14 +614,14 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               </div>
 
               {/* Consultation Setup */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <div className="font-bold text-slate-900 text-[11px] uppercase tracking-wider">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-[#E5E7EB] space-y-2">
+                <div className="font-bold text-[#18211E] text-[11px] uppercase tracking-wider">
                   Proposed Offerings & Consultation Modes
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-slate-400 font-mono">Proposed Fee:</span>{' '}
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-[#18211E]">
                       ₹{(selectedApp.proposedFeeINR || selectedApp.proposedFee || 1499).toLocaleString('en-IN')}
                     </span>
                     <span className="text-slate-400 ml-1 text-[11px]">
@@ -630,7 +630,7 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-slate-400 font-mono">Supported Modes:</span>{' '}
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-[#18211E]">
                       {selectedApp.consultationModes?.join(', ') || 'Online / Phone'}
                     </span>
                   </div>
@@ -659,22 +659,22 @@ export const AdminProfessionalApplicationsSection: React.FC = () => {
               )}
 
               {/* Reviewer Action Form */}
-              <div className="pt-2 border-t border-slate-200 space-y-3">
-                <label className="block font-bold text-slate-900 text-xs">
+              <div className="pt-2 border-t border-[#E5E7EB] space-y-3">
+                <label className="block font-bold text-[#18211E] text-xs">
                   Reviewer Notes & Feedback:
                 </label>
                 <textarea
                   value={reviewerNotes}
                   onChange={(e) => setReviewerNotes(e.target.value)}
                   placeholder="Enter internal review notes or reasons (required if rejecting or requesting information)..."
-                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                  className="w-full p-3 bg-white border border-[#E5E7EB] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   rows={3}
                 />
               </div>
             </div>
 
             {/* Modal Actions Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 rounded-b-3xl">
+            <div className="p-4 bg-slate-50 border-t border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3 rounded-b-3xl">
               <div className="flex items-center gap-2">
                 <button
                   type="button"

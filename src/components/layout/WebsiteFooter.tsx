@@ -35,7 +35,7 @@ export const WebsiteFooter: React.FC = () => {
                 </div>
               </div>
               <p className="text-sm text-white/70 max-w-sm font-normal leading-relaxed">
-                Plan your home with clarity. Architectural planning, materials needed, and detailed construction cost estimates.
+                Build your home with clarity. Architectural planning, materials needed, and itemized construction cost intelligence before you build.
               </p>
               <div className="text-xs text-white/40 pt-1">
                 Bangalore &bull; Mysore &bull; Karnataka

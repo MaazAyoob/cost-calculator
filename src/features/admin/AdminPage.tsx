@@ -419,13 +419,13 @@ export const AdminPage: React.FC = () => {
   if (!isAuthenticated && !token) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-8 bg-white border border-slate-200 rounded-3xl shadow-xl space-y-6 text-center">
+        <div className="max-w-md w-full p-8 bg-white border border-[#E5E7EB] rounded-3xl shadow-xl space-y-6 text-center">
           <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200">
             <Lock className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 font-heading">Hutty Admin Access</h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <h2 className="text-2xl font-bold text-[#18211E] font-heading">Hutty Admin Access</h2>
+            <p className="text-xs text-[#707873] mt-1">
               Authorized personnel only. Authenticate to manage Rate Master, Auto Price Updates, and System Analytics.
             </p>
           </div>
@@ -446,7 +446,7 @@ export const AdminPage: React.FC = () => {
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="admin@hutty.in"
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
+                className="w-full px-3 py-2 text-sm border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
                 required
               />
             </div>
@@ -458,7 +458,7 @@ export const AdminPage: React.FC = () => {
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
+                className="w-full px-3 py-2 text-sm border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
                 required
               />
             </div>
@@ -481,7 +481,7 @@ export const AdminPage: React.FC = () => {
               Demo Auto-Sign In (Admin@123456)
             </button>
             <div className="text-[11px] text-slate-400">
-              Preview access: <span className="font-mono text-slate-600">Admin@123456</span>
+              Preview access: <span className="font-mono text-[#707873]">Admin@123456</span>
             </div>
           </div>
         </div>
@@ -499,7 +499,7 @@ export const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] pb-24 font-sans">
       {/* ── TOP ARCHITECTURAL OPERATIONS COMMAND BAR ── */}
-      <header className="bg-white border-b border-[#E3E8E2] sticky top-0 z-40 shadow-xs">
+      <header className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40 shadow-xs">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-3.5">
             <div className="w-9 h-9 rounded-xl bg-[#1B3D34] text-white flex items-center justify-center font-mono font-bold text-xs tracking-wider shrink-0 shadow-xs">
@@ -514,11 +514,11 @@ export const AdminPage: React.FC = () => {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Engine Live · IS-456:2000
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-slate-100 text-slate-700 border border-slate-200">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-slate-100 text-slate-700 border border-[#E5E7EB]">
                   v2.6 PROD
                 </span>
               </div>
-              <h1 className="text-sm sm:text-base font-bold font-heading text-slate-900 tracking-tight mt-0.5">
+              <h1 className="text-sm sm:text-base font-bold font-heading text-[#18211E] tracking-tight mt-0.5">
                 Authoritative Construction Operations Console
               </h1>
             </div>
@@ -526,14 +526,14 @@ export const AdminPage: React.FC = () => {
 
           <div className="flex items-center gap-3 self-end md:self-auto flex-wrap">
             {/* Basic / Advanced Mode Switcher */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs">
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-[#E5E7EB] text-xs">
               <button
                 type="button"
                 onClick={() => setAdminViewMode('BASIC')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   adminViewMode === 'BASIC'
                     ? 'bg-white text-[#1B3D34] shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-[#707873] hover:text-[#18211E]'
                 }`}
               >
                 Basic
@@ -544,7 +544,7 @@ export const AdminPage: React.FC = () => {
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   adminViewMode === 'ADVANCED'
                     ? 'bg-[#1B3D34] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-[#707873] hover:text-[#18211E]'
                 }`}
               >
                 Advanced Ops
@@ -552,9 +552,9 @@ export const AdminPage: React.FC = () => {
             </div>
 
             {/* Quick Admin Profile */}
-            <div className="text-right hidden sm:block border-l border-slate-200 pl-3">
-              <span className="text-xs font-bold text-slate-800 block">{adminUser?.name || 'Hutty System Admin'}</span>
-              <span className="text-[11px] font-mono text-slate-500 block">{adminUser?.email || 'admin@hutty.in'}</span>
+            <div className="text-right hidden sm:block border-l border-[#E5E7EB] pl-3">
+              <span className="text-xs font-bold text-[#18211E] block">{adminUser?.name || 'Hutty System Admin'}</span>
+              <span className="text-[11px] font-mono text-[#707873] block">{adminUser?.email || 'admin@hutty.in'}</span>
             </div>
 
             <button
@@ -737,10 +737,10 @@ export const AdminPage: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Find parameter (e.g. Wall Height, Margin)..."
-                    className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                    className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                   />
                   {searchResults.length > 0 && (
-                    <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
+                    <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
                       {searchResults.map((r, i) => (
                         <button
                           key={i}
@@ -751,8 +751,8 @@ export const AdminPage: React.FC = () => {
                           }}
                           className="w-full px-3 py-2 text-left hover:bg-emerald-50/50 flex items-center justify-between group cursor-pointer"
                         >
-                          <span className="font-semibold text-slate-800 group-hover:text-[#1B3D34]">{r.label}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">
+                          <span className="font-semibold text-[#18211E] group-hover:text-[#1B3D34]">{r.label}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-[#707873] font-mono">
                             {r.group}
                           </span>
                         </button>
@@ -772,7 +772,7 @@ export const AdminPage: React.FC = () => {
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                           isGroupActive
                             ? 'bg-[#1B3D34] text-white shadow-xs'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white text-slate-700 border border-[#E5E7EB] hover:bg-slate-50'
                         }`}
                       >
                         <span className="font-mono text-[10px] text-[#F28C28]">{g.num}</span>
@@ -794,7 +794,7 @@ export const AdminPage: React.FC = () => {
                           className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${
                             isSecActive
                               ? 'bg-[#1B3D34]/10 text-[#1B3D34] border border-[#1B3D34]/30'
-                              : 'bg-white text-slate-600 border border-slate-200'
+                              : 'bg-white text-[#707873] border border-[#E5E7EB]'
                           }`}
                         >
                           <span>{sec.label}</span>
@@ -822,10 +822,10 @@ export const AdminPage: React.FC = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Fast parameter jump..."
-                      className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] shadow-2xs"
+                      className="w-full pl-8 pr-3 py-2 bg-white border border-[#E5E7EB] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#1B3D34] shadow-2xs"
                     />
                     {searchResults.length > 0 && (
-                      <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
+                      <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#E5E7EB] rounded-xl shadow-lg z-30 max-h-56 overflow-y-auto divide-y divide-slate-100 text-xs">
                         {searchResults.map((r, i) => (
                           <button
                             key={i}
@@ -836,8 +836,8 @@ export const AdminPage: React.FC = () => {
                             }}
                             className="w-full px-3 py-2 text-left hover:bg-emerald-50/50 flex items-center justify-between group cursor-pointer"
                           >
-                            <span className="font-semibold text-slate-800 group-hover:text-[#1B3D34]">{r.label}</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">
+                            <span className="font-semibold text-[#18211E] group-hover:text-[#1B3D34]">{r.label}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-[#707873] font-mono">
                               {r.group}
                             </span>
                           </button>
@@ -847,7 +847,7 @@ export const AdminPage: React.FC = () => {
                   </div>
 
                   {/* Operational Groups Accordion / Tree */}
-                  <div className="bg-white rounded-2xl border border-slate-200 shadow-xs divide-y divide-slate-100 overflow-hidden text-xs">
+                  <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs divide-y divide-slate-100 overflow-hidden text-xs">
                     {navGroups.map((group) => {
                       const isGroupActive = group.sections.some((s) => s.id === activeTab);
                       return (
@@ -889,7 +889,7 @@ export const AdminPage: React.FC = () => {
                                   className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all text-left cursor-pointer ${
                                     isSecActive
                                       ? 'bg-[#1B3D34] text-white font-bold shadow-xs'
-                                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                                      : 'text-[#707873] hover:text-[#18211E] hover:bg-slate-50'
                                   }`}
                                 >
                                   <span className="truncate">{sec.label}</span>
@@ -1027,15 +1027,15 @@ export const AdminPage: React.FC = () => {
                   {(activeTab === 'rates' || activeTab === 'material-prices') && (
                     <div className="space-y-6">
                       {/* Header Action Strip */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-xs">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h2 className="text-base font-bold text-slate-900 font-heading">Authoritative Construction Rate Master</h2>
-                            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">
+                            <h2 className="text-base font-bold text-[#18211E] font-heading">Authoritative Construction Rate Master</h2>
+                            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-100 text-[#707873] font-bold">
                               {rates.length} ITEMS
                             </span>
                           </div>
-                          <p className="text-xs text-slate-500 mt-0.5">
+                          <p className="text-xs text-[#707873] mt-0.5">
                             Directly controls monetary unit rates across Bengaluru &amp; Mysuru projects. Quantities remain invariant.
                           </p>
                         </div>
@@ -1053,7 +1053,7 @@ export const AdminPage: React.FC = () => {
                       </div>
 
                       {/* Filters Bar */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 bg-white p-3 rounded-2xl border border-slate-200 text-xs shadow-2xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 bg-white p-3 rounded-2xl border border-[#E5E7EB] text-xs shadow-2xs">
                         <div className="relative">
                           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                           <input
@@ -1061,14 +1061,14 @@ export const AdminPage: React.FC = () => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search rate name or ID..."
-                            className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
+                            className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1B3D34]"
                           />
                         </div>
 
                         <select
                           value={selectedCategory}
                           onChange={(e) => setSelectedCategory(e.target.value as any)}
-                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none cursor-pointer"
                         >
                           {categories.map((c) => (
                             <option key={c} value={c}>{c === 'ALL' ? 'All Categories' : c}</option>
@@ -1078,7 +1078,7 @@ export const AdminPage: React.FC = () => {
                         <select
                           value={selectedPackage}
                           onChange={(e) => setSelectedPackage(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none cursor-pointer"
                         >
                           <option value="ALL">All Packages (Global)</option>
                           <option value="STANDARD">Standard</option>
@@ -1089,7 +1089,7 @@ export const AdminPage: React.FC = () => {
                         <select
                           value={selectedLocation}
                           onChange={(e) => setSelectedLocation(e.target.value)}
-                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer"
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none cursor-pointer"
                         >
                           <option value="ALL">All Locations</option>
                           <option value="Bangalore">Bengaluru</option>
@@ -1099,7 +1099,7 @@ export const AdminPage: React.FC = () => {
                         <select
                           value={overrideFilter}
                           onChange={(e) => setOverrideFilter(e.target.value as any)}
-                          className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer font-bold"
+                          className="w-full px-3 py-1.5 bg-slate-50 border border-[#E5E7EB] rounded-xl focus:outline-none cursor-pointer font-bold"
                         >
                           <option value="ALL">All Rates ({rates.length})</option>
                           <option value="OVERRIDDEN">Active Overrides Only ({overrides.length})</option>
@@ -1108,11 +1108,11 @@ export const AdminPage: React.FC = () => {
                       </div>
 
                       {/* ── DESKTOP/TABLET AUTHORITATIVE LEDGER TABLE (hidden on mobile) ── */}
-                      <div className="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                      <div className="hidden md:block bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-xs">
                         <div className="overflow-x-auto">
                           <table className="w-full text-left text-xs border-collapse">
                             <thead>
-                              <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                              <tr className="bg-slate-50 border-b border-[#E5E7EB] font-bold text-[#707873]">
                                 <th className="p-3.5">Category</th>
                                 <th className="p-3.5">Item &amp; ID</th>
                                 <th className="p-3.5">Package</th>
@@ -1145,21 +1145,21 @@ export const AdminPage: React.FC = () => {
 
                                   return (
                                     <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
-                                      <td className="p-3.5 font-bold text-slate-800">
-                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px]">
+                                      <td className="p-3.5 font-bold text-[#18211E]">
+                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-[#E5E7EB] text-[11px]">
                                           {item.category}
                                         </span>
                                       </td>
                                       <td className="p-3.5">
-                                        <div className="font-bold text-slate-900">{item.name}</div>
+                                        <div className="font-bold text-[#18211E]">{item.name}</div>
                                         <div className="font-mono text-[10px] text-slate-400">{item.id}</div>
                                       </td>
-                                      <td className="p-3.5 font-mono text-[11px] text-slate-600">{item.packageTier}</td>
-                                      <td className="p-3.5 font-mono text-[11px] text-slate-600">{item.location}</td>
-                                      <td className="p-3.5 text-right font-mono text-slate-500">
+                                      <td className="p-3.5 font-mono text-[11px] text-[#707873]">{item.packageTier}</td>
+                                      <td className="p-3.5 font-mono text-[11px] text-[#707873]">{item.location}</td>
+                                      <td className="p-3.5 text-right font-mono text-[#707873]">
                                         ₹{item.rate.toLocaleString('en-IN')} <span className="text-[10px]">{item.unit}</span>
                                       </td>
-                                      <td className="p-3.5 text-right font-mono font-bold text-slate-900">
+                                      <td className="p-3.5 text-right font-mono font-bold text-[#18211E]">
                                         <span className={isOverridden ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : ''}>
                                           ₹{effRate.toLocaleString('en-IN')}
                                         </span>
@@ -1170,7 +1170,7 @@ export const AdminPage: React.FC = () => {
                                             Overridden
                                           </span>
                                         ) : (
-                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-slate-500 bg-slate-100">
+                                          <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-[#707873] bg-slate-100">
                                             Default
                                           </span>
                                         )}
@@ -1206,7 +1206,7 @@ export const AdminPage: React.FC = () => {
                       {/* ── MOBILE STACKED RECORD CARD LEDGER (visible on phone screens) ── */}
                       <div className="block md:hidden space-y-3">
                         {filteredRates.length === 0 ? (
-                          <div className="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-200">
+                          <div className="p-8 text-center text-slate-400 bg-white rounded-2xl border border-[#E5E7EB]">
                             No rates found matching current search and filters.
                           </div>
                         ) : (
@@ -1223,13 +1223,13 @@ export const AdminPage: React.FC = () => {
                               : item.rate;
 
                             return (
-                              <div key={item.id} className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                              <div key={item.id} className="p-4 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3">
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
-                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-[#E5E7EB]">
                                       {item.category}
                                     </span>
-                                    <h4 className="text-sm font-bold text-slate-900 mt-1">{item.name}</h4>
+                                    <h4 className="text-sm font-bold text-[#18211E] mt-1">{item.name}</h4>
                                     <span className="text-[10px] font-mono text-slate-400">{item.id}</span>
                                   </div>
                                   {isOverridden ? (
@@ -1237,7 +1237,7 @@ export const AdminPage: React.FC = () => {
                                       Overridden
                                     </span>
                                   ) : (
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-slate-500 bg-slate-100">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-normal text-[#707873] bg-slate-100">
                                       Default
                                     </span>
                                   )}
@@ -1245,17 +1245,17 @@ export const AdminPage: React.FC = () => {
                                 <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
                                   <div>
                                     <span className="text-[10px] text-slate-400 block">Baseline</span>
-                                    <span className="font-mono text-slate-600">₹{item.rate.toLocaleString('en-IN')} /{item.unit}</span>
+                                    <span className="font-mono text-[#707873]">₹{item.rate.toLocaleString('en-IN')} /{item.unit}</span>
                                   </div>
                                   <div>
                                     <span className="text-[10px] text-slate-400 block">Effective</span>
-                                    <span className={`font-mono font-bold ${isOverridden ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                    <span className={`font-mono font-bold ${isOverridden ? 'text-emerald-700' : 'text-[#18211E]'}`}>
                                       ₹{effRate.toLocaleString('en-IN')} /{item.unit}
                                     </span>
                                   </div>
                                 </div>
                                 <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
-                                  <span className="font-mono text-slate-500">{item.packageTier} · {item.location}</span>
+                                  <span className="font-mono text-[#707873]">{item.packageTier} · {item.location}</span>
                                   <div className="flex items-center gap-1.5">
                                     <button
                                       type="button"
@@ -1287,14 +1287,14 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'price-update' && (
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-base font-bold text-slate-900 font-heading">Automatic Market Price Proposals</h2>
+                  <h2 className="text-base font-bold text-[#18211E] font-heading">Automatic Market Price Proposals</h2>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-[#707873] mt-0.5">
                   Fetch live market benchmark quotes from providers. Proposals require explicit admin approval before modifying live calculator rates.
                 </p>
               </div>
@@ -1318,7 +1318,7 @@ export const AdminPage: React.FC = () => {
                 <select
                   value={selectedProviderId}
                   onChange={(e) => setSelectedProviderId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 cursor-pointer focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl font-bold text-[#18211E] cursor-pointer focus:outline-none"
                 >
                   {priceProviders.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -1338,7 +1338,7 @@ export const AdminPage: React.FC = () => {
                 <select
                   value={selectedPriceCategory}
                   onChange={(e) => setSelectedPriceCategory(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 cursor-pointer focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-[#18211E] cursor-pointer focus:outline-none"
                 >
                   {categories.map((c) => (
                     <option key={c} value={c}>{c === 'ALL' ? 'All Categories (All Rates)' : c}</option>
@@ -1351,7 +1351,7 @@ export const AdminPage: React.FC = () => {
                 <select
                   value={proposalFilterStatus}
                   onChange={(e) => setProposalFilterStatus(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 cursor-pointer focus:outline-none font-bold"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl text-[#18211E] cursor-pointer focus:outline-none font-bold"
                 >
                   <option value="ALL">All Proposals ({proposals.length})</option>
                   <option value="PENDING">Pending Review</option>
@@ -1375,7 +1375,7 @@ export const AdminPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedProposalIds([])}
-                  className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 rounded-xl cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-[#707873] hover:text-[#18211E] rounded-xl cursor-pointer"
                 >
                   Clear Selection
                 </button>
@@ -1390,16 +1390,16 @@ export const AdminPage: React.FC = () => {
           )}
 
           {/* Proposals Table */}
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                  <tr className="bg-slate-50 border-b border-[#E5E7EB] font-bold text-[#707873]">
                     <th className="p-3 text-center w-10">
                       <button
                         type="button"
                         onClick={handleSelectAllProposals}
-                        className="p-1 text-slate-500 hover:text-slate-900 cursor-pointer"
+                        className="p-1 text-[#707873] hover:text-[#18211E] cursor-pointer"
                       >
                         {selectedProposalIds.length > 0 ? <CheckSquare className="w-4 h-4 text-emerald-600" /> : <Square className="w-4 h-4" />}
                       </button>
@@ -1440,14 +1440,14 @@ export const AdminPage: React.FC = () => {
                               checked={isSelected}
                               disabled={isApproved || isRejected}
                               onChange={() => handleToggleSelectProposal(prop.id)}
-                              className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                              className="rounded border-[#CBD5CB] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                             />
                           </td>
                           <td className="p-3">
-                            <div className="font-bold text-slate-900">{prop.rateName}</div>
+                            <div className="font-bold text-[#18211E]">{prop.rateName}</div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[10px] font-mono text-slate-400">{prop.rateId}</span>
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-[#707873]">
                                 {prop.category}
                               </span>
                               {prop.isAiAssisted && (
@@ -1463,19 +1463,19 @@ export const AdminPage: React.FC = () => {
                               </div>
                             )}
                           </td>
-                          <td className="p-3 text-right font-mono text-slate-500">
+                          <td className="p-3 text-right font-mono text-[#707873]">
                             ₹{prop.currentRate.toLocaleString('en-IN')}
                             <span className="text-[10px] block">{prop.unit}</span>
                           </td>
-                          <td className="p-3 text-right font-mono font-bold text-slate-900">
+                          <td className="p-3 text-right font-mono font-bold text-[#18211E]">
                             ₹{prop.proposedRate.toLocaleString('en-IN')}
-                            <span className="text-[10px] text-slate-500 block">{prop.unit}</span>
+                            <span className="text-[10px] text-[#707873] block">{prop.unit}</span>
                           </td>
                           <td className="p-3 text-right font-mono font-bold">
                             <span
                               className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded ${
                                 prop.difference === 0
-                                  ? 'text-slate-600 bg-slate-100'
+                                  ? 'text-[#707873] bg-slate-100'
                                   : isPositive
                                   ? 'text-amber-800 bg-amber-50'
                                   : 'text-emerald-800 bg-emerald-50'
@@ -1497,7 +1497,7 @@ export const AdminPage: React.FC = () => {
                             </span>
                           </td>
                           <td className="p-3">
-                            <div className="font-semibold text-slate-800 truncate max-w-xs">{prop.source}</div>
+                            <div className="font-semibold text-[#18211E] truncate max-w-xs">{prop.source}</div>
                             {prop.sourceUrl && (
                               <a
                                 href={prop.sourceUrl}
@@ -1520,7 +1520,7 @@ export const AdminPage: React.FC = () => {
                                   : prop.status === 'NEEDS_REVIEW'
                                   ? 'bg-amber-100 text-amber-800 border border-amber-300'
                                   : prop.status === 'UNVERIFIED'
-                                  ? 'bg-slate-100 text-slate-600'
+                                  ? 'bg-slate-100 text-[#707873]'
                                   : 'bg-blue-100 text-blue-800 border border-blue-300'
                               }`}
                             >
@@ -1574,11 +1574,11 @@ export const AdminPage: React.FC = () => {
 
       {/* ── TAB 4: CALCULATOR CONFIG ── */}
       {activeTab === 'config' && (
-        <Card className="max-w-3xl mx-auto border-slate-200 rounded-3xl shadow-sm">
+        <Card className="max-w-3xl mx-auto border-[#E5E7EB] rounded-3xl shadow-sm">
           <CardContent className="p-8 space-y-6">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 font-heading">Calculator Coefficients &amp; Markups</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-lg font-bold text-[#18211E] font-heading">Calculator Coefficients &amp; Markups</h2>
+              <p className="text-xs text-[#707873]">
                 Modify global wastage allowances, contractor margins, and professional fee percentages.
               </p>
             </div>
@@ -1594,7 +1594,7 @@ export const AdminPage: React.FC = () => {
                     min="0"
                     max="40"
                     step="0.5"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                   />
                 </div>
                 <div>
@@ -1606,7 +1606,7 @@ export const AdminPage: React.FC = () => {
                     min="0"
                     max="20"
                     step="0.5"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                   />
                 </div>
                 <div>
@@ -1618,7 +1618,7 @@ export const AdminPage: React.FC = () => {
                     min="0"
                     max="20"
                     step="0.5"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                   />
                 </div>
                 <div>
@@ -1630,7 +1630,7 @@ export const AdminPage: React.FC = () => {
                     min="0"
                     max="28"
                     step="1"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                   />
                 </div>
               </div>
@@ -1642,7 +1642,7 @@ export const AdminPage: React.FC = () => {
                   value={configReason}
                   onChange={(e) => setConfigReason(e.target.value)}
                   placeholder="e.g., Q3 2026 contractor baseline rate review"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                   required
                 />
               </div>
@@ -1660,9 +1660,9 @@ export const AdminPage: React.FC = () => {
       {/* ── TAB 5: PACKAGE STANDARDS ── */}
       {activeTab === 'packages' && (
         <div className="space-y-6">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-            <h2 className="text-base font-bold text-slate-900">Hutty 3-Tier Construction Standards</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+          <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
+            <h2 className="text-base font-bold text-[#18211E]">Hutty 3-Tier Construction Standards</h2>
+            <p className="text-xs text-[#707873] mt-0.5">
               Standard, Premium, and Luxury baseline specification matrices for Karnataka urban residential construction.
             </p>
           </div>
@@ -1712,20 +1712,20 @@ export const AdminPage: React.FC = () => {
                 ],
               },
             ].map((p) => (
-              <div key={p.tier} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-xs">
+              <div key={p.tier} className="bg-white border border-[#E5E7EB] rounded-3xl p-6 space-y-4 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                     {p.tier}
                   </span>
-                  <span className="text-sm font-bold font-mono text-slate-800">{p.costPerSqFt}/sq.ft</span>
+                  <span className="text-sm font-bold font-mono text-[#18211E]">{p.costPerSqFt}/sq.ft</span>
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">{p.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{p.desc}</p>
+                  <h3 className="text-base font-bold text-[#18211E]">{p.title}</h3>
+                  <p className="text-xs text-[#707873] mt-1 leading-relaxed">{p.desc}</p>
                 </div>
                 <div className="border-t border-slate-100 pt-3 space-y-2">
                   <span className="text-[11px] font-bold text-slate-700 block">Baseline Takeoff Specs:</span>
-                  <ul className="space-y-1.5 text-xs text-slate-600">
+                  <ul className="space-y-1.5 text-xs text-[#707873]">
                     {p.specs.map((s, idx) => (
                       <li key={idx} className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
@@ -1744,11 +1744,11 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'analytics' && (
         <div className="space-y-6">
           {/* Header & Date Filter Bar */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
-                <h2 className="text-base font-bold text-slate-900 font-heading">Calculator Product Analytics</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-base font-bold text-[#18211E] font-heading">Calculator Product Analytics</h2>
+                <p className="text-xs text-[#707873]">
                   Aggregated, anonymous user funnel metrics, step timing, and package decisions.
                 </p>
               </div>
@@ -1767,7 +1767,7 @@ export const AdminPage: React.FC = () => {
 
             {/* Date Filters */}
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-[#E5E7EB]">
                 {[
                   { id: 'today', label: 'Today' },
                   { id: '7d', label: '7 Days' },
@@ -1780,7 +1780,7 @@ export const AdminPage: React.FC = () => {
                     type="button"
                     onClick={() => setAnalyticsFilter(f.id as any, customStart, customEnd)}
                     className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                      analyticsFilter === f.id ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      analyticsFilter === f.id ? 'bg-white text-[#18211E] shadow-xs' : 'text-[#707873] hover:text-[#18211E]'
                     }`}
                   >
                     {f.label}
@@ -1794,14 +1794,14 @@ export const AdminPage: React.FC = () => {
                     type="date"
                     value={customStart}
                     onChange={(e) => setCustomStart(e.target.value)}
-                    className="px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs"
+                    className="px-2 py-1 bg-white border border-[#E5E7EB] rounded-lg text-xs"
                   />
                   <span>to</span>
                   <input
                     type="date"
                     value={customEnd}
                     onChange={(e) => setCustomEnd(e.target.value)}
-                    className="px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs"
+                    className="px-2 py-1 bg-white border border-[#E5E7EB] rounded-lg text-xs"
                   />
                   <button
                     type="button"
@@ -1817,46 +1817,46 @@ export const AdminPage: React.FC = () => {
 
           {/* Overview KPI Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
+            <div className="p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-1">
               <span className="text-[11px] font-bold text-slate-400 uppercase">Calculator Sessions</span>
-              <div className="text-2xl font-extrabold font-mono text-slate-900">{analytics?.totalSessions || 0}</div>
-              <span className="text-[10px] text-slate-500">100% anonymous tracking</span>
+              <div className="text-2xl font-extrabold font-mono text-[#18211E]">{analytics?.totalSessions || 0}</div>
+              <span className="text-[10px] text-[#707873]">100% anonymous tracking</span>
             </div>
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
+            <div className="p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-1">
               <span className="text-[11px] font-bold text-slate-400 uppercase">Completion Rate</span>
               <div className="text-2xl font-extrabold font-mono text-emerald-700">{analytics?.completionRate || 0}%</div>
-              <span className="text-[10px] text-slate-500">{analytics?.abandonmentRate || 0}% abandonment</span>
+              <span className="text-[10px] text-[#707873]">{analytics?.abandonmentRate || 0}% abandonment</span>
             </div>
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
+            <div className="p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-1">
               <span className="text-[11px] font-bold text-slate-400 uppercase">Average Duration</span>
-              <div className="text-2xl font-extrabold font-mono text-slate-900">
+              <div className="text-2xl font-extrabold font-mono text-[#18211E]">
                 {Math.round((analytics?.avgDurationSec || 180) / 60)}m {((analytics?.avgDurationSec || 180) % 60)}s
               </div>
-              <span className="text-[10px] text-slate-500">per full calculator journey</span>
+              <span className="text-[10px] text-[#707873]">per full calculator journey</span>
             </div>
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-1">
+            <div className="p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-1">
               <span className="text-[11px] font-bold text-slate-400 uppercase">Top Abandonment Step</span>
               <div className="text-base font-bold text-amber-700 truncate">{analytics?.highestDropOffStep || 'Plot Dimensions'}</div>
-              <span className="text-[10px] text-slate-500">primary funnel drop point</span>
+              <span className="text-[10px] text-[#707873]">primary funnel drop point</span>
             </div>
           </div>
 
           {/* ── 14-STEP VISUAL FUNNEL ── */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-slate-900 font-heading">14-Step Calculator Progression Funnel</h3>
-                <p className="text-xs text-slate-500">Tracks user transition from initial onboarding to final calculation completion.</p>
+                <h3 className="text-base font-bold text-[#18211E] font-heading">14-Step Calculator Progression Funnel</h3>
+                <p className="text-xs text-[#707873]">Tracks user transition from initial onboarding to final calculation completion.</p>
               </div>
               <div className="flex items-center gap-1 text-xs">
-                <span className="text-slate-500">Sort table by:</span>
+                <span className="text-[#707873]">Sort table by:</span>
                 {(['dropOff', 'time', 'completion'] as const).map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => setStepSortBy(s)}
                     className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer ${
-                      stepSortBy === s ? 'bg-slate-200 text-slate-900' : 'text-slate-500 hover:text-slate-900'
+                      stepSortBy === s ? 'bg-slate-200 text-[#18211E]' : 'text-[#707873] hover:text-[#18211E]'
                     }`}
                   >
                     {s === 'dropOff' ? 'Highest Drop-off' : s === 'time' ? 'Longest Time' : 'Completion'}
@@ -1869,7 +1869,7 @@ export const AdminPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                  <tr className="bg-slate-50 border-b border-[#E5E7EB] text-[#707873] font-bold">
                     <th className="p-3">#</th>
                     <th className="p-3">Step Name</th>
                     <th className="p-3 text-right">Users Reached</th>
@@ -1882,7 +1882,7 @@ export const AdminPage: React.FC = () => {
                   {sortedFunnelSteps.map((step) => (
                     <tr key={step.name} className="hover:bg-slate-50/70 transition-colors">
                       <td className="p-3 font-mono text-slate-400">{step.stepIndex}</td>
-                      <td className="p-3 font-bold text-slate-900">{step.name}</td>
+                      <td className="p-3 font-bold text-[#18211E]">{step.name}</td>
                       <td className="p-3 text-right font-mono text-slate-700">{step.usersReached}</td>
                       <td className="p-3 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -1894,7 +1894,7 @@ export const AdminPage: React.FC = () => {
                       </td>
                       <td className="p-3 text-right">
                         <span className={`font-mono font-bold px-1.5 py-0.5 rounded ${
-                          step.dropOffPercent > 20 ? 'bg-red-50 text-red-700' : 'text-slate-500'
+                          step.dropOffPercent > 20 ? 'bg-red-50 text-red-700' : 'text-[#707873]'
                         }`}>
                           {step.dropOffPercent > 0 ? `-${step.dropOffPercent}%` : '0%'}
                         </span>
@@ -1910,8 +1910,8 @@ export const AdminPage: React.FC = () => {
           {/* Visual Activity & Distribution Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Activity Line Chart */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-              <h3 className="text-sm font-bold text-slate-900">Activity Over Time (Sessions &amp; Completions)</h3>
+            <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
+              <h3 className="text-sm font-bold text-[#18211E]">Activity Over Time (Sessions &amp; Completions)</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analytics?.activityTimeline || []}>
@@ -1927,8 +1927,8 @@ export const AdminPage: React.FC = () => {
             </div>
 
             {/* Estimated Cost Distribution Histogram */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-              <h3 className="text-sm font-bold text-slate-900">Project Cost Distribution</h3>
+            <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
+              <h3 className="text-sm font-bold text-[#18211E]">Project Cost Distribution</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analytics?.costDistribution || []}>
@@ -1945,7 +1945,7 @@ export const AdminPage: React.FC = () => {
 
           {/* Package & Location Breakdown */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-3">
+            <div className="p-5 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-3">
               <span className="text-xs font-bold text-slate-700 block">Package Selection Breakdown</span>
               <div className="space-y-2">
                 {[
@@ -1954,7 +1954,7 @@ export const AdminPage: React.FC = () => {
                   { name: 'Luxury', pct: analytics?.packagePercentages.LUXURY ?? 20, color: 'bg-amber-500' },
                 ].map((item) => (
                   <div key={item.name} className="space-y-1 text-xs">
-                    <div className="flex justify-between font-bold text-slate-800">
+                    <div className="flex justify-between font-bold text-[#18211E]">
                       <span>{item.name}</span>
                       <span className="font-mono">{item.pct}%</span>
                     </div>
@@ -1966,7 +1966,7 @@ export const AdminPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-2">
+            <div className="p-5 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-2">
               <span className="text-xs font-bold text-slate-700 block">Location Distribution</span>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between font-bold">
@@ -1980,18 +1980,18 @@ export const AdminPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-2">
+            <div className="p-5 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs space-y-2">
               <span className="text-xs font-bold text-slate-700 block">Device Distribution</span>
               <div className="flex items-center justify-around pt-2">
                 <div className="text-center">
-                  <Monitor className="w-6 h-6 text-slate-600 mx-auto" />
-                  <span className="text-xs font-bold text-slate-900 block mt-1">Desktop</span>
-                  <span className="text-[11px] font-mono text-slate-500">{analytics?.deviceDistribution.desktop || 32} sessions</span>
+                  <Monitor className="w-6 h-6 text-[#707873] mx-auto" />
+                  <span className="text-xs font-bold text-[#18211E] block mt-1">Desktop</span>
+                  <span className="text-[11px] font-mono text-[#707873]">{analytics?.deviceDistribution.desktop || 32} sessions</span>
                 </div>
                 <div className="text-center">
-                  <Smartphone className="w-6 h-6 text-slate-600 mx-auto" />
-                  <span className="text-xs font-bold text-slate-900 block mt-1">Mobile</span>
-                  <span className="text-[11px] font-mono text-slate-500">{analytics?.deviceDistribution.mobile || 13} sessions</span>
+                  <Smartphone className="w-6 h-6 text-[#707873] mx-auto" />
+                  <span className="text-xs font-bold text-[#18211E] block mt-1">Mobile</span>
+                  <span className="text-[11px] font-mono text-[#707873]">{analytics?.deviceDistribution.mobile || 13} sessions</span>
                 </div>
               </div>
             </div>
@@ -2002,18 +2002,18 @@ export const AdminPage: React.FC = () => {
       {/* ── TAB 7: AUDIT TRAIL ── */}
       {activeTab === 'audit' && (
         <div className="space-y-6">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-            <h2 className="text-base font-bold text-slate-900">Complete Rate Modification Audit Trail</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+          <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
+            <h2 className="text-base font-bold text-[#18211E]">Complete Rate Modification Audit Trail</h2>
+            <p className="text-xs text-[#707873] mt-0.5">
               Every manual override and approved automated price update is permanently recorded.
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                  <tr className="bg-slate-50 border-b border-[#E5E7EB] font-bold text-[#707873]">
                     <th className="p-3.5">Timestamp</th>
                     <th className="p-3.5">Action</th>
                     <th className="p-3.5">Item &amp; Category</th>
@@ -2033,7 +2033,7 @@ export const AdminPage: React.FC = () => {
                   ) : (
                     auditLogs.map((log) => (
                       <tr key={log.id} className="hover:bg-slate-50/60 transition-colors">
-                        <td className="p-3.5 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+                        <td className="p-3.5 font-mono text-[11px] text-[#707873] whitespace-nowrap">
                           {new Date(log.timestamp).toLocaleString()}
                         </td>
                         <td className="p-3.5 font-bold">
@@ -2052,17 +2052,17 @@ export const AdminPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="p-3.5">
-                          <div className="font-bold text-slate-900">{log.rateName}</div>
+                          <div className="font-bold text-[#18211E]">{log.rateName}</div>
                           <div className="font-mono text-[10px] text-slate-400">{log.rateId}</div>
                         </td>
                         <td className="p-3.5 text-right font-mono text-slate-400">
                           {log.oldValue !== null && log.oldValue !== undefined ? `₹${log.oldValue}` : '—'}
                         </td>
-                        <td className="p-3.5 text-right font-mono font-bold text-slate-900">
+                        <td className="p-3.5 text-right font-mono font-bold text-[#18211E]">
                           ₹{log.newValue}
                         </td>
-                        <td className="p-3.5 font-mono text-[11px] text-slate-600">{log.adminEmail}</td>
-                        <td className="p-3.5 text-slate-600 max-w-sm truncate" title={log.reason}>
+                        <td className="p-3.5 font-mono text-[11px] text-[#707873]">{log.adminEmail}</td>
+                        <td className="p-3.5 text-[#707873] max-w-sm truncate" title={log.reason}>
                           {log.reason}
                         </td>
                       </tr>
@@ -2079,15 +2079,15 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'account' && (
         <div className="space-y-6 max-w-4xl mx-auto">
           {/* Profile Card */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-bold text-lg">
                   {(adminProfile?.name || adminUser?.name || 'A').charAt(0)}
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">{adminProfile?.name || adminUser?.name || 'Hutty System Admin'}</h2>
-                  <span className="text-xs text-slate-500 font-mono">{adminProfile?.email || adminUser?.email || 'admin@hutty.in'}</span>
+                  <h2 className="text-base font-bold text-[#18211E]">{adminProfile?.name || adminUser?.name || 'Hutty System Admin'}</h2>
+                  <span className="text-xs text-[#707873] font-mono">{adminProfile?.email || adminUser?.email || 'admin@hutty.in'}</span>
                 </div>
               </div>
               <div className="text-right">
@@ -2111,10 +2111,10 @@ export const AdminPage: React.FC = () => {
           )}
 
           {/* Change Password Form */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <KeyRound className="w-4 h-4 text-[#1B3D34]" />
-              <h3 className="text-sm font-bold text-slate-900">Change Admin Password</h3>
+              <h3 className="text-sm font-bold text-[#18211E]">Change Admin Password</h3>
             </div>
 
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4 text-xs">
@@ -2125,7 +2125,7 @@ export const AdminPage: React.FC = () => {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter current password"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                   required
                 />
               </div>
@@ -2138,7 +2138,7 @@ export const AdminPage: React.FC = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Min 8 chars, mixed case, special"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                     required
                   />
                 </div>
@@ -2149,13 +2149,13 @@ export const AdminPage: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                     required
                   />
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500 space-y-1">
+              <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-[#707873] space-y-1">
                 <span className="font-bold text-slate-700 block">Security Policy:</span>
                 <p>• Minimum 8 characters with uppercase, lowercase, digit, and special symbol.</p>
                 <p>• Changing your password immediately invalidates all other active sessions.</p>
@@ -2170,10 +2170,10 @@ export const AdminPage: React.FC = () => {
           </div>
 
           {/* Change Email Form */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <UserCheck className="w-4 h-4 text-[#1B3D34]" />
-              <h3 className="text-sm font-bold text-slate-900">Change Admin Email</h3>
+              <h3 className="text-sm font-bold text-[#18211E]">Change Admin Email</h3>
             </div>
 
             <form onSubmit={handleEmailChangeSubmit} className="space-y-4 text-xs">
@@ -2184,7 +2184,7 @@ export const AdminPage: React.FC = () => {
                   value={emailCurrentPassword}
                   onChange={(e) => setEmailCurrentPassword(e.target.value)}
                   placeholder="Enter current password"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                   required
                 />
               </div>
@@ -2197,7 +2197,7 @@ export const AdminPage: React.FC = () => {
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="newadmin@hutty.in"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                     required
                   />
                 </div>
@@ -2208,7 +2208,7 @@ export const AdminPage: React.FC = () => {
                     value={confirmEmail}
                     onChange={(e) => setConfirmEmail(e.target.value)}
                     placeholder="newadmin@hutty.in"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm"
                     required
                   />
                 </div>
@@ -2223,11 +2223,11 @@ export const AdminPage: React.FC = () => {
           </div>
 
           {/* Active Sessions & Session Security */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#1B3D34]" />
-                <h3 className="text-sm font-bold text-slate-900">Active Admin Sessions</h3>
+                <h3 className="text-sm font-bold text-[#18211E]">Active Admin Sessions</h3>
               </div>
               <button
                 type="button"
@@ -2240,9 +2240,9 @@ export const AdminPage: React.FC = () => {
 
             <div className="space-y-2 text-xs">
               {adminSessions.map((s) => (
-                <div key={s.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div key={s.id} className="p-3 bg-slate-50 rounded-xl border border-[#E5E7EB] flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <div className="font-bold text-slate-900 flex items-center gap-2">
+                    <div className="font-bold text-[#18211E] flex items-center gap-2">
                       <span>{s.device}</span>
                       {s.isCurrent && (
                         <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-100 text-emerald-800 font-mono">
@@ -2250,7 +2250,7 @@ export const AdminPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-slate-500 font-mono">
+                    <div className="text-[11px] text-[#707873] font-mono">
                       {s.browser} · IP: {s.ipAddress}
                     </div>
                   </div>
@@ -2261,12 +2261,12 @@ export const AdminPage: React.FC = () => {
           </div>
 
           {/* Security Audit Events */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-slate-900">Security Audit Logs</h3>
+          <div className="bg-white p-6 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
+            <h3 className="text-sm font-bold text-[#18211E]">Security Audit Logs</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                  <tr className="bg-slate-50 border-b border-[#E5E7EB] text-[#707873] font-bold">
                     <th className="p-2.5">Timestamp</th>
                     <th className="p-2.5">Action</th>
                     <th className="p-2.5">User</th>
@@ -2278,12 +2278,12 @@ export const AdminPage: React.FC = () => {
                     <tr key={ev.id} className="hover:bg-slate-50">
                       <td className="p-2.5 font-mono text-[11px] text-slate-400">{new Date(ev.createdAt).toLocaleString()}</td>
                       <td className="p-2.5 font-bold">
-                        <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-800 font-mono">
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-[#18211E] font-mono">
                           {ev.action}
                         </span>
                       </td>
-                      <td className="p-2.5 font-mono text-slate-600">{ev.userEmail}</td>
-                      <td className="p-2.5 text-slate-500 max-w-xs truncate">
+                      <td className="p-2.5 font-mono text-[#707873]">{ev.userEmail}</td>
+                      <td className="p-2.5 text-[#707873] max-w-xs truncate">
                         {typeof ev.details === 'object' ? JSON.stringify(ev.details) : ev.details || '—'}
                       </td>
                     </tr>
@@ -2359,10 +2359,10 @@ export const AdminPage: React.FC = () => {
       {/* ── MODAL: EDIT RATE OVERRIDE ── */}
       {editingItem && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full space-y-4 shadow-xl text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 max-w-md w-full space-y-4 shadow-xl text-left">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-900 font-heading">Set Rate Override</h3>
+                <h3 className="text-sm font-bold text-[#18211E] font-heading">Set Rate Override</h3>
                 <span className="text-[11px] font-mono text-slate-400">{editingItem.id}</span>
               </div>
               <button onClick={() => setEditingItem(null)} className="p-1 text-slate-400 hover:text-slate-700">
@@ -2373,7 +2373,7 @@ export const AdminPage: React.FC = () => {
             <form onSubmit={handleSaveEditOverride} className="space-y-4 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Item Name</label>
-                <div className="p-2.5 bg-slate-50 rounded-xl text-slate-800 font-medium">{editingItem.name}</div>
+                <div className="p-2.5 bg-slate-50 rounded-xl text-[#18211E] font-medium">{editingItem.name}</div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -2382,7 +2382,7 @@ export const AdminPage: React.FC = () => {
                   <select
                     value={editPackage}
                     onChange={(e) => setEditPackage(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl"
                   >
                     <option value="ALL">ALL (Global)</option>
                     <option value="STANDARD">Standard</option>
@@ -2395,7 +2395,7 @@ export const AdminPage: React.FC = () => {
                   <select
                     value={editLocation}
                     onChange={(e) => setEditLocation(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E5E7EB] rounded-xl"
                   >
                     <option value="ALL">ALL Locations</option>
                     <option value="Bangalore">Bengaluru</option>
@@ -2414,7 +2414,7 @@ export const AdminPage: React.FC = () => {
                   onChange={(e) => setEditRate(parseFloat(e.target.value) || 0)}
                   min="0"
                   step="any"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm font-bold"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm font-bold"
                   required
                 />
                 <span className="text-[10px] text-slate-400 block mt-1">Baseline Rate: ₹{editingItem.rate}</span>
@@ -2427,7 +2427,7 @@ export const AdminPage: React.FC = () => {
                   value={editReason}
                   onChange={(e) => setEditReason(e.target.value)}
                   placeholder="e.g., Q3 supplier price adjustment"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                   required
                 />
               </div>
@@ -2436,7 +2436,7 @@ export const AdminPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingItem(null)}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-[#707873] hover:bg-slate-100 rounded-xl"
                 >
                   Cancel
                 </button>
@@ -2452,10 +2452,10 @@ export const AdminPage: React.FC = () => {
       {/* ── MODAL: EDIT PROPOSAL BEFORE APPROVING ── */}
       {editingProposal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full space-y-4 shadow-xl text-left">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 max-w-md w-full space-y-4 shadow-xl text-left">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-900 font-heading">Edit Proposal Before Approving</h3>
+                <h3 className="text-sm font-bold text-[#18211E] font-heading">Edit Proposal Before Approving</h3>
                 <span className="text-[11px] font-mono text-slate-400">{editingProposal.rateId}</span>
               </div>
               <button onClick={() => setEditingProposal(null)} className="p-1 text-slate-400 hover:text-slate-700">
@@ -2472,7 +2472,7 @@ export const AdminPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Current Rate</label>
-                  <div className="p-2.5 bg-slate-50 rounded-xl font-mono text-slate-500">
+                  <div className="p-2.5 bg-slate-50 rounded-xl font-mono text-[#707873]">
                     ₹{editingProposal.currentRate} {editingProposal.unit}
                   </div>
                 </div>
@@ -2494,7 +2494,7 @@ export const AdminPage: React.FC = () => {
                   onChange={(e) => setCustomProposedRate(parseFloat(e.target.value) || 0)}
                   min="0"
                   step="any"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-sm font-bold text-emerald-800"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl font-mono text-sm font-bold text-emerald-800"
                   required
                 />
               </div>
@@ -2506,7 +2506,7 @@ export const AdminPage: React.FC = () => {
                   value={customProposalNotes}
                   onChange={(e) => setCustomProposalNotes(e.target.value)}
                   placeholder="e.g., Negotiated supplier quote with Bengaluru depot"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl"
                 />
               </div>
 
@@ -2514,7 +2514,7 @@ export const AdminPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingProposal(null)}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-[#707873] hover:bg-slate-100 rounded-xl"
                 >
                   Cancel
                 </button>

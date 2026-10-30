@@ -53,13 +53,13 @@ export const SimulationImpactTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* ── HEADER & ACTIONS ── */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#18211E] font-heading flex items-center gap-2">
             <Activity className="w-5 h-5 text-[#1B3D34]" />
             Simulation & Pre-Publish Impact Analysis
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#707873] mt-0.5">
             Evaluate exact physical quantity, BOQ, and budget ramifications across the calculation engine before activating configuration.
           </p>
         </div>
@@ -100,15 +100,15 @@ export const SimulationImpactTab: React.FC = () => {
 
       {/* ── EMPTY STATE / PROMPT TO MODIFY ── */}
       {changedCount === 0 && !simulationReport && (
-        <Card className="border border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border border-dashed border-[#CBD5CB] bg-slate-50/50">
           <CardContent className="p-12 text-center space-y-3">
-            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto border border-slate-200 text-slate-400">
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto border border-[#E5E7EB] text-slate-400">
               <Sparkles className="w-6 h-6 text-[#F28C28]" />
             </div>
-            <h3 className="text-base font-bold text-slate-800 font-heading">
+            <h3 className="text-base font-bold text-[#18211E] font-heading">
               No Draft Parameters Modified
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <p className="text-xs text-[#707873] max-w-md mx-auto">
               Go to <strong>Construction Parameters</strong> or any trade tab (Structure, Masonry, Paint, etc.) to modify values.
               Then return here to simulate side-by-side impact before publishing.
             </p>
@@ -137,17 +137,17 @@ export const SimulationImpactTab: React.FC = () => {
           {/* Top Summary KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Total Cost Active vs Draft */}
-            <Card className="border border-slate-200 bg-white">
+            <Card className="border border-[#E5E7EB] bg-white">
               <CardContent className="p-4 space-y-1">
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Active Production Cost</span>
-                <span className="text-lg font-bold font-mono text-slate-900 block">
+                <span className="text-lg font-bold font-mono text-[#18211E] block">
                   {formatCurrency(simulationReport.totalCost.oldCost)}
                 </span>
                 <span className="text-[11px] text-slate-400">Base v2.0-ACTIVE</span>
               </CardContent>
             </Card>
 
-            <Card className="border border-slate-200 bg-white">
+            <Card className="border border-[#E5E7EB] bg-white">
               <CardContent className="p-4 space-y-1">
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Simulated Draft Cost</span>
                 <span className="text-lg font-bold font-mono text-[#1B3D34] block">
@@ -157,7 +157,7 @@ export const SimulationImpactTab: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="border border-slate-200 bg-white">
+            <Card className="border border-[#E5E7EB] bg-white">
               <CardContent className="p-4 space-y-1">
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Cost Shift (Delta)</span>
                 <div className="flex items-center gap-1.5">
@@ -173,17 +173,17 @@ export const SimulationImpactTab: React.FC = () => {
                     {formatCurrency(simulationReport.totalCost.delta)}
                   </span>
                 </div>
-                <span className="text-[11px] font-mono text-slate-500">
+                <span className="text-[11px] font-mono text-[#707873]">
                   {simulationReport.totalCost.percentChange >= 0 ? '+' : ''}
                   {simulationReport.totalCost.percentChange}% variance
                 </span>
               </CardContent>
             </Card>
 
-            <Card className="border border-slate-200 bg-white">
+            <Card className="border border-[#E5E7EB] bg-white">
               <CardContent className="p-4 space-y-1">
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Affected BOQ Lines</span>
-                <span className="text-lg font-bold font-mono text-slate-800 block">
+                <span className="text-lg font-bold font-mono text-[#18211E] block">
                   {simulationReport.affectedBOQLines.length} items
                 </span>
                 <span className="text-[11px] text-slate-400">
@@ -194,17 +194,17 @@ export const SimulationImpactTab: React.FC = () => {
           </div>
 
           {/* Key Physical Metric Deltas */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-4">
-              <h3 className="text-sm font-bold text-slate-900 font-heading">
+              <h3 className="text-sm font-bold text-[#18211E] font-heading">
                 Physical Quantity Impact Analysis
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {simulationReport.keyMetrics.map((m) => (
-                  <div key={m.metricKey} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <span className="text-[11px] font-bold text-slate-500 block truncate">{m.name}</span>
+                  <div key={m.metricKey} className="p-3 bg-slate-50 rounded-xl border border-[#E5E7EB] space-y-1">
+                    <span className="text-[11px] font-bold text-[#707873] block truncate">{m.name}</span>
                     <div className="flex items-baseline justify-between">
-                      <span className="text-xs font-mono text-slate-500">
+                      <span className="text-xs font-mono text-[#707873]">
                         {m.oldValue.toFixed(1)} {m.unit}
                       </span>
                       <ArrowRight className="w-3 h-3 text-slate-400" />
@@ -224,14 +224,14 @@ export const SimulationImpactTab: React.FC = () => {
           </Card>
 
           {/* Affected BOQ Schedule Lines */}
-          <Card className="border border-slate-200 bg-white">
+          <Card className="border border-[#E5E7EB] bg-white">
             <CardContent className="p-5 space-y-3">
-              <h3 className="text-sm font-bold text-slate-900 font-heading">
+              <h3 className="text-sm font-bold text-[#18211E] font-heading">
                 Shifted Bill of Quantities (BOQ) Lines
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] border-b border-slate-200">
+                  <thead className="bg-slate-50 text-[#707873] font-bold uppercase text-[10px] border-b border-[#E5E7EB]">
                     <tr>
                       <th className="p-2.5">BOQ Description</th>
                       <th className="p-2.5">Category</th>
@@ -245,22 +245,22 @@ export const SimulationImpactTab: React.FC = () => {
                   <tbody className="divide-y divide-slate-100 font-mono">
                     {simulationReport.affectedBOQLines.map((line) => (
                       <tr key={line.lineId} className="hover:bg-slate-50/70">
-                        <td className="p-2.5 font-sans font-medium text-slate-800">
+                        <td className="p-2.5 font-sans font-medium text-[#18211E]">
                           {line.title}
                         </td>
-                        <td className="p-2.5 text-[10px] text-slate-500 font-sans">
+                        <td className="p-2.5 text-[10px] text-[#707873] font-sans">
                           {line.category}
                         </td>
-                        <td className="p-2.5 text-right text-slate-500">
+                        <td className="p-2.5 text-right text-[#707873]">
                           {line.oldQuantity} {line.unit}
                         </td>
                         <td className="p-2.5 text-right font-bold text-[#1B3D34]">
                           {line.newQuantity} {line.unit}
                         </td>
-                        <td className="p-2.5 text-right text-slate-500">
+                        <td className="p-2.5 text-right text-[#707873]">
                           {formatCurrency(line.oldTotal)}
                         </td>
-                        <td className="p-2.5 text-right font-bold text-slate-900">
+                        <td className="p-2.5 text-right font-bold text-[#18211E]">
                           {formatCurrency(line.newTotal)}
                         </td>
                         <td className={`p-2.5 text-right font-bold ${
@@ -281,15 +281,15 @@ export const SimulationImpactTab: React.FC = () => {
       {/* ── PUBLISH CONFIRMATION MODAL (Part 27 & 49) ── */}
       {showPublishConfirm && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 space-y-4">
+          <div className="max-w-md w-full bg-white rounded-2xl p-6 shadow-2xl border border-[#E5E7EB] space-y-4">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 Production Deployment
               </span>
-              <h3 className="text-lg font-bold text-slate-900 font-heading mt-2">
+              <h3 className="text-lg font-bold text-[#18211E] font-heading mt-2">
                 Publish Draft Configuration
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-[#707873] mt-1">
                 Activating this configuration immediately updates the calculation engine for all public users. Historical estimates remain strictly snapshotted.
               </p>
             </div>
@@ -303,7 +303,7 @@ export const SimulationImpactTab: React.FC = () => {
                 onChange={(e) => setPublishSummary(e.target.value)}
                 placeholder="e.g. Updated standard wall height to 10.5ft and adjusted AAC block wastage."
                 rows={3}
-                className="w-full p-2.5 text-xs text-slate-800 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
+                className="w-full p-2.5 text-xs text-[#18211E] border border-[#CBD5CB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1B3D34]"
               />
             </div>
 
@@ -311,7 +311,7 @@ export const SimulationImpactTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPublishConfirm(false)}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-[#707873] hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               >
                 Cancel
               </button>

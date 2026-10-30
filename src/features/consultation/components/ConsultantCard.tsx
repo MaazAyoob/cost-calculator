@@ -17,7 +17,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E3E8E2] hover:border-[#1B3D34]/30 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] hover:border-[#1B3D34]/30 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group">
       {/* Top Content */}
       <div className="p-5 sm:p-6 space-y-4">
         {/* Header: Photo + Info + Category Badge */}
@@ -25,7 +25,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
           {/* Avatar */}
           <div
             onClick={handleCardClick}
-            className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden shrink-0 bg-[#F8F8F6] border border-[#E3E8E2] cursor-pointer"
+            className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden shrink-0 bg-[#F8F8F6] border border-[#E5E7EB] cursor-pointer"
           >
             {consultant.profileImage ? (
               <img
@@ -65,9 +65,9 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
               {consultant.name}
             </h3>
 
-            <p className="text-xs text-[#4B5563] truncate mt-0.5">{consultant.title}</p>
+            <p className="text-xs text-[#707873] truncate mt-0.5">{consultant.title}</p>
 
-            <div className="flex items-center gap-3 text-xs text-[#4B5563] mt-2">
+            <div className="flex items-center gap-3 text-xs text-[#707873] mt-2">
               <span className="flex items-center gap-1">
                 <Briefcase className="w-3.5 h-3.5 text-[#1B3D34]/70" />
                 <span>{consultant.experienceYears}+ yrs exp</span>
@@ -82,27 +82,27 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
         </div>
 
         {/* Short About Preview */}
-        <p className="text-xs text-[#4B5563] line-clamp-3 leading-relaxed">
+        <p className="text-xs text-[#707873] line-clamp-3 leading-relaxed">
           {consultant.about}
         </p>
 
         {/* Specializations Tags */}
         {consultant.specializations && consultant.specializations.length > 0 && (
           <div className="space-y-1.5 pt-1">
-            <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block">
               Specialties
             </span>
             <div className="flex flex-wrap gap-1.5">
               {consultant.specializations.slice(0, 3).map((spec, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#F8F8F6] text-[#1B3D34] border border-[#E3E8E2]"
+                  className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#F8F8F6] text-[#1B3D34] border border-[#E5E7EB]"
                 >
                   {spec}
                 </span>
               ))}
               {consultant.specializations.length > 3 && (
-                <span className="text-[10px] text-[#4B5563] self-center">
+                <span className="text-[10px] text-[#707873] self-center">
                   +{consultant.specializations.length - 3} more
                 </span>
               )}
@@ -111,20 +111,20 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
         )}
 
         {/* Session Inclusions Strip */}
-        <div className="pt-2 border-t border-[#E3E8E2] flex items-center justify-between text-[11px] text-[#4B5563]">
+        <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-[11px] text-[#707873]">
           <span className="flex items-center gap-1 font-semibold text-[#1B3D34]">
             <Clock className="w-3.5 h-3.5 text-[#F28C28]" /> 45-min session
           </span>
-          <span className="text-[#4B5563]">
+          <span className="text-[#707873]">
             Includes review &amp; written advice
           </span>
         </div>
       </div>
 
       {/* Card Footer: Fee + Action Buttons */}
-      <div className="px-5 py-4 sm:px-6 bg-[#F8F8F6]/70 border-t border-[#E3E8E2] flex items-center justify-between gap-3">
+      <div className="px-5 py-4 sm:px-6 bg-[#F8F8F6]/70 border-t border-[#E5E7EB] flex items-center justify-between gap-3">
         <div>
-          <span className="text-[10px] uppercase font-bold text-[#4B5563] tracking-wider block">
+          <span className="text-[10px] uppercase font-bold text-[#707873] tracking-wider block">
             Consultation Fee
           </span>
           <span className="text-base sm:text-lg font-mono font-extrabold text-[#1B3D34]">
@@ -136,7 +136,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
           <button
             type="button"
             onClick={handleCardClick}
-            className="px-3 py-2 rounded-xl text-xs font-bold text-[#1B3D34] hover:bg-white border border-[#E3E8E2] transition-colors cursor-pointer"
+            className="px-3 py-2 rounded-xl text-xs font-bold text-[#1B3D34] hover:bg-white border border-[#E5E7EB] transition-colors cursor-pointer"
           >
             View Profile
           </button>

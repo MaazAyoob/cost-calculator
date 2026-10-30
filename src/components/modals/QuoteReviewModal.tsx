@@ -33,7 +33,7 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#707873] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -48,7 +48,7 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <h2 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
                 Should I sign this?
               </h2>
-              <p className="text-xs text-[#4B5563]">
+              <p className="text-xs text-[#707873]">
                 Professional quote review, market rate benchmarking, clause risk analysis, and negotiation support before you appoint a contractor.
               </p>
             </div>
@@ -56,9 +56,9 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
             {/* Price Card */}
             <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">Professional Consultation</span>
+                <span className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block">Professional Consultation</span>
                 <span className="text-2xl font-black text-[#1B3D34] font-mono">₹1,499</span>
-                <span className="text-[10px] text-[#4B5563] ml-1.5">• 45-min session &amp; written advice</span>
+                <span className="text-[10px] text-[#707873] ml-1.5">• 45-min session &amp; written advice</span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2.5 py-1 rounded border border-[#E5E7EB] font-mono">
@@ -69,7 +69,7 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
             {/* Scope Features */}
             <div className="space-y-2 text-xs text-[#1B3D34]">
-              <span className="font-bold text-[11px] uppercase tracking-wider text-[#4B5563] block">
+              <span className="font-bold text-[11px] uppercase tracking-wider text-[#707873] block">
                 What Hutty QS Engineers do for you:
               </span>
               <div className="space-y-1.5">
@@ -102,7 +102,7 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   <span className="text-xs font-bold text-[#1B3D34]">
                     {fileUploaded ? fileUploaded : 'Click to select quote document'}
                   </span>
-                  <span className="text-[10px] text-[#4B5563]">PDF, Excel, Word or Scanned Images up to 25MB</span>
+                  <span className="text-[10px] text-[#707873]">PDF, Excel, Word or Scanned Images up to 25MB</span>
                   <input type="file" onChange={handleFileChange} className="hidden" />
                 </label>
               </div>
@@ -166,7 +166,7 @@ export const QuoteReviewModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <h3 className="text-2xl font-extrabold text-[#1B3D34] font-heading">
                 We're reviewing your quote.
               </h3>
-              <p className="text-xs text-[#4B5563] max-w-sm mx-auto leading-relaxed">
+              <p className="text-xs text-[#707873] max-w-sm mx-auto leading-relaxed">
                 A senior Hutty Quantity Survey engineer will audit the quote line items, compare with market benchmarks, and contact <strong>{phone}</strong> within 48 hours with a detailed redline report.
               </p>
             </div>

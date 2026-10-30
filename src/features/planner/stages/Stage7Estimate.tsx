@@ -96,10 +96,10 @@ export const Stage7Estimate: React.FC<Stage7EstimateProps> = ({
           </div>
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           Here's your estimated construction cost.
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Calculated in real-time by the canonical engine using Bengaluru verified market rates and statutory planning guidelines.
         </p>
       </div>

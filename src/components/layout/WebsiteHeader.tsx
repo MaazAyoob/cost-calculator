@@ -65,8 +65,8 @@ export const WebsiteHeader: React.FC = () => {
       <header
         className={`sticky top-0 z-50 transition-all duration-300 border-b ${
           scrolled
-            ? 'bg-[#F8F8F6]/95 backdrop-blur-md border-[#E3E8E2] py-2.5 shadow-xs'
-            : 'bg-[#F8F8F6] border-[#E3E8E2] py-3.5'
+            ? 'bg-[#F8F8F6]/95 backdrop-blur-md border-[#E5E7EB] py-2.5 shadow-xs'
+            : 'bg-[#F8F8F6] border-[#E5E7EB] py-3.5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6">
@@ -91,7 +91,7 @@ export const WebsiteHeader: React.FC = () => {
               className={`text-sm transition-colors cursor-pointer py-1 font-semibold ${
                 isCurrent('/how-it-works')
                   ? 'text-[#1B3D34] font-bold after:content-[\'\'] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#F28C28] after:rounded-full relative'
-                  : 'text-[#52605B] hover:text-[#172722]'
+                  : 'text-[#707873] hover:text-[#18211E]'
               }`}
             >
               How It Works
@@ -102,7 +102,7 @@ export const WebsiteHeader: React.FC = () => {
               className={`text-sm transition-colors cursor-pointer py-1 font-semibold ${
                 isCurrent('/pricing')
                   ? 'text-[#1B3D34] font-bold after:content-[\'\'] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#F28C28] after:rounded-full relative'
-                  : 'text-[#52605B] hover:text-[#172722]'
+                  : 'text-[#707873] hover:text-[#18211E]'
               }`}
             >
               Pricing
@@ -113,7 +113,7 @@ export const WebsiteHeader: React.FC = () => {
               className={`text-sm transition-colors cursor-pointer py-1 font-semibold ${
                 isCurrent('/consult')
                   ? 'text-[#1B3D34] font-bold after:content-[\'\'] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#F28C28] after:rounded-full relative'
-                  : 'text-[#52605B] hover:text-[#172722]'
+                  : 'text-[#707873] hover:text-[#18211E]'
               }`}
             >
               Consult an Expert
@@ -137,10 +137,10 @@ export const WebsiteHeader: React.FC = () => {
                   </button>
 
                   {accountDropdown && (
-                    <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-2xl shadow-lg border border-[#E3E8E2] p-2 space-y-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                    <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-2 space-y-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
                       <div className="px-3 py-2 border-b border-[#EDF2EE]">
                         <span className="block text-xs font-bold text-[#1B3D34] truncate">{user?.name}</span>
-                        <span className="block text-[11px] text-[#687770] truncate">{user?.email}</span>
+                        <span className="block text-[11px] text-[#707873] truncate">{user?.email}</span>
                       </div>
 
                       <button
@@ -154,7 +154,7 @@ export const WebsiteHeader: React.FC = () => {
                           <FolderKanban className="w-3.5 h-3.5 text-[#1B3D34]" />
                           My Projects
                         </span>
-                        <ArrowRight className="w-3 h-3 text-[#687770]" />
+                        <ArrowRight className="w-3 h-3 text-[#707873]" />
                       </button>
 
                       <button
@@ -168,7 +168,7 @@ export const WebsiteHeader: React.FC = () => {
                           <FileText className="w-3.5 h-3.5 text-[#1B3D34]" />
                           My Reports
                         </span>
-                        <ArrowRight className="w-3 h-3 text-[#687770]" />
+                        <ArrowRight className="w-3 h-3 text-[#707873]" />
                       </button>
 
                       <button
@@ -182,7 +182,7 @@ export const WebsiteHeader: React.FC = () => {
                           <UserIcon className="w-3.5 h-3.5 text-[#1B3D34]" />
                           Profile &amp; Settings
                         </span>
-                        <ArrowRight className="w-3 h-3 text-[#687770]" />
+                        <ArrowRight className="w-3 h-3 text-[#707873]" />
                       </button>
 
                       <div className="pt-1 border-t border-[#EDF2EE]">
@@ -228,18 +228,18 @@ export const WebsiteHeader: React.FC = () => {
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-lg lg:hidden text-[#172722] hover:bg-[rgba(27,61,52,0.06)] transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#E3E8E2]"
+              className="p-2.5 rounded-lg lg:hidden text-[#18211E] hover:bg-[rgba(27,61,52,0.06)] transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#E5E7EB]"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 text-[#172722]" /> : <Menu className="w-5 h-5 text-[#172722]" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-[#18211E]" /> : <Menu className="w-5 h-5 text-[#18211E]" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-[57px] bottom-0 z-50 bg-[#F8F8F6] flex flex-col border-t border-[#E3E8E2] animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="lg:hidden fixed inset-x-0 top-[57px] bottom-0 z-50 bg-[#F8F8F6] flex flex-col border-t border-[#E5E7EB] animate-in fade-in slide-in-from-top-3 duration-200">
             <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3">
               {/* Authenticated Customer Card in Mobile Menu */}
               {isAuthenticated ? (
@@ -250,7 +250,7 @@ export const WebsiteHeader: React.FC = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <span className="text-sm font-bold text-[#1B3D34] block truncate">{user?.name}</span>
-                        <span className="text-xs text-[#687770] block truncate">{user?.email}</span>
+                        <span className="text-xs text-[#707873] block truncate">{user?.email}</span>
                       </div>
                     </div>
 
@@ -299,10 +299,10 @@ export const WebsiteHeader: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="p-3.5 bg-white rounded-2xl border border-[#E3E8E2] flex items-center justify-between mb-2 shadow-2xs">
+                  <div className="p-3.5 bg-white rounded-2xl border border-[#E5E7EB] flex items-center justify-between mb-2 shadow-2xs">
                     <div className="space-y-0.5">
                       <span className="text-xs font-bold text-[#1B3D34] block">Already have an account?</span>
-                      <span className="text-[11px] text-[#687770] block">Access saved plans and unlocked reports</span>
+                      <span className="text-[11px] text-[#707873] block">Access saved plans and unlocked reports</span>
                     </div>
                     <button
                       onClick={() => {
@@ -326,16 +326,16 @@ export const WebsiteHeader: React.FC = () => {
                 className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/calculator') || isCurrent('/planner')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Start Free Estimate</span>
-                  <p className={`text-xs ${isCurrent('/calculator') ? 'text-white/80' : 'text-[#687770]'}`}>
+                  <p className={`text-xs ${isCurrent('/calculator') ? 'text-white/80' : 'text-[#707873]'}`}>
                     Plot sizing, rooms &amp; real-time cost calculation (no login required)
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/calculator') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/calculator') ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
               </button>
 
               <button
@@ -343,16 +343,16 @@ export const WebsiteHeader: React.FC = () => {
                 className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/how-it-works')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">How It Works</span>
-                  <p className={`text-xs ${isCurrent('/how-it-works') ? 'text-white/80' : 'text-[#687770]'}`}>
+                  <p className={`text-xs ${isCurrent('/how-it-works') ? 'text-white/80' : 'text-[#707873]'}`}>
                     Step-by-step home planning and cost estimation
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/how-it-works') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/how-it-works') ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
               </button>
 
               <button
@@ -360,16 +360,16 @@ export const WebsiteHeader: React.FC = () => {
                 className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/pricing')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Pricing &amp; Plans</span>
-                  <p className={`text-xs ${isCurrent('/pricing') ? 'text-white/80' : 'text-[#687770]'}`}>
+                  <p className={`text-xs ${isCurrent('/pricing') ? 'text-white/80' : 'text-[#707873]'}`}>
                     Free estimate, ₹499 detailed BOQ, ₹1,499 premium
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/pricing') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/pricing') ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
               </button>
 
               <button
@@ -377,16 +377,16 @@ export const WebsiteHeader: React.FC = () => {
                 className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/consult')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Consult an Expert</span>
-                  <p className={`text-xs ${isCurrent('/consult') ? 'text-white/80' : 'text-[#687770]'}`}>
+                  <p className={`text-xs ${isCurrent('/consult') ? 'text-white/80' : 'text-[#707873]'}`}>
                     Independent architectural reviews &bull; Flat ₹1,499
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/consult') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/consult') ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
               </button>
 
               <button
@@ -394,16 +394,16 @@ export const WebsiteHeader: React.FC = () => {
                 className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/professionals')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">For Professionals</span>
-                  <p className={`text-xs ${isCurrent('/professionals') ? 'text-white/80' : 'text-[#687770]'}`}>
+                  <p className={`text-xs ${isCurrent('/professionals') ? 'text-white/80' : 'text-[#707873]'}`}>
                     Join Hutty network &bull; Offer independent consultations
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/professionals') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/professionals') ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
               </button>
 
               <button
@@ -411,21 +411,21 @@ export const WebsiteHeader: React.FC = () => {
                 className={`w-full text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/dashboard')
                     ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                    : 'bg-white text-[#172722] border-[#E3E8E2] hover:bg-[rgba(27,61,52,0.04)]'
+                    : 'bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)]'
                 }`}
               >
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Estimate Summary</span>
-                  <p className={`text-xs ${isCurrent('/dashboard') ? 'text-white/80' : 'text-[#687770]'}`}>
+                  <p className={`text-xs ${isCurrent('/dashboard') ? 'text-white/80' : 'text-[#707873]'}`}>
                     Active residence status, quantities &amp; budget
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 ${isCurrent('/dashboard') ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+                <ArrowRight className={`w-4 h-4 ${isCurrent('/dashboard') ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
               </button>
             </div>
 
             {/* Bottom Sticky Action inside Mobile Drawer */}
-            <div className="p-5 border-t border-[#E3E8E2] bg-white">
+            <div className="p-5 border-t border-[#E5E7EB] bg-white">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

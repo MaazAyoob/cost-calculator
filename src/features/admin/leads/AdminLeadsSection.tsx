@@ -287,7 +287,7 @@ export const AdminLeadsSection: React.FC = () => {
         );
       case 'CLOSED':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-[#CBD5CB]">
             Closed
           </span>
         );
@@ -318,7 +318,7 @@ export const AdminLeadsSection: React.FC = () => {
       case 'ACCOUNT_SIGNUP':
       default:
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-[#E5E7EB]">
             {label}
           </span>
         );
@@ -328,17 +328,17 @@ export const AdminLeadsSection: React.FC = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* ── SECTION HEADER & EXPORT ACTION ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-[#1B3D34] text-white">
               <Users className="w-5 h-5" />
             </span>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold font-heading text-[#18211E] tracking-tight">
                 Customer Leads & Enquiries
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-[#707873]">
                 Authoritative customer leads, phone verification intelligence, enquiries, and export engine.
               </p>
             </div>
@@ -350,7 +350,7 @@ export const AdminLeadsSection: React.FC = () => {
             type="button"
             onClick={loadLeads}
             disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-white border border-[#E5E7EB] rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
             title="Refresh Leads"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#1B3D34]' : ''}`} />
@@ -396,15 +396,15 @@ export const AdminLeadsSection: React.FC = () => {
       {/* ── 4 SUMMARY METRIC CARDS ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Leads */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 mb-1">
+        <div className="bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-xs">
+          <div className="flex items-center justify-between text-[#707873] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider">Total Filtered Leads</span>
             <Users className="w-4 h-4 text-slate-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900">
+          <div className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E]">
             {summary.totalLeads}
           </div>
-          <div className="text-[11px] text-slate-500 mt-1 truncate">
+          <div className="text-[11px] text-[#707873] mt-1 truncate">
             {activeDateRange.label}
           </div>
         </div>
@@ -455,10 +455,10 @@ export const AdminLeadsSection: React.FC = () => {
       </div>
 
       {/* ── FILTERING CONTROLS CONTAINER ── */}
-      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E7EB] shadow-xs space-y-4">
         {/* Quick Date Presets Strip */}
         <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+          <div className="text-xs font-bold uppercase tracking-wider text-[#707873] mb-2 flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-[#1B3D34]" />
             <span>Date Range Preset (Asia/Kolkata IST)</span>
           </div>
@@ -481,7 +481,7 @@ export const AdminLeadsSection: React.FC = () => {
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     isActive
                       ? 'bg-[#1B3D34] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                      : 'bg-slate-100 text-[#707873] hover:bg-slate-200 hover:text-[#18211E]'
                   }`}
                 >
                   {p.label}
@@ -493,7 +493,7 @@ export const AdminLeadsSection: React.FC = () => {
 
         {/* Custom Date Pickers (if Custom Selected) */}
         {datePreset === 'custom' && (
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3 flex-wrap text-xs">
+          <div className="p-3 bg-slate-50 border border-[#E5E7EB] rounded-xl flex items-center gap-3 flex-wrap text-xs">
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-700">Start Date:</span>
               <input
@@ -503,7 +503,7 @@ export const AdminLeadsSection: React.FC = () => {
                   setCustomStart(e.target.value);
                   setPage(1);
                 }}
-                className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-1 focus:ring-[#1B3D34] focus:outline-none"
+                className="px-2.5 py-1.5 bg-white border border-[#CBD5CB] rounded-lg text-xs focus:ring-1 focus:ring-[#1B3D34] focus:outline-none"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -515,10 +515,10 @@ export const AdminLeadsSection: React.FC = () => {
                   setCustomEnd(e.target.value);
                   setPage(1);
                 }}
-                className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-1 focus:ring-[#1B3D34] focus:outline-none"
+                className="px-2.5 py-1.5 bg-white border border-[#CBD5CB] rounded-lg text-xs focus:ring-1 focus:ring-[#1B3D34] focus:outline-none"
               />
             </div>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-[#707873]">
               Includes full 00:00:00 to 23:59:59 IST for selected dates
             </span>
           </div>
@@ -537,7 +537,7 @@ export const AdminLeadsSection: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by name, phone, email, reference..."
-              className="w-full pl-9 pr-3 py-2 bg-[#FAFBF9] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
+              className="w-full pl-9 pr-3 py-2 bg-[#FAFBF9] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#18211E] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
             />
           </div>
 
@@ -549,7 +549,7 @@ export const AdminLeadsSection: React.FC = () => {
                 setSourceFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-[#FAFBF9] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
+              className="w-full px-3 py-2 bg-[#FAFBF9] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#18211E] focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
             >
               <option value="ALL">All Lead Sources</option>
               <option value="CONSULTATION_BOOKING">Consultation Booking</option>
@@ -567,7 +567,7 @@ export const AdminLeadsSection: React.FC = () => {
                 setVerificationFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-[#FAFBF9] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
+              className="w-full px-3 py-2 bg-[#FAFBF9] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#18211E] focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
             >
               <option value="ALL">All Phone Verification</option>
               <option value="VERIFIED">Verified Only</option>
@@ -583,7 +583,7 @@ export const AdminLeadsSection: React.FC = () => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-[#FAFBF9] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
+              className="w-full px-3 py-2 bg-[#FAFBF9] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#18211E] focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
             >
               <option value="ALL">All Lead Statuses</option>
               <option value="NEW">New</option>
@@ -595,7 +595,7 @@ export const AdminLeadsSection: React.FC = () => {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="px-3 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
+              className="px-3 py-2 text-xs font-bold text-[#707873] hover:text-[#18211E] bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
               title="Reset Filters"
             >
               Reset
@@ -636,9 +636,9 @@ export const AdminLeadsSection: React.FC = () => {
       )}
 
       {/* ── LEADS TABLE / LIST CONTAINER ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs overflow-hidden">
         {/* Table Top Controls */}
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between text-xs text-[#707873]">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -676,7 +676,7 @@ export const AdminLeadsSection: React.FC = () => {
                   setLimit(Number(e.target.value));
                   setPage(1);
                 }}
-                className="px-2 py-0.5 border border-slate-200 rounded-lg text-xs"
+                className="px-2 py-0.5 border border-[#E5E7EB] rounded-lg text-xs"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -690,7 +690,7 @@ export const AdminLeadsSection: React.FC = () => {
         {isLoading ? (
           <div className="py-16 text-center space-y-3">
             <RefreshCw className="w-8 h-8 text-[#1B3D34] animate-spin mx-auto" />
-            <p className="text-sm font-bold text-slate-600">Loading customer leads...</p>
+            <p className="text-sm font-bold text-[#707873]">Loading customer leads...</p>
           </div>
         ) : leads.length === 0 ? (
           /* Empty State */
@@ -698,8 +698,8 @@ export const AdminLeadsSection: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-800">No customer leads found</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <h3 className="text-base font-bold text-[#18211E]">No customer leads found</h3>
+            <p className="text-xs text-[#707873] max-w-md mx-auto">
               No customer accounts, consultation enquiries, or report purchases match the active date range ({activeDateRange.label}) and filter criteria.
             </p>
             <button
@@ -715,7 +715,7 @@ export const AdminLeadsSection: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                <tr className="bg-slate-50/75 border-b border-[#E5E7EB] text-[#707873] font-bold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4 w-10">
                     <span className="sr-only">Select</span>
                   </th>
@@ -768,11 +768,11 @@ export const AdminLeadsSection: React.FC = () => {
 
                       {/* Customer Info */}
                       <td className="py-3 px-4">
-                        <div className="font-bold text-slate-900">{lead.name}</div>
+                        <div className="font-bold text-[#18211E]">{lead.name}</div>
                         {lead.email && (
                           <a
                             href={`mailto:${lead.email}`}
-                            className="text-[11px] text-slate-500 hover:text-[#1B3D34] flex items-center gap-1 mt-0.5"
+                            className="text-[11px] text-[#707873] hover:text-[#1B3D34] flex items-center gap-1 mt-0.5"
                           >
                             <Mail className="w-3 h-3 text-slate-400" />
                             <span>{lead.email}</span>
@@ -790,7 +790,7 @@ export const AdminLeadsSection: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           <a
                             href={`tel:${lead.phone}`}
-                            className="font-mono font-semibold text-slate-800 hover:text-[#1B3D34] hover:underline"
+                            className="font-mono font-semibold text-[#18211E] hover:text-[#1B3D34] hover:underline"
                             title="Click to call"
                           >
                             {lead.phoneFormatted || lead.phone}
@@ -818,11 +818,11 @@ export const AdminLeadsSection: React.FC = () => {
 
                       {/* Enquiry Summary */}
                       <td className="py-3 px-4 max-w-xs">
-                        <div className="truncate text-slate-800" title={lead.enquiryDetails}>
+                        <div className="truncate text-[#18211E]" title={lead.enquiryDetails}>
                           {lead.enquiryDetails}
                         </div>
                         {lead.notes && (
-                          <div className="text-[11px] text-slate-500 italic mt-0.5 flex items-center gap-1 truncate">
+                          <div className="text-[11px] text-[#707873] italic mt-0.5 flex items-center gap-1 truncate">
                             <MessageSquare className="w-3 h-3 text-slate-400 flex-shrink-0" />
                             <span>Notes: {lead.notes}</span>
                           </div>
@@ -836,8 +836,8 @@ export const AdminLeadsSection: React.FC = () => {
 
                       {/* Created Timestamp */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="text-slate-800 font-medium">{dateStr}</div>
-                        <div className="text-[11px] text-slate-500 font-mono">{timeStr}</div>
+                        <div className="text-[#18211E] font-medium">{dateStr}</div>
+                        <div className="text-[11px] text-[#707873] font-mono">{timeStr}</div>
                       </td>
 
                       {/* Actions */}
@@ -861,13 +861,13 @@ export const AdminLeadsSection: React.FC = () => {
 
         {/* ── PAGINATION CONTROLS ── */}
         {!isLoading && leads.length > 0 && (
-          <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#707873]">
             <div>
-              Showing <span className="font-bold text-slate-800">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
-              <span className="font-bold text-slate-800">
+              Showing <span className="font-bold text-[#18211E]">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
+              <span className="font-bold text-[#18211E]">
                 {Math.min(pagination.page * pagination.limit, pagination.total)}
               </span>{' '}
-              of <span className="font-bold text-slate-800">{pagination.total}</span> leads
+              of <span className="font-bold text-[#18211E]">{pagination.total}</span> leads
             </div>
 
             <div className="flex items-center gap-2">
@@ -875,7 +875,7 @@ export const AdminLeadsSection: React.FC = () => {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={pagination.page <= 1}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="p-1.5 rounded-lg border border-[#E5E7EB] text-[#707873] hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 title="Previous Page"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -889,7 +889,7 @@ export const AdminLeadsSection: React.FC = () => {
                 type="button"
                 onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
                 disabled={pagination.page >= pagination.totalPages}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="p-1.5 rounded-lg border border-[#E5E7EB] text-[#707873] hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 title="Next Page"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -902,7 +902,7 @@ export const AdminLeadsSection: React.FC = () => {
       {/* ── LEAD DETAIL MODAL / DRAWER ── */}
       {selectedLeadForDetail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 animate-scale-up">
+          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#E5E7EB] animate-scale-up">
             {/* Modal Header */}
             <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
               <div className="flex items-center gap-2">
@@ -910,10 +910,10 @@ export const AdminLeadsSection: React.FC = () => {
                   <Users className="w-5 h-5" />
                 </span>
                 <div>
-                  <h3 className="font-bold font-heading text-slate-900 text-base">
+                  <h3 className="font-bold font-heading text-[#18211E] text-base">
                     Lead Details: {selectedLeadForDetail.name}
                   </h3>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-[#707873]">
                     {renderSourceBadge(selectedLeadForDetail.source, selectedLeadForDetail.sourceLabel)}
                   </span>
                 </div>
@@ -921,7 +921,7 @@ export const AdminLeadsSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedLeadForDetail(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-[#707873] rounded-lg hover:bg-slate-100 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -930,9 +930,9 @@ export const AdminLeadsSection: React.FC = () => {
             {/* Modal Body */}
             <div className="p-5 space-y-4 text-xs sm:text-sm text-slate-700">
               {/* Contact Information */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-[#E5E7EB]">
                 <div>
-                  <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase block mb-1">
                     Contact Phone
                   </span>
                   <div className="flex items-center gap-2">
@@ -960,13 +960,13 @@ export const AdminLeadsSection: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase block mb-1">
                     Email Address
                   </span>
                   {selectedLeadForDetail.email ? (
                     <a
                       href={`mailto:${selectedLeadForDetail.email}`}
-                      className="font-semibold text-slate-800 hover:text-[#1B3D34] flex items-center gap-1"
+                      className="font-semibold text-[#18211E] hover:text-[#1B3D34] flex items-center gap-1"
                     >
                       <Mail className="w-3.5 h-3.5 text-slate-400" />
                       <span className="break-all">{selectedLeadForDetail.email}</span>
@@ -977,10 +977,10 @@ export const AdminLeadsSection: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase block mb-1">
                     Creation Timestamp
                   </span>
-                  <span className="text-slate-800 font-mono text-xs">
+                  <span className="text-[#18211E] font-mono text-xs">
                     {new Date(selectedLeadForDetail.createdAt).toLocaleString('en-IN', {
                       timeZone: 'Asia/Kolkata',
                     })} (IST)
@@ -988,10 +988,10 @@ export const AdminLeadsSection: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">
+                  <span className="text-[11px] font-bold text-[#707873] uppercase block mb-1">
                     Lead Reference ID
                   </span>
-                  <span className="text-slate-800 font-mono text-xs font-bold">
+                  <span className="text-[#18211E] font-mono text-xs font-bold">
                     {selectedLeadForDetail.reference || selectedLeadForDetail.leadKey}
                   </span>
                 </div>
@@ -999,17 +999,17 @@ export const AdminLeadsSection: React.FC = () => {
 
               {/* Enquiry / Scope Description */}
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#707873] block mb-1.5">
                   Enquiry & Requirements
                 </span>
-                <div className="p-3 bg-white border border-slate-200 rounded-xl leading-relaxed text-slate-800">
+                <div className="p-3 bg-white border border-[#E5E7EB] rounded-xl leading-relaxed text-[#18211E]">
                   {selectedLeadForDetail.enquiryDetails}
                 </div>
               </div>
 
               {/* Status Update Control */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#707873] block mb-1.5">
                   Update Lead Status
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -1021,7 +1021,7 @@ export const AdminLeadsSection: React.FC = () => {
                       className={`py-2 px-3 rounded-xl font-bold text-xs border transition-all cursor-pointer ${
                         drawerStatus === st
                           ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-xs'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                          : 'bg-white text-slate-700 border-[#E5E7EB] hover:bg-slate-50'
                       }`}
                     >
                       {st}
@@ -1032,7 +1032,7 @@ export const AdminLeadsSection: React.FC = () => {
 
               {/* Internal Follow-Up Notes */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#707873] block mb-1.5">
                   Internal Follow-Up Notes
                 </label>
                 <textarea
@@ -1040,7 +1040,7 @@ export const AdminLeadsSection: React.FC = () => {
                   value={drawerNotes}
                   onChange={(e) => setDrawerNotes(e.target.value)}
                   placeholder="Record customer conversation, preferred consultation time, budget notes..."
-                  className="w-full p-3 bg-[#FAFBF9] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
+                  className="w-full p-3 bg-[#FAFBF9] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#18211E] focus:outline-none focus:ring-2 focus:ring-[#1B3D34]/20 focus:border-[#1B3D34]"
                 />
               </div>
             </div>
@@ -1050,7 +1050,7 @@ export const AdminLeadsSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedLeadForDetail(null)}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-xl cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-[#707873] hover:text-[#18211E] bg-white border border-[#E5E7EB] rounded-xl cursor-pointer"
               >
                 Close
               </button>
@@ -1077,16 +1077,16 @@ export const AdminLeadsSection: React.FC = () => {
       {/* ── EXPORT OPTIONS MODAL ── */}
       {showExportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 space-y-4 animate-scale-up">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-[#E5E7EB] space-y-4 animate-scale-up">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-[#1B3D34]">
                 <FileSpreadsheet className="w-5 h-5 text-[#F28C28]" />
-                <h3 className="font-bold font-heading text-slate-900 text-base">Export Customer Leads</h3>
+                <h3 className="font-bold font-heading text-[#18211E] text-base">Export Customer Leads</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowExportModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
+                className="p-1 text-slate-400 hover:text-[#707873] rounded-lg hover:bg-slate-100 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1095,7 +1095,7 @@ export const AdminLeadsSection: React.FC = () => {
             <div className="space-y-4 text-xs sm:text-sm">
               {/* Export Format Selection */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#707873] block mb-1.5">
                   1. File Format
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -1105,7 +1105,7 @@ export const AdminLeadsSection: React.FC = () => {
                     className={`p-3 rounded-xl border flex items-center gap-2 font-bold cursor-pointer transition-all ${
                       exportFormat === 'xlsx'
                         ? 'bg-emerald-50 text-emerald-900 border-emerald-500 ring-2 ring-emerald-500/20'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        : 'bg-white text-slate-700 border-[#E5E7EB] hover:bg-slate-50'
                     }`}
                   >
                     <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
@@ -1118,7 +1118,7 @@ export const AdminLeadsSection: React.FC = () => {
                     className={`p-3 rounded-xl border flex items-center gap-2 font-bold cursor-pointer transition-all ${
                       exportFormat === 'csv'
                         ? 'bg-emerald-50 text-emerald-900 border-emerald-500 ring-2 ring-emerald-500/20'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        : 'bg-white text-slate-700 border-[#E5E7EB] hover:bg-slate-50'
                     }`}
                   >
                     <FileText className="w-4 h-4 text-blue-600" />
@@ -1129,11 +1129,11 @@ export const AdminLeadsSection: React.FC = () => {
 
               {/* Export Scope Selection */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#707873] block mb-1.5">
                   2. Export Scope
                 </label>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#E5E7EB] hover:bg-slate-50 cursor-pointer">
                     <input
                       type="radio"
                       name="exportScope"
@@ -1142,10 +1142,10 @@ export const AdminLeadsSection: React.FC = () => {
                       className="text-[#1B3D34] focus:ring-[#1B3D34]"
                     />
                     <div>
-                      <span className="font-bold text-slate-900 block">
+                      <span className="font-bold text-[#18211E] block">
                         All Leads Matching Active Filters ({summary.totalLeads})
                       </span>
-                      <span className="text-[11px] text-slate-500 block">
+                      <span className="text-[11px] text-[#707873] block">
                         Applies current date range ({activeDateRange.label}) and active search filters.
                       </span>
                     </div>
@@ -1155,7 +1155,7 @@ export const AdminLeadsSection: React.FC = () => {
                     className={`flex items-center gap-2 p-2.5 rounded-xl border ${
                       selectedLeadKeys.size === 0
                         ? 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed'
-                        : 'border-slate-200 hover:bg-slate-50 cursor-pointer'
+                        : 'border-[#E5E7EB] hover:bg-slate-50 cursor-pointer'
                     }`}
                   >
                     <input
@@ -1167,16 +1167,16 @@ export const AdminLeadsSection: React.FC = () => {
                       className="text-[#1B3D34] focus:ring-[#1B3D34]"
                     />
                     <div>
-                      <span className="font-bold text-slate-900 block">
+                      <span className="font-bold text-[#18211E] block">
                         Selected Leads Only ({selectedLeadKeys.size})
                       </span>
-                      <span className="text-[11px] text-slate-500 block">
+                      <span className="text-[11px] text-[#707873] block">
                         Exports only the rows currently ticked in the leads table.
                       </span>
                     </div>
                   </label>
 
-                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#E5E7EB] hover:bg-slate-50 cursor-pointer">
                     <input
                       type="radio"
                       name="exportScope"
@@ -1185,10 +1185,10 @@ export const AdminLeadsSection: React.FC = () => {
                       className="text-[#1B3D34] focus:ring-[#1B3D34]"
                     />
                     <div>
-                      <span className="font-bold text-slate-900 block">
+                      <span className="font-bold text-[#18211E] block">
                         Phone-Verified Leads Only ({summary.phoneVerified})
                       </span>
-                      <span className="text-[11px] text-slate-500 block">
+                      <span className="text-[11px] text-[#707873] block">
                         Excludes unverified leads from the exported spreadsheet.
                       </span>
                     </div>
@@ -1201,7 +1201,7 @@ export const AdminLeadsSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowExportModal(false)}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-xl cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-[#707873] hover:text-[#18211E] bg-white border border-[#E5E7EB] rounded-xl cursor-pointer"
               >
                 Cancel
               </button>

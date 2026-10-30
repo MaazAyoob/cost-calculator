@@ -24,7 +24,7 @@ export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#4B5563] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#707873] hover:text-[#1B3D34] hover:bg-[rgba(27,61,52,0.04)] cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -39,7 +39,7 @@ export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <h2 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
                 Where is my money going?
               </h2>
-              <p className="text-xs text-[#4B5563]">
+              <p className="text-xs text-[#707873]">
                 Live construction budget, actual vs planned spending, milestone progress verification, and material cost change alerts.
               </p>
             </div>
@@ -47,9 +47,9 @@ export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
             {/* Pricing Card */}
             <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider block">Monthly Subscription</span>
+                <span className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block">Monthly Subscription</span>
                 <span className="text-2xl font-black text-[#1B3D34] font-mono">₹1,999</span>
-                <span className="text-[10px] text-[#4B5563] ml-1">/ month during build</span>
+                <span className="text-[10px] text-[#707873] ml-1">/ month during build</span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2.5 py-1 rounded border border-[#E5E7EB] font-mono">
@@ -62,27 +62,27 @@ export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
             <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-3 text-xs">
               <div className="flex justify-between items-center pb-2 border-b border-[#E5E7EB]">
                 <span className="font-bold text-[#1B3D34]">Live Project Budget Shell</span>
-                <span className="font-mono text-[11px] text-[#4B5563]">Target: {formatCurrency(totalCost)}</span>
+                <span className="font-mono text-[11px] text-[#707873]">Target: {formatCurrency(totalCost)}</span>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
-                  <span className="text-[9px] font-bold text-[#4B5563] uppercase block">Planned</span>
+                  <span className="text-[9px] font-bold text-[#707873] uppercase block">Planned</span>
                   <span className="text-xs font-black text-[#1B3D34] font-mono">{formatCurrency(totalCost * 0.35)}</span>
                 </div>
                 <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
-                  <span className="text-[9px] font-bold text-[#4B5563] uppercase block">Actual Spent</span>
+                  <span className="text-[9px] font-bold text-[#707873] uppercase block">Actual Spent</span>
                   <span className="text-xs font-black text-[#1B3D34] font-mono">{formatCurrency(totalCost * 0.33)}</span>
                 </div>
                 <div className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
-                  <span className="text-[9px] font-bold text-[#4B5563] uppercase block">Remaining</span>
+                  <span className="text-[9px] font-bold text-[#707873] uppercase block">Remaining</span>
                   <span className="text-xs font-black text-[#1B3D34] font-mono">{formatCurrency(totalCost * 0.67)}</span>
                 </div>
               </div>
 
               {/* Progress Bar */}
               <div className="space-y-1 pt-1">
-                <div className="flex justify-between text-[10px] text-[#4B5563]">
+                <div className="flex justify-between text-[10px] text-[#707873]">
                   <span>Physical Stage: Plinth &amp; RCC Column Casting</span>
                   <span className="font-mono font-bold text-[#1B3D34]">35% Complete</span>
                 </div>
@@ -94,7 +94,7 @@ export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
             {/* Feature List */}
             <div className="space-y-2 text-xs text-[#1B3D34]">
-              <span className="font-bold text-[11px] uppercase tracking-wider text-[#4B5563] block">
+              <span className="font-bold text-[11px] uppercase tracking-wider text-[#707873] block">
                 Platform Capabilities:
               </span>
               <div className="space-y-1.5">
@@ -150,7 +150,7 @@ export const BuildTrackingModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <h3 className="text-2xl font-extrabold text-[#1B3D34] font-heading">
                 Welcome to Hutty Build Tracking.
               </h3>
-              <p className="text-xs text-[#4B5563] max-w-sm mx-auto leading-relaxed">
+              <p className="text-xs text-[#707873] max-w-sm mx-auto leading-relaxed">
                 Your construction spending ledger is being linked to your project BOQ. We have sent setup details and invite links to <strong>{email || 'your email'}</strong>.
               </p>
             </div>

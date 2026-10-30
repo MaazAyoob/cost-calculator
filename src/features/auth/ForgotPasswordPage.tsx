@@ -91,7 +91,7 @@ export const ForgotPasswordPage: React.FC = () => {
         <h2 className="mt-4 text-3xl font-black text-[#1B3D34] tracking-tight font-heading">
           {isResetting ? 'Reset your password' : 'Recover your account'}
         </h2>
-        <p className="mt-1.5 text-sm text-[#52605B]">
+        <p className="mt-1.5 text-sm text-[#707873]">
           {isResetting
             ? 'Enter your new secure password below.'
             : 'Enter your email address and we will help you reset your password.'}
@@ -99,7 +99,7 @@ export const ForgotPasswordPage: React.FC = () => {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E2E8E3] shadow-sm">
+        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-[#E5E7EB] shadow-sm">
           
           {error && (
             <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2.5">

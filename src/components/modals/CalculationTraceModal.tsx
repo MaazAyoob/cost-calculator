@@ -48,14 +48,14 @@ export const CalculationTraceModal: React.FC<CalculationTraceModalProps> = ({
                 <h3 className="text-base font-bold text-[#1B3D34] font-heading">
                   How This Was Calculated
                 </h3>
-                <p className="text-xs text-[#4B5563]">
+                <p className="text-xs text-[#707873]">
                   Hutty preliminary estimation rules, formulas, inputs &amp; adjustments
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white hover:bg-[#E5E7EB] text-[#4B5563] flex items-center justify-center transition-colors cursor-pointer border border-[#E5E7EB]"
+              className="w-8 h-8 rounded-full bg-white hover:bg-[#E5E7EB] text-[#707873] flex items-center justify-center transition-colors cursor-pointer border border-[#E5E7EB]"
             >
               <X className="w-4 h-4" />
             </button>
@@ -88,7 +88,7 @@ export const CalculationTraceModal: React.FC<CalculationTraceModalProps> = ({
                         <span className="text-xs font-bold text-[#1B3D34] block">
                           {step.tradeCategory || step.category}: {step.parameter}
                         </span>
-                        <span className="text-[11px] text-[#4B5563] line-clamp-1 font-mono">
+                        <span className="text-[11px] text-[#707873] line-clamp-1 font-mono">
                           {step.formula}
                         </span>
                       </div>
@@ -100,15 +100,15 @@ export const CalculationTraceModal: React.FC<CalculationTraceModalProps> = ({
                           {typeof step.result === 'number' ? step.result.toLocaleString() : step.result} {step.unit}
                         </span>
                         {step.amount ? (
-                          <span className="text-[10px] text-[#4B5563] font-mono">
+                          <span className="text-[10px] text-[#707873] font-mono">
                             {formatCurrency(step.amount)}
                           </span>
                         ) : null}
                       </div>
                       {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-[#4B5563]" />
+                        <ChevronUp className="w-4 h-4 text-[#707873]" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-[#4B5563]" />
+                        <ChevronDown className="w-4 h-4 text-[#707873]" />
                       )}
                     </div>
                   </button>
@@ -132,22 +132,22 @@ export const CalculationTraceModal: React.FC<CalculationTraceModalProps> = ({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
-                          <span className="text-[10px] uppercase font-bold text-[#4B5563] block">Formula Applied</span>
+                          <span className="text-[10px] uppercase font-bold text-[#707873] block">Formula Applied</span>
                           <span className="font-mono text-[#1B3D34] font-bold text-[11px]">{step.formula}</span>
                         </div>
                         <div className="p-2.5 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
-                          <span className="text-[10px] uppercase font-bold text-[#4B5563] block">Wastage / Adjustments</span>
+                          <span className="text-[10px] uppercase font-bold text-[#707873] block">Wastage / Adjustments</span>
                           <span className="text-[#1B3D34] font-medium text-[11px]">{step.adjustments || 'Standard trade factor'}</span>
                         </div>
                       </div>
 
                       {step.inputs && (
                         <div className="space-y-1">
-                          <span className="text-[10px] uppercase font-bold text-[#4B5563] block">Source Inputs &amp; Parameters</span>
+                          <span className="text-[10px] uppercase font-bold text-[#707873] block">Source Inputs &amp; Parameters</span>
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                             {Object.entries(step.inputs).map(([k, v]) => (
                               <div key={k} className="p-2 bg-[#F8F8F6] rounded-md text-[10px] border border-[#E5E7EB]/80 font-mono">
-                                <span className="text-[#4B5563] block truncate">{k}:</span>
+                                <span className="text-[#707873] block truncate">{k}:</span>
                                 <span className="font-bold text-[#1B3D34] truncate block">{String(v)}</span>
                               </div>
                             ))}
@@ -155,7 +155,7 @@ export const CalculationTraceModal: React.FC<CalculationTraceModalProps> = ({
                         </div>
                       )}
 
-                      <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-[11px] text-[#4B5563]">
+                      <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-[11px] text-[#707873]">
                         <span>Assumption: {step.assumption}</span>
                         {step.unitRate ? (
                           <span className="font-mono font-bold text-[#1B3D34]">Unit Rate: ₹{step.unitRate.toLocaleString('en-IN')}/{step.unit}</span>
@@ -170,7 +170,7 @@ export const CalculationTraceModal: React.FC<CalculationTraceModalProps> = ({
 
           {/* Footer */}
           <div className="p-4 bg-[#F8F8F6] border-t border-[#E5E7EB] flex items-center justify-between text-xs">
-            <span className="text-[#4B5563]">Hutty Calculation Traceability &bull; 100% Auditable Chain</span>
+            <span className="text-[#707873]">Hutty Calculation Traceability &bull; 100% Auditable Chain</span>
             <button
               onClick={onClose}
               className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer"

@@ -100,17 +100,17 @@ export const Stage1Plot: React.FC = () => {
           <MapPin className="w-3 h-3 text-[#F28C28]" />
           <span>STAGE 1 OF 8 &bull; YOUR PLOT</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black font-heading text-[#1B3D34] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           Where are you building, and how big is your plot?
         </h2>
-        <p className="text-xs sm:text-sm text-[#4B5563]">
+        <p className="text-xs sm:text-sm text-[#707873]">
           Tell us about your plot location and dimensions. We'll automatically calculate your plot area, buildable space, and required open gaps.
         </p>
       </div>
 
       {/* 1. Location Selection */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#18211E]">
           1. Where are you building?
         </label>
         <div className="grid grid-cols-2 gap-3 max-w-md">
@@ -124,12 +124,12 @@ export const Stage1Plot: React.FC = () => {
                 className={`min-h-[48px] py-3 px-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                   isSelected
                     ? 'border-[#1B3D34] bg-[#EBF3EF] text-[#1B3D34] font-bold shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                    : 'border-[#E5E7EB] bg-white text-[#707873] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <MapPin className={`w-4 h-4 ${isSelected ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
-                  <span className="text-sm">{c}</span>
+                  <MapPin className={`w-4 h-4 ${isSelected ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
+                  <span className="text-sm font-semibold">{c}</span>
                 </div>
                 {isSelected && <Check className="w-4 h-4 text-[#1B3D34]" />}
               </button>
@@ -141,10 +141,10 @@ export const Stage1Plot: React.FC = () => {
       {/* 2. Common Plot Dimension Presets */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#18211E]">
             2. How big is your plot?
           </label>
-          <span className="text-[11px] text-[#687770]">Choose a standard size or enter custom feet below</span>
+          <span className="text-[11px] text-[#707873]">Choose a standard size or enter custom feet below</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">

@@ -172,7 +172,7 @@ export const ProfessionalJoinPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 text-left">
         {submittedData ? (
           /* Success Screen */
-          <div className="bg-white rounded-3xl border border-[#E3E8E2] p-8 sm:p-12 shadow-sm text-center space-y-6">
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] p-8 sm:p-12 shadow-sm text-center space-y-6">
             <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8 text-emerald-700" />
             </div>
@@ -184,13 +184,13 @@ export const ProfessionalJoinPage: React.FC = () => {
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading pt-1">
                 Thank you, {submittedData.fullName}
               </h1>
-              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
                 Your application to join the Hutty Professional Network has been received and recorded.
               </p>
             </div>
 
             {/* Reference Box */}
-            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E3E8E2] max-w-md mx-auto text-left space-y-2.5">
+            <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] max-w-md mx-auto text-left space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#687770]">Application Reference:</span>
                 <span className="font-mono font-bold text-[#1B3D34]">{submittedData.id}</span>
@@ -233,7 +233,7 @@ export const ProfessionalJoinPage: React.FC = () => {
           /* Application Form */
           <div className="space-y-8">
             {/* Header Card with Authentic Indian Engineer Photography */}
-            <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 lg:p-10 shadow-xs space-y-6">
+            <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 lg:p-10 shadow-xs space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 
                 <div className="lg:col-span-7 space-y-4">
@@ -250,7 +250,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                     Join our verified network of residential architects, structural engineers, cost specialists, and contractors. Showcase your expertise to pre-screened homeowners seeking independent paid advisory.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#E3E8E2] text-xs text-[#1B3D34]">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#E5E7EB] text-xs text-[#1B3D34]">
                     <div className="flex items-center gap-2 font-semibold">
                       <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Genuine Homeowners</span>
@@ -268,7 +268,7 @@ export const ProfessionalJoinPage: React.FC = () => {
 
                 {/* Right Column: Professional Engineer Photo */}
                 <div className="lg:col-span-5 relative">
-                  <div className="relative rounded-2xl overflow-hidden border border-[#E3E8E2] shadow-sm bg-slate-100 group">
+                  <div className="relative rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm bg-slate-100 group">
                     <div className="h-60 sm:h-64 w-full overflow-hidden">
                       <img
                         src={professionalEngineerImg}
@@ -311,8 +311,8 @@ export const ProfessionalJoinPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               
               {/* Step 1: Personal & Contact Information */}
-              <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-6">
-                <div className="flex items-center gap-2.5 border-b border-[#E3E8E2] pb-3">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
+                <div className="flex items-center gap-2.5 border-b border-[#E5E7EB] pb-3">
                   <span className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center font-bold text-xs">
                     1
                   </span>
@@ -334,7 +334,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="e.g. Ar. Ramesh Nambiar or Er. Sneha Kulkarni"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-medium"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-medium"
                       />
                     </div>
                   </div>
@@ -351,7 +351,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@practice.com"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                       />
                     </div>
                   </div>
@@ -368,7 +368,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="98XXXXXXXX"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
                       />
                     </div>
                   </div>
@@ -384,7 +384,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                         required
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                       />
                     </div>
                   </div>
@@ -404,7 +404,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                             className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
                               active
                                 ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                                : 'bg-[#F8F8F6] text-[#4B5563] border-[#E3E8E2] hover:bg-white'
+                                : 'bg-[#F8F8F6] text-[#707873] border-[#E5E7EB] hover:bg-white'
                             }`}
                           >
                             {loc}
@@ -417,8 +417,8 @@ export const ProfessionalJoinPage: React.FC = () => {
               </div>
 
               {/* Step 2: Category & Qualifications */}
-              <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-6">
-                <div className="flex items-center gap-2.5 border-b border-[#E3E8E2] pb-3">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
+                <div className="flex items-center gap-2.5 border-b border-[#E5E7EB] pb-3">
                   <span className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center font-bold text-xs">
                     2
                   </span>
@@ -435,7 +435,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-semibold cursor-pointer"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-semibold cursor-pointer"
                     >
                       {CANONICAL_CONSULTATION_CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -455,7 +455,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={qualifications}
                       onChange={(e) => setQualifications(e.target.value)}
                       placeholder="e.g. B.Arch (SPA Delhi), M.Tech Structural Engg (IISc), B.E. Civil"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                     />
                   </div>
 
@@ -468,7 +468,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={licenseNumber}
                       onChange={(e) => setLicenseNumber(e.target.value)}
                       placeholder="e.g. CA/2012/54821 or BBMP/BL-4819"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
                     />
                     <p className="text-[10px] text-[#687770]">
                       Required for Council of Architecture or Chartered Engineers; optional for interior specialists.
@@ -486,15 +486,15 @@ export const ProfessionalJoinPage: React.FC = () => {
                       max={60}
                       value={experienceYears}
                       onChange={(e) => setExperienceYears(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Step 3: Practice & Services */}
-              <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-6">
-                <div className="flex items-center gap-2.5 border-b border-[#E3E8E2] pb-3">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
+                <div className="flex items-center gap-2.5 border-b border-[#E5E7EB] pb-3">
                   <span className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center font-bold text-xs">
                     3
                   </span>
@@ -514,7 +514,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={expertise}
                       onChange={(e) => setExpertise(e.target.value)}
                       placeholder="e.g. Bespoke Villa Design, Vastu Space Planning, BBMP Setbacks, RCC Detail"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                     />
                   </div>
 
@@ -527,7 +527,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={proposedServices}
                       onChange={(e) => setProposedServices(e.target.value)}
                       placeholder="e.g. Plan Audit, Foundation Review, Contractor Quote Sanity Check"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                     />
                   </div>
 
@@ -550,7 +550,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                             className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
                               active
                                 ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                                : 'bg-[#F8F8F6] text-[#4B5563] border-[#E3E8E2] hover:bg-white'
+                                : 'bg-[#F8F8F6] text-[#707873] border-[#E5E7EB] hover:bg-white'
                             }`}
                           >
                             {m.label}
@@ -569,7 +569,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={portfolioLinks}
                       onChange={(e) => setPortfolioLinks(e.target.value)}
                       placeholder="e.g. https://instagram.com/myarchitecture, https://behance.net/..."
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                     />
                   </div>
 
@@ -584,7 +584,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={documentUrl}
                         onChange={(e) => setDocumentUrl(e.target.value)}
                         placeholder="https://drive.google.com/file/d/... or public credential document link"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E3E8E2] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
                       />
                     </div>
                     <p className="text-[10px] text-[#687770]">
@@ -595,7 +595,7 @@ export const ProfessionalJoinPage: React.FC = () => {
               </div>
 
               {/* Step 4: Verification Consent & Terms */}
-              <div className="bg-white rounded-3xl border border-[#E3E8E2] p-6 sm:p-8 shadow-xs space-y-4">
+              <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
                 <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -605,7 +605,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                     onChange={(e) => setConsentGiven(e.target.checked)}
                     className="w-4 h-4 mt-0.5 rounded text-[#1B3D34] focus:ring-[#1B3D34] border-gray-300 cursor-pointer"
                   />
-                  <label htmlFor="consentCheckbox" className="text-xs text-[#4B5563] leading-relaxed cursor-pointer">
+                  <label htmlFor="consentCheckbox" className="text-xs text-[#707873] leading-relaxed cursor-pointer">
                     I confirm that the details, qualifications, and credentials provided above are genuine. I agree to Hutty&apos;s professional vetting process, independent advisory code of conduct, and privacy policy. I understand that submitting this application does not automatically list me publicly until authorized admin review is complete.
                   </label>
                 </div>

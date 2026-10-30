@@ -72,13 +72,13 @@ export const FourOfferingsSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-full inline-block">
-            HOW HUTTY HELPS
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[#EBF3EF] border border-[#D5E5DC] px-3 py-1.5 rounded-full inline-block">
+            CONSTRUCTION INTELLIGENCE PILLARS
           </span>
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#18211E] font-heading tracking-tight leading-[1.12]">
             Four questions every home builder asks.
           </h2>
-          <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
+          <p className="text-sm sm:text-base text-[#707873] leading-relaxed font-normal">
             Whether you are exploring costs for a vacant plot, evaluating a contractor quote, or planning your payment schedule, Hutty provides clear, reliable guidance at every step.
           </p>
         </div>
