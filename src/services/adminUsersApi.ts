@@ -3,6 +3,7 @@
 // ==============================================================================
 
 import { getApiUrl } from '../config/api';
+import { useAdminStore } from '../store/useAdminStore';
 
 export interface AdminUserListItem {
   id: string;
@@ -78,7 +79,11 @@ export async function fetchAdminUsers(
 
   const json = await res.json();
   if (!res.ok || !json.success) {
-    throw new Error(json.error || 'Failed to fetch customer accounts');
+    const errMsg = json.error || 'Failed to fetch customer accounts';
+    if (res.status === 401 || res.status === 403 || errMsg.toLowerCase().includes('expired token') || errMsg.toLowerCase().includes('invalid token')) {
+      useAdminStore.getState().handleAuthError(res.status, errMsg);
+    }
+    throw new Error(errMsg);
   }
 
   return json.data;
@@ -105,7 +110,11 @@ export async function disableAdminUser(
 
   const json = await res.json();
   if (!res.ok || !json.success) {
-    throw new Error(json.error || 'Failed to disable customer account');
+    const errMsg = json.error || 'Failed to disable customer account';
+    if (res.status === 401 || res.status === 403 || errMsg.toLowerCase().includes('expired token') || errMsg.toLowerCase().includes('invalid token')) {
+      useAdminStore.getState().handleAuthError(res.status, errMsg);
+    }
+    throw new Error(errMsg);
   }
 
   return json.data;
@@ -130,7 +139,11 @@ export async function restoreAdminUser(
 
   const json = await res.json();
   if (!res.ok || !json.success) {
-    throw new Error(json.error || 'Failed to restore customer account');
+    const errMsg = json.error || 'Failed to restore customer account';
+    if (res.status === 401 || res.status === 403 || errMsg.toLowerCase().includes('expired token') || errMsg.toLowerCase().includes('invalid token')) {
+      useAdminStore.getState().handleAuthError(res.status, errMsg);
+    }
+    throw new Error(errMsg);
   }
 
   return json.data;
@@ -167,7 +180,11 @@ export async function deleteAdminUser(
 
   const json = await res.json();
   if (!res.ok || !json.success) {
-    throw new Error(json.error || 'Failed to delete customer account');
+    const errMsg = json.error || 'Failed to delete customer account';
+    if (res.status === 401 || res.status === 403 || errMsg.toLowerCase().includes('expired token') || errMsg.toLowerCase().includes('invalid token')) {
+      useAdminStore.getState().handleAuthError(res.status, errMsg);
+    }
+    throw new Error(errMsg);
   }
 
   return json;

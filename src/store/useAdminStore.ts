@@ -288,12 +288,35 @@ interface AdminStoreState {
   setSelectedPriceCategory: (cat: string) => void;
   setSelectedProviderId: (id: string) => void;
   clearMessages: () => void;
+  handleAuthError: (status: number, message?: string) => boolean;
 }
 
 const getStoredToken = (): string | null => {
   try {
     const t = localStorage.getItem('hutty_admin_token');
-    if (t) return t;
+    if (t) {
+      // Decode JWT payload to check if already expired
+      if (t.includes('.')) {
+        try {
+          const parts = t.split('.');
+          if (parts.length === 3) {
+            const rawPayload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+            const payload = JSON.parse(rawPayload);
+            if (payload && typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now()) {
+              console.warn('[useAdminStore] Stored admin JWT has expired. Automatically evicting session.');
+              try { localStorage.removeItem('hutty_admin_token'); } catch {}
+              return import.meta.env.DEV ? 'dev-admin-mock-token-2026' : null;
+            }
+          }
+        } catch {
+          if (!import.meta.env.DEV) {
+            try { localStorage.removeItem('hutty_admin_token'); } catch {}
+            return null;
+          }
+        }
+      }
+      return t;
+    }
     // Allow dev preview token strictly in Vite dev server (import.meta.env.DEV)
     if (import.meta.env.DEV) {
       return 'dev-admin-mock-token-2026';
@@ -497,6 +520,30 @@ export const useAdminStore = create<AdminStoreState>((set, get) => ({
       adminProfile: null,
       adminSessions: [],
     });
+  },
+
+  handleAuthError: (status: number, message?: string) => {
+    if (
+      status === 401 ||
+      status === 403 ||
+      (message && (
+        message.toLowerCase().includes('expired token') ||
+        message.toLowerCase().includes('invalid token') ||
+        message.toLowerCase().includes('jwt expired')
+      ))
+    ) {
+      try {
+        localStorage.removeItem('hutty_admin_token');
+      } catch {}
+      set({
+        token: null,
+        adminUser: null,
+        isAuthenticated: false,
+        authError: 'Your admin session has expired or is invalid. Please sign in again.',
+      });
+      return true;
+    }
+    return false;
   },
 
   fetchData: async () => {

@@ -416,7 +416,7 @@ export const AdminPage: React.FC = () => {
   };
 
   // Login Gate
-  if (!isAuthenticated && !token) {
+  if (!isAuthenticated || !token) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
         <div className="max-w-md w-full p-8 bg-white border border-[#E5E7EB] rounded-3xl shadow-xl space-y-6 text-center">

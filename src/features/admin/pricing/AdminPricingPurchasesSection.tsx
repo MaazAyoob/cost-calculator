@@ -47,9 +47,11 @@ export const AdminPricingPurchasesSection: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PAID' | 'PENDING'>('ALL');
   const [tierFilter, setTierFilter] = useState<string>('ALL');
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchPurchases = async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (effectiveToken) headers['Authorization'] = `Bearer ${effectiveToken}`;
@@ -59,11 +61,18 @@ export const AdminPricingPurchasesSection: React.FC = () => {
         fetch(getApiUrl('/admin/pricing/metrics'), { headers }),
       ]);
 
+      if (purchasesRes.status === 401 || purchasesRes.status === 403) {
+        useAdminStore.getState().handleAuthError(purchasesRes.status, 'Admin session expired');
+      }
+
       if (purchasesRes.ok) {
         const json = await purchasesRes.json();
         if (json.success && Array.isArray(json.data)) {
           setPurchases(json.data);
         }
+      } else {
+        const errJson = await purchasesRes.json().catch(() => ({}));
+        setFetchError(errJson.error || `Failed to load purchases (${purchasesRes.status})`);
       }
       if (metricsRes.ok) {
         const json = await metricsRes.json();
@@ -71,8 +80,8 @@ export const AdminPricingPurchasesSection: React.FC = () => {
           setMetrics(json.data);
         }
       }
-    } catch {
-      // In-memory fallback
+    } catch (err: any) {
+      setFetchError(err?.message || 'Network error loading purchase data');
     } finally {
       setIsLoading(false);
     }
@@ -100,6 +109,16 @@ export const AdminPricingPurchasesSection: React.FC = () => {
   return (
     <div className="space-y-6 text-left select-none">
       
+      {/* ── ERROR NOTIFICATION BANNER ── */}
+      {fetchError && (
+        <div className="p-4 bg-red-50 text-red-800 text-xs rounded-xl border border-red-200 flex items-center justify-between">
+          <span>{fetchError}</span>
+          <button onClick={() => fetchPurchases()} className="underline font-bold hover:text-red-950 cursor-pointer">
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* ── METRICS SUMMARY BANNER ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs space-y-1">
@@ -108,10 +127,10 @@ export const AdminPricingPurchasesSection: React.FC = () => {
             <DollarSign className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-black text-[#1B3D34] font-mono">
-            ₹{metrics.totalRevenueINR.toLocaleString('en-IN')}
+            {fetchError ? '—' : isLoading ? '...' : `₹${metrics.totalRevenueINR.toLocaleString('en-IN')}`}
           </div>
           <span className="text-[10px] text-slate-400 block">
-            {metrics.totalRevenuePaise} paise (From PAID purchases only)
+            {fetchError ? '—' : `${metrics.totalRevenuePaise} paise (From PAID purchases only)`}
           </span>
         </div>
 
@@ -121,7 +140,7 @@ export const AdminPricingPurchasesSection: React.FC = () => {
             <CheckCircle2 className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-black text-[#1B3D34] font-mono">
-            {metrics.paidPurchases}
+            {fetchError ? '—' : isLoading ? '...' : metrics.paidPurchases}
           </div>
           <span className="text-[10px] text-slate-400 block">
             Active customer orders granted
@@ -134,7 +153,7 @@ export const AdminPricingPurchasesSection: React.FC = () => {
             <Clock className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-black text-[#1B3D34] font-mono">
-            {metrics.pendingPurchases}
+            {fetchError ? '—' : isLoading ? '...' : metrics.pendingPurchases}
           </div>
           <span className="text-[10px] text-slate-400 block">
             Awaiting payment confirmation
@@ -147,7 +166,7 @@ export const AdminPricingPurchasesSection: React.FC = () => {
             <Tag className="w-4 h-4 text-[#F28C28]" />
           </div>
           <div className="text-2xl font-black text-[#1B3D34] font-mono">
-            {metrics.totalPurchases}
+            {fetchError ? '—' : isLoading ? '...' : metrics.totalPurchases}
           </div>
           <span className="text-[10px] text-slate-400 block">
             All customer checkout attempts

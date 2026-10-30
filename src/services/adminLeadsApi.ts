@@ -70,6 +70,7 @@ export interface LeadsApiResponse {
 }
 
 import { getApiUrl } from '../config/api';
+import { useAdminStore } from '../store/useAdminStore';
 
 /**
  * Fetch filtered leads with pagination and metrics
@@ -102,7 +103,11 @@ export async function fetchAdminLeads(filters: LeadFilters, token?: string | nul
 
   const json = await res.json();
   if (!res.ok || !json.success) {
-    throw new Error(json.error || 'Failed to fetch leads');
+    const errMsg = json.error || 'Failed to fetch leads';
+    if (res.status === 401 || res.status === 403 || errMsg.toLowerCase().includes('expired token') || errMsg.toLowerCase().includes('invalid token')) {
+      useAdminStore.getState().handleAuthError(res.status, errMsg);
+    }
+    throw new Error(errMsg);
   }
 
   return json.data;
@@ -133,7 +138,11 @@ export async function updateAdminLeadStatus(
 
   const json = await res.json();
   if (!res.ok || !json.success) {
-    throw new Error(json.error || 'Failed to update lead status');
+    const errMsg = json.error || 'Failed to update lead status';
+    if (res.status === 401 || res.status === 403 || errMsg.toLowerCase().includes('expired token') || errMsg.toLowerCase().includes('invalid token')) {
+      useAdminStore.getState().handleAuthError(res.status, errMsg);
+    }
+    throw new Error(errMsg);
   }
 
   return json.data;

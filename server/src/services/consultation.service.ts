@@ -1019,19 +1019,112 @@ export class ConsultationService {
 
     const now = new Date().toISOString();
 
+    // Authoritatively resolve and safeguard foreign keys for durable Prisma persistence
+    let safeUserId: string | null = userContext?.id || null;
+    let safeConsultantId: string | null = consultant ? consultant.id : null;
+    let safeProjectId: string | null = data.projectId || null;
+
+    if (this.prisma) {
+      // 1. Safeguard userId FK against PostgreSQL foreign key violation
+      if (safeUserId) {
+        try {
+          const userExists = await (this.prisma as any).user.findUnique({
+            where: { id: safeUserId },
+            select: { id: true },
+          });
+          if (!userExists) {
+            // Check if user exists by email
+            const userByEmail = await (this.prisma as any).user.findFirst({
+              where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+              select: { id: true },
+            });
+            safeUserId = userByEmail ? userByEmail.id : null;
+          }
+        } catch {
+          safeUserId = null;
+        }
+      } else if (normalizedEmail) {
+        try {
+          const userByEmail = await (this.prisma as any).user.findFirst({
+            where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+            select: { id: true },
+          });
+          if (userByEmail) {
+            safeUserId = userByEmail.id;
+          }
+        } catch {
+          safeUserId = null;
+        }
+      }
+
+      // 2. Safeguard consultantId FK against PostgreSQL foreign key violation
+      if (safeConsultantId) {
+        try {
+          const consultantExists = await (this.prisma as any).consultant.findUnique({
+            where: { id: safeConsultantId },
+            select: { id: true },
+          });
+          if (!consultantExists && consultant) {
+            // Attempt to seed the consultant row into PostgreSQL so the relation holds
+            try {
+              await (this.prisma as any).consultant.create({
+                data: {
+                  id: consultant.id,
+                  slug: consultant.slug,
+                  name: consultant.name,
+                  title: consultant.title,
+                  category: consultant.category,
+                  profileImage: consultant.profileImage,
+                  experienceYears: consultant.experienceYears,
+                  city: consultant.city,
+                  serviceAreas: consultant.serviceAreas,
+                  about: consultant.about,
+                  specializations: consultant.specializations,
+                  services: consultant.services,
+                  active: consultant.active,
+                  featured: consultant.featured,
+                  displayOrder: consultant.displayOrder,
+                },
+              });
+            } catch {
+              // If seed insert fails, nullify consultantId to prevent FK violation
+              safeConsultantId = null;
+            }
+          }
+        } catch {
+          safeConsultantId = null;
+        }
+      }
+
+      // 3. Safeguard projectId FK against PostgreSQL foreign key violation
+      if (safeProjectId) {
+        try {
+          const projectExists = await (this.prisma as any).project.findUnique({
+            where: { id: safeProjectId },
+            select: { id: true },
+          });
+          if (!projectExists) {
+            safeProjectId = null;
+          }
+        } catch {
+          safeProjectId = null;
+        }
+      }
+    }
+
     const requestEntity: ConsultationRequestEntity = {
       id: requestId,
       publicReference,
       idempotencyKey: data.idempotencyKey || null,
-      userId: userContext?.id || null,
-      consultantId: consultant ? consultant.id : null,
+      userId: safeUserId,
+      consultantId: safeConsultantId,
       consultant,
       consultantNameSnapshot: consultant ? consultant.name : 'Hutty Expert Desk',
       consultantTitleSnapshot: consultant ? consultant.title : 'Senior Lead Architect / Engineer Review',
       homeownerName: data.homeownerName.trim(),
       homeownerPhone: normPhone.e164,
       homeownerEmail: normalizedEmail,
-      projectId: data.projectId || null,
+      projectId: safeProjectId,
       projectSnapshot,
       projectLocation: (data.projectLocation || 'Bangalore').trim(),
       projectType: (data.projectType || 'Independent Residential House').trim(),

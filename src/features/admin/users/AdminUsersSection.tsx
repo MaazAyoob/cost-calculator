@@ -108,7 +108,11 @@ export const AdminUsersSection: React.FC = () => {
       setPagination(data.pagination);
       setSummary(data.summary);
     } catch (err: any) {
-      setError(err.message || 'Failed to load customer accounts');
+      const msg = err.message || 'Failed to load customer accounts';
+      setError(msg);
+      if (msg.toLowerCase().includes('expired token') || msg.toLowerCase().includes('invalid token')) {
+        useAdminStore.getState().handleAuthError(401, msg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -229,7 +233,9 @@ export const AdminUsersSection: React.FC = () => {
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-[#18211E] mt-2 font-mono">{summary.totalUsers}</div>
+          <div className="text-2xl font-bold text-[#18211E] mt-2 font-mono">
+            {error ? '—' : isLoading ? '...' : summary.totalUsers}
+          </div>
           <div className="text-[11px] text-slate-400 mt-0.5">Database & in-memory accounts</div>
         </div>
 
@@ -240,7 +246,9 @@ export const AdminUsersSection: React.FC = () => {
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-emerald-700 mt-2 font-mono">{summary.activeUsers}</div>
+          <div className="text-2xl font-bold text-emerald-700 mt-2 font-mono">
+            {error ? '—' : isLoading ? '...' : summary.activeUsers}
+          </div>
           <div className="text-[11px] text-emerald-600 mt-0.5">Permitted to log in & book</div>
         </div>
 
@@ -251,7 +259,9 @@ export const AdminUsersSection: React.FC = () => {
               <ShieldAlert className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-rose-700 mt-2 font-mono">{summary.disabledUsers}</div>
+          <div className="text-2xl font-bold text-rose-700 mt-2 font-mono">
+            {error ? '—' : isLoading ? '...' : summary.disabledUsers}
+          </div>
           <div className="text-[11px] text-rose-600 mt-0.5">Access blocked server-side</div>
         </div>
       </div>

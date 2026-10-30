@@ -196,37 +196,37 @@ export const AdminConsultationsSection: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Total</span>
-          <span className="text-xl font-extrabold text-[#18211E] font-mono mt-0.5 block">{adminStats.total}</span>
+          <span className="text-xl font-extrabold text-[#18211E] font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.total}</span>
         </div>
 
         <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Paid</span>
-          <span className="text-xl font-extrabold text-emerald-700 font-mono mt-0.5 block">{adminStats.paid}</span>
+          <span className="text-xl font-extrabold text-emerald-700 font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.paid}</span>
         </div>
 
         <div className="bg-white p-3.5 rounded-2xl border border-amber-300 bg-amber-50/40 shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-amber-700 block tracking-wider">Awaiting Review</span>
-          <span className="text-xl font-extrabold text-amber-900 font-mono mt-0.5 block">{adminStats.awaitingReview}</span>
+          <span className="text-xl font-extrabold text-amber-900 font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.awaitingReview}</span>
         </div>
 
         <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Assigned</span>
-          <span className="text-xl font-extrabold text-blue-800 font-mono mt-0.5 block">{adminStats.assigned}</span>
+          <span className="text-xl font-extrabold text-blue-800 font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.assigned}</span>
         </div>
 
         <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Scheduled</span>
-          <span className="text-xl font-extrabold text-emerald-800 font-mono mt-0.5 block">{adminStats.scheduled}</span>
+          <span className="text-xl font-extrabold text-emerald-800 font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.scheduled}</span>
         </div>
 
         <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Completed</span>
-          <span className="text-xl font-extrabold text-slate-700 font-mono mt-0.5 block">{adminStats.completed}</span>
+          <span className="text-xl font-extrabold text-slate-700 font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.completed}</span>
         </div>
 
         <div className="bg-white p-3.5 rounded-2xl border border-[#E5E7EB] shadow-2xs">
           <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Cancelled</span>
-          <span className="text-xl font-extrabold text-red-700 font-mono mt-0.5 block">{adminStats.cancelled}</span>
+          <span className="text-xl font-extrabold text-red-700 font-mono mt-0.5 block">{adminError ? '—' : isAdminLoading ? '...' : adminStats.cancelled}</span>
         </div>
       </div>
 

@@ -136,7 +136,11 @@ export const AdminLeadsSection: React.FC = () => {
       setSummary(data.summary);
       setActiveDateRange(data.activeDateRange);
     } catch (err: any) {
-      setError(err.message || 'Failed to load leads');
+      const msg = err.message || 'Failed to load leads';
+      setError(msg);
+      if (msg.toLowerCase().includes('expired token') || msg.toLowerCase().includes('invalid token')) {
+        useAdminStore.getState().handleAuthError(401, msg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -402,7 +406,7 @@ export const AdminLeadsSection: React.FC = () => {
             <Users className="w-4 h-4 text-slate-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E]">
-            {summary.totalLeads}
+            {error ? '—' : isLoading ? '...' : summary.totalLeads}
           </div>
           <div className="text-[11px] text-[#707873] mt-1 truncate">
             {activeDateRange.label}
@@ -416,7 +420,7 @@ export const AdminLeadsSection: React.FC = () => {
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold font-heading text-emerald-900">
-            {summary.phoneVerified}
+            {error ? '—' : isLoading ? '...' : summary.phoneVerified}
           </div>
           <div className="text-[11px] text-emerald-700 mt-1 font-medium">
             {summary.totalLeads > 0
@@ -432,7 +436,7 @@ export const AdminLeadsSection: React.FC = () => {
             <AlertCircle className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold font-heading text-amber-900">
-            {summary.unverified}
+            {error ? '—' : isLoading ? '...' : summary.unverified}
           </div>
           <div className="text-[11px] text-amber-700 mt-1 font-medium">
             Requires direct follow-up
@@ -446,7 +450,7 @@ export const AdminLeadsSection: React.FC = () => {
             <Clock className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold font-heading text-blue-900">
-            {summary.newEnquiries}
+            {error ? '—' : isLoading ? '...' : summary.newEnquiries}
           </div>
           <div className="text-[11px] text-blue-700 mt-1 font-medium">
             Awaiting initial contact

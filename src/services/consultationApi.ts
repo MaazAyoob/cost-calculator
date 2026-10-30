@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import { getApiUrl } from '../config/api';
+import { useAdminStore } from '../store/useAdminStore';
 import {
   Consultant,
   ConsultationRequest,
@@ -156,6 +157,9 @@ class ConsultationApiClient {
       headers: this.getHeaders(token),
     });
     if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        useAdminStore.getState().handleAuthError(res.status, 'Admin session expired');
+      }
       throw new Error(`Failed to load admin consultants (${res.status})`);
     }
     const json = await res.json();
@@ -221,6 +225,9 @@ class ConsultationApiClient {
       headers: this.getHeaders(token),
     });
     if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        useAdminStore.getState().handleAuthError(res.status, 'Admin session expired');
+      }
       throw new Error(`Failed to load requests (${res.status})`);
     }
     const json = await res.json();
