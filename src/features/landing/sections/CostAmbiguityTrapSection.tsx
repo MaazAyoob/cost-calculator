@@ -11,13 +11,13 @@ export const CostAmbiguityTrapSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
-            <span className="text-[#F28C28] font-bold">The Cost Trap</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#183B32]/10 text-xs font-semibold text-[#183B32]">
+            <span className="text-[#C66B4E] font-bold">The Cost Trap</span>
             <span>&bull;</span>
             <span>Why Square-Foot Quotes Fail</span>
           </div>
 
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
+          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#183B32] tracking-tight">
             The Cost Ambiguity Trap.
           </h2>
 
@@ -45,7 +45,7 @@ export const CostAmbiguityTrapSection: React.FC = () => {
 
             <div className="my-6 space-y-2">
               <span className="text-xs font-medium text-[#4B5563]">The Single Flat Rate</span>
-              <div className="text-4xl sm:text-5xl font-black text-[#1B3D34] font-heading">
+              <div className="text-4xl sm:text-5xl font-black text-[#183B32] font-heading">
                 ₹2,100 <span className="text-lg font-normal text-[#4B5563]">/ sq.ft</span>
               </div>
               <p className="text-xs text-red-600 font-medium">
@@ -76,54 +76,54 @@ export const CostAmbiguityTrapSection: React.FC = () => {
           </div>
 
           {/* RIGHT: Hutty's Transparent Quantity Planning */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#1B3D34] shadow-md relative overflow-hidden text-left">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#F28C28]" />
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#183B32] shadow-md relative overflow-hidden text-left">
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#C66B4E]" />
             
             <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
-              <span className="text-xs font-bold text-[#1B3D34] uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#F28C28]" />
+              <span className="text-xs font-bold text-[#183B32] uppercase tracking-wider flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#C66B4E]" />
                 Hutty Quantity-First Planning
               </span>
-              <span className="text-xs font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded">
+              <span className="text-xs font-bold text-[#183B32] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded">
                 Transparent
               </span>
             </div>
 
             <div className="my-6 space-y-2">
               <span className="text-xs font-medium text-[#4B5563]">Physical Material &amp; Labour Schedules</span>
-              <div className="text-4xl sm:text-5xl font-black text-[#1B3D34] font-heading tabular-nums">
+              <div className="text-4xl sm:text-5xl font-black text-[#183B32] font-heading tabular-nums">
                 8.64 T <span className="text-lg font-normal text-[#4B5563]">Steel + 1,080 Bags</span>
               </div>
-              <p className="text-xs text-[#1B3D34] font-medium">
+              <p className="text-xs text-[#183B32] font-medium">
                 How we calculate your estimate: based on your room layout and actual house dimensions.
               </p>
             </div>
 
             <div className="space-y-3 pt-4 border-t border-[#E5E7EB] text-xs text-[#4B5563]">
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
                 <span><strong>Total Built-Up Area Calculation:</strong> Sets setbacks, room layout, and structural ratios based on standard municipal guidelines.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
                 <span><strong>Transparent Brand Comparison:</strong> Compare Tata Tiscon vs JSW Steel, UltraTech vs ACC cement at real verified Bangalore retail rates.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
                 <span><strong>Detailed 13-Stage Work Schedule:</strong> A detailed report you can discuss with your bank or contractor.</span>
               </div>
             </div>
 
-            <div className="mt-6 p-3.5 bg-[rgba(27,61,52,0.06)] rounded-2xl border border-[#1B3D34]/20 flex items-center justify-between">
-              <span className="text-xs font-bold text-[#1B3D34]">
+            <div className="mt-6 p-3.5 bg-[rgba(27,61,52,0.06)] rounded-2xl border border-[#183B32]/20 flex items-center justify-between">
+              <span className="text-xs font-bold text-[#183B32]">
                 Hutty Outcome: Complete Financial Clarity
               </span>
               <button
                 onClick={() => navigate('/calculator')}
-                className="text-xs font-bold text-[#1B3D34] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#183B32] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <span>Calculate Now</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
               </button>
             </div>
           </div>

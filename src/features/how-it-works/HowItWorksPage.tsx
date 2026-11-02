@@ -12,9 +12,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   Sparkles,
-  MapPin,
-  Clock,
-  Award,
 } from 'lucide-react';
 import { SEO } from '../../components/common/SEO';
 import { useWizardStore } from '../../store/useWizardStore';
@@ -57,7 +54,7 @@ const STEPS = [
     step: '05',
     title: 'Detailed Construction Cost Report',
     subtitle: 'Work-wise BOQ and report',
-    desc: 'Unlock the complete itemized bill of quantities (BOQ) with granular material quantities, market rates, trade labour milestones, and a downloadable PDF report you can discuss with your contractor or banker.',
+    desc: 'Unlock the complete itemized bill of quantities (BOQ) with granular material quantities, market rates, trade labour milestones, and a downloadable PDF report you can discuss with your contractor or consultant.',
     icon: FileText,
     highlights: ['Available for ₹499', 'Itemized civil & MEP line items', 'Downloadable PDF format'],
   },
@@ -81,7 +78,7 @@ export const HowItWorksPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] py-10 sm:py-16">
+    <div className="min-h-screen bg-[#F8F8F6] text-[#183B32] py-10 sm:py-16">
       <SEO
         title="How Hutty Works — Step-by-Step Home Construction Planning"
         description="Learn how Hutty calculates your home construction cost, checks municipal setbacks, plans material quantities, and connects you with verified independent experts."
@@ -97,17 +94,17 @@ export const HowItWorksPage: React.FC = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 space-y-5"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-xs font-semibold text-[#1B3D34]">
-              <Sparkles className="w-3.5 h-3.5 text-[#F28C28]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E8EFE9] border border-[#CBD5CB] text-xs font-semibold text-[#183B32]">
+              <Sparkles className="w-3.5 h-3.5 text-[#C66B4E]" />
               <span className="font-bold">HOW HUTTY WORKS &bull; FROM PLOT TO HOME</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-heading text-[#1B3D34] tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-heading text-[#183B32] tracking-tight leading-tight">
               Build your home with clarity, <br className="hidden sm:inline" />
               one step at a time.
             </h1>
 
-            <p className="text-sm sm:text-base text-[#707873] leading-relaxed max-w-xl">
+            <p className="text-sm sm:text-base text-[#66716B] leading-relaxed max-w-xl">
               Hutty demystifies residential construction. We combine statutory bylaws, structural quantity algorithms, and verified local market rates into an intuitive journey designed for first-time homebuilders.
             </p>
 
@@ -115,15 +112,15 @@ export const HowItWorksPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleStartEstimate}
-                className="bg-[#1B3D34] hover:bg-[#142E27] text-white text-sm font-bold px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2 active:scale-[0.98]"
+                className="bg-[#183B32] hover:bg-[#245747] text-white text-sm font-bold px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-soft-sm hover:shadow-soft-md flex items-center justify-center gap-2 active:scale-[0.98]"
               >
                 <span>Start Free Estimate</span>
-                <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+                <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/consult')}
-                className="bg-white hover:bg-[#F8F9F7] text-[#1B3D34] border border-[#D7DFD9] text-sm font-semibold px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-2 active:scale-[0.98]"
+                className="bg-white hover:bg-[#E8EFE9] text-[#183B32] border border-[#CBD5CB] text-sm font-semibold px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-soft-xs flex items-center justify-center gap-2 active:scale-[0.98]"
               >
                 <span>Consult an Expert — ₹1,499</span>
               </button>
@@ -137,7 +134,7 @@ export const HowItWorksPage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 relative"
           >
-            <div className="relative rounded-3xl overflow-hidden border-2 border-[#E5E7EB] shadow-md bg-white group">
+            <div className="relative rounded-3xl overflow-hidden border-2 border-[#CBD5CB] shadow-soft-md bg-white group">
               <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-100">
                 <img
                   src={familyHomeImg}
@@ -150,7 +147,7 @@ export const HowItWorksPage: React.FC = () => {
                 {/* Floating Bottom Card */}
                 <div className="absolute bottom-3.5 left-3.5 right-3.5 text-left text-white space-y-1">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white">
-                    <Sparkles className="w-3 h-3 text-[#F28C28]" />
+                    <Sparkles className="w-3 h-3 text-[#C66B4E]" />
                     <span>Real Homeowners</span>
                   </div>
                   <h3 className="text-sm font-bold leading-tight">
@@ -163,9 +160,9 @@ export const HowItWorksPage: React.FC = () => {
               </div>
 
               {/* Bottom Quick Metric */}
-              <div className="p-3.5 bg-[#F8F9F7] border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#1B3D34]">
+              <div className="p-3.5 bg-[#F8F8F6] border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#183B32]">
                 <span className="font-semibold">Average Homeowner Clarity</span>
-                <span className="font-bold text-[#F28C28]">₹21.4L+ In Decisions Planned</span>
+                <span className="font-bold text-[#C66B4E]">₹21.4L+ In Decisions Planned</span>
               </div>
             </div>
           </motion.div>
@@ -183,36 +180,36 @@ export const HowItWorksPage: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: idx * 0.06 }}
                 whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E7EB] hover:border-[#1B3D34]/50 transition-all shadow-xs hover:shadow-md flex flex-col justify-between space-y-4 text-left"
+                className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E5E7EB] hover:border-[#183B32]/40 transition-all shadow-soft-xs hover:shadow-soft-md flex flex-col justify-between space-y-4 text-left"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-black text-[#F28C28] bg-[rgba(242,140,40,0.10)] px-2.5 py-1 rounded-md">
+                    <span className="font-mono text-xs font-black text-[#C66B4E] bg-[#C66B4E]/10 px-2.5 py-1 rounded-md">
                       STAGE {step.step}
                     </span>
-                    <div className="w-9 h-9 rounded-xl bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34]">
-                      <Icon className="w-4 h-4 text-[#1B3D34]" />
+                    <div className="w-9 h-9 rounded-xl bg-[#E8EFE9] border border-[#CBD5CB] flex items-center justify-center text-[#183B32]">
+                      <Icon className="w-4 h-4 text-[#245747]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[11px] font-mono text-[#687770] uppercase tracking-wider block">
+                    <span className="text-[11px] font-mono text-[#66716B] uppercase tracking-wider block">
                       {step.subtitle}
                     </span>
-                    <h3 className="text-xl font-bold font-heading text-[#1B3D34] leading-snug">
+                    <h3 className="text-xl font-bold font-heading text-[#183B32] leading-snug">
                       {step.title}
                     </h3>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#66716B] leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
 
                 <div className="pt-3 border-t border-[#E5E7EB] space-y-1.5">
                   {step.highlights.map((h, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-[#202522]">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                    <div key={i} className="flex items-center gap-2 text-xs text-[#183B32]">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#347A62] shrink-0" />
                       <span>{h}</span>
                     </div>
                   ))}
@@ -223,28 +220,28 @@ export const HowItWorksPage: React.FC = () => {
         </div>
 
         {/* Estimation Disclaimer Callout */}
-        <div className="bg-[#EFF5F1] rounded-3xl p-6 sm:p-8 border border-[#DCE5DF] max-w-4xl mx-auto space-y-3 text-left">
+        <div className="bg-[#E8EFE9]/60 rounded-3xl p-6 sm:p-8 border border-[#CBD5CB] max-w-4xl mx-auto space-y-3 text-left">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-[#1B3D34]" />
-            <h4 className="text-sm sm:text-base font-bold text-[#1B3D34]">
+            <ShieldCheck className="w-5 h-5 text-[#183B32]" />
+            <h4 className="text-sm sm:text-base font-bold text-[#183B32]">
               Independent, Transparent &amp; Code-Compliant
             </h4>
           </div>
-          <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#66716B] leading-relaxed">
             Hutty does not take contractor kickbacks or inflate material rates. All calculations are derived from published engineering standards (IS 456:2000, IS 1786 Fe550D, NBC 2016) and active Bengaluru retail material benchmarks.
           </p>
-          <p className="text-[11px] text-[#687770] italic pt-1 border-t border-[#D5E1D8]">
+          <p className="text-[11px] text-[#66716B] italic pt-1 border-t border-[#CBD5CB]/60">
             <strong>Important Planning Disclaimer:</strong> This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked.
           </p>
         </div>
 
         {/* Bottom CTA Block */}
-        <div className="bg-[#1B3D34] text-white rounded-3xl p-8 sm:p-12 text-center max-w-4xl mx-auto space-y-6 shadow-md">
+        <div className="bg-[#183B32] text-white rounded-3xl p-8 sm:p-12 text-center max-w-4xl mx-auto space-y-6 shadow-soft-lg">
           <div className="space-y-2">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-heading tracking-tight">
               Ready to understand your home?
             </h2>
-            <p className="text-xs sm:text-sm text-white/70 max-w-lg mx-auto">
+            <p className="text-xs sm:text-sm text-white/80 max-w-lg mx-auto">
               Start your free residential estimate in under 3 minutes without registration.
             </p>
           </div>
@@ -253,7 +250,7 @@ export const HowItWorksPage: React.FC = () => {
             <button
               type="button"
               onClick={handleStartEstimate}
-              className="w-full sm:w-auto bg-[#F28C28] hover:bg-[#D9771A] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2 active:scale-[0.98]"
+              className="w-full sm:w-auto bg-[#C66B4E] hover:bg-[#A95640] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer shadow-soft-sm flex items-center justify-center gap-2 active:scale-[0.98]"
             >
               <span>Start Free Estimate</span>
               <ArrowRight className="w-4 h-4" />

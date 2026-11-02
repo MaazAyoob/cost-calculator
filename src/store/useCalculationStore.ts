@@ -13,7 +13,7 @@ import { rateService } from '../calculation-engine/data/rateService';
 function buildInput(): EngineInput {
   const s = useWizardStore.getState();
   const input: EngineInput = {
-    city:            s.city || 'Bangalore',
+    city:            (s.city === 'Other' ? 'Bangalore' : s.city) || 'Bangalore',
     authority:       s.authority || 'BBMP/BDA',
     plotLength:      s.plotLength || 0,
     plotWidth:       s.plotWidth || 0,
@@ -45,6 +45,7 @@ function buildInput(): EngineInput {
     electrical:      s.electrical,
     bathroomFittings: s.bathroomFittings,
     painting:        s.painting,
+    fabrication:     s.fabrication,
     contractorMode:  s.contractorMode || 'independent',
     contractorMarginRate: s.contractorMarginRate,
     applyContractorGST: s.applyContractorGST,

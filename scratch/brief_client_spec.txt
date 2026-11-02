@@ -1,0 +1,555 @@
+=== PAGE 1 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 1
+HUTTY
+Residential Digital Quantity Surveyor
+Calculation Engine & Formula Specification
+Client Review Document • Version 1.0.0 • Bangalore (BBMP/BDA) & Mysore (MUDA)
+Build your home with clarity.
+Purpose. This document explains how Hutty converts homeowner inputs into building geometry, physical quantities,
+selected-material costs, BOQ schedules and a final project estimate. The formulas and rates below are reproduced from
+the specifications supplied for this project; assumptions and commercial parameters remain subject to client/Rightcon
+confirmation.
+1. HOW THE ENGINE WORKS
+Hutty follows a forward calculation chain. The homeowner does not enter raw civil quantities. Instead, design inputs drive
+a canonical space model, which produces quantities. Material choices then supply rates for those quantities.
+USER INPUTS → SPACE MODEL → GEOMETRY → PHYSICAL QUANTITIES → MATERIAL SELECTION → UNIT RATES →
+BOQ → TOTAL COST
+Layer
+What happens
+Typical outputs
+1. User Inputs
+Plot, location, setbacks, storeys, house type, parking, rooms
+and material choices.
+Plot dimensions, floors, bedrooms, bathrooms, brands
+2. Space Model
+Creates room envelopes and authoritative
+door/window/fixture schedules.
+Areas, perimeters, openings, points, fixtures
+3. Geometry
+Calculates buildable footprint and total BUA.
+Plot area, floor BUA, total BUA, remaining ground
+4. Quantity Takeoff
+Applies formula/engineering rules to derive physical
+quantities.
+Steel, cement, sand, blocks, tiles, paint, pipes
+5. Pricing
+Applies selected brand/material unit rates.
+Rate × quantity
+6. Reporting
+Separates works, materials, fixtures and cost.
+BOQ, material schedule, fixture schedule, cost
+summary
+
+
+=== PAGE 2 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 2
+2. STEP-BY-STEP USER INPUT MODEL
+Step 1 — Site & Building Inputs. Location, plot dimensions, setback rules, number of floors/storeys, house type and
+parking type are collected. These inputs determine the buildable footprint and built-up area.
+Step 2 — House Configuration. Bedrooms, bathrooms, kitchen/dining, living, balcony/utility and related spaces drive
+masonry, doors/windows, electrical, plumbing, flooring, paint and fixture quantities.
+Steps 3–10 — Material Selection. The homeowner selects preferred materials/brands. These selections change the
+applicable unit rates and therefore cost, while the underlying physical quantity remains governed by the design and
+quantity formulas.
+Final output. Hutty presents: (1) Works BOQ, (2) Material Schedule, (3) Fixtures & Fittings Schedule, and (4) Cost
+Summary.
+3. PLOT, SETBACK & BUA FORMULAS
+Parameter
+Formula
+Unit / meaning
+Plot Area
+Plot Length × Plot Width
+sq.ft gross site area
+Buildable Length
+Plot Length − Front Setback − Rear Setback
+ft
+Buildable Width
+Plot Width − Left Setback − Right Setback
+ft
+Buildable Footprint
+Buildable Length × Buildable Width
+sq.ft
+Floor BUA
+min(Buildable Footprint, Plot Area × 0.60)
+sq.ft
+Total BUA
+Floor BUA × Number of Storeys
+sq.ft
+Remaining Ground
+Plot Area − Floor BUA
+sq.ft
+Important: The 60% coverage value is a default in the supplied pilot specification. Actual permissible
+coverage/setbacks depend on the applicable authority, plot conditions and confirmed planning rules.
+4. CANONICAL SPACE MODEL
+The space model uses a standard wall height of 10.0 ft unless otherwise configured. Each configured space has length,
+width, area, perimeter, openings and downstream quantity dependencies.
+Space
+Default L × W
+Area
+Perimeter
+Openings allowance
+Master Bedroom
+14 × 12 ft
+168 sq.ft
+52 ft
+1 door 21 + 1 window 20 sq.ft
+Standard Bedroom
+12 × 11 ft
+132 sq.ft
+46 ft
+1 door 21 + 1 window 16 sq.ft
+Attached Bathroom
+8 × 5 ft
+40 sq.ft
+26 ft
+1 door 15 + 1 ventilator 4 sq.ft
+Living Room
+18 × 14 ft
+252 sq.ft
+64 ft
+1 main door 28 + 2 windows 40
+sq.ft
+Kitchen & Dining
+12 × 10 ft
+120 sq.ft
+44 ft
+1 door 21 + 1 window 15 sq.ft
+Balcony / Utility
+10 × 4 ft
+40 sq.ft
+28 ft
+1 external door 18 sq.ft
+From these envelopes the engine derives gross wall area, net wall area, ceiling area, paintable area, flooring area, wall
+cladding, waterproofing, electrical points and plumbing fixtures.
+
+
+=== PAGE 3 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 3
+5. SECTION B — MATERIAL CONSUMPTION
+These are the physical consumables in the supplied pilot specification. Concrete/RCC is budgeted as a works item rather
+than duplicated as a separate customer-facing material line.
+Material
+Formula
+Unit
+Rate / rule
+TMT Steel Rebar
+Total BUA × [2.8 + 0.2 × (Floors − 1)] ÷ 1000
+Tonnes
+2.8 kg/sq.ft at G; +0.2 per
+additional floor
+Portland Cement
+Total BUA × 0.40
+50 kg bags
+0.40 bags/sq.ft
+M-Sand
+Total BUA × 0.60
+CFT
+0.60 CFT/sq.ft
+P-Sand
+Total BUA × 0.60
+CFT
+0.60 CFT/sq.ft
+Coarse Aggregate
+Total BUA × 1.35
+CFT
+1.35 CFT/sq.ft
+AAC Blocks
+(Net Wall Area × Thickness ÷ Unit Block Volume) × 1.05
+Pieces
+600×200×150 mm; +5% buffer
+Floor Tiles
+Configured floor areas × 1.07
+sq.ft
++7% cutting buffer
+Bathroom Dado
+Bath perimeter × dado height − openings
+sq.ft
+7 ft lintel or 10 ft ceiling
+Kitchen Backsplash
+Counter length × 2.0
+sq.ft
+2 ft height
+Internal Paint
+(Net internal wall + ceiling) ÷ 45
+Litres
+2-coat coverage rule supplied
+External Paint
+Net external wall area ÷ 60
+Litres
+2-coat coverage rule supplied
+Wall Putty
+(Internal wall + ceiling area) × 0.55
+kg
+0.55 kg/sq.ft
+Waterproofing
+Bath floors + perimeter×1 ft + terrace + sump
+sq.ft
+Flexible waterproofing system
+6. SECTION C — DOORS & JOINERY
+Item
+Quantity / sizing logic
+Base rate
+Main Entrance Door
+1 set per dwelling; 7×4 ft = 28 sq.ft
+I1,45,000 premium
+Internal Room Doors
+1 per bedroom/study/office/pooja; 7×3 ft = 21 sq.ft
+I18,500/set
+Bathroom Doors
+1 per bathroom/powder room; 7×2.5 ft = 17.5 sq.ft
+I14,500/set
+Utility/Balcony Door
+1 per configured balcony/utility; 7×2.5 ft
+Uses selected door rate
+Door Frames
+(Main + Internal doors) × 6.5 RM
+I1,800/RM
+Locksets/Hardware
+1 set per internal door
+I3,200/set
+
+
+=== PAGE 4 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 4
+7. SECTION C — WINDOWS, GLAZING & GRILLES
+Item
+Quantity / area logic
+Base rate
+Bedroom Windows
+1 per bedroom; 5×4 ft = 20 sq.ft each
+uPVC I780/sq.ft
+Living Windows
+2 windows; total 40 sq.ft
+uPVC I780/sq.ft
+Kitchen/Dining
+1 window; 4×3 ft = 12 sq.ft
+uPVC I780/sq.ft
+Bathroom Ventilator
+1 per bath; 2×2 ft = 4 sq.ft
+Selected rate
+MS Safety Grilles
+Total window area × 1.00
+I280/sq.ft
+RCC Chajjas/Sunshades
+Measured running length
+I1,200/RM
+8. PLUMBING, SANITARY & TANKS
+Item
+Formula / takeoff
+Base rate
+Bathroom Fixture Set
+1 set per bathroom
+Premium I38,000/set; Luxury I85,000;
+Economy I18,000
+CPVC Water Lines
+Water points × 4.5 m + vertical shaft risers
+I140/m
+SWR Drain Lines
+Drain points × 3.5 m + vertical soil stacks
+I180/m
+Floor Traps
+Bathrooms×2 + utility×1 + kitchen×1
+I850/unit
+Overhead Tank
+Bedrooms × 2 occupants × 135 LPCD × 1.5 days; minimum 1000 L
+I28,000/unit
+Underground Sump
+1.5–2 × overhead capacity; supplied range 4,000–6,000 L
+Sized from tank capacity
+Booster Pump
+1 × 0.75 HP VFD unit
+I35,000/set
+Kitchen Sink & Mixer
+1 configured kitchen
+I14,500/unit
+9. ELECTRICAL MEP & UTILITIES
+Space
+Point schedule
+Master Bedroom
+4 light + 1 fan + 3 power + 1 AC + 1 TV/Data
+Standard Bedroom
+3 light + 1 fan + 3 power + 1 AC
+Living & Dining
+8 light + 2 fans + 6 power + 1 AC + 2 TV/Data
+Kitchen
+4 light + 1 exhaust + 4 dedicated 16A appliance points
+Bathroom
+2 light + 1 geyser + 1 exhaust
+FRLS wire = Total Electrical Points × 5.5 m + distribution circuits. PVC conduit = Total Electrical Points × 3.2 m + slab
+routing.
+
+
+=== PAGE 5 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 5
+10. ELECTRICAL PRICING & SPECIAL UTILITIES
+Item
+Supplied specification
+Base rate
+FRLS Copper Wire
+1.5/2.5/4.0 sq.mm multi-strand
+I38–I48/m
+PVC Conduit
+25mm heavy-duty fire-retardant ISI
+I35/m
+Modular Switch Modules
+Schneider/Legrand/Havells class
+I185–I240/module
+LED Lighting Point
+Philips/Havells 9W/12W
+I1,200/point
+Chemical Earthing
+2 gel earth pits with copper electrode
+I22,000/pit
+Distribution Board
+8/12-way with MCB/RCCB/isolators
+I24,000/floor
+Main Feeder Cable
+4-core 16 sq.mm armoured XLPE
+I1,800/RM
+Residential Lift
+G+3 or higher; 6-passenger MRL
+I5.80L Bangalore / I5.20L Mysore
+EV Wallbox
+7.2 kW Type 2
+I38,000/unit
+BLDC Fan
+1 per bedroom/living/study
+I6,500/unit
+Modular Kitchen
+12 RM marine BWP + quartz package
+I18,000/RM
+Stilt Parking Civil
+Per car allowance
+I1,80,000/car
+11. SECTION D — COMMERCIAL COST ENGINE
+The supplied specification defines the following cost aggregation. The base cost is derived from the Works BOQ, then
+commercial/statutory additions are calculated from the stated bases.
+Base Construction Cost = Σ (Section A Works BOQ line items)
+Professional Fees = Base Construction Cost × 5%
+Contractor Margin = Base Construction Cost × 15%
+Contingency Reserve = Base Construction Cost × 6%
+GST = (Base Cost + Professional Fees) × 18%
+Total Project Cost = Base Cost + Professional Fees + Margin + Contingency + GST
+Effective Rate / Sq.Ft = Total Project Cost ÷ Total Built-Up Area
+12. CITY BENCHMARKS & MATERIAL RATE MATRIX
+Tier
+Bangalore
+Mysore
+Typical specification
+Essential
+I1,750/sq.ft
+I1,550/sq.ft
+600×600 tiles, flush doors, Anchor, Cera
+Premium
+I2,450/sq.ft
+I2,150/sq.ft
+800×800 vitrified, Teak entry, uPVC, Finolex, Jaquar
+Luxury
+I3,400/sq.ft
+I2,950/sq.ft
+Italian marble, Burma Teak, DGU, Toto, automation
+Bangalore labour index: 1.00. Mysore labour index: 0.88. Mysore transit surcharge: I45/sq.ft.
+
+
+=== PAGE 6 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 6
+13. BRAND INVARIANCE — A CORE ENGINE RULE
+Material/brand selection is a pricing layer. It must not rewrite the physical quantity derived from the building and space
+model.
+PHYSICAL QUANTITY → SELECTED BRAND → UNIT RATE → AMOUNT
+Category
+Premium
+Economy
+Luxury
+Steel
+Tata Tiscon I78,000/T
+Indus TMT I69,000/T
+Tata Tiscon 550D Super I84,000/T
+Cement
+UltraTech OPC 53 I420/bag
+Dalmia Bharat I375/bag
+ACC Concrete+ I450/bag
+Flooring
+Vitrified I110/sq.ft
+Ceramic I65/sq.ft
+Italian Marble I420/sq.ft
+Sanitaryware
+Jaquar/Kohler I38,000/set
+Cera/Hindware I18,000/set
+Toto/Grohe I85,000/set
+Electrical
+Finolex/Polycab I48/m
+Anchor I28/m
+Havells Fire Shield I62/m
+Paint
+Asian Paints Royale I580/L
+Tractor I220/L
+PU Luxury I950/L
+14. DESIGN CHANGE → AUTOMATIC COST CHANGE
+Example supplied for client discussion: add 1 bedroom + 1 bathroom. The space model automatically propagates the
+change.
+Dependency
+Automatic change
+Example cost effect
+Internal door
++1
+I18,500
+Bathroom door
++1
+I14,500
+Bedroom window
++1 / 20 sq.ft
+20 × selected window rate
+Sanitary set
++1
+I38,000 premium
+Electrical
+Additional room/bath points
+Points × applicable rates
+Plumbing
+Additional water/drain points
+Length × applicable rates
+Flooring / walls / paint
+Additional configured space area
+Quantity × selected rate
+Other fixtures
+Fan/utility items where configured
+Quantity × selected rate
+This is the central Hutty behavior: design changes drive quantities; material choices drive rates.
+15. FOUR CLIENT REPORT SECTIONS
+Section
+Name
+What the client sees
+A
+WHAT WE BUILD
+Works BOQ: earthwork, PCC, RCC framing, masonry, plaster, waterproofing, tile fixing, painting,
+MEP execution
+B
+WHAT WE CONSUME
+Steel, cement, M-sand, P-sand, aggregate, AAC blocks, tiles, paint, waterproofing
+C
+WHAT WE INSTALL
+Doors, windows, sanitary fixtures, electrical, plumbing, tanks, pumps and other installed units
+D
+WHAT IT COSTS
+Base cost, professional fees, margin, contingency, GST and effective rate
+
+
+=== PAGE 7 ===
+Hutty — Residential Digital Quantity Surveyor
+Page 7
+16. STANDARD PILOT VALIDATION CASES
+The following cases are supplied as the canonical pilot validation set. They are useful for regression testing of the engine.
+Case
+Plot
+Floors
+Total BUA
+Steel
+Cement
+M-Sand / P-Sand
+Aggre
+30×40 Ground
+1,200
+1
+720
+2.016 T
+288 bags
+432 / 432 CFT
+972 C
+30×40 G+1
+1,200
+2
+1,440
+4.320 T
+576 bags
+864 / 864 CFT
+1,944 
+30×40 G+2
+1,200
+3
+2,160
+6.912 T
+864 bags
+1,296 / 1,296 CFT
+2,916 
+30×40 G+3
+1,200
+4
+2,880
+9.792 T
+1,152 bags
+1,728 / 1,728 CFT
+3,888 
+30×40 G+4
+1,200
+5
+3,600
+12.960 T
+1,440 bags
+2,160 / 2,160 CFT
+4,860 
+30×50 G+2
+1,500
+3
+2,700
+8.640 T
+1,080 bags
+1,620 / 1,620 CFT
+3,645 
+60×90 G+4
+5,400
+5
+16,200
+58.320 T
+6,480 bags
+9,720 / 9,720 CFT
+21,870
+The supplied pilot benchmark table also lists Works BOQ Sum, Total Project Cost and Effective Rate for each case.
+Those values should be treated as regression/reference outputs only after the underlying assumptions and rate inputs are
+confirmed.
+17. ZERO STATE & LIVE PREVIEW
+At the beginning of a new calculation, the engine should remain honest and empty: Plot = 0, BUA = 0, Cost = I0 and no
+material/space quantities until the user provides the required inputs. As inputs change, the live preview consumes the
+same calculation result used by the report.
+18. IMPORTANT PARAMETERS FOR CLIENT
+CONFIRMATION
+Parameter
+Supplied value / rule
+Why confirmation matters
+Coverage
+60% default
+Actual authority rules vary by location, road width and plot conditions
+Wall height
+10 ft
+Controls wall, paint and opening-related quantities
+Steel factor
+2.8 + 0.2 × (floors−1) kg/sq.ft
+Engineering/QS thumb rule used by pilot
+Cement
+0.40 bags/sq.ft
+Material consumption assumption
+Sand/Aggregate
+0.60 / 0.60 / 1.35 CFT/sq.ft
+Material consumption assumptions
+Commercial additions
+5% / 15% / 6%
+Business/commercial assumptions
+GST
+18% on stated base
+Tax treatment must be confirmed for the actual service/tax structure
+Market rates
+Brand/location matrices
+Rates must be dated and refreshed periodically
+19. ENGINEERING TRACEABILITY PRINCIPLE
+Every quantity should be traceable to an input, an assumption/rule, a formula, a unit and a resulting value. Every cost
+should be traceable to quantity × unit rate. This makes the calculator auditable rather than a black-box estimate.
+CLIENT REVIEW NOTE
+This document describes the supplied Hutty pilot calculation framework. It is intended for review and confirmation of
+formulas, assumptions, schedules and commercial parameters before these values are treated as
+production-authoritative engineering inputs.

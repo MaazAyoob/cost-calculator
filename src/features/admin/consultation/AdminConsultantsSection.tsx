@@ -182,7 +182,7 @@ export const AdminConsultantsSection: React.FC = () => {
           onClick={handleOpenAddModal}
           className="hutty-btn-primary px-4 py-2.5 rounded-xl text-xs font-bold inline-flex items-center gap-2 cursor-pointer shadow-xs"
         >
-          <Plus className="w-4 h-4 text-[#F28C28]" />
+          <Plus className="w-4 h-4 text-[#C66B4E]" />
           <span>Add New Consultant</span>
         </button>
       </div>
@@ -278,7 +278,7 @@ export const AdminConsultantsSection: React.FC = () => {
                           <div className="flex items-center gap-1.5">
                             <span className="font-bold text-[#18211E]">{c.name}</span>
                             {c.featured && (
-                              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#F28C28]/20 text-[#F28C28]">
+                              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#C66B4E]/15 text-[#C66B4E]">
                                 Featured
                               </span>
                             )}

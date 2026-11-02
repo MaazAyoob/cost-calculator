@@ -27,7 +27,20 @@ import { configResolver } from '../config/configurationResolver';
 export function generateBuildingModel(input: EngineInput, area: AreaResult): BuildingModel {
   const activeWallHeight = configResolver.resolveParameter('config.structure.wall_height_ft', undefined, WALL_HEIGHT_FT);
   const floorsCount = Math.max(0, input.floors || 0);
-  const rooms = input.rooms;
+  const rawRooms = input.rooms || ({} as any);
+  const rooms = {
+    living: rawRooms.living ?? 1,
+    dining: rawRooms.dining ?? 1,
+    kitchen: rawRooms.kitchen ?? 1,
+    bedrooms: rawRooms.bedrooms ?? Math.max(1, floorsCount),
+    bathrooms: rawRooms.bathrooms ?? Math.max(1, floorsCount),
+    commonToilets: rawRooms.commonToilets ?? 0,
+    balcony: rawRooms.balcony ?? (floorsCount > 1 ? floorsCount - 1 : 0),
+    utility: rawRooms.utility ?? 1,
+    pooja: rawRooms.pooja ?? 1,
+    office: rawRooms.office ?? 0,
+    storeRoom: rawRooms.storeRoom ?? 0,
+  };
   const isZeroState = area.totalBUASqFt <= 0 && area.plotAreaSqFt <= 0;
 
   if (isZeroState || floorsCount <= 0) {

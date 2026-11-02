@@ -84,7 +84,7 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
             <Button
               type="button"
               onClick={() => onNavigate('test-calculator')}
-              className="px-4 py-2.5 bg-[#F28C28] hover:bg-[#D9771A] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+              className="px-4 py-2.5 bg-[#C66B4E] hover:bg-[#A95640] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>Test Calculator</span>
@@ -300,7 +300,7 @@ export const AdminOverviewSection: React.FC<AdminOverviewSectionProps> = ({ onNa
             className="p-5 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl hover:border-orange-500 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center group-hover:bg-[#F28C28] transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-[#C66B4E] text-white flex items-center justify-center group-hover:bg-[#A95640] transition-colors">
                 <Play className="w-5 h-5 fill-white" />
               </div>
               <ArrowRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />

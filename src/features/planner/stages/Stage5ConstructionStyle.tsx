@@ -116,14 +116,14 @@ export const Stage5ConstructionStyle: React.FC = () => {
     <div className="space-y-6 text-left">
       {/* Stage Header */}
       <div className="space-y-1.5 border-b border-[#E5E7EB] pb-4">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-[11px] font-bold text-[#1B3D34]">
-          <Building2 className="w-3 h-3 text-[#F28C28]" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E8EFE9] border border-[#B7CDBB] text-[11px] font-bold text-[#183B32]">
+          <Building2 className="w-3 h-3 text-[#C66B4E]" />
           <span>STAGE 5 OF 8 &bull; CONSTRUCTION STYLE</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           What type of construction are you considering?
         </h2>
-        <p className="text-xs sm:text-sm text-[#707873]">
+        <p className="text-xs sm:text-sm text-[#66716B]">
           Choose your structural framing system, walling materials, and finish level. You can choose "Not sure" if you want our recommended defaults.
         </p>
       </div>
@@ -143,18 +143,18 @@ export const Stage5ConstructionStyle: React.FC = () => {
                 onClick={() => setStructuralSystem(sys.id)}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#EBF3EF] shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/30 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#E8EFE9] shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/30 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-mono text-[#F28C28] font-bold uppercase">
+                    <span className="text-[10px] font-mono text-[#C66B4E] font-bold uppercase">
                       {sys.tag}
                     </span>
-                    {isSelected && <Check className="w-4 h-4 text-[#1B3D34]" />}
+                    {isSelected && <Check className="w-4 h-4 text-[#183B32]" />}
                   </div>
-                  <h4 className="text-sm font-bold text-[#1B3D34] font-heading">{sys.label}</h4>
+                  <h4 className="text-sm font-bold text-[#183B32] font-heading">{sys.label}</h4>
                 </div>
                 <p className="text-[11px] text-[#687770] leading-relaxed">
                   {sys.desc}
@@ -167,7 +167,7 @@ export const Stage5ConstructionStyle: React.FC = () => {
 
       {/* 2. Walling Material Type */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
           2. What kind of walling would you prefer?
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -180,17 +180,17 @@ export const Stage5ConstructionStyle: React.FC = () => {
                 onClick={() => handleWallingSelect(wall.id)}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#EBF3EF] shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/30 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#E8EFE9] shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/30 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <div className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
-                  isSelected ? 'border-[#1B3D34] bg-[#1B3D34]' : 'border-[#CBD5CB] bg-white'
+                  isSelected ? 'border-[#183B32] bg-[#183B32]' : 'border-[#CBD5CB] bg-white'
                 }`}>
                   {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                 </div>
                 <div>
-                  <span className="block text-xs font-bold text-[#1B3D34]">{wall.label}</span>
+                  <span className="block text-xs font-bold text-[#183B32]">{wall.label}</span>
                   <span className="block text-[11px] text-[#687770] leading-snug mt-0.5">
                     {wall.desc}
                   </span>
@@ -204,7 +204,7 @@ export const Stage5ConstructionStyle: React.FC = () => {
       {/* 3. Specification / Quality Tier (Standard, Premium, Luxury) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
             3. What level of finish are you looking for?
           </label>
           <span className="text-[11px] text-[#687770]">Determines finishes, fixtures &amp; material rates</span>
@@ -217,23 +217,23 @@ export const Stage5ConstructionStyle: React.FC = () => {
                 key={tier.id}
                 onClick={() => handleTierSelect(tier.id)}
                 className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between space-y-4 relative ${isSelected
-                  ? 'border-2 border-[#1B3D34] bg-white shadow-md'
-                  : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                  ? 'border-2 border-[#183B32] bg-white shadow-md'
+                  : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/40 hover:bg-[#F8F9F7]'
                   }`}
               >
                 {tier.badge && (
-                  <span className="absolute -top-2.5 right-4 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#1B3D34] text-white flex items-center gap-1 shadow-2xs">
-                    <Sparkles className="w-2.5 h-2.5 text-[#F28C28]" />
+                  <span className="absolute -top-2.5 right-4 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#183B32] text-white flex items-center gap-1 shadow-2xs">
+                    <Sparkles className="w-2.5 h-2.5 text-[#C66B4E]" />
                     {tier.badge}
                   </span>
                 )}
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold font-heading text-[#1B3D34]">
+                    <span className="text-sm font-bold font-heading text-[#183B32]">
                       {tier.name}
                     </span>
-                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isSelected ? 'border-[#1B3D34] bg-[#1B3D34]' : 'border-[#CBD5CB]'
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isSelected ? 'border-[#183B32] bg-[#183B32]' : 'border-[#CBD5CB]'
                       }`}>
                       {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </div>
@@ -245,7 +245,7 @@ export const Stage5ConstructionStyle: React.FC = () => {
                   <div className="pt-2 border-t border-[#E5E7EB] space-y-1.5">
                     {tier.features.map((f, i) => (
                       <div key={i} className="flex items-start gap-1.5 text-[11px] text-[#202522]">
-                        <Check className="w-3 h-3 text-[#1B3D34] shrink-0 mt-0.5" />
+                        <Check className="w-3 h-3 text-[#183B32] shrink-0 mt-0.5" />
                         <span>{f}</span>
                       </div>
                     ))}
@@ -253,7 +253,7 @@ export const Stage5ConstructionStyle: React.FC = () => {
                 </div>
 
                 <div className={`py-1.5 px-3 rounded-xl text-center text-xs font-bold transition-all ${isSelected
-                  ? 'bg-[#1B3D34] text-white'
+                  ? 'bg-[#183B32] text-white'
                   : 'bg-[#F8F8F6] text-[#4B5563]'
                   }`}>
                   {isSelected ? 'Active Tier' : 'Select Tier'}
@@ -266,7 +266,7 @@ export const Stage5ConstructionStyle: React.FC = () => {
 
       {/* 4. Structural Drawings Availability */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
           4. Do you have structural drawings?
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -279,14 +279,14 @@ export const Stage5ConstructionStyle: React.FC = () => {
                 key={item.id}
                 type="button"
                 onClick={() => setDrawingsReady(item.id)}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${isSelected ? 'border-[#1B3D34] bg-[#EBF3EF]' : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/30'
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${isSelected ? 'border-[#183B32] bg-[#E8EFE9]' : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/30'
                   }`}
               >
                 <div>
-                  <span className="block text-xs font-bold text-[#1B3D34]">{item.label}</span>
+                  <span className="block text-xs font-bold text-[#183B32]">{item.label}</span>
                   <span className="block text-[10px] text-[#687770]">{item.desc}</span>
                 </div>
-                {isSelected && <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />}
+                {isSelected && <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />}
               </button>
             );
           })}

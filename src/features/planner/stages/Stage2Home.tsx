@@ -99,14 +99,14 @@ export const Stage2Home: React.FC = () => {
     <div className="space-y-6 text-left">
       {/* Stage Header */}
       <div className="space-y-1.5 border-b border-[#E5E7EB] pb-4">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-[11px] font-bold text-[#1B3D34]">
-          <Home className="w-3 h-3 text-[#F28C28]" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E8EFE9] border border-[#B7CDBB] text-[11px] font-bold text-[#183B32]">
+          <Home className="w-3 h-3 text-[#C66B4E]" />
           <span>STAGE 2 OF 8 &bull; YOUR HOME</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           What kind of home are you planning?
         </h2>
-        <p className="text-xs sm:text-sm text-[#707873]">
+        <p className="text-xs sm:text-sm text-[#66716B]">
           Choose the number of floors, home purpose, and parking. Your floor count stays synchronized with your estimate and buildable area.
         </p>
       </div>
@@ -117,7 +117,7 @@ export const Stage2Home: React.FC = () => {
           <label className="block text-xs font-bold uppercase tracking-wider text-[#18211E]">
             1. How many floors would you like?
           </label>
-          <span className="text-[11px] text-[#707873]">Ground to Ground + 4</span>
+          <span className="text-[11px] text-[#66716B]">Ground to Ground + 4</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
@@ -130,13 +130,13 @@ export const Stage2Home: React.FC = () => {
                 onClick={() => handleFloorSelect(floor.count)}
                 className={`p-3.5 rounded-2xl border text-center transition-all cursor-pointer relative ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#1B3D34] text-white shadow-xs'
-                    : 'border-[#E5E7EB] bg-white text-[#202522] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#183B32] text-white shadow-xs'
+                    : 'border-[#E5E7EB] bg-white text-[#202522] hover:border-[#183B32]/40 hover:bg-[#F8F9F7]'
                 }`}
               >
                 {floor.popular && (
                   <span className={`absolute -top-2 right-2 text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
-                    isSelected ? 'bg-[#F28C28] text-white' : 'bg-[#EBF3EF] text-[#1B3D34] border border-[#D5E5DC]'
+                    isSelected ? 'bg-[#C66B4E] text-white' : 'bg-[#E8EFE9] text-[#183B32] border border-[#B7CDBB]'
                   }`}>
                     Popular
                   </span>
@@ -153,7 +153,7 @@ export const Stage2Home: React.FC = () => {
 
       {/* 2. Intended Use / House Purpose */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
           2. What kind of home are you planning?
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -167,18 +167,18 @@ export const Stage2Home: React.FC = () => {
                 onClick={() => handlePurposeSelect(opt.id)}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#EBF3EF] shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/30 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#E8EFE9] shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/30 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-[#CBD5CB] flex items-center justify-center text-[#1B3D34]">
-                    <Icon className="w-4 h-4 text-[#1B3D34]" />
+                  <div className="w-8 h-8 rounded-lg bg-white border border-[#CBD5CB] flex items-center justify-center text-[#183B32]">
+                    <Icon className="w-4 h-4 text-[#183B32]" />
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-[#1B3D34]" />}
+                  {isSelected && <Check className="w-4 h-4 text-[#183B32]" />}
                 </div>
                 <div>
-                  <span className="block text-sm font-bold text-[#1B3D34]">{opt.label}</span>
+                  <span className="block text-sm font-bold text-[#183B32]">{opt.label}</span>
                   <span className="block text-xs text-[#687770] leading-relaxed mt-1">
                     {opt.desc}
                   </span>
@@ -191,7 +191,7 @@ export const Stage2Home: React.FC = () => {
 
       {/* 3. Parking Preferences */}
       <div className="space-y-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
           3. Do you need parking?
         </label>
         
@@ -205,16 +205,16 @@ export const Stage2Home: React.FC = () => {
                 onClick={() => handleParkingSelect(park.id)}
                 className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#EBF3EF] shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/30'
+                    ? 'border-[#183B32] bg-[#E8EFE9] shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/30'
                 }`}
               >
                 <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-[#1B3D34] block">{park.label}</span>
+                  <span className="text-xs font-bold text-[#183B32] block">{park.label}</span>
                   <span className="text-[11px] text-[#687770] block">{park.desc}</span>
                 </div>
                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                  isSelected ? 'border-[#1B3D34] bg-[#1B3D34]' : 'border-[#CBD5CB] bg-white'
+                  isSelected ? 'border-[#183B32] bg-[#183B32]' : 'border-[#CBD5CB] bg-white'
                 }`}>
                   {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                 </div>
@@ -226,23 +226,23 @@ export const Stage2Home: React.FC = () => {
         {/* Car slots & EV charging toggle */}
         <div className="p-3.5 bg-white rounded-xl border border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Car className="w-4 h-4 text-[#1B3D34]" />
+            <Car className="w-4 h-4 text-[#183B32]" />
             <span className="text-xs font-medium text-[#202522]">Number of Cars to Park:</span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => handleCarCountChange(-1)}
-                className="w-7 h-7 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] text-[#1B3D34] font-bold text-sm hover:bg-[#EBF3EF] flex items-center justify-center cursor-pointer"
+                className="w-7 h-7 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] text-[#183B32] font-bold text-sm hover:bg-[#E8EFE9] flex items-center justify-center cursor-pointer"
               >
                 -
               </button>
-              <span className="text-sm font-mono font-bold text-[#1B3D34] min-w-[20px] text-center">
+              <span className="text-sm font-mono font-bold text-[#183B32] min-w-[20px] text-center">
                 {selectedCars}
               </span>
               <button
                 type="button"
                 onClick={() => handleCarCountChange(1)}
-                className="w-7 h-7 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] text-[#1B3D34] font-bold text-sm hover:bg-[#EBF3EF] flex items-center justify-center cursor-pointer"
+                className="w-7 h-7 rounded-lg border border-[#E5E7EB] bg-[#F8F8F6] text-[#183B32] font-bold text-sm hover:bg-[#E8EFE9] flex items-center justify-center cursor-pointer"
               >
                 +
               </button>
@@ -254,11 +254,11 @@ export const Stage2Home: React.FC = () => {
             onClick={handleEvToggle}
             className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
               isEvReady
-                ? 'border-[#1B3D34] bg-[#1B3D34] text-white'
-                : 'border-[#E5E7EB] bg-[#F8F8F6] text-[#4B5563] hover:border-[#1B3D34]/40'
+                ? 'border-[#183B32] bg-[#183B32] text-white'
+                : 'border-[#E5E7EB] bg-[#F8F8F6] text-[#4B5563] hover:border-[#183B32]/40'
             }`}
           >
-            <Zap className={`w-3.5 h-3.5 ${isEvReady ? 'text-[#F28C28]' : 'text-[#687770]'}`} />
+            <Zap className={`w-3.5 h-3.5 ${isEvReady ? 'text-[#C66B4E]' : 'text-[#687770]'}`} />
             <span>EV Charging Ready</span>
           </button>
         </div>
@@ -266,7 +266,7 @@ export const Stage2Home: React.FC = () => {
 
       {/* 4. Construction Start Timeline */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
           4. When do you hope to start?
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -282,8 +282,8 @@ export const Stage2Home: React.FC = () => {
                 }}
                 className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#1B3D34] text-white shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#183B32] text-white shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#183B32]/40 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <span className={`block text-xs font-bold ${isSelected ? 'text-white' : 'text-[#202522]'}`}>

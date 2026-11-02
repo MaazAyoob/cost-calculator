@@ -1,38 +1,38 @@
 import React from 'react';
 
 export const EngineeringStandardsSection: React.FC = () => {
-  const pipelineSteps = ['INPUT', 'ASSUMPTION', 'QUANTITY', 'RATE', 'BOQ', 'ESTIMATE'];
+  const pipelineSteps = ['YOUR CHOICES', 'ENGINEERING RULES', 'EXACT QUANTITIES', 'BANGALORE RATES', 'DETAILED ESTIMATE'];
 
   const references = [
     {
-      code: 'IS 456',
-      title: 'Plain and Reinforced Concrete Code of Practice',
-      assumption: 'M20/M25 concrete mix design, structural cover standards & dry cement consumption ratios.',
+      code: 'IS 456:2000',
+      title: 'Plain and Reinforced Concrete Code',
+      assumption: 'Sets the cement, sand, and stone ratios for strong columns, beams, and slabs.',
     },
     {
-      code: 'IS 1786',
-      title: 'High Strength Deformed Steel Bars for Concrete Reinforcement',
-      assumption: 'Fe 500D / Fe 550D rebar standards (4.0 to 5.0 kg per sq.ft of total built-up area).',
+      code: 'IS 1786:2008',
+      title: 'High-Strength Steel Rebar Standards',
+      assumption: 'Ensures steel reinforcement weights match seismic and structural safety guidelines.',
     },
     {
       code: 'NBC 2016',
-      title: 'National Building Code of India Guidelines',
-      assumption: 'Permissible FSI, ground coverage limits, room ventilation & clear ceiling heights.',
+      title: 'National Building Code of India',
+      assumption: 'Governs room heights, light, ventilation, and safe staircase dimensions.',
     },
     {
-      code: 'BUILDING STANDARDS',
-      title: 'Defined Residential Building Norms',
-      assumption: 'Concrete volumes, mortar ratios, wall surfaces & floor efficiency standards.',
+      code: 'BBMP / BDA',
+      title: 'Bangalore Building Regulations',
+      assumption: 'Verifies legal front, rear, and side setback distances based on your plot size.',
     },
     {
       code: 'MARKET RATES',
-      title: 'Bangalore Regional Cost Indices',
-      assumption: 'Material and labour rates reflecting current regional construction market levels.',
+      title: 'Bangalore Material & Labour Rates',
+      assumption: 'Tracks current regional retail prices for cement bags, steel per kg, and skilled trade labour.',
     },
   ];
 
   return (
-    <section id="standards" className="py-20 lg:py-28 bg-[#1B3D34] text-white relative overflow-hidden select-none">
+    <section id="standards" className="py-20 lg:py-28 bg-[#183B32] text-white relative overflow-hidden select-none border-b border-[#245747]">
       {/* Blueprint Grid Watermark */}
       <div className="absolute inset-0 pointer-events-none arch-grid-dark opacity-30" />
 
@@ -40,22 +40,24 @@ export const EngineeringStandardsSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white">
-            <span className="text-[#F28C28] font-bold">Civil Standards</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-white">
+            <span className="w-2 h-2 rounded-full bg-[#C66B4E]" />
+            <span className="text-[#E5D5B4] font-bold">Engineering Integrity</span>
             <span>&bull;</span>
-            <span>Engineering Codes &amp; Calculations</span>
+            <span>IS Codes &amp; Bangalore Rules</span>
           </div>
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12]">
-            Formula-driven construction estimation.
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-heading leading-[1.14]">
+            Calculated using Indian civil engineering codes.
           </h2>
-          <p className="text-sm sm:text-base text-white/80 leading-relaxed font-normal">
-            Calculations anchored directly to recognized Indian civil engineering codes and defined mathematical relationships.
+          <p className="text-sm sm:text-base text-[#B7CDBB] leading-relaxed font-normal">
+            Every number in your Hutty estimate is calculated using official Indian Standards, not contractor guesswork.
           </p>
         </div>
 
-        {/* Calculation Flow Diagram (INPUT → ASSUMPTION → QUANTITY → RATE → BOQ → ESTIMATE) */}
+        {/* Calculation Flow Diagram (YOUR CHOICES → ENGINEERING RULES → EXACT QUANTITIES → BANGALORE RATES → DETAILED ESTIMATE) */}
         <div className="bg-white/5 border border-white/15 rounded-2xl p-6 sm:p-8 backdrop-blur-xs text-left space-y-4">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#F28C28] block">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#E5D5B4] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C66B4E]" />
             Calculation Flow
           </span>
 
@@ -66,7 +68,7 @@ export const EngineeringStandardsSection: React.FC = () => {
                   {step}
                 </div>
                 {idx < pipelineSteps.length - 1 && (
-                  <span className="text-[#F28C28] font-bold text-sm">→</span>
+                  <span className="text-[#C66B4E] font-bold text-sm">→</span>
                 )}
               </React.Fragment>
             ))}
@@ -78,7 +80,7 @@ export const EngineeringStandardsSection: React.FC = () => {
           {references.map((item) => (
             <div key={item.code} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
               <div className="md:col-span-3">
-                <span className="text-sm font-bold text-[#F28C28] block">
+                <span className="text-sm font-mono font-bold text-[#C5A46D] block">
                   {item.code}
                 </span>
               </div>
@@ -88,7 +90,7 @@ export const EngineeringStandardsSection: React.FC = () => {
                 </h3>
               </div>
               <div className="md:col-span-5">
-                <p className="text-xs text-white/70 leading-relaxed">
+                <p className="text-xs text-[#B7CDBB] leading-relaxed">
                   {item.assumption}
                 </p>
               </div>
@@ -96,9 +98,9 @@ export const EngineeringStandardsSection: React.FC = () => {
           ))}
         </div>
 
-        <div className="text-xs text-white/50 text-left pt-2">
+        <div className="text-xs text-[#B7CDBB]/70 text-left pt-2">
           <p>
-            * Note: Formula-driven calculations provide pre-construction planning clarity. Site-specific structural engineering drawings and geotechnical soil testing are required prior to actual excavation.
+            * Note: Hutty gives you clear planning quantities and market estimates. You will still need an architect's working drawings and a structural engineer's site inspection before casting your foundation.
           </p>
         </div>
 

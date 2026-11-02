@@ -23,7 +23,7 @@ export const AppLayout: React.FC = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
-  const isCalculatorRoute = location.pathname === '/calculator' || location.pathname === '/planner';
+  const isCalculatorRoute = location.pathname === '/calculator' || location.pathname === '/planner' || location.pathname === '/plan';
 
   // Calculator wizard manages its own minimalist top bar & sticky bottom bar
   if (isCalculatorRoute) {

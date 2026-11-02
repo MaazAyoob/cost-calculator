@@ -37,7 +37,7 @@ export const Stage1Plot: React.FC = () => {
   } = store;
 
   // Local state for responsive editing
-  const [activeCity, setActiveCity] = useState<CityLocation>(city || 'Bangalore');
+  const [activeCity, setActiveCity] = useState<CityLocation>((city === 'Other' ? 'Bangalore' : city) || 'Bangalore');
   const [widthInput, setWidthInput] = useState<string>(plotWidth > 0 ? String(plotWidth) : '30');
   const [lengthInput, setLengthInput] = useState<string>(plotLength > 0 ? String(plotLength) : '40');
   const [selectedLandStatus, setSelectedLandStatus] = useState<string>('bda_approved');
@@ -96,14 +96,14 @@ export const Stage1Plot: React.FC = () => {
     <div className="space-y-6 text-left">
       {/* Stage Header */}
       <div className="space-y-1.5 border-b border-[#E5E7EB] pb-4">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-[11px] font-bold text-[#1B3D34]">
-          <MapPin className="w-3 h-3 text-[#F28C28]" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E8EFE9] border border-[#B7CDBB] text-[11px] font-bold text-[#183B32]">
+          <MapPin className="w-3 h-3 text-[#C66B4E]" />
           <span>STAGE 1 OF 8 &bull; YOUR PLOT</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           Where are you building, and how big is your plot?
         </h2>
-        <p className="text-xs sm:text-sm text-[#707873]">
+        <p className="text-xs sm:text-sm text-[#66716B]">
           Tell us about your plot location and dimensions. We'll automatically calculate your plot area, buildable space, and required open gaps.
         </p>
       </div>
@@ -123,15 +123,15 @@ export const Stage1Plot: React.FC = () => {
                 onClick={() => handleCityChange(c)}
                 className={`min-h-[48px] py-3 px-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#EBF3EF] text-[#1B3D34] font-bold shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white text-[#707873] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#E8EFE9] text-[#183B32] font-bold shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white text-[#66716B] hover:border-[#183B32]/40 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <MapPin className={`w-4 h-4 ${isSelected ? 'text-[#F28C28]' : 'text-[#707873]'}`} />
+                  <MapPin className={`w-4 h-4 ${isSelected ? 'text-[#C66B4E]' : 'text-[#66716B]'}`} />
                   <span className="text-sm font-semibold">{c}</span>
                 </div>
-                {isSelected && <Check className="w-4 h-4 text-[#1B3D34]" />}
+                {isSelected && <Check className="w-4 h-4 text-[#183B32]" />}
               </button>
             );
           })}
@@ -144,7 +144,7 @@ export const Stage1Plot: React.FC = () => {
           <label className="block text-xs font-bold uppercase tracking-wider text-[#18211E]">
             2. How big is your plot?
           </label>
-          <span className="text-[11px] text-[#707873]">Choose a standard size or enter custom feet below</span>
+          <span className="text-[11px] text-[#66716B]">Choose a standard size or enter custom feet below</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -157,13 +157,13 @@ export const Stage1Plot: React.FC = () => {
                 onClick={() => handleApplyDimensions(preset.width, preset.length)}
                 className={`min-h-[64px] p-3 rounded-xl border text-center transition-all cursor-pointer relative ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#1B3D34] text-white shadow-xs'
-                    : 'border-[#E5E7EB] bg-white text-[#202522] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#183B32] text-white shadow-xs'
+                    : 'border-[#E5E7EB] bg-white text-[#202522] hover:border-[#183B32]/40 hover:bg-[#F8F9F7]'
                 }`}
               >
                 {preset.popular && (
                   <span className={`absolute -top-2 right-2 text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider ${
-                    isSelected ? 'bg-[#F28C28] text-white' : 'bg-[#EBF3EF] text-[#1B3D34] border border-[#D5E5DC]'
+                    isSelected ? 'bg-[#C66B4E] text-white' : 'bg-[#E8EFE9] text-[#183B32] border border-[#B7CDBB]'
                   }`}>
                     Popular
                   </span>
@@ -181,10 +181,10 @@ export const Stage1Plot: React.FC = () => {
       {/* 3. Custom Width & Length Inputs with Visual Plot Preview */}
       <div className="p-4 sm:p-5 bg-white rounded-2xl border border-[#E5E7EB] space-y-4">
         <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-          <span className="text-xs font-bold text-[#1B3D34]">
+          <span className="text-xs font-bold text-[#183B32]">
             Custom Plot Dimensions &bull; Feet (ft)
           </span>
-          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#EBF3EF] px-2.5 py-0.5 rounded-full border border-[#D5E5DC]">
+          <span className="text-xs font-mono font-bold text-[#183B32] bg-[#E8EFE9] px-2.5 py-0.5 rounded-full border border-[#B7CDBB]">
             {calculatedArea.toLocaleString()} sq.ft
           </span>
         </div>
@@ -202,7 +202,7 @@ export const Stage1Plot: React.FC = () => {
                   max="200"
                   value={widthInput}
                   onChange={(e) => handleWidthChange(e.target.value)}
-                  className="w-full min-h-[44px] px-3.5 py-2 rounded-xl border border-[#CBD5CB] bg-[#F8F8F6] text-[#202522] font-mono text-sm focus:outline-none focus:border-[#1B3D34] focus:bg-white transition-all"
+                  className="w-full min-h-[44px] px-3.5 py-2 rounded-xl border border-[#CBD5CB] bg-[#F8F8F6] text-[#202522] font-mono text-sm focus:outline-none focus:border-[#183B32] focus:bg-white transition-all"
                   placeholder="30"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-[#687770] font-mono">ft</span>
@@ -220,7 +220,7 @@ export const Stage1Plot: React.FC = () => {
                   max="300"
                   value={lengthInput}
                   onChange={(e) => handleLengthChange(e.target.value)}
-                  className="w-full min-h-[44px] px-3.5 py-2 rounded-xl border border-[#CBD5CB] bg-[#F8F8F6] text-[#202522] font-mono text-sm focus:outline-none focus:border-[#1B3D34] focus:bg-white transition-all"
+                  className="w-full min-h-[44px] px-3.5 py-2 rounded-xl border border-[#CBD5CB] bg-[#F8F8F6] text-[#202522] font-mono text-sm focus:outline-none focus:border-[#183B32] focus:bg-white transition-all"
                   placeholder="40"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-[#687770] font-mono">ft</span>
@@ -230,12 +230,12 @@ export const Stage1Plot: React.FC = () => {
 
           {/* Simple Visual Plot Aspect Box */}
           <div className="md:col-span-5 bg-[#F8F9F7] rounded-xl p-3 border border-[#E5E7EB] flex flex-col items-center justify-center">
-            <div className="w-full max-w-[140px] aspect-[4/3] rounded-lg border-2 border-dashed border-[#1B3D34]/40 bg-[#EBF3EF]/60 relative flex flex-col items-center justify-center p-2 text-center">
+            <div className="w-full max-w-[140px] aspect-[4/3] rounded-lg border-2 border-dashed border-[#183B32]/40 bg-[#E8EFE9]/60 relative flex flex-col items-center justify-center p-2 text-center">
               <span className="text-[10px] text-[#687770] uppercase font-bold">Road Frontage</span>
-              <span className="text-xs font-bold font-mono text-[#1B3D34]">{numWidth} ft</span>
-              <div className="w-3/4 h-0.5 bg-[#F28C28] my-1" />
+              <span className="text-xs font-bold font-mono text-[#183B32]">{numWidth} ft</span>
+              <div className="w-3/4 h-0.5 bg-[#C66B4E] my-1" />
               <span className="text-[10px] font-mono text-[#687770]">{numLength} ft depth</span>
-              <span className="text-[11px] font-black font-mono text-[#1B3D34] mt-0.5">{calculatedArea} sq.ft</span>
+              <span className="text-[11px] font-black font-mono text-[#183B32] mt-0.5">{calculatedArea} sq.ft</span>
             </div>
             <span className="text-[10px] text-[#687770] mt-1.5 text-center">Live Plot Boundary Preview</span>
           </div>
@@ -254,7 +254,7 @@ export const Stage1Plot: React.FC = () => {
 
       {/* 4. Land Status Selection */}
       <div className="space-y-2">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
           3. Do you know your land approval details? (Optional)
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -267,17 +267,17 @@ export const Stage1Plot: React.FC = () => {
                 onClick={() => setSelectedLandStatus(status.id)}
                 className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#EBF3EF] shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white hover:border-[#1B3D34]/30 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#E8EFE9] shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white hover:border-[#183B32]/30 hover:bg-[#F8F9F7]'
                 }`}
               >
                 <div className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
-                  isSelected ? 'border-[#1B3D34] bg-[#1B3D34]' : 'border-[#CBD5CB] bg-white'
+                  isSelected ? 'border-[#183B32] bg-[#183B32]' : 'border-[#CBD5CB] bg-white'
                 }`}>
                   {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                 </div>
                 <div className="min-w-0">
-                  <span className={`block text-xs font-bold ${isSelected ? 'text-[#1B3D34]' : 'text-[#202522]'}`}>
+                  <span className={`block text-xs font-bold ${isSelected ? 'text-[#183B32]' : 'text-[#202522]'}`}>
                     {status.label}
                   </span>
                   <span className="block text-[11px] text-[#687770] leading-snug mt-0.5">
@@ -293,7 +293,7 @@ export const Stage1Plot: React.FC = () => {
       {/* Planning Authority Option */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3D34]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#183B32]">
             4. Local Planning Authority
           </label>
           <span className="text-[11px] text-[#687770]">Determines statutory setback norms</span>
@@ -313,8 +313,8 @@ export const Stage1Plot: React.FC = () => {
                 onClick={() => handleAuthoritySelect(item.id)}
                 className={`py-2.5 px-3 rounded-xl border text-center transition-all cursor-pointer text-xs font-bold ${
                   isSelected
-                    ? 'border-[#1B3D34] bg-[#1B3D34] text-white shadow-2xs'
-                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#1B3D34]/40 hover:bg-[#F8F9F7]'
+                    ? 'border-[#183B32] bg-[#183B32] text-white shadow-2xs'
+                    : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#183B32]/40 hover:bg-[#F8F9F7]'
                 }`}
               >
                 {item.label}

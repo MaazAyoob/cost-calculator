@@ -154,6 +154,26 @@ export interface ConsultationEventEntity {
 // Initial Curated Seed Consultants (Real architectural and structural profiles for Hutty Bangalore)
 export const INITIAL_CONSULTANTS: ConsultantEntity[] = [
   {
+    id: 'cons-ar-rahul',
+    slug: 'rahul-cip3',
+    name: 'Ar. Rahul Sharma',
+    title: 'Lead Architect & Structural Reviewer',
+    category: 'Architect',
+    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
+    experienceYears: 15,
+    city: 'Bangalore',
+    serviceAreas: ['Indiranagar', 'Koramangala', 'Whitefield', 'HSR Layout', 'All Bangalore'],
+    about:
+      'Council of Architecture certified Principal Architect with 15+ years overseeing luxury residential construction and independent engineering audits across Bangalore. Specializes in structural safety, RCC optimization, and comprehensive plan vetting.',
+    specializations: ['Bespoke Villa Design', 'Structural Safety & RCC Optimization', 'BBMP Setback Optimization', 'Passive Solar Lighting'],
+    services: ['Architectural Plan Review', 'Floor Layout Optimization', 'Facade & Elevation Design Review', 'Structural Safety Vetting'],
+    active: true,
+    featured: true,
+    displayOrder: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
     id: 'cons-ar-ramesh',
     slug: 'ar-ramesh-nambiar',
     name: 'Ar. Ramesh Nambiar',
@@ -692,6 +712,22 @@ export class ConsultationService {
     adminEmail = 'admin@hutty.in'
   ): Promise<ConsultantEntity> {
     return this.setConsultantStatus(id, active, undefined, adminEmail);
+  }
+
+  public async deleteConsultant(id: string, _adminEmail = 'admin@hutty.in'): Promise<boolean> {
+    if (this.isDbConnected()) {
+      try {
+        await (this.prisma as any).consultant.delete({ where: { id } });
+      } catch (err: any) {
+        console.warn('[ConsultationService] Prisma deleteConsultant failed, fallback to in-memory:', err.message);
+      }
+    }
+    const idx = this.inMemoryConsultants.findIndex((c) => c.id === id);
+    if (idx !== -1) {
+      this.inMemoryConsultants.splice(idx, 1);
+      return true;
+    }
+    return false;
   }
 
   // ═════════════════════════════════════════════════════════════════════════

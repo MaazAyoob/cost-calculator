@@ -340,7 +340,7 @@ export const FormulaLibrarySection: React.FC = () => {
                     onClick={() => handleOpenBuilder(f)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold transition-colors cursor-pointer"
                   >
-                    <Eye className="w-3.5 h-3.5 text-[#F28C28]" />
+                    <Eye className="w-3.5 h-3.5 text-[#C66B4E]" />
                     <span>View Formula</span>
                   </button>
                 </div>

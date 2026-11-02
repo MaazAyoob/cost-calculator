@@ -143,7 +143,7 @@ export const ConsultationPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34]">
+    <div className="min-h-screen bg-[#F8F8F6] text-[#183B32]">
       <SEO
         title="Consult Construction Experts — Verified Architects, Structural Engineers & Contractors | Hutty"
         description="Get practical guidance for your home construction—from planning and approvals to structure, materials and interiors. Verified independent professionals in Bangalore for a single fixed fee of ₹1,499."
@@ -171,7 +171,7 @@ export const ConsultationPage: React.FC = () => {
       <div ref={directoryRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8 text-left">
         {/* Active Feedback Banner */}
         {activeChoiceBanner && (
-          <div className="p-4 bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 rounded-2xl flex items-center justify-between text-xs sm:text-sm text-[#1B3D34]">
+          <div className="p-4 bg-[rgba(27,61,52,0.08)] border border-[#183B32]/20 rounded-2xl flex items-center justify-between text-xs sm:text-sm text-[#183B32]">
             <div className="flex items-center gap-2.5 font-medium">
               <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
               <span>{activeChoiceBanner}</span>
@@ -181,7 +181,7 @@ export const ConsultationPage: React.FC = () => {
               onClick={() => setActiveChoiceBanner(null)}
               className="p-1 hover:bg-black/5 rounded cursor-pointer"
             >
-              <X className="w-4 h-4 text-[#1B3D34]" />
+              <X className="w-4 h-4 text-[#183B32]" />
             </button>
           </div>
         )}
@@ -189,10 +189,10 @@ export const ConsultationPage: React.FC = () => {
         {/* Directory Header & Tracking Actions */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C66B4E]">
               APPROVED PRACTITIONERS DIRECTORY
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#183B32] font-heading tracking-tight">
               Browse Available Construction Experts
             </h2>
             <p className="text-xs sm:text-sm text-[#687770]">
@@ -216,9 +216,9 @@ export const ConsultationPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowHistoryModal(true)}
-              className="px-4 py-2.5 bg-white hover:bg-[#F8F8F6] text-xs font-bold text-[#1B3D34] border border-[#E5E7EB] rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 bg-white hover:bg-[#F8F8F6] text-xs font-bold text-[#183B32] border border-[#E5E7EB] rounded-xl transition-all shadow-2xs hover:shadow-xs flex items-center gap-2 cursor-pointer"
             >
-              <Clock className="w-3.5 h-3.5 text-[#1B3D34]" />
+              <Clock className="w-3.5 h-3.5 text-[#183B32]" />
               <span>Track My Consultation</span>
             </button>
           </div>
@@ -261,11 +261,11 @@ export const ConsultationPage: React.FC = () => {
           <div className="bg-white p-8 rounded-2xl border border-red-200 text-center space-y-3 shadow-xs">
             <SearchX className="w-8 h-8 text-red-500 mx-auto" />
             <h3 className="text-base font-bold text-slate-800">Unable to load consultants</h3>
-            <p className="text-xs text-[#707873] max-w-md mx-auto">{error}</p>
+            <p className="text-xs text-[#66716B] max-w-md mx-auto">{error}</p>
             <button
               type="button"
               onClick={() => fetchConsultants()}
-              className="px-4 py-2 bg-[#1B3D34] text-white text-xs font-bold rounded-xl cursor-pointer inline-flex items-center gap-1.5"
+              className="px-4 py-2 bg-[#183B32] text-white text-xs font-bold rounded-xl cursor-pointer inline-flex items-center gap-1.5"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Retry</span>
@@ -275,7 +275,7 @@ export const ConsultationPage: React.FC = () => {
           <div className="bg-white p-10 sm:p-12 rounded-3xl border border-[#E5E7EB] text-center space-y-4 shadow-xs">
             <SearchX className="w-10 h-10 text-[#687770]/60 mx-auto" />
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
+              <h3 className="text-lg font-bold text-[#183B32] font-heading">
                 No verified experts currently available for this selection
               </h3>
               <p className="text-xs text-[#687770] max-w-md mx-auto leading-relaxed">
@@ -292,7 +292,7 @@ export const ConsultationPage: React.FC = () => {
                   setSearchQuery('');
                   setSelectedCity('ALL');
                 }}
-                className="px-4 py-2.5 bg-[#F8F8F6] hover:bg-[#E5E7EB] text-[#1B3D34] border border-[#E5E7EB] text-xs font-bold rounded-xl cursor-pointer transition-colors"
+                className="px-4 py-2.5 bg-[#F8F8F6] hover:bg-[#E5E7EB] text-[#183B32] border border-[#E5E7EB] text-xs font-bold rounded-xl cursor-pointer transition-colors"
               >
                 Clear All Filters
               </button>

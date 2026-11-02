@@ -33,26 +33,26 @@ export const TestimonialsSection: React.FC = () => {
         
         {/* Section Tag */}
         <div className="text-center">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-md inline-block">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] bg-[rgba(27,61,52,0.08)] border border-[#183B32]/20 px-3 py-1.5 rounded-md inline-block">
             HOMEOWNER EXPERIENCES
           </span>
         </div>
 
         {/* Large Editorial Quotation */}
         <div className="bg-white rounded-3xl p-8 sm:p-14 border border-[#E5E7EB] shadow-xs text-left space-y-8 relative">
-          <Quote className="w-10 h-10 text-[#1B3D34]/20" />
+          <Quote className="w-10 h-10 text-[#183B32]/20" />
 
-          <p className="text-xl sm:text-2xl lg:text-3xl font-medium text-[#1B3D34] leading-relaxed tracking-tight font-heading">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-medium text-[#183B32] leading-relaxed tracking-tight font-heading">
             "{current.quote}"
           </p>
 
           <div className="pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-base font-bold text-[#1B3D34] font-heading">
+              <h4 className="text-base font-bold text-[#183B32] font-heading">
                 {current.author}
               </h4>
               <p className="text-xs text-[#4B5563] mt-0.5">
-                {current.location} &bull; <span className="text-[#1B3D34] font-semibold">{current.project}</span>
+                {current.location} &bull; <span className="text-[#183B32] font-semibold">{current.project}</span>
               </p>
             </div>
 
@@ -60,7 +60,7 @@ export const TestimonialsSection: React.FC = () => {
             <div className="flex items-center gap-2 self-end sm:self-center">
               <button
                 onClick={() => setCurrentIdx((prev) => (prev > 0 ? prev - 1 : testimonials.length - 1))}
-                className="w-9 h-9 rounded-full bg-[#F8F8F6] hover:bg-[rgba(27,61,52,0.08)] border border-[#E5E7EB] flex items-center justify-center text-[#1B3D34] transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-full bg-[#F8F8F6] hover:bg-[rgba(27,61,52,0.08)] border border-[#E5E7EB] flex items-center justify-center text-[#183B32] transition-colors cursor-pointer"
                 aria-label="Previous testimonial"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -70,7 +70,7 @@ export const TestimonialsSection: React.FC = () => {
               </span>
               <button
                 onClick={() => setCurrentIdx((prev) => (prev < testimonials.length - 1 ? prev + 1 : 0))}
-                className="w-9 h-9 rounded-full bg-[#F8F8F6] hover:bg-[rgba(27,61,52,0.08)] border border-[#E5E7EB] flex items-center justify-center text-[#1B3D34] transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-full bg-[#F8F8F6] hover:bg-[rgba(27,61,52,0.08)] border border-[#E5E7EB] flex items-center justify-center text-[#183B32] transition-colors cursor-pointer"
                 aria-label="Next testimonial"
               >
                 <ChevronRight className="w-4 h-4" />

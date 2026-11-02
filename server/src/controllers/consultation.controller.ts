@@ -361,6 +361,24 @@ export async function setConsultantStatus(req: AuthenticatedRequest, res: Respon
   }
 }
 
+export async function deleteConsultant(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const adminEmail = req.user?.email || 'admin@hutty.in';
+    const deleted = await consultationService.deleteConsultant(id, adminEmail);
+    res.json({
+      success: true,
+      message: `Consultant "${id}" deleted successfully`,
+      deleted,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Failed to delete consultant',
+    });
+  }
+}
+
 export async function getAdminConsultations(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { status, search } = req.query as { status?: string; search?: string };

@@ -116,7 +116,7 @@ export const TestCalculatorSection: React.FC = () => {
             type="button"
             onClick={() => runTestCalculator()}
             disabled={isCalculatingTest}
-            className="px-5 py-2.5 bg-[#F28C28] hover:bg-[#D9771A] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs cursor-pointer"
+            className="px-5 py-2.5 bg-[#C66B4E] hover:bg-[#A95640] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs cursor-pointer"
           >
             {isCalculatingTest ? (
               <>

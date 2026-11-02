@@ -69,7 +69,7 @@ export const SimulationImpactTab: React.FC = () => {
             type="button"
             onClick={handleSimulate}
             disabled={changedCount === 0 || isSimulating}
-            className="px-4 py-2 text-xs font-bold bg-[#F28C28] hover:bg-[#D9771A] text-white rounded-xl flex items-center gap-1.5 shadow-xs"
+            className="px-4 py-2 text-xs font-bold bg-[#C66B4E] hover:bg-[#A95640] text-white rounded-xl flex items-center gap-1.5 shadow-xs"
           >
             {isSimulating ? (
               <>
@@ -103,7 +103,7 @@ export const SimulationImpactTab: React.FC = () => {
         <Card className="border border-dashed border-[#CBD5CB] bg-slate-50/50">
           <CardContent className="p-12 text-center space-y-3">
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto border border-[#E5E7EB] text-slate-400">
-              <Sparkles className="w-6 h-6 text-[#F28C28]" />
+              <Sparkles className="w-6 h-6 text-[#C66B4E]" />
             </div>
             <h3 className="text-base font-bold text-[#18211E] font-heading">
               No Draft Parameters Modified
@@ -123,7 +123,7 @@ export const SimulationImpactTab: React.FC = () => {
           {simulationReport.severitySummary.requiresConfirmation && (
             <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl space-y-2">
               <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
-                <ShieldAlert className="w-5 h-5 text-[#F28C28]" />
+                <ShieldAlert className="w-5 h-5 text-[#C66B4E]" />
                 <span>High-Impact Parameter Modifications Detected</span>
               </div>
               <ul className="text-xs text-amber-800 list-disc list-inside space-y-1 pl-1">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
 import { IntroductionSection } from './sections/IntroductionSection';
@@ -10,10 +10,16 @@ import { SignatureConstructionBreakdownSection } from './sections/SignatureConst
 import { WhyPlanningSection } from './sections/WhyPlanningSection';
 import { EngineeringStandardsSection } from './sections/EngineeringStandardsSection';
 import { SignatureExpertSection } from './sections/SignatureExpertSection';
+import { SignaturePricingSection } from './sections/SignaturePricingSection';
 import { FaqSection } from './sections/FaqSection';
 import { FinalCtaSection } from './sections/FinalCtaSection';
+import { analytics } from '../../utils/analytics';
 
 export const LandingPage: React.FC = () => {
+  useEffect(() => {
+    analytics.trackLandingView();
+  }, []);
+
   return (
     <div className="w-full min-h-screen font-sans bg-[#F8F8F6] text-[#18211E]">
       <SEO
@@ -48,10 +54,13 @@ export const LandingPage: React.FC = () => {
       {/* 09. Trust & Credibility — Indian Civil Codes (IS 456, IS 1786, NBC 2016) & Formulas */}
       <EngineeringStandardsSection />
 
-      {/* 10. Consultation Call-to-Action — Unbiased COA Architects & Structural Engineers (₹1,499) */}
+      {/* 10. Consultation Call-to-Action — Unbiased Independent Advisory (₹1,499) */}
       <SignatureExpertSection />
 
-      {/* 11. FAQ Section — Clear Homeowner Answers on Municipal Bye-Laws & Cost Variances */}
+      {/* 11. Plans & Pricing Transparency — Free vs Paid Options */}
+      <SignaturePricingSection />
+
+      {/* 12. FAQ Section — Clear Homeowner Answers on Municipal Bye-Laws & Cost Variances */}
       <FaqSection />
 
       {/* Closing Action Anchor */}

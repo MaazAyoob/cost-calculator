@@ -194,7 +194,7 @@ export const AdminPricingTiersSection: React.FC = () => {
       <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-2 py-0.5 rounded border border-[#F28C28]/20">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#C66B4E] bg-[#C66B4E]/10 px-2 py-0.5 rounded border border-[#C66B4E]/20">
               PRICING &bull; COMMERCIAL ACCESS LAYER
             </span>
           </div>
@@ -263,7 +263,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                   {tier.code}
                 </span>
                 {tier.badge && (
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#F28C28] bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded font-mono">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#C66B4E] bg-[#C66B4E]/10 border border-[#C66B4E]/20 px-1.5 py-0.2 rounded font-mono">
                     {tier.badge}
                   </span>
                 )}
@@ -328,7 +328,7 @@ export const AdminPricingTiersSection: React.FC = () => {
               onClick={() => openEditModal(tier)}
               className="w-full py-2 px-3 rounded-xl border border-[#E5E7EB] hover:bg-slate-50 text-xs font-bold text-[#1B3D34] transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <Edit3 className="w-3.5 h-3.5 text-[#F28C28]" />
+              <Edit3 className="w-3.5 h-3.5 text-[#C66B4E]" />
               <span>Configure Tier</span>
             </button>
           </div>
@@ -338,7 +338,7 @@ export const AdminPricingTiersSection: React.FC = () => {
       {/* ── PRICE AUDIT LOG TABLE ── */}
       <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-xs p-5 space-y-4">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <History className="w-4 h-4 text-[#F28C28]" />
+          <History className="w-4 h-4 text-[#C66B4E]" />
           <h3 className="text-sm font-extrabold text-[#1B3D34] font-heading">
             Pricing Configuration Audit Trail ({auditLogs.length})
           </h3>
@@ -403,7 +403,7 @@ export const AdminPricingTiersSection: React.FC = () => {
           <div className="bg-white rounded-2xl border border-[#E5E7EB] max-w-2xl w-full p-6 space-y-5 shadow-2xl text-left relative max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase text-[#F28C28]">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#C66B4E]">
                   CONFIGURE COMMERCIAL TIER &bull; {editingTier.code}
                 </span>
                 <h3 className="text-lg font-extrabold text-[#1B3D34] font-heading">
@@ -580,7 +580,7 @@ export const AdminPricingTiersSection: React.FC = () => {
                   type="submit"
                   className="hutty-btn-primary px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Save className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <Save className="w-3.5 h-3.5 text-[#C66B4E]" />
                   <span>Save Tier Configuration</span>
                 </button>
               </div>

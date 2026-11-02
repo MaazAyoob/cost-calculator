@@ -388,7 +388,7 @@ export const SpaceRoomsTab: React.FC = () => {
 
                   {hasDraft && (
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                      isSelected ? 'bg-amber-400 text-[#18211E]' : 'bg-amber-100 text-[#F28C28]'
+                      isSelected ? 'bg-amber-400 text-[#18211E]' : 'bg-[#C66B4E]/10 text-[#C66B4E]'
                     }`}>
                       DRAFT
                     </span>

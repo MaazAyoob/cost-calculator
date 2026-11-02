@@ -58,9 +58,14 @@ const HowItWorksPage = lazy(() =>
 );
 
 const PageFallback = () => (
-  <div className="h-[70vh] flex flex-col items-center justify-center space-y-3">
-    <Loader size={36} />
-    <p className="text-xs text-slate-500 font-medium animate-pulse">Loading Cost Calculator Workspace...</p>
+  <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 space-y-4 select-none">
+    <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-[#E8EFE9] border border-[#CBD5CB]/80 shadow-soft-xs">
+      <div className="w-7 h-7 rounded-full border-2 border-[#183B32] border-t-transparent animate-spin" />
+    </div>
+    <div className="text-center space-y-1">
+      <p className="text-xs font-bold tracking-wider uppercase text-[#183B32]">Hutty</p>
+      <p className="text-xs text-[#6B7280] animate-pulse">Preparing your experience...</p>
+    </div>
   </div>
 );
 
@@ -89,6 +94,14 @@ export const router = createBrowserRouter([
             </Suspense>
           </ErrorBoundary>
         ),
+      },
+      {
+        path: 'auth/login',
+        element: <Navigate to="/login" replace />,
+      },
+      {
+        path: 'auth/signup',
+        element: <Navigate to="/signup" replace />,
       },
       {
         path: 'signup',
@@ -134,6 +147,16 @@ export const router = createBrowserRouter([
       },
       {
         path: 'calculator',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <PlannerPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: 'plan',
         element: (
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>

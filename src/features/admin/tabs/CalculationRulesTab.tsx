@@ -162,7 +162,7 @@ export const CalculationRulesTab: React.FC = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-sm font-bold text-[#18211E] font-heading flex items-center gap-2">
-                <GitBranch className="w-4 h-4 text-[#F28C28]" />
+                <GitBranch className="w-4 h-4 text-[#C66B4E]" />
                 Structured AST Rule Visualization (Deterministic & Safe)
               </h3>
               <p className="text-xs text-[#707873] mt-0.5">

@@ -62,11 +62,57 @@ import { rateService }               from './data/rateService';
 import { configResolver }            from './config';
 
 export function runCalculator(input: EngineInput): CalculationResult {
+  // Normalize rooms with safe defaults if omitted or partial
+  const floors = Math.max(0, input.floors || 0);
+  const normalizedRooms = {
+    living: input.rooms?.living ?? 1,
+    dining: input.rooms?.dining ?? 1,
+    kitchen: input.rooms?.kitchen ?? 1,
+    bedrooms: input.rooms?.bedrooms ?? Math.max(1, floors),
+    bathrooms: input.rooms?.bathrooms ?? Math.max(1, floors),
+    commonToilets: input.rooms?.commonToilets ?? 0,
+    balcony: input.rooms?.balcony ?? (floors > 1 ? floors - 1 : 0),
+    utility: input.rooms?.utility ?? 1,
+    pooja: input.rooms?.pooja ?? 1,
+    office: input.rooms?.office ?? 0,
+    storeRoom: input.rooms?.storeRoom ?? 0,
+  };
+
+  const city = input.city || 'Bangalore';
+  const qualityTier = input.qualityTier || 'Premium';
+
+  const rawBrands = input.materialBrands || ({} as any);
+  const normalizedMaterialBrands = {
+    steel: rawBrands.steel || 'Tata Tiscon',
+    cement: rawBrands.cement || 'UltraTech',
+    ...(rawBrands.masonry ? { masonry: rawBrands.masonry } : {}),
+    doors: rawBrands.doors || 'Teak Wood',
+    windows: rawBrands.windows || 'UPVC',
+    flooring: rawBrands.flooring || 'Vitrified Tiles',
+    bathroom: rawBrands.bathroom || 'Kohler',
+    electrical: rawBrands.electrical || (input.electrical?.wireTier || 'Finolex FRLS'),
+    paint: rawBrands.paint || 'Asian Paints Royale',
+  };
+
+  const normalizedElectrical = {
+    conduit: input.electrical?.conduit || 'Heavy-Duty ISI Marked PVC',
+    wireTier: input.electrical?.wireTier || normalizedMaterialBrands.electrical || 'Finolex FRLS',
+  };
+
+  const normalizedInput: EngineInput = {
+    ...input,
+    city,
+    qualityTier,
+    rooms: normalizedRooms,
+    materialBrands: normalizedMaterialBrands,
+    electrical: normalizedElectrical,
+  };
+
   // ── STEP 1: Built-Up Area & Setback Geometry ──────────────
-  const area = calculateArea(input);
+  const area = calculateArea(normalizedInput);
 
   // ── STEP 2: Canonical Space & Building Model ──────────────
-  const buildingModel = generateBuildingModel(input, area);
+  const buildingModel = generateBuildingModel(normalizedInput, area);
 
   // ── STEP 3: Door & Window Schedules ───────────────────────
   const {
@@ -76,19 +122,19 @@ export function runCalculator(input: EngineInput): CalculationResult {
     totalDoorsCount,
     doorOpeningAreaSqFt,
     doorSchedule,
-  } = calculateDoors(input);
+  } = calculateDoors(normalizedInput);
 
   const {
     windowsCount,
     windowAreaSqFt,
     grillAreaSqFt,
     windowSchedule,
-  } = calculateWindows(input);
+  } = calculateWindows(normalizedInput);
 
   // ── STEP 4: Physical Material Quantities ──────────────────
-  const { steelTonnes, steelKg, steelFactorKgPerSqFt } = calculateSteel(input, area);
-  const { cementBags, bagsPerSqFt: cementFactorBagsPerSqFt } = calculateCement(input, area);
-  const rcc = calculateRCC(input, area);
+  const { steelTonnes, steelKg, steelFactorKgPerSqFt } = calculateSteel(normalizedInput, area);
+  const { cementBags, bagsPerSqFt: cementFactorBagsPerSqFt } = calculateCement(normalizedInput, area);
+  const rcc = calculateRCC(normalizedInput, area);
   const {
     masonryMaterial,
     masonryBrand,
@@ -112,7 +158,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     pSandCuFt,
     sandCuFt,
     coarseAggregateCuFt,
-  } = calculateMasonry(input, area, buildingModel);
+  } = calculateMasonry(normalizedInput, area, buildingModel);
 
   const {
     floorTilesSqFt,
@@ -127,7 +173,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     flooringRawAreaSqFt,
     flooringCirculationSqFt,
     flooringWastagePct,
-  } = calculateFlooring(input, area, buildingModel);
+  } = calculateFlooring(normalizedInput, area, buildingModel);
 
   const {
     internalWallAreaSqFt,
@@ -142,7 +188,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     interiorCoverageSqFtPerLitre: interiorPaintCoverageSqFtPerLitre,
     exteriorCoverageSqFtPerLitre: exteriorPaintCoverageSqFtPerLitre,
     puttyKgPerSqFt,
-  } = calculatePaint(input, area, buildingModel);
+  } = calculatePaint(normalizedInput, area, buildingModel);
 
   const {
     lightingPoints,
@@ -162,7 +208,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     wire2_5SqMmMetres,
     wire4SqMmMetres,
     wire6SqMmMetres,
-  } = calculateElectrical(input, area, buildingModel);
+  } = calculateElectrical(normalizedInput, area, buildingModel);
 
   const {
     totalWaterPoints,
@@ -177,7 +223,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
     kitchenSinkCount,
     bathroomFixtureSets,
     overheadTankLitres,
-  } = calculatePlumbing(input, area, buildingModel);
+  } = calculatePlumbing(normalizedInput, area, buildingModel);
 
   // Unified Material Takeoff Object
   const quantities: MaterialQuantities = {
@@ -278,40 +324,48 @@ export function runCalculator(input: EngineInput): CalculationResult {
     flooringWastagePct,
     flooringRawAreaSqFt,
     flooringCirculationSqFt,
+    staircaseRailingRft: Math.max(0, ((normalizedInput.floors || 1) - 1) * 24),
+    balconyRailingRft: (normalizedInput.rooms?.balcony || 0) * 12,
+    terraceRailingRft: (normalizedInput.floors || 0) >= 1 ? 45 : 0,
+    mainGateSqFt: (normalizedInput.plotWidth || 0) > 0 ? 60 : 0,
+    tankLadderCount: (normalizedInput.floors || 0) >= 1 ? 1 : 0,
+    skylightAreaSqFt: normalizedInput.fabrication?.skylight && !normalizedInput.fabrication.skylight.includes('None') ? 24 : 0,
+    elevationCladdingSqFt: normalizedInput.fabrication?.elevationCladding && !normalizedInput.fabrication.elevationCladding.includes('Paint Only') ? 180 : 0,
+    balconyDoorsCount: normalizedInput.rooms?.balcony || 0,
   };
 
   // ── STEP 5: SECTION A – Works BOQ (What We Build) ─────────
-  const boq = generateBOQ(input, area, quantities, buildingModel, doorSchedule, windowSchedule);
+  const boq = generateBOQ(normalizedInput, area, quantities, buildingModel, doorSchedule, windowSchedule);
 
   // ── STEP 6: SECTION B – Material Schedule (What We Consume)
-  const materialSchedule = generateMaterialSchedule(input, quantities);
+  const materialSchedule = generateMaterialSchedule(normalizedInput, quantities);
 
   // ── STEP 7: SECTION C – Fixture Schedule (What We Install) ─
-  const fixtureSchedule = generateFixtureSchedule(input, quantities, doorSchedule, windowSchedule);
+  const fixtureSchedule = generateFixtureSchedule(normalizedInput, quantities, doorSchedule, windowSchedule);
 
   // ── STEP 7.5: SECTION E – Labour Schedule (Labour Takeoff) ──
-  const labourResult = calculateLabour(input, area, quantities, buildingModel);
+  const labourResult = calculateLabour(normalizedInput, area, quantities, buildingModel);
   const labourSchedule = labourResult.items;
 
   // ── STEP 8: SECTION D – Budget (What It Costs) ────────────
-  const budget = calculateBudget(input, area, boq, materialSchedule, fixtureSchedule, labourSchedule);
+  const budget = calculateBudget(normalizedInput, area, boq, materialSchedule, fixtureSchedule, labourSchedule);
 
   // ── STEP 9: Timeline ──────────────────────────────────────
-  const timeline = calculateTimeline(input, area);
+  const timeline = calculateTimeline(normalizedInput, area);
 
   // ── STEP 10: Payment Plan ─────────────────────────────────
-  const paymentPlan = calculatePaymentPlan(input, budget, timeline);
+  const paymentPlan = calculatePaymentPlan(normalizedInput, budget, timeline);
   const paymentSummary = getPaymentPlanSummary(paymentPlan, budget.totalProjectCost);
 
   // ── STEP 11: Procurement List ─────────────────────────────
-  const procurement = generateProcurementList(input, quantities, materialSchedule);
+  const procurement = generateProcurementList(normalizedInput, quantities, materialSchedule);
 
   // ── STEP 12: Calculation Traceability Audit ───────────────
-  const trace = generateCalculationTrace(input, area, quantities, buildingModel, budget);
+  const trace = generateCalculationTrace(normalizedInput, area, quantities, buildingModel, budget);
 
   // ── STEP 13: Report Assembly ──────────────────────────────
   const report = assembleReport(
-    input,
+    normalizedInput,
     area,
     buildingModel,
     quantities,
@@ -335,7 +389,7 @@ export function runCalculator(input: EngineInput): CalculationResult {
   // Partial calculation result for QA gate validation
   const calculatedAt = new Date().toISOString();
   const partialResult: CalculationResult = {
-    input,
+    input: normalizedInput,
     area,
     buildingModel,
     quantities,
@@ -357,8 +411,8 @@ export function runCalculator(input: EngineInput): CalculationResult {
     rateSourceMetadata,
     commercialReconciliation,
     resolvedConfiguration: configResolver.getResolvedConfigurationSnapshot({
-      city: input.city,
-      packageTier: input.qualityTier,
+      city: normalizedInput.city,
+      packageTier: normalizedInput.qualityTier,
     }),
     calculatedAt,
   };

@@ -1,0 +1,303 @@
+=== PAGE 1 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 1
+HUTTY
+Quantity Calculation Engine — Pilot Specification
+Developer handover: calculation hierarchy, space configuration, quantity rules, material quantities, fittings, rates and final BOQ.
+Critical architecture rule: Hutty separates WORK QUANTITIES, MATERIAL QUANTITIES and FITTINGS & FIXTURES. The user's Space
+Configuration is the common engine that drives walls, openings, electrical, plumbing, sanitary and other fittings.
+Important: This is a preliminary estimation engine. Quantity factors are configurable and should be calibrated against reliable Indian
+construction data and actual project BOQs.
+
+
+=== PAGE 2 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 2
+1. The Fundamental Product Model
+1 — WHAT WE BUILD / WORKS: excavation, PCC, foundation, plinth, RCC/superstructure, masonry, plastering, flooring, painting and
+other construction activities.
+2 — WHAT WE CONSUME / MATERIALS: steel, cement, M-Sand, P-Sand, coarse aggregate, blocks/bricks, tiles, paint and other
+physical materials.
+3 — WHAT WE INSTALL / FITTINGS & FIXTURES: doors, windows, sanitary, electrical, plumbing, tanks, pumps and other installed
+items.
+4 — WHAT IT COSTS: quantity × selected rate.
+Critical: the same calculated requirement must not be charged or displayed twice.
+2. User Inputs — Source of Truth
+Project: plot location, approval authority, plot length, plot width, number of floors, house type, parking, EV charging, cars, two-wheelers.
+Space Configuration: number of bedrooms, bathrooms, common toilets/powder rooms, kitchen, living room, dining, balconies, utility,
+lift and other selected spaces.
+Material / specification selections: steel/cement brands, flooring by space, wall cladding, doors, windows, electrical wire/conduit,
+bathroom brands, CPVC brand, paint specifications.
+The homeowner does not enter quantities. Hutty calculates quantities from the project inputs and the selected space configuration.
+3. Space Configuration — THE CORE ENGINE
+This is a major architectural rule for the MVP: the space configuration is not merely information for the report. It is an input object
+used by multiple quantity engines.
+Example: user selects 3 bedrooms + 3 bathrooms + 1 kitchen + 1 living + 1 dining + 2 balconies + 1 utility.
+Hutty creates a space model containing the type and count of each space.
+Every downstream engine reads from this same space model rather than independently guessing quantities.
+Space Configuration → Wall Model → Openings → Masonry/Plaster/Paint.
+Space Configuration → Electrical Point Schedule → Switches/Sockets/Light/Fan/AC points.
+Space Configuration → Plumbing Fixture Schedule → Water Supply/Drainage/Sanitary quantities.
+Space Configuration → Door/Window Schedule → Doors, frames, windows, shutters and grills.
+Space Configuration → Flooring/Cladding Schedule → Flooring and wall-cladding areas.
+4. Space Model — Developer Structure
+Each space should have: Space Type, Quantity, Estimated Area, Estimated Length, Estimated Width, Wall Height, Door Requirement,
+Window Requirement, Electrical Point Schedule, Plumbing Fixture Schedule and Flooring/Cladding Selection.
+Exact architectural dimensions are not available in the pilot. Therefore the system uses configurable room-size/area assumptions for
+each space type.
+Important: these assumptions are applied consistently across all engines. The system should not use one room size for masonry and a
+different room size for electrical/plumbing.
+Example: if the user selects 3 bedrooms, the engine creates 3 bedroom records and calculates the corresponding walls, door, window,
+electrical and flooring requirements.
+5. Built-up Area
+Plot Area = Plot Length × Plot Width.
+Buildable Length = Plot Length − Front Setback − Rear Setback.
+Buildable Width = Plot Width − Left Setback − Right Setback.
+Buildable Footprint = Buildable Length × Buildable Width.
+Total Built-up Area = Sum of applicable floor areas.
+Setback values come from the authority/rule configuration.
+
+
+=== PAGE 3 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 3
+6. Steel — Pilot Thumb Rule
+Base Steel Factor = 2.8 kg/sqft of total built-up area.
+Additional Floor Factor = +0.2 kg/sqft for every floor after the first.
+Steel Factor = 2.8 + [0.2 × (Number of Floors − 1)] kg/sqft
+Steel Quantity = Total Built-up Area × Steel Factor
+Example: 2,000 sqft total built-up, G+1 (2 floors): 2,000 × 3.0 = 6,000 kg steel.
+7. Material Quantities — Direct Thumb Rules
+Do not calculate or display a separate Concrete/RCC quantity in the Material Quantity section.
+RCC/concrete is part of the construction work. The customer-facing material report directly shows the physical materials.
+Cement = Total Built-up Area × Cement Thumb Rule.
+M-Sand = Total Built-up Area × M-Sand Thumb Rule.
+P-Sand = Total Built-up Area × P-Sand Thumb Rule.
+Coarse Aggregate = Total Built-up Area × Coarse Aggregate Thumb Rule.
+Do not complicate the MVP with wet-volume, dry-volume, concrete-mix-ratio or structural-member calculations.
+Each factor is configurable and can later be calibrated using reliable Indian construction data and actual project BOQs.
+8. Cement — Starting Rule
+Starting parameter: 0.40 bags/sqft of total built-up area.
+Cement Quantity = Total Built-up Area × 0.40 bags/sqft
+Example: 2,000 sqft → 800 bags.
+9. M-Sand — Starting Rule
+Starting parameter: 0.60 CFT/sqft of total built-up area.
+M-Sand Quantity = Total Built-up Area × 0.60 CFT/sqft
+Use M-Sand as the material category for concrete/fine-aggregate demand where applicable. Do not derive it through a detailed concrete
+mix calculation in the MVP.
+10. P-Sand — Starting Rule
+Starting parameter: 0.60 CFT/sqft of total built-up area.
+P-Sand Quantity = Total Built-up Area × 0.60 CFT/sqft
+P-Sand is kept separate from M-Sand for masonry/plastering demand. The factor is configurable.
+11. Coarse Aggregate — Starting Rule
+Starting parameter: 1.35 CFT/sqft of total built-up area.
+Coarse Aggregate Quantity = Total Built-up Area × 1.35 CFT/sqft
+12. Masonry — SPACE CONFIGURATION → WALL AREA → BLOCKS / BRICKS
+This must NOT be based on a generic internal-wall factor.
+The user has already selected the number and type of spaces. Hutty uses those spaces to create an estimated room layout.
+Step 1 — Create room/space envelopes: bedroom × number selected; bathroom × number selected; kitchen; living; dining; utility; etc.
+Step 2 — Calculate the wall perimeter of each configured space.
+Step 3 — Calculate wall area: Space Wall Perimeter × Wall Height.
+Step 4 — Sum all configured internal space wall areas.
+Step 5 — Calculate external wall area from the building footprint/perimeter.
+Step 6 — Deduct openings generated by the Door & Window Schedule.
+
+
+=== PAGE 4 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 4
+Net Wall Area = External Wall Area + Internal Wall Area − Door Openings − Window Openings.
+Wall Volume = Net Wall Area × Selected Wall Thickness.
+Block Quantity = Wall Volume ÷ Selected Block Unit Volume × (1 + Wastage%).
+For red bricks, use the selected brick dimensions and the same wall-volume logic.
+The same space model must feed the door/window openings, so openings are not guessed independently.
+13. Space Configuration → Doors
+Main Door: generated from number of primary dwelling entrances.
+Bedroom Doors: 1 per configured bedroom.
+Bathroom Doors: 1 per configured bathroom.
+Utility/Kitchen/Other Enclosed Space Doors: generated according to the selected space type and door rule.
+Door Frames: one frame set per applicable door.
+Door Quantity = function of configured spaces, not a generic sqft factor.
+14. Space Configuration → Windows / Frames / Shutters / Grills
+Each space type has a configurable window requirement.
+Bedroom Window Quantity = Bedrooms × Window Rule per Bedroom.
+Living Window Quantity = Living Spaces × Window Rule.
+Kitchen/Bathroom/Utility Windows = generated from their space rules.
+Window size/module is configurable by space type.
+Window Frame/Shutter Quantity = Window Quantity × selected window module.
+Grill Area = Sum of applicable window opening areas × grill coverage.
+This is preferable to using a single generic window-to-wall ratio because the user has already defined the spaces.
+15. Space Configuration → Flooring
+Each selected space receives an estimated floor area from the space model.
+Bedroom Flooring = Number of Bedrooms × Estimated Bedroom Area.
+Bathroom Flooring = Number of Bathrooms × Estimated Bathroom Area.
+Kitchen Flooring = Kitchen Area.
+Living/Dining Flooring = Corresponding configured space areas.
+Parking/Balcony/Utility = corresponding configured areas.
+Total Flooring = Sum of all selected space floor areas × (1 + Wastage%).
+The user's flooring selection is attached to each space, so living, bedroom, kitchen, bathroom and parking can have different
+materials/rates.
+16. Space Configuration → Wall Cladding
+Kitchen Cladding = Kitchen Wall Perimeter × Selected Cladding Height − openings.
+Bathroom Cladding = Bathroom Wall Perimeter × Selected Height − openings.
+The number of kitchens/bathrooms and their estimated dimensions come directly from the space model.
+The selected tile/cladding specification changes the rate, not the calculated area.
+17. Space Configuration → Plastering & Paint
+Internal Plaster Area = Net Internal Wall Area generated by the space model.
+External Plaster Area = Net External Wall Area.
+Internal Paint Area = Internal Wall Area + applicable ceilings.
+
+
+=== PAGE 5 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 5
+External Paint Area = External Wall Area.
+Total Paintable Area = Internal + External.
+Because wall area is generated from the space configuration, plaster and paint quantities automatically respond when the user changes
+2 bedrooms to 3 bedrooms, or 2 bathrooms to 4 bathrooms.
+18. Space Configuration → Electrical
+Electrical quantities must be generated from the selected spaces.
+Bedroom schedule: light points, fan point, sockets, optional AC point, TV/data point.
+Living schedule: light points, fan points, sockets, TV/data, optional AC points.
+Kitchen schedule: light points, appliance sockets, chimney/exhaust points and other selected appliance points.
+Bathroom schedule: light, exhaust/geyser points and other applicable points.
+Balcony/Utility/Parking: applicable light/socket points.
+Total Light Points = Sum of light points from all configured spaces.
+Total Fan Points = Sum of fan points from all configured spaces.
+Total Socket Points = Sum of socket points from all configured spaces.
+Total AC Points = Sum of configured AC requirements.
+Switches and sockets should be generated from the point schedule rather than a generic sqft rule.
+19. Space Configuration → Electrical Conduit & Wire
+Once electrical points are generated, apply configurable point-to-length rules.
+Conduit Length = Total Electrical Points × Conduit-per-Point Factor + Main Route Allowance.
+Wire Length = Total Electrical Points × Wire-per-Point Factor, split by circuit type.
+These factors are configurable and should be calibrated against actual project data.
+20. Space Configuration → Plumbing & Sanitary
+Bathroom Count → WC, basin, shower, health faucet, floor drain and other bathroom fixture quantities.
+Kitchen → sink + water supply point + drainage point + appliance points.
+Utility → washing-machine/water points where selected.
+Total Water Supply Points = Sum of water points from configured spaces.
+Total Drainage Points = Sum of drainage points from configured spaces.
+Water Supply Pipe = Water Points × Pipe-per-Point Factor + Vertical Riser Allowance.
+Drainage Pipe = Drainage Points × Pipe-per-Point Factor + Vertical Riser Allowance.
+Brand selection changes rate/specification, not the base quantity.
+21. Space Configuration → Bathroom Fixtures
+WC Quantity = Number of Bathrooms × WC per Bathroom.
+Wash Basin Quantity = Number of Bathrooms × Basin per Bathroom.
+Shower Quantity = Number of Bathrooms × Shower per Bathroom.
+Health Faucet Quantity = Number of Bathrooms × Health Faucet per Bathroom.
+Floor Drain Quantity = Number of Bathrooms × Drain Rule.
+Additional fixtures are generated from the selected bathroom specification/package.
+Example: changing bathrooms from 3 to 4 automatically changes the sanitary, plumbing, electrical and wall-area quantities associated
+with bathrooms.
+22. Water Tank / Sump / Pump
+Use the configured house type/bedroom count as the occupancy proxy.
+
+
+=== PAGE 6 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 6
+Estimated Occupants = Bedroom/House-Type Occupancy Rule.
+Tank Capacity = Estimated Occupants × Daily Demand × Storage-Day Factor.
+Pumps: generated according to the selected water-system configuration.
+Keep sump, overhead tank and pump rules configurable.
+23. Waterproofing
+Bathroom Waterproofing = Sum of configured bathroom floor areas + applicable upturn/wall area.
+Terrace Waterproofing = Exposed Terrace Area.
+Sump Waterproofing = Applicable Sump Surface Area.
+Total Waterproofing = Bathroom + Terrace + Sump + other applicable areas.
+24. Construction Work Breakdown
+Site Cleaning: configurable site-area/lump-sum rule.
+Excavation: preliminary excavation rule.
+PCC: preliminary PCC rule.
+Foundation: preliminary calibrated work quantity.
+Plinth: applicable plinth work quantities.
+RCC/Superstructure: construction work category; no separate concrete material line in the customer material report.
+Masonry: generated from the configured space/wall model.
+Plastering: generated from net wall areas.
+Waterproofing: generated from bathrooms/terrace/sump configuration.
+Flooring: generated from configured spaces.
+Doors/Windows: generated from configured spaces.
+Electrical/Plumbing: generated from configured spaces and fixture schedules.
+Painting: generated from calculated paintable areas.
+25. Rate Engine and Cost
+Item Cost = Calculated Quantity × Selected Rate.
+Material/specification selection changes the rate while preserving the calculated quantity.
+Item Percentage = Item Cost ÷ Total Pre-Tax Construction Cost × 100.
+Changing a user's material selection should recalculate cost without changing the underlying space-driven quantity unless the selected
+product has a different unit/coverage rule.
+26. Final Customer-Facing Report
+SECTION A — WHAT WE BUILD: works/activity breakdown.
+SECTION B — WHAT WE CONSUME: steel, cement, M-Sand, P-Sand, coarse aggregate, blocks/bricks, flooring, paint, waterproofing
+and other materials.
+SECTION C — WHAT WE INSTALL: doors, windows, sanitary, electrical, plumbing, tanks, pumps and other fittings.
+SECTION D — WHAT IT COSTS: quantity × selected rate, amount, percentage and total.
+No separate Concrete line is required in the Material Quantity section.
+The report should clearly show how the selected space configuration influenced the generated quantities.
+27. Configuration / Parameter Table
+All assumptions must be stored in an admin/QS parameter table rather than hard-coded throughout the app.
+Fields: Parameter Name | Value | Unit | Space Type | House Type | Floor Type | Source | Effective Date | Notes.
+
+
+=== PAGE 7 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 7
+Examples: bedroom area, bathroom area, kitchen area, wall height, wall thickness, door rule, window rule, electrical point schedule,
+conduit/point factor, plumbing fixture schedule, pipe/point factor, flooring wastage, cladding height, steel factor, cement factor, M-Sand
+factor, P-Sand factor, aggregate factor.
+One space model should feed all engines. Do not maintain separate hidden room assumptions for masonry, electrical, plumbing and
+fittings.
+28. Developer Non-Negotiables
+1. Do not ask the homeowner for quantities.
+2. The user's Space Configuration is a core calculation input, not just a display field.
+3. Wall quantities must respond to bedroom/bathroom/kitchen/living/etc. selections.
+4. Fittings and fixtures must respond to the same space configuration.
+5. Electrical and plumbing quantities must be generated from space/fixture schedules.
+6. Do not build structural-design calculations into the MVP.
+7. Do not calculate/display a separate concrete quantity in the customer-facing material report.
+8. Use simple transparent thumb rules for material quantities.
+9. Keep Works, Materials and Fittings/Fixtures separate.
+10. Every final cost = quantity × selected rate.
+11. Every quantity must be traceable to user input + parameter + formula.
+
+
+=== PAGE 8 ===
+Hutty — Quantity Calculation Engine | Final — Space Configuration Engine
+Page 8
+29. ONE-PAGE DEVELOPER BLUEPRINT
+USER INPUT
+SHARED ENGINE
+OUTPUT
+Plot + Authority
+Setback rules → built-up area
+Built-up area
+Floors
+Steel floor-adjusted rule
+Steel kg
+Built-up area
+Direct material thumb rules
+Cement / M-Sand / P-Sand / Aggregate
+Space Configuration
+Space → estimated room envelopes
+Wall area / blocks / plaster / paint
+Space Configuration
+Space → door/window schedule
+Doors / windows / frames / shutters / grills
+Space Configuration
+Space → electrical schedule
+Switches / sockets / light / fan / AC points
+Space Configuration
+Space → plumbing schedule
+Water / drainage pipes + sanitary
+Space Configuration
+Space → floor/cladding schedule
+Flooring / wall cladding
+Material Selection
+Quantity × selected rate
+Item cost
+All costs
+Item ÷ total
+Percentage + grand total
+Final principle: Hutty should have one shared Space Configuration engine. If the user changes 3 bedrooms to 4, the system should
+automatically update walls, blocks, plaster, paintable area, doors, windows, flooring, electrical points, plumbing and sanitary quantities.
+Material selections then change rates and the final cost.

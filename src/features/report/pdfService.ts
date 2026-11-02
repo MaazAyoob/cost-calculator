@@ -81,7 +81,7 @@ export async function viewBasicEstimatePdfInNewTab(options: GeneratePdfOptions):
 
 /**
  * Core PDF generation engine.
- * Single source of truth for generating the complete, bank-ready Detailed BOQ & Engineering Report.
+ * Single source of truth for generating the complete Detailed Construction Estimate & BOQ.
  * Both customer downloads and developer testing actions invoke this exact function.
  */
 export async function generateDetailedReportPdfBlob(options: GeneratePdfOptions): Promise<GeneratedPdfResult> {

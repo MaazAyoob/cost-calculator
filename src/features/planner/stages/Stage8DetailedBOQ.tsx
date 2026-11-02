@@ -59,14 +59,14 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
     <div className="space-y-6 text-left">
       {/* Stage Header */}
       <div className="space-y-1.5 border-b border-[#E5E7EB] pb-4">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-[11px] font-bold text-[#1B3D34]">
-          <FileText className="w-3 h-3 text-[#F28C28]" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E8EFE9] border border-[#B7CDBB] text-[11px] font-bold text-[#183B32]">
+          <FileText className="w-3 h-3 text-[#C66B4E]" />
           <span>STAGE 8 OF 8 &bull; DETAILED BOQ &amp; REPORT PLANS</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#18211E] tracking-tight">
           See what your home may need, work by work.
         </h2>
-        <p className="text-xs sm:text-sm text-[#707873]">
+        <p className="text-xs sm:text-sm text-[#66716B]">
           Preview your itemized work-wise BOQ, material takeoff schedules, and trade labour milestones before choosing a report plan.
         </p>
       </div>
@@ -75,14 +75,14 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
       <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#E5E7EB] shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] pb-3">
           <div>
-            <h3 className="text-sm font-bold text-[#1B3D34] flex items-center gap-1.5">
-              <Table className="w-4 h-4 text-[#F28C28]" />
+            <h3 className="text-sm font-bold text-[#183B32] flex items-center gap-1.5">
+              <Table className="w-4 h-4 text-[#C66B4E]" />
               <span>Civil &amp; Finishing Works BOQ Preview</span>
             </h3>
             <span className="text-[11px] text-[#687770]">Showing preview of 8 items out of {boq.length || 32} total schedule items</span>
           </div>
 
-          <span className="text-xs font-mono font-bold text-[#1B3D34] bg-[#EBF3EF] px-3 py-1 rounded-full border border-[#D5E5DC] w-fit">
+          <span className="text-xs font-mono font-bold text-[#183B32] bg-[#E8EFE9] px-3 py-1 rounded-full border border-[#B7CDBB] w-fit">
             Total BUA: {buaSqFt.toLocaleString()} sq.ft
           </span>
         </div>
@@ -105,12 +105,12 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
               {previewItems.map((item, idx) => (
                 <tr key={idx} className="hover:bg-[#F8F9F7] transition-colors">
                   <td className="py-2.5 px-3 text-[#687770]">{String(idx + 1).padStart(2, '0')}</td>
-                  <td className="py-2.5 px-3 font-sans font-semibold text-[#1B3D34]">{item.category}</td>
+                  <td className="py-2.5 px-3 font-sans font-semibold text-[#183B32]">{item.category}</td>
                   <td className="py-2.5 px-4 font-sans text-xs text-[#4B5563]">{item.description}</td>
                   <td className="py-2.5 px-3 text-right">{item.quantity ? Math.round(item.quantity).toLocaleString() : '-'}</td>
                   <td className="py-2.5 px-3 text-[#687770]">{item.unit || 'sq.ft'}</td>
                   <td className="py-2.5 px-3 text-right">₹{item.unitRate ? Math.round(item.unitRate).toLocaleString() : '-'}</td>
-                  <td className="py-2.5 px-4 text-right font-bold text-[#1B3D34]">
+                  <td className="py-2.5 px-4 text-right font-bold text-[#183B32]">
                     ₹{item.amount ? Math.round(item.amount).toLocaleString() : '-'}
                   </td>
                 </tr>
@@ -123,13 +123,13 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
         {!isUnlocked && (
           <div className="p-3.5 bg-[#F8F8F6] rounded-2xl border border-dashed border-[#CBD5CB] flex items-center justify-between text-xs text-[#4B5563]">
             <span className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#F28C28]" />
+              <Lock className="w-4 h-4 text-[#C66B4E]" />
               Remaining 24+ civil, plumbing, electrical, and joinery line items available in the Detailed BOQ report.
             </span>
             <button
               type="button"
               onClick={() => handleSelectPlan('DETAILED_ESTIMATE_499')}
-              className="text-[#1B3D34] font-bold hover:underline cursor-pointer shrink-0"
+              className="text-[#183B32] font-bold hover:underline cursor-pointer shrink-0"
             >
               Unlock Report &rarr;
             </button>
@@ -140,7 +140,7 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
       {/* 2. Commercial Report Plans (Exact 4 Products/Services) */}
       <div className="space-y-3">
         <div>
-          <h3 className="text-base font-bold text-[#1B3D34] font-heading">
+          <h3 className="text-base font-bold text-[#183B32] font-heading">
             Select Your Plan
           </h3>
           <p className="text-xs text-[#687770]">
@@ -157,15 +157,15 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770]">
                   PLAN 01
                 </span>
-                <span className="text-xs font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                <span className="text-xs font-bold text-[#183B32] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
                   ACTIVE
                 </span>
               </div>
 
               <div>
-                <h4 className="text-lg font-bold font-heading text-[#1B3D34]">Free Estimate</h4>
+                <h4 className="text-lg font-bold font-heading text-[#183B32]">Free Estimate</h4>
                 <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-black font-heading text-[#1B3D34]">₹0</span>
+                  <span className="text-2xl font-black font-heading text-[#183B32]">₹0</span>
                   <span className="text-xs text-[#687770]">/ free forever</span>
                 </div>
               </div>
@@ -190,51 +190,51 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-[#EBF3EF] text-center text-xs font-bold text-[#1B3D34]">
+            <div className="p-2.5 rounded-xl bg-[#E8EFE9] text-center text-xs font-bold text-[#183B32]">
               Included with Calculator
             </div>
           </div>
 
           {/* PLAN 2: Detailed BOQ (₹499) — FEATURED */}
-          <div className="p-5 bg-white rounded-3xl border-2 border-[#1B3D34] flex flex-col justify-between space-y-4 shadow-md relative">
-            <span className="absolute -top-2.5 right-4 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#1B3D34] text-white flex items-center gap-1">
-              <Sparkles className="w-2.5 h-2.5 text-[#F28C28]" />
+          <div className="p-5 bg-white rounded-3xl border-2 border-[#183B32] flex flex-col justify-between space-y-4 shadow-md relative">
+            <span className="absolute -top-2.5 right-4 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#183B32] text-white flex items-center gap-1">
+              <Sparkles className="w-2.5 h-2.5 text-[#C66B4E]" />
               Recommended
             </span>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#C66B4E]">
                   PLAN 02
                 </span>
-                <span className="text-xs font-black text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded">
+                <span className="text-xs font-black text-[#183B32] bg-[rgba(27,61,52,0.08)] px-2 py-0.5 rounded">
                   FULL REPORT
                 </span>
               </div>
 
               <div>
-                <h4 className="text-lg font-bold font-heading text-[#1B3D34]">Detailed BOQ</h4>
+                <h4 className="text-lg font-bold font-heading text-[#183B32]">Detailed BOQ</h4>
                 <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-black font-heading text-[#1B3D34]">₹499</span>
+                  <span className="text-2xl font-black font-heading text-[#183B32]">₹499</span>
                   <span className="text-xs text-[#687770]">/ one-time payment</span>
                 </div>
               </div>
 
               <div className="space-y-1.5 text-xs text-[#202522] pt-2 border-t border-[#E5E7EB]">
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Work-wise BOQ:</strong> Complete civil &amp; MEP items</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Materials Needed:</strong> Steel, cement, sand unit rates</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Trade Labour:</strong> Trade allocations &amp; milestone schedule</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Downloadable PDF:</strong> Comprehensive estimation report with full BOQ</span>
                 </div>
               </div>
@@ -243,10 +243,10 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
             <button
               type="button"
               onClick={() => handleSelectPlan('DETAILED_ESTIMATE_499')}
-              className="w-full py-3 rounded-xl bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
+              className="w-full py-3 rounded-xl bg-[#183B32] hover:bg-[#245747] text-white text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
             >
               <span>Get Detailed BOQ — ₹499</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
             </button>
           </div>
 
@@ -257,34 +257,34 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#687770]">
                   PLAN 03
                 </span>
-                <span className="text-xs font-bold text-[#1B3D34] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                <span className="text-xs font-bold text-[#183B32] bg-[#F8F8F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
                   UPGRADED
                 </span>
               </div>
 
               <div>
-                <h4 className="text-lg font-bold font-heading text-[#1B3D34]">Premium BOQ</h4>
+                <h4 className="text-lg font-bold font-heading text-[#183B32]">Premium BOQ</h4>
                 <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-black font-heading text-[#1B3D34]">₹1,499</span>
+                  <span className="text-2xl font-black font-heading text-[#183B32]">₹1,499</span>
                   <span className="text-xs text-[#687770]">/ one-time payment</span>
                 </div>
               </div>
 
               <div className="space-y-1.5 text-xs text-[#4B5563] pt-2 border-t border-[#E5E7EB]">
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span>Everything in Detailed BOQ plan (₹499)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Multi-Scenario Comparison:</strong> Compare layouts</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Premium Specification Customizer</strong></span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0" />
                   <span><strong>Priority Export Suite:</strong> Unlimited PDF downloads</span>
                 </div>
               </div>
@@ -297,7 +297,7 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
             <button
               type="button"
               onClick={() => handleSelectPlan('PREMIUM_1499')}
-              className="w-full py-3 rounded-xl border border-[#1B3D34] text-[#1B3D34] bg-white hover:bg-[#F8F8F6] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-3 rounded-xl border border-[#183B32] text-[#183B32] bg-white hover:bg-[#F8F8F6] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <span>Get Premium — ₹1,499</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -310,7 +310,7 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
       {/* 3. Decoupled Consultation Callout (₹1,499) */}
       <div className="p-5 sm:p-6 bg-[#112821] text-white rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#F28C28]">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#C66B4E]">
             <Compass className="w-3.5 h-3.5" />
             <span>INDEPENDENT EXPERT CONSULTATION &bull; ₹1,499</span>
           </div>
@@ -318,17 +318,17 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
             Need drawings reviewed or contractor bids checked?
           </h4>
           <p className="text-xs text-white/70 max-w-xl">
-            Book a 45-minute 1-on-1 online session with a verified architect or structural engineer. Separate from report purchases.
+            Book a private 1-on-1 online session with an independent construction advisor. Separate from report purchases.
           </p>
         </div>
 
         <button
           type="button"
           onClick={() => window.open('/consult', '_blank')}
-          className="bg-white hover:bg-white/90 text-[#1B3D34] text-xs font-bold px-5 py-3 rounded-xl transition-all cursor-pointer shrink-0 shadow-xs flex items-center justify-center gap-1.5"
+          className="bg-white hover:bg-white/90 text-[#183B32] text-xs font-bold px-5 py-3 rounded-xl transition-all cursor-pointer shrink-0 shadow-xs flex items-center justify-center gap-1.5"
         >
           <span>Book Consultation — ₹1,499</span>
-          <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+          <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
         </button>
       </div>
 
@@ -337,7 +337,7 @@ export const Stage8DetailedBOQ: React.FC<Stage8DetailedBOQProps> = ({ onBackToEs
         <button
           type="button"
           onClick={onBackToEstimate}
-          className="px-4 py-2.5 rounded-xl border border-[#CBD5CB] text-[#1B3D34] bg-white hover:bg-[#F8F9F7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+          className="px-4 py-2.5 rounded-xl border border-[#CBD5CB] text-[#183B32] bg-white hover:bg-[#F8F9F7] text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>&larr; Back to Preliminary Estimate</span>

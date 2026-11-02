@@ -1,0 +1,90 @@
+[
+  {
+    "target": "01_landing_hero_desktop_1440.png",
+    "url": "http://localhost:3000/",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 623272
+  },
+  {
+    "target": "02_landing_hero_mobile_375.png",
+    "url": "http://localhost:3000/",
+    "width": 375,
+    "height": 812,
+    "success": true,
+    "sizeBytes": 74853
+  },
+  {
+    "target": "03_landing_how_it_works_desktop.png",
+    "url": "http://localhost:3000/#how-it-works",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 623269
+  },
+  {
+    "target": "04_landing_demo_estimator_desktop.png",
+    "url": "http://localhost:3000/#demo",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 623269
+  },
+  {
+    "target": "05_landing_why_hutty_desktop.png",
+    "url": "http://localhost:3000/#why-planning",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 623270
+  },
+  {
+    "target": "06_landing_engineering_standards_desktop.png",
+    "url": "http://localhost:3000/#standards",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 623269
+  },
+  {
+    "target": "07_pricing_page_desktop.png",
+    "url": "http://localhost:3000/pricing",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 140590
+  },
+  {
+    "target": "08_pricing_page_mobile.png",
+    "url": "http://localhost:3000/pricing",
+    "width": 375,
+    "height": 812,
+    "success": true,
+    "sizeBytes": 51212
+  },
+  {
+    "target": "09_consultation_page_desktop.png",
+    "url": "http://localhost:3000/consult",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 435250
+  },
+  {
+    "target": "10_calculator_stage1_desktop.png",
+    "url": "http://localhost:3000/calculator",
+    "width": 1440,
+    "height": 900,
+    "success": true,
+    "sizeBytes": 200973
+  },
+  {
+    "target": "11_calculator_stage1_mobile.png",
+    "url": "http://localhost:3000/calculator",
+    "width": 375,
+    "height": 812,
+    "success": true,
+    "sizeBytes": 58298
+  }
+]

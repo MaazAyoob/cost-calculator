@@ -8,6 +8,18 @@
 import { getApiUrl } from '../config/api';
 
 export type CalculatorEventType =
+  // Canonical Client Funnel Events
+  | 'landing_view'
+  | 'calculator_start'
+  | 'chapter_started'
+  | 'chapter_completed'
+  | 'estimate_generated'
+  | 'boq_preview_viewed'
+  | 'checkout_started'
+  | 'payment_success'
+  | 'payment_failed'
+  | 'report_downloaded'
+  // Legacy / Diagnostic Events (Preserved for full telemetry compatibility)
   | 'calculator_started'
   | 'package_selected'
   | 'plot_configured'
@@ -17,7 +29,6 @@ export type CalculatorEventType =
   | 'specification_changed'
   | 'comparison_opened'
   | 'package_switched'
-  | 'estimate_generated'
   | 'report_generated'
   | 'calculator_completed';
 
@@ -186,6 +197,149 @@ class CalculatorAnalytics {
       estimatedCost: data?.cost,
       builtUpArea: data?.bua,
       durationMs: totalPageDuration,
+    });
+  }
+
+  public getDeviceCategory(): 'desktop' | 'mobile' | 'tablet' {
+    if (typeof window === 'undefined') return 'desktop';
+    const width = window.innerWidth;
+    if (width < 768) return 'mobile';
+    if (width <= 1024) return 'tablet';
+    return 'desktop';
+  }
+
+  public trackLandingView(source?: string) {
+    this.trackEvent({
+      eventType: 'landing_view',
+      metadata: {
+        source: source || (typeof document !== 'undefined' ? document.referrer : 'direct'),
+        deviceCategory: this.getDeviceCategory(),
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  public trackCalculatorStart(chapter: number = 1) {
+    this.trackEvent({
+      eventType: 'calculator_start',
+      step: chapter,
+      metadata: {
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+    // Also track legacy event for backward dashboard telemetry
+    this.trackEvent({
+      eventType: 'calculator_started',
+      step: chapter,
+    });
+  }
+
+  public trackChapterStarted(chapter: number, chapterName: string) {
+    this.recordStepEnter(chapterName, undefined, undefined, chapter);
+    this.trackEvent({
+      eventType: 'chapter_started',
+      step: chapter,
+      stepName: chapterName,
+      metadata: {
+        chapter,
+        chapterName,
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+  }
+
+  public trackChapterCompleted(chapter: number, chapterName: string, durationMs?: number) {
+    this.trackEvent({
+      eventType: 'chapter_completed',
+      step: chapter,
+      stepName: chapterName,
+      durationMs,
+      metadata: {
+        chapter,
+        chapterName,
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+  }
+
+  public trackEstimateGenerated(estimatedCost: number, builtUpArea: number, costPerSqFt: number, packageTier?: string) {
+    this.trackEvent({
+      eventType: 'estimate_generated',
+      estimatedCost,
+      builtUpArea,
+      costPerSqFt,
+      packageTier,
+      metadata: {
+        packageTier,
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+  }
+
+  public trackBoqPreviewViewed(previewItemsCount: number = 5) {
+    this.trackEvent({
+      eventType: 'boq_preview_viewed',
+      metadata: {
+        previewItemsCount,
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+  }
+
+  public trackCheckoutStarted(plan: string, amount: number, gateway: string = 'CASHFREE') {
+    this.trackEvent({
+      eventType: 'checkout_started',
+      packageTier: plan,
+      estimatedCost: amount,
+      metadata: {
+        plan,
+        amount,
+        gateway,
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+  }
+
+  public trackPaymentSuccess(plan: string, orderId: string, amount: number, gateway: string = 'CASHFREE') {
+    this.trackEvent({
+      eventType: 'payment_success',
+      packageTier: plan,
+      estimatedCost: amount,
+      metadata: {
+        plan,
+        orderId,
+        amount,
+        gateway,
+        deviceCategory: this.getDeviceCategory(),
+        verifiedAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  public trackPaymentFailed(plan: string, reason: string, failureCategory: string = 'GATEWAY_ERROR', gateway: string = 'CASHFREE') {
+    this.trackEvent({
+      eventType: 'payment_failed',
+      packageTier: plan,
+      metadata: {
+        plan,
+        reason,
+        failureCategory,
+        gateway,
+        deviceCategory: this.getDeviceCategory(),
+      },
+    });
+  }
+
+  public trackReportDownloaded(plan: string, reportFormat: string = 'PDF') {
+    this.trackEvent({
+      eventType: 'report_downloaded',
+      packageTier: plan,
+      metadata: {
+        plan,
+        reportFormat,
+        deviceCategory: this.getDeviceCategory(),
+        downloadedAt: new Date().toISOString(),
+      },
     });
   }
 

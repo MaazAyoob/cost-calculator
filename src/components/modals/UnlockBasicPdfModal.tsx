@@ -11,6 +11,7 @@ import { modalScaleVariant } from '../../animations/variants';
 import { persistProject, getCachedProjectId, setCachedProjectId } from '../../services/projectApi';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 import { normalizeIndianPhoneNumber } from '../../utils/phone';
+import { analytics } from '../../utils/analytics';
 
 interface Props {
   isOpen: boolean;
@@ -199,10 +200,12 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
                 setIsProcessing(false);
                 setFormError(cfResult.error.message || 'Payment cancelled');
                 failPurchasePayment(purchase.id, cfResult.error.message);
+                analytics.trackPaymentFailed('BASIC_ESTIMATE_PDF', cfResult.error.message || 'Payment cancelled', 'USER_CANCELLED', 'CASHFREE');
                 return;
               }
               try {
                 await verifyCashfreePayment(purchase.id, gatewayOrder.orderId);
+                analytics.trackPaymentSuccess('BASIC_ESTIMATE_PDF', gatewayOrder.orderId, 99, 'CASHFREE');
                 setCompletedOrderRef(purchase.publicReference);
                 grantBasicPdfAccess(targetProjectId, purchase.publicReference);
                 grantEntitlementsDirectly('BASIC_ESTIMATE_PDF', targetProjectId, leadEmail, purchase.publicReference);
@@ -228,6 +231,7 @@ export const UnlockBasicPdfModal: React.FC<Props> = ({
               } catch (verErr: any) {
                 setIsProcessing(false);
                 setFormError(verErr.message || 'Cashfree payment verification failed.');
+                analytics.trackPaymentFailed('BASIC_ESTIMATE_PDF', verErr.message || 'Verification failed', 'VERIFICATION_FAILED', 'CASHFREE');
               }
             });
           return;

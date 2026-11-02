@@ -1,45 +1,71 @@
 @import "tailwindcss";
 
+@theme {
+  --color-deep-forest: #183B32;
+  --color-forest-green: #245747;
+  --color-emerald: #347A62;
+  --color-soft-sage: #B7CDBB;
+  --color-light-sage: #E8EFE9;
+
+  --color-warm-ivory: #F7F3EA;
+  --color-sandstone: #E9DDC9;
+  --color-terracotta: #C66B4E;
+  --color-clay: #A95640;
+
+  --color-muted-gold: #C5A46D;
+  --color-pale-gold: #E5D5B4;
+
+  --color-charcoal: #202824;
+  --color-slate: #66716B;
+  --color-soft-white: #FFFFFF;
+}
+
 /* ============================================================
-   HUTTY — STRICT BRAND SYSTEM & DESIGN TOKENS
-   Primary Green:       #1B3D34
-   Roof Accent Orange:  #F28C28 (Used sparingly)
-   Secondary Text:      #4B5563
-   White Surface:       #FFFFFF
-   Light Background:    #F8F8F6
-   Border:              #E5E7EB
+   HUTTY 3.1 — ARCHITECTURAL DESIGN SYSTEM & RICHER COLOR PALETTE
+   Primary Forest:      #183B32 / #245747 / #347A62 / #B7CDBB
+   Warm Architectural:  #F7F3EA / #E9DDC9 / #C66B4E / #A95640
+   Premium Accents:     #C5A46D / #E5D5B4
+   Supporting Neutrals: #202824 / #66716B / #FFFFFF / #E8EFE9
    ============================================================ */
 
 @layer base {
   :root {
     color-scheme: light;
 
-    /* Hutty 3.0 Brand Core Palette */
-    --cc-bg:             #F8F8F6;
-    --cc-surface:        #FFFFFF;
-    --cc-surface-muted:  #F2F2EE;
+    /* Hutty 3.1 Preserved Base Backgrounds */
+    --cc-bg:               #F8F8F6;
+    --cc-surface:          #FFFFFF;
+    --cc-surface-muted:    #F2F2EE;
     --cc-surface-elevated: #FFFFFF;
 
-    /* Hutty 3.0 Typography & Text */
-    --cc-text-primary:   #18211E;
-    --cc-text-secondary: #707873;
-    --cc-text-disabled:  #9CA3AF;
-    --cc-text-inverse:   #FFFFFF;
+    /* Hutty 3.1 Typography & Text */
+    --cc-text-primary:     #18211E;
+    --cc-text-secondary:   #66716B;
+    --cc-text-disabled:    #8D9791;
+    --cc-text-inverse:     #FFFFFF;
 
-    /* Hutty 3.0 Brand Forest Green */
-    --cc-brand:          #1B3D34;
-    --cc-brand-hover:    #142F28;
-    --cc-brand-active:   #0F241F;
-    --cc-brand-soft:     rgba(27, 61, 52, 0.08);
-    --cc-brand-light:    rgba(27, 61, 52, 0.04);
-    --cc-brand-muted:    rgba(27, 61, 52, 0.025);
+    /* Hutty 3.1 Forest Green Palette */
+    --cc-brand:            #183B32; /* Deep Forest */
+    --cc-brand-forest:     #245747;
+    --cc-emerald:          #347A62;
+    --cc-sage:             #B7CDBB;
+    --cc-brand-hover:      #245747;
+    --cc-brand-active:     #142E27;
+    --cc-brand-soft:       rgba(24, 59, 50, 0.08);
+    --cc-brand-light:      rgba(24, 59, 50, 0.04);
+    --cc-brand-muted:      rgba(24, 59, 50, 0.025);
     
-    /* Hutty 3.0 Roof Accent Orange (Used with architectural purpose) */
-    --cc-accent:         #F28C28;
-    --cc-accent-hover:   #D9771A;
-    --cc-accent-active:  #C26715;
-    --cc-accent-soft:    rgba(242, 140, 40, 0.12);
-    --cc-accent-light:   rgba(242, 140, 40, 0.05);
+    /* Hutty 3.1 Warm Architectural Terracotta & Clay */
+    --cc-accent:           #C66B4E; /* Terracotta */
+    --cc-accent-hover:     #A95640;
+    --cc-accent-active:    #8C3D2B;
+    --cc-accent-soft:      rgba(198, 107, 78, 0.12);
+    --cc-accent-light:     rgba(198, 107, 78, 0.05);
+
+    /* Premium Muted Gold */
+    --cc-gold:             #C5A46D;
+    --cc-pale-gold:        #E5D5B4;
+    --cc-gold-soft:        rgba(197, 164, 109, 0.14);
 
     /* Semantic Status Surfaces */
     --cc-success-surface:#E7F3E8;
@@ -48,28 +74,28 @@
     --cc-soft-lavender:  #EEE8FF;
     --cc-info-blue:      #2563EB;
 
-    /* Neutral Architectural Borders */
-    --cc-border:         #E5E7EB;
-    --cc-border-light:   #EEF0F2;
-    --cc-border-strong:  #CBD5CB;
+    /* Preserved Neutral Architectural Borders */
+    --cc-border:           #E5E7EB;
+    --cc-border-light:     #EEF0F2;
+    --cc-border-strong:    #CBD5CB;
 
     /* Architectural Overlays */
-    --cc-overlay:        rgba(27, 61, 52, 0.40);
+    --cc-overlay:          rgba(24, 59, 50, 0.45);
 
     /* Architectural Radii System — Clean, Non-Bubbly */
-    --cc-radius-panel:   16px;
-    --cc-radius-card:    12px;
-    --cc-radius-btn:     8px;
-    --cc-radius-input:   8px;
-    --cc-radius-badge:   6px;
-    --cc-radius-pill:    9999px;
+    --cc-radius-panel:     16px;
+    --cc-radius-card:      14px;
+    --cc-radius-btn:       10px;
+    --cc-radius-input:     10px;
+    --cc-radius-badge:     6px;
+    --cc-radius-pill:      9999px;
 
-    /* Shadows: Subtle, derived strictly from Hutty Forest Green */
-    --cc-shadow-xs:      0 1px 2px 0 rgba(27, 61, 52, 0.04);
-    --cc-shadow-sm:      0 1px 3px 0 rgba(27, 61, 52, 0.06), 0 1px 2px -1px rgba(27, 61, 52, 0.03);
-    --cc-shadow-md:      0 4px 12px -2px rgba(27, 61, 52, 0.07), 0 2px 4px -2px rgba(27, 61, 52, 0.03);
-    --cc-shadow-lg:      0 12px 28px -4px rgba(27, 61, 52, 0.09), 0 4px 8px -2px rgba(27, 61, 52, 0.04);
-    --cc-shadow-brand:   0 4px 14px 0 rgba(27, 61, 52, 0.20);
+    /* Shadows: Subtle, derived strictly from Deep Forest */
+    --cc-shadow-xs:        0 1px 2px 0 rgba(24, 59, 50, 0.04);
+    --cc-shadow-sm:        0 1px 3px 0 rgba(24, 59, 50, 0.06), 0 1px 2px -1px rgba(24, 59, 50, 0.03);
+    --cc-shadow-md:        0 4px 12px -2px rgba(24, 59, 50, 0.08), 0 2px 4px -2px rgba(24, 59, 50, 0.04);
+    --cc-shadow-lg:        0 14px 32px -4px rgba(24, 59, 50, 0.10), 0 4px 10px -2px rgba(24, 59, 50, 0.04);
+    --cc-shadow-brand:     0 4px 16px 0 rgba(24, 59, 50, 0.22);
   }
 
   *, *::before, *::after {
@@ -91,7 +117,7 @@
   }
 
   ::selection {
-    background-color: #1B3D34;
+    background-color: #183B32;
     color: #FFFFFF;
   }
 }
@@ -381,7 +407,7 @@
 }
 
 /* ============================================================
-   BUTTONS
+   BUTTONS (Phase 06.1 Hierarchy: Deep Forest Primary, Clean Secondary, Terracotta Accent)
    ============================================================ */
 .hutty-btn-primary {
   display: inline-flex;
@@ -390,7 +416,7 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: var(--cc-radius-btn);
-  background-color: #1B3D34;
+  background-color: #183B32;
   color: #FFFFFF;
   font-weight: 700;
   font-size: 0.875rem;
@@ -404,18 +430,18 @@
   user-select: none;
 }
 .hutty-btn-primary:hover:not(:disabled) {
-  background-color: #142F28;
+  background-color: #245747;
   box-shadow: var(--cc-shadow-md);
   transform: translateY(-1px);
 }
 .hutty-btn-primary:active:not(:disabled) {
-  background-color: #112821;
+  background-color: #142E27;
   transform: scale(0.985);
   box-shadow: var(--cc-shadow-xs);
 }
 .hutty-btn-primary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1B3D34;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #183B32;
 }
 .hutty-btn-primary:disabled {
   opacity: 0.4;
@@ -433,11 +459,11 @@
   padding: 0.75rem 1.5rem;
   border-radius: var(--cc-radius-btn);
   background-color: #FFFFFF;
-  color: #18211E;
+  color: #183B32;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: -0.01em;
-  border: 1px solid #E5E7EB;
+  border: 1px solid rgba(24, 59, 50, 0.35);
   cursor: pointer;
   box-shadow: var(--cc-shadow-xs);
   transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
@@ -447,19 +473,58 @@
   user-select: none;
 }
 .hutty-btn-secondary:hover:not(:disabled) {
-  background-color: rgba(27, 61, 52, 0.04);
-  border-color: #CBD5CB;
+  background-color: #F8F8F6;
+  border-color: #183B32;
   transform: translateY(-1px);
 }
 .hutty-btn-secondary:active:not(:disabled) {
-  background-color: rgba(27, 61, 52, 0.08);
+  background-color: rgba(24, 59, 50, 0.08);
   transform: scale(0.985);
 }
 .hutty-btn-secondary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1B3D34;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #183B32;
 }
 .hutty-btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.hutty-btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--cc-radius-btn);
+  background-color: #C66B4E;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  box-shadow: var(--cc-shadow-sm);
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.hutty-btn-accent:hover:not(:disabled) {
+  background-color: #A95640;
+  transform: translateY(-1px);
+}
+.hutty-btn-accent:active:not(:disabled) {
+  background-color: #8C3D2B;
+  transform: scale(0.985);
+}
+.hutty-btn-accent:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #C66B4E;
+}
+.hutty-btn-accent:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   pointer-events: none;

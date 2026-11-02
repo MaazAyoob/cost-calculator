@@ -58,7 +58,7 @@ export const PricingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] select-none py-10 sm:py-16">
+    <div className="min-h-screen bg-[#F8F8F6] text-[#183B32] select-none py-10 sm:py-16">
       <SEO
         title="Plans & Pricing | Hutty Residential Construction"
         description="Transparent pricing for residential construction planning: Free estimate, ₹499 detailed BOQ report, and ₹1,499 premium package. Expert consultation available at ₹1,499."
@@ -68,16 +68,16 @@ export const PricingPage: React.FC = () => {
         
         {/* Editorial Top Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 arch-spec-pill text-[#1B3D34]">
-            <Layers className="w-3.5 h-3.5 text-[#F28C28]" />
+          <div className="inline-flex items-center gap-2 arch-spec-pill text-[#183B32]">
+            <Layers className="w-3.5 h-3.5 text-[#C66B4E]" />
             <span>TRANSPARENT PRICING</span>
           </div>
 
-          <h1 className="heading-xl text-4xl sm:text-5xl lg:text-6xl font-black text-[#1B3D34] font-heading tracking-tight leading-[1.08]">
+          <h1 className="heading-xl text-4xl sm:text-5xl lg:text-6xl font-black text-[#183B32] font-heading tracking-tight leading-[1.08]">
             Choose how much clarity you need.
           </h1>
 
-          <p className="body-lg text-[#707873] leading-relaxed max-w-2xl mx-auto">
+          <p className="body-lg text-[#66716B] leading-relaxed max-w-2xl mx-auto">
             Explore your house plan for free, unlock a detailed construction cost report, or choose our premium planning package. Need personalized advice? Book an independent expert.
           </p>
 
@@ -86,9 +86,9 @@ export const PricingPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] hover:underline cursor-pointer bg-white px-4 py-2 rounded-xl border border-[#E5E7EB] shadow-2xs"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#183B32] hover:underline cursor-pointer bg-white px-4 py-2 rounded-xl border border-[#E5E7EB] shadow-2xs"
               >
-                <Clock className="w-3.5 h-3.5 text-[#F28C28]" />
+                <Clock className="w-3.5 h-3.5 text-[#C66B4E]" />
                 <span>View My Purchased Plans ({purchases.length})</span>
               </button>
             </div>
@@ -99,49 +99,49 @@ export const PricingPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch text-left">
           
           {/* TIER 01: CALCULATOR — FREE */}
-          <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
+          <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#183B32] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#707873]">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#66716B]">
                   CALCULATOR PLAN
                 </span>
-                <span className="font-mono text-xs font-bold text-[#1B3D34] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
+                <span className="font-mono text-xs font-bold text-[#183B32] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
                   ₹0 FREE
                 </span>
               </div>
 
               <div className="space-y-1">
-                <h2 className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading">
+                <h2 className="text-xl sm:text-2xl font-black text-[#183B32] font-heading">
                   Calculator — Free
                 </h2>
-                <p className="text-xs text-[#707873] leading-relaxed">
+                <p className="text-xs text-[#66716B] leading-relaxed">
                   Explore your house plan and see a basic estimate. Understand your plot and built-up area.
                 </p>
               </div>
 
               <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#1B3D34] font-heading">₹0</span>
-                  <span className="text-xs text-[#707873]">/ forever</span>
+                  <span className="text-3xl font-black text-[#183B32] font-heading">₹0</span>
+                  <span className="text-xs text-[#66716B]">/ forever</span>
                 </div>
-                <span className="text-[10px] font-mono text-[#707873] block mt-0.5">No credit card or login required</span>
+                <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">No credit card or login required</span>
               </div>
 
-              <div className="space-y-2 text-xs text-[#1B3D34]">
+              <div className="space-y-2 text-xs text-[#183B32]">
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span>Interactive 8-stage room &amp; material choices</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span>Total built-up area (BUA) and footprint estimate</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span>Preliminary construction cost range</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span>3D house view and plot layout</span>
                 </div>
               </div>
@@ -150,7 +150,7 @@ export const PricingPage: React.FC = () => {
             <button
               type="button"
               onClick={() => handleSelectTier('FREE')}
-              className="w-full py-3 px-4 rounded-xl border border-[#1B3D34] text-[#1B3D34] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-3 px-4 rounded-xl border border-[#183B32] text-[#183B32] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <span>Start Free Estimate</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -158,63 +158,63 @@ export const PricingPage: React.FC = () => {
           </div>
 
           {/* TIER 02: CALCULATOR — DETAILED BOQ (₹499) */}
-          <div className="p-6 sm:p-7 bg-white rounded-3xl border-2 border-[#1B3D34] shadow-md flex flex-col justify-between space-y-5 tactile-card arch-bracketed relative">
-            <div className="absolute -top-3 right-4 bg-[#1B3D34] text-white text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[#F28C28]" />
+          <div className="p-6 sm:p-7 bg-white rounded-3xl border-2 border-[#183B32] shadow-md flex flex-col justify-between space-y-5 tactile-card arch-bracketed relative">
+            <div className="absolute -top-3 right-4 bg-[#183B32] text-white text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-[#C66B4E]" />
               <span>RECOMMENDED</span>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#C66B4E]">
                   FULL REPORT
                 </span>
-                <span className="font-mono text-xs font-black text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded">
+                <span className="font-mono text-xs font-black text-[#183B32] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded">
                   OFFICIAL REPORT
                 </span>
               </div>
 
               <div className="space-y-1">
-                <h2 className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading">
+                <h2 className="text-xl sm:text-2xl font-black text-[#183B32] font-heading">
                   Calculator — Detailed BOQ
                 </h2>
-                <p className="text-xs text-[#707873] leading-relaxed">
+                <p className="text-xs text-[#66716B] leading-relaxed">
                   Get a detailed report showing the work, materials, and estimated costs for your house.
                 </p>
               </div>
 
               <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#1B3D34] font-heading">₹499</span>
-                  <span className="text-xs text-[#707873]">/ project</span>
+                  <span className="text-3xl font-black text-[#183B32] font-heading">₹499</span>
+                  <span className="text-xs text-[#66716B]">/ project</span>
                 </div>
-                <span className="text-[10px] font-mono text-[#707873] block mt-0.5">One-time payment • All inclusive</span>
+                <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">One-time payment • All inclusive</span>
               </div>
 
-              <div className="space-y-2 text-xs text-[#1B3D34]">
+              <div className="space-y-2 text-xs text-[#183B32]">
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span>Everything in Free Estimate</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>What We Build:</strong> Itemized civil &amp; structural works BOQ</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>Materials Needed:</strong> Exact steel, cement, sand, brick counts</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>What We Install:</strong> Doors, windows, and sanitary fixtures</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>Labour &amp; Work Costs:</strong> Itemized trades &amp; milestone payment plan</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span><strong>Downloadable PDF Report:</strong> Share with contractor or bank</span>
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
+                  <span><strong>Downloadable PDF Report:</strong> Share with family, builders, or consultants</span>
                 </div>
               </div>
             </div>
@@ -225,58 +225,58 @@ export const PricingPage: React.FC = () => {
               className="w-full hutty-btn-primary py-3.5 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
             >
               <span>Get Detailed BOQ — ₹499</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
             </button>
           </div>
 
           {/* TIER 03: CALCULATOR — PREMIUM (₹1,499) */}
-          <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
+          <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#183B32] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#707873]">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#66716B]">
                   UPGRADED SUITE
                 </span>
-                <span className="font-mono text-xs font-bold text-[#1B3D34] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
+                <span className="font-mono text-xs font-bold text-[#183B32] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
                   PREMIUM
                 </span>
               </div>
 
               <div className="space-y-1">
-                <h2 className="text-xl sm:text-2xl font-black text-[#1B3D34] font-heading">
+                <h2 className="text-xl sm:text-2xl font-black text-[#183B32] font-heading">
                   Calculator — Premium
                 </h2>
-                <p className="text-xs text-[#707873] leading-relaxed">
+                <p className="text-xs text-[#66716B] leading-relaxed">
                   An upgraded calculator package with multi-scenario comparison and premium material customization.
                 </p>
               </div>
 
               <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#1B3D34] font-heading">₹1,499</span>
-                  <span className="text-xs text-[#707873]">/ project</span>
+                  <span className="text-3xl font-black text-[#183B32] font-heading">₹1,499</span>
+                  <span className="text-xs text-[#66716B]">/ project</span>
                 </div>
-                <span className="text-[10px] font-mono text-[#707873] block mt-0.5">One-time payment • All inclusive</span>
+                <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">One-time payment • All inclusive</span>
               </div>
 
-              <div className="space-y-2 text-xs text-[#1B3D34]">
+              <div className="space-y-2 text-xs text-[#183B32]">
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span>Everything in Detailed BOQ plan (₹499)</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>Multi-Scenario Comparison:</strong> Compare layouts &amp; areas side by side</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>Premium Specification Customizer:</strong> Fine-tune luxury finish options</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>Permanent Cloud Save:</strong> Unlimited revision history</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
                   <span><strong>Priority Export Suite:</strong> Unlimited PDF &amp; spreadsheet downloads</span>
                 </div>
                 <div className="p-2 bg-amber-50 rounded-lg border border-amber-200/80 text-[10px] text-amber-900 leading-tight">
@@ -288,7 +288,7 @@ export const PricingPage: React.FC = () => {
             <button
               type="button"
               onClick={() => handleSelectTier('PREMIUM_1499')}
-              className="w-full py-3 px-4 rounded-xl border border-[#1B3D34] text-[#1B3D34] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-3 px-4 rounded-xl border border-[#183B32] text-[#183B32] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <span>Get Calculator — Premium (₹1,499)</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -314,7 +314,7 @@ export const PricingPage: React.FC = () => {
           </div>
 
           <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-white/10 text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-white/10 text-[10px] font-mono font-bold uppercase tracking-wider text-[#C66B4E]">
               <UserCheck className="w-3.5 h-3.5" />
               <span>SEPARATE PROFESSIONAL SERVICE</span>
             </div>
@@ -324,23 +324,23 @@ export const PricingPage: React.FC = () => {
             </h3>
             
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
-              Book a 45-minute 1-on-1 private advisory session with a Council of Architecture (COA) registered architect or chartered structural engineer. We review your house plan, contractor quote, structural questions, or site problems.
+              Book a private 1-on-1 advisory session with an independent construction specialist. Review your floor plan, clarify municipal setback rules, and examine contractor estimates with complete objectivity.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10 pt-4">
               <div>
                 <span className="text-[10px] text-white/60 uppercase font-mono block">Consultation Fee</span>
-                <span className="text-3xl font-black text-[#F28C28] font-heading">₹1,499</span>
-                <span className="text-[10px] text-white/50 block">45-minute independent session</span>
+                <span className="text-3xl font-black text-[#C66B4E] font-heading">₹1,499</span>
+                <span className="text-[10px] text-white/50 block">Private independent session</span>
               </div>
 
               <button
                 type="button"
                 onClick={() => navigate('/consult')}
-                className="hutty-btn-primary bg-[#F28C28] hover:bg-[#D9771A] text-[#1B3D34] font-bold px-6 py-3.5 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                className="bg-[#C66B4E] hover:bg-[#A95640] text-white font-bold px-6 py-3.5 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
               >
                 <span>Consult an Expert — ₹1,499</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <ArrowRight className="w-3.5 h-3.5 text-white/90" />
               </button>
             </div>
           </div>
@@ -349,10 +349,10 @@ export const PricingPage: React.FC = () => {
         {/* ── FREQUENTLY ASKED QUESTIONS ── */}
         <div className="max-w-3xl mx-auto space-y-6 text-left">
           <div className="text-center space-y-1">
-            <h3 className="text-2xl font-extrabold text-[#1B3D34] font-heading">
+            <h3 className="text-2xl font-extrabold text-[#183B32] font-heading">
               Frequently Asked Questions
             </h3>
-            <p className="text-xs text-[#707873]">
+            <p className="text-xs text-[#66716B]">
               Clear commercial terms for homeowners and builders.
             </p>
           </div>
@@ -373,14 +373,14 @@ export const PricingPage: React.FC = () => {
               },
               {
                 q: 'Is the ₹1,499 Consultation included in any calculator tier?',
-                a: 'No. The ₹1,499 Expert Consultation is an independent professional advisory service with verified architects and chartered engineers and is booked separately.',
+                a: 'No. The ₹1,499 Expert Consultation is an independent advisory service with construction and estimation specialists and is booked separately.',
               },
             ].map((faq, idx) => (
               <div key={idx} className="bg-white p-5 rounded-2xl border border-[#E5E7EB] space-y-1.5 shadow-2xs">
-                <h4 className="text-xs sm:text-sm font-bold text-[#1B3D34]">
+                <h4 className="text-xs sm:text-sm font-bold text-[#183B32]">
                   {faq.q}
                 </h4>
-                <p className="text-xs text-[#707873] leading-relaxed">
+                <p className="text-xs text-[#66716B] leading-relaxed">
                   {faq.a}
                 </p>
               </div>
@@ -401,19 +401,19 @@ export const PricingPage: React.FC = () => {
 
       {/* Customer Purchase History Modal */}
       {showHistoryModal && (
-        <div className="fixed inset-0 z-50 bg-[#1B3D34]/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-[#183B32]/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-[#E5E7EB] max-w-lg w-full p-6 space-y-4 shadow-2xl text-left relative max-h-[85vh] overflow-y-auto arch-bracketed">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#F28C28]" />
-                <h3 className="text-base font-extrabold text-[#1B3D34] font-heading">
+                <Clock className="w-4 h-4 text-[#C66B4E]" />
+                <h3 className="text-base font-extrabold text-[#183B32] font-heading">
                   My Purchased Plans ({purchases.length})
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(false)}
-                className="text-xs font-bold text-[#707873] hover:text-[#1B3D34] cursor-pointer"
+                className="text-xs font-bold text-[#66716B] hover:text-[#183B32] cursor-pointer"
               >
                 Close
               </button>
@@ -423,18 +423,18 @@ export const PricingPage: React.FC = () => {
               {purchases.map((p) => (
                 <div key={p.id} className="p-3.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#1B3D34]">{p.tierNameSnapshot}</span>
-                    <span className="font-mono font-bold text-[#1B3D34]">
+                    <span className="font-bold text-[#183B32]">{p.tierNameSnapshot}</span>
+                    <span className="font-mono font-bold text-[#183B32]">
                       {formatPaiseToINR(p.amountMinorUnits)}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#707873] flex items-center justify-between">
+                  <div className="text-[11px] text-[#66716B] flex items-center justify-between">
                     <span>Order: {p.publicReference}</span>
                     <span className="uppercase text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
                       {p.status}
                     </span>
                   </div>
-                  <div className="text-[10px] text-[#707873]">
+                  <div className="text-[10px] text-[#66716B]">
                     Date: {new Date(p.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
                 </div>

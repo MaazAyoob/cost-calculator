@@ -8,6 +8,7 @@ import {
   ElectricalSelection,
   BathroomFittingSelection,
   PaintingSelection,
+  FabricationSelection,
 } from '../calculation-engine/types';
 import {
   ConstructionPackageId,
@@ -19,7 +20,8 @@ import { useReportStore } from './useReportStore';
 
 export type QualityTier = 'Essential' | 'Premium' | 'Luxury';
 export type CityLocation = 'Bangalore' | 'Mysore';
-export type AuthorityOption = 'BBMP/BDA' | 'MUDA' | 'Not sure';
+export type ConfiguratorCity = 'Bangalore' | 'Mysore' | 'Other';
+export type AuthorityOption = 'BBMP/BDA' | 'MUDA' | 'Not sure' | 'Other / None';
 export type HouseType = 'Duplex' | 'Triplex' | 'Rental Units' | 'Mixed Use' | 'Farmhouse';
 export type ParkingTypeOption = 'Stilt' | 'Normal Ground' | 'EV Charging Ready';
 
@@ -76,7 +78,7 @@ export interface ConfiguratorState {
   selectedPackage: ConstructionPackageId;
 
   // Screen 01: Basic Project Info (Starts null/0)
-  city: CityLocation | null;
+  city: ConfiguratorCity | null;
   authority: AuthorityOption | null;
   plotLength: number;
   plotWidth: number;
@@ -118,6 +120,16 @@ export interface ConfiguratorState {
   electrical: ElectricalSelection;
   bathroomFittings: BathroomFittingSelection;
   painting: PaintingSelection;
+  fabrication: FabricationSelection;
+
+  // Space-by-space flooring overrides & bathroom dado selections
+  spaceFlooringOverrides: Record<string, string>;
+  spaceDadoOverrides: Record<string, { height?: '7 ft (Lintel)' | 'Full Height (Ceiling)'; tile?: string }>;
+  spaceDoorOverrides: Record<string, string>;
+  spaceWindowOverrides: Record<string, string>;
+  spaceElectricalTierOverrides: Record<string, 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)'>;
+  spaceSanitaryOverrides: Record<string, string>;
+  spacePaintOverrides: Record<string, string>;
 
   // Computed Live Preview Metrics (Synced from engine)
   calculatedAreaSqFt: number;
@@ -135,7 +147,7 @@ export interface ConfiguratorState {
 
   setSelectedPackage: (packageId: ConstructionPackageId | string, applyDefaults?: boolean) => void;
   setSpecificationTier: (tier: 'standard' | 'premium' | 'luxury') => void;
-  setCity: (city: CityLocation) => void;
+  setCity: (city: ConfiguratorCity) => void;
   setAuthority: (authority: AuthorityOption | 'Not sure') => void;
   setStartTimeline: (startTimeline: string) => void;
   setPlotDimensions: (length: number, width: number) => void;
@@ -162,11 +174,33 @@ export interface ConfiguratorState {
   setMasonryMaterial: (masonry: 'AAC Blocks' | 'Clay Bricks' | 'Concrete Blocks' | string) => void;
   setFlooringZone: (zone: keyof ZoneFlooringSelection, choice: any) => void;
   setWallCladding: (kitchenDadoHeight: '2 ft' | '4 ft', bathroomTileHeight: '7 ft (Lintel)' | 'Full Height (Ceiling)') => void;
+  setSpaceFlooring: (spaceId: string, material: string, spaceType?: string) => void;
+  setSpaceDado: (spaceId: string, height: '7 ft (Lintel)' | 'Full Height (Ceiling)', tile?: string) => void;
+  applyFlooringToSimilarSpaces: (spaceType: string, material: string) => void;
+  applyDadoToAllBathrooms: (height: '7 ft (Lintel)' | 'Full Height (Ceiling)', tile?: string) => void;
+  clearSpaceFlooringOverride: (spaceId: string) => void;
+  pruneOrphanedSpaceOverrides: (activeSpaceIds: string[]) => void;
+  setSpaceDoor: (spaceId: string, choice: string, category?: 'mainDoor' | 'internalDoor' | 'bathroomDoor') => void;
+  clearSpaceDoorOverride: (spaceId: string) => void;
+  applyDoorToSimilarSpaces: (category: 'mainDoor' | 'internalDoor' | 'bathroomDoor', choice: string) => void;
+  setSpaceWindow: (spaceId: string, choice: string) => void;
+  clearSpaceWindowOverride: (spaceId: string) => void;
+  applyWindowToAllRooms: (choice: string) => void;
+  setSpaceElectricalTier: (spaceId: string, tier: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)') => void;
+  clearSpaceElectricalOverride: (spaceId: string) => void;
+  applyElectricalToAllRooms: (tier: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)') => void;
+  setSpaceSanitary: (spaceId: string, brand: string) => void;
+  clearSpaceSanitaryOverride: (spaceId: string) => void;
+  applySanitaryToAllBathrooms: (brand: string) => void;
+  setSpacePaint: (spaceId: string, paintChoice: string) => void;
+  clearSpacePaintOverride: (spaceId: string) => void;
+  applyPaintToAllRooms: (paintChoice: string) => void;
   setDoorSelection: (category: keyof DoorSelection, choice: any) => void;
   setWindowSelection: (primaryMaterial: 'uPVC' | 'Wood' | 'Aluminium', subGrade?: string) => void;
   setElectricalSelection: (wireTier: 'Economy (Anchor)' | 'Mid-range (V-Guard)' | 'Premium (Finolex / Polycab)') => void;
   setBathroomFittingSelection: (sanitaryTier: any, cpvcBrand: any) => void;
   setPaintingSelection: (internalPaint: any, externalPaint: any, brand: any) => void;
+  setFabricationSelection: (selection: Partial<FabricationSelection>) => void;
   setQualityTier: (tier: QualityTier) => void;
   // Commercial / Contractor Execution Mode (Phase 1)
   contractorMode: 'independent' | 'contractor';
@@ -245,6 +279,23 @@ export function getFreshZeroState() {
     electrical: { ...pkg.specs.electrical },
     bathroomFittings: { ...pkg.specs.bathroomFittings },
     painting: { ...pkg.specs.painting },
+    fabrication: {
+      staircaseRailing: 'SS 304 with Toughened Glass',
+      balconyRailing: 'SS 304 with Toughened Glass',
+      terraceRailing: 'MS Parapet Safety Extension Railing',
+      mainGate: 'MS Designer Sliding / Swing Gate (10x6 ft)',
+      tankLadder: 'GI / MS Cat Ladder with Safety Rungs',
+      skylight: 'None',
+      balconyDoor: 'UPVC / Aluminium 2.5-Track French Sliding Door',
+      elevationCladding: 'HPL / Stone Veneer Façade Cladding',
+    },
+    spaceFlooringOverrides: {},
+    spaceDadoOverrides: {},
+    spaceDoorOverrides: {},
+    spaceWindowOverrides: {},
+    spaceElectricalTierOverrides: {},
+    spaceSanitaryOverrides: {},
+    spacePaintOverrides: {},
 
     // Commercial / Contractor Execution Mode
     contractorMode: 'independent' as const,
@@ -530,6 +581,312 @@ export const useWizardStore = create<ConfiguratorState>()(
         });
       },
 
+      setSpaceFlooring: (spaceId, material, spaceType) => {
+        set((state) => {
+          const overrides = { ...state.spaceFlooringOverrides, [spaceId]: material };
+          const zones = { ...state.flooringZones };
+          const normalized = (spaceType || '').toLowerCase();
+          if (normalized.includes('living') || normalized.includes('dining')) zones.living = material as any;
+          else if (normalized.includes('kitchen')) zones.kitchenDining = material as any;
+          else if (normalized.includes('bed')) zones.bedrooms = material as any;
+          else if (normalized.includes('bath') || normalized.includes('toilet')) zones.bathrooms = material as any;
+          else if (normalized.includes('balcony')) zones.balconies = material as any;
+          else if (normalized.includes('utility') || normalized.includes('parking')) zones.parkingUtility = material as any;
+
+          return {
+            hasStartedSelection: true,
+            spaceFlooringOverrides: overrides,
+            flooringZones: zones,
+          };
+        });
+      },
+
+      setSpaceDado: (spaceId, height, tile) => {
+        set((state) => {
+          const dadoOverrides = {
+            ...state.spaceDadoOverrides,
+            [spaceId]: { height, tile: tile || state.spaceDadoOverrides[spaceId]?.tile },
+          };
+          return {
+            hasStartedSelection: true,
+            spaceDadoOverrides: dadoOverrides,
+            wallCladding: {
+              ...state.wallCladding,
+              bathroomTileHeight: height,
+            },
+          };
+        });
+      },
+
+      applyFlooringToSimilarSpaces: (spaceType, material) => {
+        set((state) => {
+          const zones = { ...state.flooringZones };
+          const normalized = (spaceType || '').toLowerCase();
+          if (normalized.includes('living') || normalized.includes('dining')) zones.living = material as any;
+          else if (normalized.includes('kitchen')) zones.kitchenDining = material as any;
+          else if (normalized.includes('bed')) zones.bedrooms = material as any;
+          else if (normalized.includes('bath') || normalized.includes('toilet')) zones.bathrooms = material as any;
+          else if (normalized.includes('balcony')) zones.balconies = material as any;
+          else if (normalized.includes('utility') || normalized.includes('parking')) zones.parkingUtility = material as any;
+
+          const overrides = { ...state.spaceFlooringOverrides };
+          // Apply override to all keys matching this space category
+          Object.keys(overrides).forEach((key) => {
+            if (key.toLowerCase().includes(normalized)) {
+              overrides[key] = material;
+            }
+          });
+
+          return {
+            hasStartedSelection: true,
+            flooringZones: zones,
+            spaceFlooringOverrides: overrides,
+          };
+        });
+      },
+
+      applyDadoToAllBathrooms: (height, tile) => {
+        set((state) => {
+          const dadoOverrides = { ...state.spaceDadoOverrides };
+          Object.keys(dadoOverrides).forEach((k) => {
+            if (k.toLowerCase().includes('bath') || k.toLowerCase().includes('toilet')) {
+              dadoOverrides[k] = { height, tile: tile || dadoOverrides[k]?.tile };
+            }
+          });
+          return {
+            hasStartedSelection: true,
+            spaceDadoOverrides: dadoOverrides,
+            wallCladding: {
+              ...state.wallCladding,
+              bathroomTileHeight: height,
+            },
+          };
+        });
+      },
+
+      clearSpaceFlooringOverride: (spaceId) => {
+        set((state) => {
+          const overrides = { ...state.spaceFlooringOverrides };
+          delete overrides[spaceId];
+          return {
+            spaceFlooringOverrides: overrides,
+          };
+        });
+      },
+
+      pruneOrphanedSpaceOverrides: (activeSpaceIds) => {
+        set((state) => {
+          const activeSet = new Set(activeSpaceIds);
+          let changed = false;
+
+          const pruneMap = <T>(map: Record<string, T> | undefined): Record<string, T> => {
+            const next = { ...(map || {}) };
+            Object.keys(next).forEach((k) => {
+              if (!activeSet.has(k)) {
+                delete next[k];
+                changed = true;
+              }
+            });
+            return next;
+          };
+
+          const nextFlooring = pruneMap(state.spaceFlooringOverrides);
+          const nextDado = pruneMap(state.spaceDadoOverrides);
+          const nextDoor = pruneMap(state.spaceDoorOverrides);
+          const nextWindow = pruneMap(state.spaceWindowOverrides);
+          const nextElec = pruneMap(state.spaceElectricalTierOverrides);
+          const nextSan = pruneMap(state.spaceSanitaryOverrides);
+          const nextPaint = pruneMap(state.spacePaintOverrides);
+
+          if (!changed) return state;
+          return {
+            spaceFlooringOverrides: nextFlooring,
+            spaceDadoOverrides: nextDado,
+            spaceDoorOverrides: nextDoor,
+            spaceWindowOverrides: nextWindow,
+            spaceElectricalTierOverrides: nextElec,
+            spaceSanitaryOverrides: nextSan,
+            spacePaintOverrides: nextPaint,
+          };
+        });
+      },
+
+      setSpaceDoor: (spaceId, choice, category = 'internalDoor') => {
+        set((state) => {
+          const overrides = { ...state.spaceDoorOverrides, [spaceId]: choice };
+          const doors = { ...state.doors, [category]: choice };
+          const materialBrands = {
+            ...state.materialBrands,
+            ...(category === 'mainDoor' ? { doors: choice } : {}),
+          };
+          return {
+            hasStartedSelection: true,
+            spaceDoorOverrides: overrides,
+            doors,
+            materialBrands,
+          };
+        });
+      },
+
+      clearSpaceDoorOverride: (spaceId) => {
+        set((state) => {
+          const overrides = { ...state.spaceDoorOverrides };
+          delete overrides[spaceId];
+          return { spaceDoorOverrides: overrides };
+        });
+      },
+
+      applyDoorToSimilarSpaces: (category, choice) => {
+        set((state) => {
+          const overrides = { ...state.spaceDoorOverrides };
+          const doors = { ...state.doors, [category]: choice };
+          const materialBrands = {
+            ...state.materialBrands,
+            ...(category === 'mainDoor' ? { doors: choice } : {}),
+          };
+          return {
+            hasStartedSelection: true,
+            doors,
+            materialBrands,
+            spaceDoorOverrides: overrides,
+          };
+        });
+      },
+
+      setSpaceWindow: (spaceId, choice) => {
+        set((state) => {
+          const overrides = { ...state.spaceWindowOverrides, [spaceId]: choice };
+          let prim: 'uPVC' | 'Wood' | 'Aluminium' = 'uPVC';
+          if (choice.includes('Wood') || choice.includes('Teak') || choice.includes('Sal')) prim = 'Wood';
+          else if (choice.includes('Aluminium')) prim = 'Aluminium';
+
+          return {
+            hasStartedSelection: true,
+            spaceWindowOverrides: overrides,
+            windows: { primaryMaterial: prim, subGrade: choice },
+            materialBrands: { ...state.materialBrands, windows: choice },
+          };
+        });
+      },
+
+      clearSpaceWindowOverride: (spaceId) => {
+        set((state) => {
+          const overrides = { ...state.spaceWindowOverrides };
+          delete overrides[spaceId];
+          return { spaceWindowOverrides: overrides };
+        });
+      },
+
+      applyWindowToAllRooms: (choice) => {
+        set((state) => {
+          let prim: 'uPVC' | 'Wood' | 'Aluminium' = 'uPVC';
+          if (choice.includes('Wood') || choice.includes('Teak') || choice.includes('Sal')) prim = 'Wood';
+          else if (choice.includes('Aluminium')) prim = 'Aluminium';
+
+          return {
+            hasStartedSelection: true,
+            windows: { primaryMaterial: prim, subGrade: choice },
+            materialBrands: { ...state.materialBrands, windows: choice },
+          };
+        });
+      },
+
+      setSpaceElectricalTier: (spaceId, tier) => {
+        set((state) => {
+          const overrides = { ...state.spaceElectricalTierOverrides, [spaceId]: tier };
+          return {
+            hasStartedSelection: true,
+            spaceElectricalTierOverrides: overrides,
+            electrical: { conduit: 'Heavy-Duty ISI Marked PVC' as const, wireTier: tier },
+            materialBrands: { ...state.materialBrands, electrical: tier },
+          };
+        });
+      },
+
+      clearSpaceElectricalOverride: (spaceId) => {
+        set((state) => {
+          const overrides = { ...state.spaceElectricalTierOverrides };
+          delete overrides[spaceId];
+          return { spaceElectricalTierOverrides: overrides };
+        });
+      },
+
+      applyElectricalToAllRooms: (tier) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          electrical: { conduit: 'Heavy-Duty ISI Marked PVC' as const, wireTier: tier },
+          materialBrands: { ...state.materialBrands, electrical: tier },
+        }));
+      },
+
+      setSpaceSanitary: (spaceId, brand) => {
+        set((state) => {
+          const overrides = { ...state.spaceSanitaryOverrides, [spaceId]: brand };
+          return {
+            hasStartedSelection: true,
+            spaceSanitaryOverrides: overrides,
+            bathroomFittings: {
+              ...state.bathroomFittings,
+              sanitaryTier: brand,
+            },
+            materialBrands: { ...state.materialBrands, bathroom: brand },
+          };
+        });
+      },
+
+      clearSpaceSanitaryOverride: (spaceId) => {
+        set((state) => {
+          const overrides = { ...state.spaceSanitaryOverrides };
+          delete overrides[spaceId];
+          return { spaceSanitaryOverrides: overrides };
+        });
+      },
+
+      applySanitaryToAllBathrooms: (brand) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          bathroomFittings: {
+            ...state.bathroomFittings,
+            sanitaryTier: brand,
+          },
+          materialBrands: { ...state.materialBrands, bathroom: brand },
+        }));
+      },
+
+      setSpacePaint: (spaceId, paintChoice) => {
+        set((state) => {
+          const overrides = { ...state.spacePaintOverrides, [spaceId]: paintChoice };
+          return {
+            hasStartedSelection: true,
+            spacePaintOverrides: overrides,
+            painting: {
+              ...state.painting,
+              internalPaint: paintChoice,
+            },
+            materialBrands: { ...state.materialBrands, paint: paintChoice },
+          };
+        });
+      },
+
+      clearSpacePaintOverride: (spaceId) => {
+        set((state) => {
+          const overrides = { ...state.spacePaintOverrides };
+          delete overrides[spaceId];
+          return { spacePaintOverrides: overrides };
+        });
+      },
+
+      applyPaintToAllRooms: (paintChoice) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          painting: {
+            ...state.painting,
+            internalPaint: paintChoice,
+          },
+          materialBrands: { ...state.materialBrands, paint: paintChoice },
+        }));
+      },
+
       setDoorSelection: (category, choice) => {
         set((state) => ({
           hasStartedSelection: true,
@@ -581,6 +938,16 @@ export const useWizardStore = create<ConfiguratorState>()(
           hasStartedSelection: true,
           painting: { baseLayer: 'Putty + Primer' as const, internalPaint, externalPaint, brand },
         });
+      },
+
+      setFabricationSelection: (selection) => {
+        set((state) => ({
+          hasStartedSelection: true,
+          fabrication: {
+            ...state.fabrication,
+            ...selection,
+          },
+        }));
       },
 
       setQualityTier: (qualityTier: QualityTier) => {

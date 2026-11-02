@@ -151,7 +151,7 @@ export const ProfessionalJoinPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] pb-24">
+    <div className="min-h-screen bg-[#F8F8F6] text-[#183B32] pb-24">
       <SEO
         title="Join Hutty as a Construction Professional — Architect, Engineer & Contractor Network"
         description="Connect with genuine homeowners planning residential construction across Bangalore. Offer verified independent advisory consultations. Submit your application for review."
@@ -162,7 +162,7 @@ export const ProfessionalJoinPage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate('/consult')}
-          className="inline-flex items-center gap-2 text-xs font-bold text-[#687770] hover:text-[#1B3D34] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-bold text-[#687770] hover:text-[#183B32] transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Consultation Platform</span>
@@ -181,10 +181,10 @@ export const ProfessionalJoinPage: React.FC = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                 APPLICATION SUBMITTED &bull; UNDER REVIEW
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading pt-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#183B32] font-heading pt-1">
                 Thank you, {submittedData.fullName}
               </h1>
-              <p className="text-xs sm:text-sm text-[#707873] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#66716B] leading-relaxed">
                 Your application to join the Hutty Professional Network has been received and recorded.
               </p>
             </div>
@@ -193,11 +193,11 @@ export const ProfessionalJoinPage: React.FC = () => {
             <div className="p-5 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] max-w-md mx-auto text-left space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#687770]">Application Reference:</span>
-                <span className="font-mono font-bold text-[#1B3D34]">{submittedData.id}</span>
+                <span className="font-mono font-bold text-[#183B32]">{submittedData.id}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#687770]">Category:</span>
-                <span className="font-semibold text-[#1B3D34]">{submittedData.category}</span>
+                <span className="font-semibold text-[#183B32]">{submittedData.category}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#687770]">Review Status:</span>
@@ -208,7 +208,7 @@ export const ProfessionalJoinPage: React.FC = () => {
             </div>
 
             {/* Explanation Note */}
-            <div className="p-4 bg-[rgba(27,61,52,0.04)] border border-[#1B3D34]/15 rounded-2xl max-w-lg mx-auto text-xs text-[#1B3D34] text-left space-y-2">
+            <div className="p-4 bg-[rgba(27,61,52,0.04)] border border-[#183B32]/15 rounded-2xl max-w-lg mx-auto text-xs text-[#183B32] text-left space-y-2">
               <div className="flex items-center gap-2 font-bold">
                 <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                 <span>What happens next?</span>
@@ -225,7 +225,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                 className="hutty-btn-primary px-6 py-3 rounded-xl text-xs font-bold inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Return to Consultation Directory</span>
-                <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+                <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
               </button>
             </div>
           </div>
@@ -237,12 +237,12 @@ export const ProfessionalJoinPage: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 
                 <div className="lg:col-span-7 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.08)] border border-[rgba(27,61,52,0.12)] text-[#1B3D34] text-xs font-bold uppercase tracking-wider">
-                    <Briefcase className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.08)] border border-[rgba(27,61,52,0.12)] text-[#183B32] text-xs font-bold uppercase tracking-wider">
+                    <Briefcase className="w-3.5 h-3.5 text-[#C66B4E]" />
                     <span>Professional Practitioner Registration</span>
                   </div>
 
-                  <h1 className="text-3xl sm:text-4xl font-black text-[#1B3D34] tracking-tight font-heading leading-tight">
+                  <h1 className="text-3xl sm:text-4xl font-black text-[#183B32] tracking-tight font-heading leading-tight">
                     Apply to Join Hutty as a Construction Professional
                   </h1>
 
@@ -250,7 +250,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                     Join our verified network of residential architects, structural engineers, cost specialists, and contractors. Showcase your expertise to pre-screened homeowners seeking independent paid advisory.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#E5E7EB] text-xs text-[#1B3D34]">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#E5E7EB] text-xs text-[#183B32]">
                     <div className="flex items-center gap-2 font-semibold">
                       <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Genuine Homeowners</span>
@@ -279,7 +279,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-[#112821]/80 via-transparent to-black/20 pointer-events-none" />
 
                       <div className="absolute bottom-3 left-3 right-3 text-left text-white space-y-0.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28] bg-black/40 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#C66B4E] bg-black/40 px-2 py-0.5 rounded">
                           COA &bull; Chartered Engineers
                         </span>
                         <h4 className="text-xs font-bold leading-tight">
@@ -313,17 +313,17 @@ export const ProfessionalJoinPage: React.FC = () => {
               {/* Step 1: Personal & Contact Information */}
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
                 <div className="flex items-center gap-2.5 border-b border-[#E5E7EB] pb-3">
-                  <span className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center font-bold text-xs">
+                  <span className="w-6 h-6 rounded-lg bg-[#183B32] text-white flex items-center justify-center font-bold text-xs">
                     1
                   </span>
-                  <h2 className="text-base font-bold text-[#1B3D34] font-heading">
+                  <h2 className="text-base font-bold text-[#183B32] font-heading">
                     Personal &amp; Contact Details
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Full Name (as registered with professional body) *
                     </label>
                     <div className="relative">
@@ -334,13 +334,13 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="e.g. Ar. Ramesh Nambiar or Er. Sneha Kulkarni"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-medium"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all font-medium"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Professional Email *
                     </label>
                     <div className="relative">
@@ -351,13 +351,13 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@practice.com"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Mobile Number (10 Digits) *
                     </label>
                     <div className="relative">
@@ -368,13 +368,13 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="98XXXXXXXX"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all font-mono"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Primary City *
                     </label>
                     <div className="relative">
@@ -384,13 +384,13 @@ export const ProfessionalJoinPage: React.FC = () => {
                         required
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs font-bold text-[#1B3D34] block">
+                    <label className="text-xs font-bold text-[#183B32] block">
                       Active Service Areas in Bangalore
                     </label>
                     <div className="flex flex-wrap gap-2 pt-1">
@@ -403,8 +403,8 @@ export const ProfessionalJoinPage: React.FC = () => {
                             onClick={() => handleToggleServiceArea(loc)}
                             className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
                               active
-                                ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                                : 'bg-[#F8F8F6] text-[#707873] border-[#E5E7EB] hover:bg-white'
+                                ? 'bg-[#183B32] text-white border-[#183B32]'
+                                : 'bg-[#F8F8F6] text-[#66716B] border-[#E5E7EB] hover:bg-white'
                             }`}
                           >
                             {loc}
@@ -419,23 +419,23 @@ export const ProfessionalJoinPage: React.FC = () => {
               {/* Step 2: Category & Qualifications */}
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
                 <div className="flex items-center gap-2.5 border-b border-[#E5E7EB] pb-3">
-                  <span className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center font-bold text-xs">
+                  <span className="w-6 h-6 rounded-lg bg-[#183B32] text-white flex items-center justify-center font-bold text-xs">
                     2
                   </span>
-                  <h2 className="text-base font-bold text-[#1B3D34] font-heading">
+                  <h2 className="text-base font-bold text-[#183B32] font-heading">
                     Specialty Category &amp; Credentials
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Consultation Category *
                     </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-semibold cursor-pointer"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all font-semibold cursor-pointer"
                     >
                       {CANONICAL_CONSULTATION_CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -446,7 +446,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                   </div>
 
                   <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Qualifications / Degrees *
                     </label>
                     <input
@@ -455,12 +455,12 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={qualifications}
                       onChange={(e) => setQualifications(e.target.value)}
                       placeholder="e.g. B.Arch (SPA Delhi), M.Tech Structural Engg (IISc), B.E. Civil"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       License / Registration No. (if applicable)
                     </label>
                     <input
@@ -468,7 +468,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={licenseNumber}
                       onChange={(e) => setLicenseNumber(e.target.value)}
                       placeholder="e.g. CA/2012/54821 or BBMP/BL-4819"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all font-mono"
                     />
                     <p className="text-[10px] text-[#687770]">
                       Required for Council of Architecture or Chartered Engineers; optional for interior specialists.
@@ -476,7 +476,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Years in Active Practice *
                     </label>
                     <input
@@ -486,7 +486,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                       max={60}
                       value={experienceYears}
                       onChange={(e) => setExperienceYears(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all font-mono"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -495,17 +495,17 @@ export const ProfessionalJoinPage: React.FC = () => {
               {/* Step 3: Practice & Services */}
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-6">
                 <div className="flex items-center gap-2.5 border-b border-[#E5E7EB] pb-3">
-                  <span className="w-6 h-6 rounded-lg bg-[#1B3D34] text-white flex items-center justify-center font-bold text-xs">
+                  <span className="w-6 h-6 rounded-lg bg-[#183B32] text-white flex items-center justify-center font-bold text-xs">
                     3
                   </span>
-                  <h2 className="text-base font-bold text-[#1B3D34] font-heading">
+                  <h2 className="text-base font-bold text-[#183B32] font-heading">
                     Expertise &amp; Consultation Offerings
                   </h2>
                 </div>
 
                 <div className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Areas of Expertise (comma separated) *
                     </label>
                     <input
@@ -514,12 +514,12 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={expertise}
                       onChange={(e) => setExpertise(e.target.value)}
                       placeholder="e.g. Bespoke Villa Design, Vastu Space Planning, BBMP Setbacks, RCC Detail"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Proposed Consultation Services (comma separated)
                     </label>
                     <input
@@ -527,12 +527,12 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={proposedServices}
                       onChange={(e) => setProposedServices(e.target.value)}
                       placeholder="e.g. Plan Audit, Foundation Review, Contractor Quote Sanity Check"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34] block">
+                    <label className="text-xs font-bold text-[#183B32] block">
                       Supported Consultation Modes *
                     </label>
                     <div className="flex flex-wrap gap-3 pt-1">
@@ -549,8 +549,8 @@ export const ProfessionalJoinPage: React.FC = () => {
                             onClick={() => handleToggleMode(m.id)}
                             className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
                               active
-                                ? 'bg-[#1B3D34] text-white border-[#1B3D34]'
-                                : 'bg-[#F8F8F6] text-[#707873] border-[#E5E7EB] hover:bg-white'
+                                ? 'bg-[#183B32] text-white border-[#183B32]'
+                                : 'bg-[#F8F8F6] text-[#66716B] border-[#E5E7EB] hover:bg-white'
                             }`}
                           >
                             {m.label}
@@ -561,7 +561,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Portfolio / Work Sample Links (comma separated)
                     </label>
                     <input
@@ -569,12 +569,12 @@ export const ProfessionalJoinPage: React.FC = () => {
                       value={portfolioLinks}
                       onChange={(e) => setPortfolioLinks(e.target.value)}
                       placeholder="e.g. https://instagram.com/myarchitecture, https://behance.net/..."
-                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#1B3D34]">
+                    <label className="text-xs font-bold text-[#183B32]">
                       Verification Document Link (Google Drive / Portfolio PDF)
                     </label>
                     <div className="relative">
@@ -584,7 +584,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                         value={documentUrl}
                         onChange={(e) => setDocumentUrl(e.target.value)}
                         placeholder="https://drive.google.com/file/d/... or public credential document link"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#1B3D34] focus:outline-none focus:ring-2 focus:ring-[#1B3D34] focus:bg-white transition-all"
+                        className="w-full pl-10 pr-3.5 py-2.5 bg-[#F8F8F6] border border-[#E5E7EB] rounded-xl text-xs sm:text-sm text-[#183B32] focus:outline-none focus:ring-2 focus:ring-[#183B32] focus:bg-white transition-all"
                       />
                     </div>
                     <p className="text-[10px] text-[#687770]">
@@ -603,9 +603,9 @@ export const ProfessionalJoinPage: React.FC = () => {
                     required
                     checked={consentGiven}
                     onChange={(e) => setConsentGiven(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded text-[#1B3D34] focus:ring-[#1B3D34] border-gray-300 cursor-pointer"
+                    className="w-4 h-4 mt-0.5 rounded text-[#183B32] focus:ring-[#183B32] border-gray-300 cursor-pointer"
                   />
-                  <label htmlFor="consentCheckbox" className="text-xs text-[#707873] leading-relaxed cursor-pointer">
+                  <label htmlFor="consentCheckbox" className="text-xs text-[#66716B] leading-relaxed cursor-pointer">
                     I confirm that the details, qualifications, and credentials provided above are genuine. I agree to Hutty&apos;s professional vetting process, independent advisory code of conduct, and privacy policy. I understand that submitting this application does not automatically list me publicly until authorized admin review is complete.
                   </label>
                 </div>
@@ -630,7 +630,7 @@ export const ProfessionalJoinPage: React.FC = () => {
                   ) : (
                     <>
                       <span>Submit Professional Application</span>
-                      <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+                      <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
                     </>
                   )}
                 </button>

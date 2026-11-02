@@ -163,7 +163,7 @@ export const AdminPricingPurchasesSection: React.FC = () => {
         <div className="bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-2xs space-y-1">
           <div className="flex items-center justify-between text-xs text-[#707873] font-bold uppercase tracking-wider">
             <span>Total Initiated</span>
-            <Tag className="w-4 h-4 text-[#F28C28]" />
+            <Tag className="w-4 h-4 text-[#C66B4E]" />
           </div>
           <div className="text-2xl font-black text-[#1B3D34] font-mono">
             {fetchError ? '—' : isLoading ? '...' : metrics.totalPurchases}

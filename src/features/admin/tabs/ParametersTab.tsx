@@ -358,7 +358,7 @@ export const ParametersTab: React.FC = () => {
       {Object.keys(draftParameters).length > 0 && (
         <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-900">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#F28C28] shrink-0" />
+            <Sparkles className="w-4 h-4 text-[#C66B4E] shrink-0" />
             <span>
               <strong>{Object.keys(draftParameters).length} parameters</strong> have unsaved draft modifications.
               Run simulation before publishing to production.
@@ -381,7 +381,7 @@ export const ParametersTab: React.FC = () => {
             <Card
               key={param.key}
               className={`border transition-all ${
-                isOverridden ? 'border-[#F28C28] bg-amber-50/20' : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
+                isOverridden ? 'border-[#C66B4E] bg-amber-50/20' : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
               }`}
             >
               <CardContent className="p-4 space-y-3">
@@ -397,7 +397,7 @@ export const ParametersTab: React.FC = () => {
                         </span>
                       )}
                       {isOverridden && (
-                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-[#F28C28] border border-amber-300">
+                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#C66B4E]/10 text-[#C66B4E] border border-[#C66B4E]/25">
                           DRAFT
                         </span>
                       )}

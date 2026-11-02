@@ -1,0 +1,377 @@
+<USER_REQUEST>
+# HUTTY 3.1 — PHASE 01
+## Complete Product Audit, Calculator Mapping & Implementation Blueprint
+
+### ROLE
+
+Act as a senior product architect, construction-estimation systems analyst, full-stack engineer and product UX researcher.
+
+You are working on Hutty, a guided home-planning and construction-estimation platform.
+
+Your task is to thoroughly inspect the existing application and produce an implementation blueprint based on the attached document:
+
+**Hutty_Product_Vision_and_Developer_Brief.docx**
+
+This document is the primary source of product requirements. Read all 10 pages, line by line. Do not skip sections, tables, implementation notes, restrictions or acceptance criteria.
+
+Do not start implementing the redesign yet.
+
+---
+
+## 1. Primary objective
+
+We need to understand:
+
+1. What Hutty currently does.
+2. What functionality already exists.
+3. How the existing calculator works.
+4. Which inputs feed which calculations.
+5. How quantities, rates and BOQ items are connected.
+6. What the client wants changed.
+7. What functionality is missing.
+8. What can be redesigned without backend changes.
+9. What requires additional engineering.
+10. What must be protected from accidental modification.
+
+Do not assume the previous development reports accurately describe the current code. Verify everything against the actual repository.
+
+## 2. Inspect the complete application
+
+Inspect the following areas wherever they exist:
+
+- Public homepage and marketing pages.
+- Calculator entry and all existing calculator stages.
+- Plot and building configuration.
+- Room and space inputs.
+- Construction material selections.
+- Flooring and tile selections.
+- Doors and windows.
+- Electrical and plumbing.
+- Painting and fabrication.
+- Estimate generation.
+- Detailed BOQ.
+- PDF generation.
+- Login and registration.
+- Anonymous or guest access.
+- Customer dashboard.
+- Projects and saved estimates.
+- Payment history.
+- Cashfree checkout and verification.
+- Consultation booking.
+- Admin dashboard and every Admin group.
+- Material rates and pricing configuration.
+- Formula management.
+- Analytics and tracking.
+
+Inspect the actual source files, routes, API calls, database models, configuration and calculation dependencies.
+
+Where possible, run the existing application and inspect the actual screens.
+
+Do not claim that something works merely because a component or API exists.
+
+## 3. Build a complete calculator input inventory
+
+Create a structured inventory of every existing calculator input.
+
+For every input, document:
+
+- Existing screen or chapter.
+- Field name.
+- What information it collects.
+- Data type and validation.
+- Whether it is mandatory or optional.
+- Default value.
+- Where the value is stored.
+- Which calculation uses it.
+- Which downstream values depend on it.
+- Whether the customer should enter it or Hutty should calculate it.
+- Whether the client wants it retained, moved, improved or added.
+
+Do not remove or simplify existing fields just because they appear technical.
+
+## 4. Map the complete calculation and BOQ flow
+
+This is one of the most important tasks.
+
+For every relevant construction category, create a mapping:
+
+**Customer input → Formula/dependency → Calculated quantity → Customer selection → Rate → Cost → BOQ item → Report output**
+
+Cover at least:
+
+- Plot and site details.
+- Setbacks and preliminary buildable area.
+- Floors and building configuration.
+- Rooms and floor-wise areas.
+- Concrete and reinforcement steel.
+- Cement, sand and aggregates.
+- AAC blocks, clay bricks and concrete blocks.
+- Flooring, tiles, skirting and dado.
+- Doors and windows.
+- Electrical points, wiring and switches.
+- Plumbing, sanitaryware and fittings.
+- Paint and surface areas.
+- Railings, gates and fabrication.
+- Elevation and cladding.
+- Labour and installation.
+- Taxes and contingency, where supported.
+
+For each calculation, identify:
+
+- Actual formula or calculation function.
+- Input dependencies.
+- Units.
+- Assumptions.
+- Rounding and precision behaviour.
+- Existing validation.
+- Whether the quantity is calculated, estimated or manually entered.
+- Whether the resulting amount reconciles with quantity × rate.
+- Whether the result appears in the BOQ and PDF.
+
+If a mapping cannot be verified, mark it as UNKNOWN. Do not invent formulas or assume functionality.
+
+## 5. Compare the existing calculator against the client's seven chapters
+
+Map the existing application into the following required journey:
+
+### Chapter 01 — Tell us about your plot
+Location, plot dimensions, planning authority, road width, orientation, setbacks and preliminary buildable area.
+
+### Chapter 02 — Tell us about your dream home
+Floors, parking, building use, rooms, floor-wise configuration, built-up area and feasibility comparison.
+
+### Chapter 03 — Choose your core construction materials
+Steel, cement, concrete grade, walling material and related quantities.
+
+### Chapter 04 — Choose flooring and tiles for each space
+Living/dining, master bedroom, other bedrooms, bathrooms, kitchen, balcony, utility, staircase and other spaces.
+
+Must support individual choices, apply-to-similar-spaces and individual overrides.
+
+### Chapter 05 — Choose doors and windows
+Main entrance, internal doors, bathroom doors, sliding doors, windows, frames, glazing and hardware.
+
+Must remain a dedicated chapter.
+
+### Chapter 06 — Select electrical, plumbing and other finishes
+Electrical, plumbing, painting, fabrication, elevation and cladding.
+
+### Chapter 07 — Review your estimate and BOQ
+Preliminary cost, cost per square foot, work-wise breakdown, material quantities, specifications, rates, assumptions and paid detailed-report offer.
+
+For each chapter classify every requirement as:
+
+- IMPLEMENTED AND VERIFIED.
+- PARTIALLY IMPLEMENTED.
+- NOT IMPLEMENTED.
+- IMPLEMENTED BUT NEEDS IMPROVEMENT.
+- UNKNOWN — REQUIRES INVESTIGATION.
+
+Provide evidence from the actual code or working application.
+
+## 6. Audit the customer journey
+
+Trace the actual user journey from homepage to report delivery.
+
+Investigate:
+
+- Whether a visitor can enter the calculator without registration.
+- Whether anonymous sessions exist.
+- How progress is stored.
+- Whether progress survives refresh.
+- Whether save/resume works.
+- How mobile/email is collected.
+- When registration becomes mandatory.
+- When the free estimate appears.
+- How the paid report is presented.
+- How checkout is initiated.
+- How Cashfree payment is verified.
+- How the report is generated.
+- How the report is delivered and retrieved.
+
+Identify every friction point and missing requirement.
+
+Do not change the existing authentication or payment implementation during this audit.
+
+## 7. Audit estimate, BOQ and PDF integrity
+
+Check whether:
+
+- Quantities reconcile with displayed rates and amounts.
+- Units are consistent.
+- Rounding is consistent.
+- Dependent quantities update when upstream inputs change.
+- Material and labour costs are distinguishable.
+- Taxes and contingency are properly identified.
+- Assumptions and exclusions are visible.
+- The free estimate and paid report offer different levels of value.
+- PDF layout is readable and professionally formatted.
+- The generated report contains the correct customer's project information.
+
+Do not modify calculation or PDF logic.
+
+Document defects with reproduction steps and evidence.
+
+## 8. Audit the existing Admin and rate system
+
+Inspect all Admin functionality, including:
+
+- Material rate management.
+- Regional pricing.
+- Rate sources and update dates.
+- Formula configuration.
+- Draft, publish and rollback workflows.
+- User management.
+- Leads and consultations.
+- Project management.
+- Audit logs and system settings.
+
+Determine how material selections from the customer calculator connect to Admin-managed rates and the production calculation engine.
+
+Identify any missing mapping or broken connections.
+
+## 9. Audit analytics
+
+Check whether the following events are already implemented:
+
+- landing_view
+- calculator_start
+- chapter_started
+- chapter_completed
+- estimate_generated
+- boq_preview_viewed
+- checkout_started
+- payment_success
+- payment_failed
+- report_downloaded
+
+Document existing tracking, event payloads, missing events and whether the data can identify funnel drop-offs by chapter, device and campaign.
+
+Do not invent analytics data.
+
+## 10. Review the visual and language experience
+
+This is a product audit, not a redesign.
+
+Inspect the current interface and identify:
+
+- Technical language that ordinary homeowners may not understand.
+- Long or confusing forms.
+- Missing visual material selections.
+- Missing quantity explanations.
+- Repetitive layouts.
+- Generic or unsuitable imagery.
+- Poor information hierarchy.
+- Mobile usability problems.
+- Confusing payment and report screens.
+- Unclear error, loading and empty states.
+
+Provide actual examples of existing text and proposed simpler alternatives.
+
+Record where original illustrations, diagrams, floor plans or custom graphics would materially improve understanding.
+
+Do not implement the new visual identity yet.
+
+## 11. Protected systems and restrictions
+
+Do not make production changes during this phase.
+
+In particular, do not modify:
+
+- Calculation engine.
+- Existing formulas.
+- Backend APIs.
+- Database schema or migrations.
+- Customer or project records.
+- Cashfree service or payment verification.
+- Authentication and authorisation.
+- PDF calculation or generation.
+- Admin functionality.
+- Production configuration.
+- Environment variables or secrets.
+
+Do not delete or replace existing features.
+
+Do not simplify the calculator into a square-foot rate calculator.
+
+Do not remove dedicated flooring or doors/windows selections.
+
+Do not introduce mandatory registration before calculator entry.
+
+Do not commit, push or deploy.
+
+If you discover a critical bug, document it rather than fixing it in this phase.
+
+## 12. Required deliverables
+
+Create a dedicated documentation directory:
+
+`docs/hutty-3.1/phase-01/`
+
+Produce these documents:
+
+### A. PRODUCT_AUDIT.md
+Complete audit of the current product, verified functionality, existing architecture and identified problems.
+
+### B. CALCULATOR_INPUT_INVENTORY.md
+Every existing calculator input, its purpose, validation, storage and dependencies.
+
+### C. CALCULATION_TO_BOQ_MAPPING.md
+Detailed mapping of input → calculation → quantity → selection → rate → cost → BOQ → report.
+
+### D. CLIENT_REQUIREMENTS_GAP_ANALYSIS.md
+Every client requirement mapped to existing implementation and gaps.
+
+### E. CUSTOMER_JOURNEY_AUDIT.md
+Homepage-to-report journey, registration, anonymous access, progress, checkout and report retrieval.
+
+### F. VISUAL_AND_LANGUAGE_AUDIT.md
+Current UX problems, confusing wording, missing visuals and recommended improvements.
+
+### G. IMPLEMENTATION_ROADMAP.md
+Prioritised development tasks, dependencies, risks, phases and testing requirements.
+
+### H. PROTECTED_SYSTEMS.md
+Systems that must remain unchanged, with their relevant source paths and dependencies.
+
+### I. PHASE_01_EXECUTIVE_SUMMARY.md
+A concise explanation of what exists, what is missing, major risks and recommended next steps.
+
+## 13. Final verification
+
+Before completing the audit:
+
+- Confirm all seven calculator chapters were reviewed.
+- Confirm all sections of the client brief were considered.
+- Confirm every acceptance criterion has been mapped.
+- Identify every unverified assumption.
+- Confirm no production files were changed.
+- Confirm no customer data was altered.
+- Confirm no database migrations were executed.
+- Report any existing test or build failures without hiding them.
+
+Do not mark a requirement as completed without evidence.
+
+## Final instruction
+
+We are not building a new Hutty from scratch.
+
+We are transforming an existing construction-estimation product into a clear, trustworthy and visually distinctive experience for ordinary homeowners.
+
+Preserve the intelligence. Improve how people experience it.
+
+**Finish the audit and present the findings for review. Do not begin Phase 02 or implement any redesign until approval is given.**
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-31T18:02:28+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\Avita\Desktop\Programming\big bnglore client\cost calculator rightcon\src\features\admin\users\AdminUsersSection.tsx (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 273
+Other open documents:
+- c:\Users\Avita\Desktop\Programming\big bnglore client\cost calculator rightcon\src\calculation-engine\modules\report.ts (LANGUAGE_UNSPECIFIED)
+- c:\Users\Avita\Desktop\Programming\big bnglore client\cost calculator rightcon\src\calculation-engine\modules\flooring.ts (LANGUAGE_UNSPECIFIED)
+- c:\Users\Avita\Desktop\Programming\big bnglore client\cost calculator rightcon\src\calculation-engine\modules\spaceModel.ts (LANGUAGE_UNSPECIFIED)
+- c:\Users\Avita\Desktop\Programming\big bnglore client\cost calculator rightcon\src\calculation-engine\data\engineeringAssumptions.ts (LANGUAGE_UNSPECIFIED)
+- c:\Users\Avita\Desktop\Programming\big bnglore client\cost calculator rightcon\src\calculation-engine\modules\labour.ts (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>

@@ -49,6 +49,7 @@ import {
   CustomerConsultation,
 } from '../../services/accountApi';
 import { formatNumber } from '../../utils/cn';
+import { CardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 
 type DashboardTab = 'projects' | 'reports' | 'purchases' | 'consultations' | 'profile';
 
@@ -266,7 +267,7 @@ export const AccountDashboardPage: React.FC = () => {
               onClick={handleStartNewProject}
               className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-[#1B3D34] hover:bg-[#142E27] text-white font-bold text-xs py-3 px-5 rounded-xl shadow-xs transition-all cursor-pointer active:scale-95"
             >
-              <Plus className="w-4 h-4 text-[#F28C28]" />
+              <Plus className="w-4 h-4 text-[#C66B4E]" />
               <span>Start a New Project</span>
             </button>
             <button
@@ -292,7 +293,7 @@ export const AccountDashboardPage: React.FC = () => {
             onClick={() => handleTabChange('projects')}
             className={`inline-flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'projects'
-                ? 'border-[#F28C28] text-[#1B3D34]'
+                ? 'border-[#C66B4E] text-[#183B32]'
                 : 'border-transparent text-[#687770] hover:text-[#1B3D34]'
             }`}
           >
@@ -305,7 +306,7 @@ export const AccountDashboardPage: React.FC = () => {
             onClick={() => handleTabChange('reports')}
             className={`inline-flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'reports'
-                ? 'border-[#F28C28] text-[#1B3D34]'
+                ? 'border-[#C66B4E] text-[#183B32]'
                 : 'border-transparent text-[#687770] hover:text-[#1B3D34]'
             }`}
           >
@@ -318,7 +319,7 @@ export const AccountDashboardPage: React.FC = () => {
             onClick={() => handleTabChange('purchases')}
             className={`inline-flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'purchases'
-                ? 'border-[#F28C28] text-[#1B3D34]'
+                ? 'border-[#C66B4E] text-[#183B32]'
                 : 'border-transparent text-[#687770] hover:text-[#1B3D34]'
             }`}
           >
@@ -331,7 +332,7 @@ export const AccountDashboardPage: React.FC = () => {
             onClick={() => handleTabChange('consultations')}
             className={`inline-flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'consultations'
-                ? 'border-[#F28C28] text-[#1B3D34]'
+                ? 'border-[#C66B4E] text-[#183B32]'
                 : 'border-transparent text-[#687770] hover:text-[#1B3D34]'
             }`}
           >
@@ -344,7 +345,7 @@ export const AccountDashboardPage: React.FC = () => {
             onClick={() => handleTabChange('profile')}
             className={`inline-flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'profile'
-                ? 'border-[#F28C28] text-[#1B3D34]'
+                ? 'border-[#C66B4E] text-[#183B32]'
                 : 'border-transparent text-[#687770] hover:text-[#1B3D34]'
             }`}
           >
@@ -358,7 +359,13 @@ export const AccountDashboardPage: React.FC = () => {
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'projects' && (
           <div className="space-y-4">
-            {projects.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <CardSkeleton />
+                <CardSkeleton />
+                <CardSkeleton />
+              </div>
+            ) : projects.length === 0 ? (
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-12 text-center max-w-lg mx-auto shadow-xs space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] mx-auto shadow-2xs">
                   <Building2 className="w-8 h-8 text-[#1B3D34]" />
@@ -376,7 +383,7 @@ export const AccountDashboardPage: React.FC = () => {
                   onClick={handleStartNewProject}
                   className="inline-flex items-center gap-2 bg-[#1B3D34] hover:bg-[#142E27] text-white font-bold text-xs py-3.5 px-6 rounded-xl shadow-xs transition-all cursor-pointer"
                 >
-                  <Plus className="w-4 h-4 text-[#F28C28]" />
+                  <Plus className="w-4 h-4 text-[#C66B4E]" />
                   <span>Start a New Project</span>
                 </button>
               </div>
@@ -403,7 +410,7 @@ export const AccountDashboardPage: React.FC = () => {
                             </h3>
                             <div className="flex items-center gap-2 text-xs text-[#687770] mt-0.5">
                               <span className="flex items-center gap-1">
-                                <MapPin className="w-3 h-3 text-[#F28C28]" />
+                                <MapPin className="w-3 h-3 text-[#C66B4E]" />
                                 {proj.city || 'Bangalore'}
                               </span>
                               <span>&bull;</span>
@@ -455,7 +462,7 @@ export const AccountDashboardPage: React.FC = () => {
                           className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#1B3D34] hover:bg-[#142E27] text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-2xs transition-all cursor-pointer"
                         >
                           <span>Continue Project</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                          <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
                         </button>
 
                         <button
@@ -493,7 +500,12 @@ export const AccountDashboardPage: React.FC = () => {
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'reports' && (
           <div className="space-y-4">
-            {reports.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardSkeleton />
+                <CardSkeleton />
+              </div>
+            ) : reports.length === 0 ? (
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-12 text-center max-w-lg mx-auto shadow-xs space-y-3">
                 <FileCheck className="w-12 h-12 text-[#687770] mx-auto opacity-70" />
                 <h3 className="text-base font-bold text-[#1B3D34]">Reports you unlock will appear here</h3>
@@ -506,7 +518,7 @@ export const AccountDashboardPage: React.FC = () => {
                   className="inline-flex items-center gap-1.5 bg-[#1B3D34] text-white font-bold text-xs py-2.5 px-4 rounded-xl"
                 >
                   <span>Go to Calculator</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
                 </button>
               </div>
             ) : (
@@ -533,7 +545,7 @@ export const AccountDashboardPage: React.FC = () => {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-2xs transition-all shrink-0 cursor-pointer"
                     >
-                      <Download className="w-3.5 h-3.5 text-[#F28C28]" />
+                      <Download className="w-3.5 h-3.5 text-[#C66B4E]" />
                       <span>Download</span>
                     </a>
                   </div>
@@ -548,7 +560,9 @@ export const AccountDashboardPage: React.FC = () => {
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'purchases' && (
           <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-xs overflow-hidden text-left">
-            {purchases.length === 0 ? (
+            {loading ? (
+              <TableSkeleton className="border-0 rounded-none p-6" />
+            ) : purchases.length === 0 ? (
               <div className="p-12 text-center text-[#707873] text-xs space-y-2">
                 <CreditCard className="w-10 h-10 text-[#687770] mx-auto opacity-70" />
                 <p className="font-semibold text-sm text-[#1B3D34]">No payment transactions found</p>
@@ -621,7 +635,7 @@ export const AccountDashboardPage: React.FC = () => {
                   className="inline-flex items-center gap-1.5 bg-[#1B3D34] text-white font-bold text-xs py-2.5 px-4 rounded-xl"
                 >
                   <span>Explore Verified Experts</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
                 </button>
               </div>
             ) : (

@@ -78,7 +78,7 @@ export function calculatePlumbing(
   const totalWaterPoints = buildingModel.allSpaces.reduce((sum, s) => sum + s.waterPoints, 0);
   const totalDrainagePoints = buildingModel.allSpaces.reduce((sum, s) => sum + s.drainagePoints, 0);
 
-  const bathroomFixtureSets = (input.rooms.bathrooms || 0) + (input.rooms.commonToilets || 0);
+  const bathroomFixtureSets = (input.rooms?.bathrooms || 0) + (input.rooms?.commonToilets || 0);
 
   // 2. CPVC & SWR Pipe Lengths (PDF Section 20)
   const riserAllowance = configResolver.resolveParameter('config.plumbing.riser_m_per_floor', undefined, VERTICAL_RISER_ALLOWANCE_M);
@@ -94,7 +94,7 @@ export function calculatePlumbing(
   const dailyDemand = configResolver.resolveParameter('config.plumbing.daily_water_demand_lpcd', undefined, DAILY_WATER_DEMAND_LPCD);
   const storageDays = configResolver.resolveParameter('config.plumbing.water_storage_reserve_days', undefined, WATER_STORAGE_DAYS);
 
-  const bedCount = Math.max(1, input.rooms.bedrooms || 1);
+  const bedCount = Math.max(1, input.rooms?.bedrooms || 1);
   const occupants = bedCount * occupantsPerBed;
   const rawTankCap = occupants * dailyDemand * storageDays;
   // Round up to standard commercial tank capacities (1000L, 1500L, 2000L, 3000L, etc.)

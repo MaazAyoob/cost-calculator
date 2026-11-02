@@ -1,6 +1,6 @@
 // ============================================================
 // Hutty — Design System Tokens
-// Primary Green: #1B3D34 | Roof Accent: #F28C28
+// Primary Green: #183B32 | Architectural Accent: #C66B4E
 // ============================================================
 
 export type Theme = 'light' | 'dark';
@@ -17,9 +17,9 @@ export const DESIGN_TOKENS = {
     brandHover:    '#132C25',
     brandSoft:     'rgba(27, 61, 52, 0.08)',
     brandLight:    'rgba(27, 61, 52, 0.04)',
-    accent:        '#F28C28',
-    accentHover:   '#D9771A',
-    accentSoft:    'rgba(242, 140, 40, 0.10)',
+    accent:        '#C66B4E',
+    accentHover:   '#A95640',
+    accentSoft:    'rgba(198, 107, 78, 0.10)',
     border:        '#E5E7EB',
     borderStrong:  '#D1D5DB',
     overlay:       'rgba(27, 61, 52, 0.40)',

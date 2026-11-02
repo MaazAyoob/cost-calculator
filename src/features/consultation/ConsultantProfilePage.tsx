@@ -92,8 +92,8 @@ export const ConsultantProfilePage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3 bg-[#F8F8F6]">
-        <div className="w-10 h-10 border-3 border-[#1B3D34] border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-[#707873] font-medium">Loading Expert Profile...</p>
+        <div className="w-10 h-10 border-3 border-[#183B32] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-[#66716B] font-medium">Loading Expert Profile...</p>
       </div>
     );
   }
@@ -102,14 +102,14 @@ export const ConsultantProfilePage: React.FC = () => {
     return (
       <div className="min-h-[75vh] flex items-center justify-center p-4 bg-[#F8F8F6]">
         <div className="max-w-md w-full p-8 bg-white border border-[#E5E7EB] rounded-3xl shadow-sm text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#F8F8F6] border border-[#E5E7EB] flex items-center justify-center mx-auto text-[#707873]">
+          <div className="w-14 h-14 rounded-2xl bg-[#F8F8F6] border border-[#E5E7EB] flex items-center justify-center mx-auto text-[#66716B]">
             <UserX className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-[#1B3D34] font-heading">
+            <h2 className="text-xl font-bold text-[#183B32] font-heading">
               Expert Not Available
             </h2>
-            <p className="text-xs text-[#707873] mt-1.5 leading-relaxed">
+            <p className="text-xs text-[#66716B] mt-1.5 leading-relaxed">
               This professional profile is either inactive or does not exist. Please return to the consultant directory
               to view currently active experts.
             </p>
@@ -128,7 +128,7 @@ export const ConsultantProfilePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] text-[#1B3D34] pb-24">
+    <div className="min-h-screen bg-[#F8F8F6] text-[#183B32] pb-24">
       <SEO
         title={`${consultant.name} — ${consultant.title} | Hutty Consultation`}
         description={consultant.about.slice(0, 160)}
@@ -139,7 +139,7 @@ export const ConsultantProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate('/consult')}
-          className="inline-flex items-center gap-2 text-xs font-bold text-[#707873] hover:text-[#1B3D34] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-bold text-[#66716B] hover:text-[#183B32] transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to All Experts</span>
@@ -163,7 +163,7 @@ export const ConsultantProfilePage: React.FC = () => {
                       className="w-full h-full object-cover object-top"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center font-bold text-2xl text-[#1B3D34]">
+                    <div className="w-full h-full flex items-center justify-center font-bold text-2xl text-[#183B32]">
                       {consultant.name.slice(0, 2)}
                     </div>
                   )}
@@ -172,7 +172,7 @@ export const ConsultantProfilePage: React.FC = () => {
                 {/* Details */}
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[rgba(27,61,52,0.08)] text-[#1B3D34] border border-[rgba(27,61,52,0.12)]">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[rgba(27,61,52,0.08)] text-[#183B32] border border-[rgba(27,61,52,0.12)]">
                       {consultant.category}
                     </span>
                     <span className="px-2.5 py-1 rounded-full text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 flex items-center gap-1">
@@ -181,22 +181,22 @@ export const ConsultantProfilePage: React.FC = () => {
                     </span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#183B32] font-heading">
                     {consultant.name}
                   </h1>
 
-                  <p className="text-sm font-semibold text-[#707873]">
+                  <p className="text-sm font-semibold text-[#66716B]">
                     {consultant.title}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs text-[#707873] pt-1">
+                  <div className="flex items-center gap-4 text-xs text-[#66716B] pt-1">
                     <span className="flex items-center gap-1">
-                      <Briefcase className="w-4 h-4 text-[#1B3D34]/70" />
+                      <Briefcase className="w-4 h-4 text-[#183B32]/70" />
                       <span>{consultant.experienceYears}+ Years Practical Experience</span>
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-[#1B3D34]/70" />
+                      <MapPin className="w-4 h-4 text-[#183B32]/70" />
                       <span>{consultant.city}</span>
                     </span>
                   </div>
@@ -206,10 +206,10 @@ export const ConsultantProfilePage: React.FC = () => {
               {/* Service Areas */}
               {consultant.serviceAreas && consultant.serviceAreas.length > 0 && (
                 <div className="pt-4 border-t border-[#E5E7EB] text-xs">
-                  <span className="font-bold text-[#1B3D34] block mb-1">Service Areas &amp; Site Visits:</span>
+                  <span className="font-bold text-[#183B32] block mb-1">Service Areas &amp; Site Visits:</span>
                   <div className="flex flex-wrap gap-1.5">
                     {consultant.serviceAreas.map((area, idx) => (
-                      <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-[#F8F8F6] border border-[#E5E7EB] text-[#707873]">
+                      <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-[#F8F8F6] border border-[#E5E7EB] text-[#66716B]">
                         {area}
                       </span>
                     ))}
@@ -220,10 +220,10 @@ export const ConsultantProfilePage: React.FC = () => {
 
             {/* About & Philosophy Card */}
             <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
-              <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
+              <h3 className="text-lg font-bold text-[#183B32] font-heading">
                 About the Expert
               </h3>
-              <p className="text-sm text-[#707873] leading-relaxed whitespace-pre-line">
+              <p className="text-sm text-[#66716B] leading-relaxed whitespace-pre-line">
                 {consultant.about}
               </p>
             </div>
@@ -231,14 +231,14 @@ export const ConsultantProfilePage: React.FC = () => {
             {/* Specializations & Core Competencies */}
             {consultant.specializations && consultant.specializations.length > 0 && (
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
-                <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
+                <h3 className="text-lg font-bold text-[#183B32] font-heading">
                   Specializations &amp; Advisory Focus
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {consultant.specializations.map((spec, idx) => (
                     <div
                       key={idx}
-                      className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] text-xs font-semibold text-[#1B3D34] flex items-center gap-2"
+                      className="p-3 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] text-xs font-semibold text-[#183B32] flex items-center gap-2"
                     >
                       <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{spec}</span>
@@ -251,13 +251,13 @@ export const ConsultantProfilePage: React.FC = () => {
             {/* Services Offered Card */}
             {consultant.services && consultant.services.length > 0 && (
               <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 shadow-xs space-y-4">
-                <h3 className="text-lg font-bold text-[#1B3D34] font-heading">
+                <h3 className="text-lg font-bold text-[#183B32] font-heading">
                   Consultation Services Covered
                 </h3>
-                <ul className="space-y-2.5 text-xs sm:text-sm text-[#707873]">
+                <ul className="space-y-2.5 text-xs sm:text-sm text-[#66716B]">
                   {consultant.services.map((svc, idx) => (
                     <li key={idx} className="flex items-start gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28] mt-2 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C66B4E] mt-2 shrink-0" />
                       <span>{svc}</span>
                     </li>
                   ))}
@@ -270,32 +270,32 @@ export const ConsultantProfilePage: React.FC = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-3xl border border-[#E5E7EB] p-6 sm:p-7 shadow-sm sticky top-24 space-y-6">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F28C28]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#C66B4E]">
                   TRANSPARENT PRICING
                 </span>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-3xl font-mono font-extrabold text-[#1B3D34]">
+                  <span className="text-3xl font-mono font-extrabold text-[#183B32]">
                     {LAUNCH_CONSULTATION_PRICE_DISPLAY}
                   </span>
-                  <span className="text-xs text-[#707873]">/ consultation</span>
+                  <span className="text-xs text-[#66716B]">/ consultation</span>
                 </div>
-                <p className="text-xs text-[#707873] mt-1">
+                <p className="text-xs text-[#66716B] mt-1">
                   Flat launch rate. No hidden platform surcharges or commissions.
                 </p>
               </div>
 
               {/* Consultation Inclusions */}
               <div className="p-4 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] space-y-2 text-xs">
-                <div className="flex items-center gap-2 text-[#1B3D34] font-semibold">
-                  <Clock className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <div className="flex items-center gap-2 text-[#183B32] font-semibold">
+                  <Clock className="w-3.5 h-3.5 text-[#183B32]" />
                   <span>45–60 Minutes Focused Advisory</span>
                 </div>
-                <div className="flex items-center gap-2 text-[#1B3D34] font-semibold">
-                  <FileText className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <div className="flex items-center gap-2 text-[#183B32] font-semibold">
+                  <FileText className="w-3.5 h-3.5 text-[#183B32]" />
                   <span>Drawing / BOQ Review Included</span>
                 </div>
-                <div className="flex items-center gap-2 text-[#1B3D34] font-semibold">
-                  <Calendar className="w-3.5 h-3.5 text-[#1B3D34]" />
+                <div className="flex items-center gap-2 text-[#183B32] font-semibold">
+                  <Calendar className="w-3.5 h-3.5 text-[#183B32]" />
                   <span>Flexible Date &amp; Time Slots</span>
                 </div>
               </div>
@@ -304,16 +304,13 @@ export const ConsultantProfilePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => {
-                  if (!isAuthenticated) {
-                    navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
-                    return;
-                  }
+                  
                   setIsBookingModalOpen(true);
                 }}
                 className="w-full hutty-btn-primary py-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <span>Book Consultation</span>
-                <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+                <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
               </button>
 
               {/* Reassurance Disclaimer */}
@@ -331,24 +328,21 @@ export const ConsultantProfilePage: React.FC = () => {
       {/* Mobile Sticky Bottom Booking CTA */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E5E7EB] p-3.5 shadow-lg flex items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-bold text-[#707873] uppercase block">Fee</span>
-          <span className="text-base font-extrabold text-[#1B3D34] font-mono leading-tight">
+          <span className="text-[10px] font-bold text-[#66716B] uppercase block">Fee</span>
+          <span className="text-base font-extrabold text-[#183B32] font-mono leading-tight">
             {LAUNCH_CONSULTATION_PRICE_DISPLAY}
           </span>
         </div>
         <button
           type="button"
           onClick={() => {
-            if (!isAuthenticated) {
-              navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
-              return;
-            }
+            
             setIsBookingModalOpen(true);
           }}
           className="hutty-btn-primary px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-xs min-h-[44px]"
         >
           <span>Book Consultation — {LAUNCH_CONSULTATION_PRICE_DISPLAY}</span>
-          <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+          <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
         </button>
       </div>
 

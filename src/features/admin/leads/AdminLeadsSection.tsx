@@ -309,7 +309,7 @@ export const AdminLeadsSection: React.FC = () => {
         );
       case 'GENERAL_ENQUIRY':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#F28C28]/10 text-[#C96B16] border border-[#F28C28]/25">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#C66B4E]/10 text-[#A95640] border border-[#C66B4E]/25">
             {label}
           </span>
         );
@@ -612,7 +612,7 @@ export const AdminLeadsSection: React.FC = () => {
       {selectedLeadKeys.size > 0 && (
         <div className="bg-[#1B3D34] text-white px-4 py-2.5 rounded-xl shadow-xs flex items-center justify-between text-xs sm:text-sm animate-fade-in">
           <div className="flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-[#F28C28]" />
+            <CheckSquare className="w-4 h-4 text-[#C66B4E]" />
             <span className="font-bold">
               {selectedLeadKeys.size} {selectedLeadKeys.size === 1 ? 'lead' : 'leads'} selected
             </span>
@@ -1084,7 +1084,7 @@ export const AdminLeadsSection: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-[#E5E7EB] space-y-4 animate-scale-up">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-[#1B3D34]">
-                <FileSpreadsheet className="w-5 h-5 text-[#F28C28]" />
+                <FileSpreadsheet className="w-5 h-5 text-[#C66B4E]" />
                 <h3 className="font-bold font-heading text-[#18211E] text-base">Export Customer Leads</h3>
               </div>
               <button

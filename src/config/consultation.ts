@@ -171,6 +171,26 @@ export const POPULAR_LOCATIONS = [
 
 export const CURATED_INITIAL_CONSULTANTS = [
   {
+    id: 'cons-ar-rahul',
+    slug: 'rahul-cip3',
+    name: 'Ar. Rahul Sharma',
+    title: 'Lead Architect & Structural Reviewer',
+    category: 'Architect',
+    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
+    experienceYears: 15,
+    city: 'Bangalore',
+    serviceAreas: ['Indiranagar', 'Koramangala', 'Whitefield', 'HSR Layout', 'All Bangalore'],
+    about:
+      'Council of Architecture certified Principal Architect with 15+ years overseeing luxury residential construction and independent engineering audits across Bangalore. Specializes in structural safety, RCC optimization, and comprehensive plan vetting.',
+    specializations: ['Bespoke Villa Design', 'Structural Safety & RCC Optimization', 'BBMP Setback Optimization', 'Passive Solar Lighting'],
+    services: ['Architectural Plan Review', 'Floor Layout Optimization', 'Facade & Elevation Design Review', 'Structural Safety Vetting'],
+    active: true,
+    featured: true,
+    displayOrder: 0,
+    createdAt: '2026-10-01T10:00:00.000Z',
+    updatedAt: '2026-10-01T10:00:00.000Z',
+  },
+  {
     id: 'cons-ar-ramesh',
     slug: 'ar-ramesh-nambiar',
     name: 'Ar. Ramesh Nambiar',

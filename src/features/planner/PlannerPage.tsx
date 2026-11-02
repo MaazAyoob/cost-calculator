@@ -10,7 +10,11 @@ import { HuttyLogo } from '../../components/brand/HuttyLogo';
 import { SEO } from '../../components/common/SEO';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 
-// 8 Stages Components
+// 8 Stages Components & Hutty 3.1 Chapters
+import { Chapter1PlotSetbacks } from './chapters/Chapter1PlotSetbacks';
+import { Chapter2DreamHome } from './chapters/Chapter2DreamHome';
+import { Chapter3CoreMaterials } from './chapters/Chapter3CoreMaterials';
+import { Chapter7ReviewCommercial } from './chapters/Chapter7ReviewCommercial';
 import { Stage1Plot } from './stages/Stage1Plot';
 import { Stage2Home } from './stages/Stage2Home';
 import { Stage3Rooms } from './stages/Stage3Rooms';
@@ -45,14 +49,14 @@ import { ProjectSaveStatusBadge } from '../../components/common/ProjectSaveStatu
 import { PackageComparisonModal } from '../../components/modals/PackageComparisonModal';
 
 export const STAGE_CONFIG = [
-  { stage: 1, label: 'Your Plot', shortLabel: 'Plot', icon: Compass },
-  { stage: 2, label: 'Your Home', shortLabel: 'Home', icon: Home },
-  { stage: 3, label: 'Your Rooms', shortLabel: 'Rooms', icon: Bed },
-  { stage: 4, label: 'Buildable Space', shortLabel: 'Setbacks', icon: Maximize2 },
-  { stage: 5, label: 'Construction Style', shortLabel: 'Style', icon: Building2 },
-  { stage: 6, label: 'Finishes & Materials', shortLabel: 'Finishes', icon: Layers },
-  { stage: 7, label: 'Your Estimate', shortLabel: 'Estimate', icon: Calculator },
-  { stage: 8, label: 'Detailed BOQ', shortLabel: 'BOQ', icon: FileText },
+  { stage: 1, label: 'Plot & Setbacks', shortLabel: 'Plot', icon: Compass, color: 'text-[#183B32]', bg: 'bg-[#E8EFE9]' },
+  { stage: 2, label: 'Your Home & Rooms', shortLabel: 'Home', icon: Home, color: 'text-[#C66B4E]', bg: 'bg-[#FDF0EB]' },
+  { stage: 3, label: 'Room Layout', shortLabel: 'Rooms', icon: Bed, color: 'text-[#C66B4E]', bg: 'bg-[#FDF0EB]' },
+  { stage: 4, label: 'Space & Setbacks', shortLabel: 'Setbacks', icon: Maximize2, color: 'text-[#347A62]', bg: 'bg-[#DDF4E7]' },
+  { stage: 5, label: 'Choose Materials', shortLabel: 'Materials', icon: Building2, color: 'text-[#C5A46D]', bg: 'bg-[#FAF4E8]' },
+  { stage: 6, label: 'Flooring & Finishes', shortLabel: 'Finishes', icon: Layers, color: 'text-[#183B32]', bg: 'bg-[#E8EFE9]' },
+  { stage: 7, label: 'Review Estimate', shortLabel: 'Estimate', icon: Calculator, color: 'text-[#347A62]', bg: 'bg-[#DDF4E7]' },
+  { stage: 8, label: 'Detailed BOQ', shortLabel: 'BOQ', icon: FileText, color: 'text-[#183B32]', bg: 'bg-[#E8EFE9]' },
 ];
 
 export const PlannerPage: React.FC = () => {
@@ -89,8 +93,17 @@ export const PlannerPage: React.FC = () => {
   const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
   const [showCompareModal, setShowCompareModal] = useState<boolean>(false);
 
+  const totalCost = budget.totalProjectCost || 0;
+  const buaSqFt = area.totalBUASqFt || 0;
+  const ratePerSqFt = totalCost > 0 && buaSqFt > 0 ? Math.round(totalCost / buaSqFt) : 0;
+
   // Track initial stage entry on mount
   useEffect(() => {
+    analytics.trackCalculatorStart(activeStage);
+    analytics.trackChapterStarted(
+      activeStage,
+      STAGE_CONFIG[activeStage - 1]?.label || 'Plot'
+    );
     analytics.recordStepEnter(
       STAGE_CONFIG[activeStage - 1]?.label || 'Plot',
       selectedPackage,
@@ -98,6 +111,20 @@ export const PlannerPage: React.FC = () => {
       activeStage
     );
   }, []);
+
+  // Track chapter transition & estimate generation across stage updates
+  const prevStageRef = React.useRef(activeStage);
+  useEffect(() => {
+    if (prevStageRef.current !== activeStage) {
+      const prev = prevStageRef.current;
+      analytics.trackChapterCompleted(prev, STAGE_CONFIG[prev - 1]?.label || `Stage ${prev}`);
+      analytics.trackChapterStarted(activeStage, STAGE_CONFIG[activeStage - 1]?.label || `Stage ${activeStage}`);
+      if (activeStage === 7 || activeStage === 8) {
+        analytics.trackEstimateGenerated(totalCost, buaSqFt, ratePerSqFt, selectedPackage);
+      }
+      prevStageRef.current = activeStage;
+    }
+  }, [activeStage, totalCost, buaSqFt, ratePerSqFt, selectedPackage]);
 
   // Sync stage to store on change
   const handleSetStage = (stage: number) => {
@@ -119,30 +146,34 @@ export const PlannerPage: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (activeStage < 8) {
+    if (activeStage === 2 || activeStage === 3) {
+      // Chapter 2 deduplication: Clicking Next from Chapter 2 advances directly to Stage 4
+      handleSetStage(4);
+    } else if (activeStage < 8) {
       handleSetStage(activeStage + 1);
     }
   };
 
   const handlePrev = () => {
-    if (activeStage > 1) {
+    if (activeStage === 4) {
+      // Chapter 2 deduplication: Clicking Previous from Stage 4 returns directly to Chapter 2 (Stage 2)
+      handleSetStage(2);
+    } else if (activeStage === 3) {
+      handleSetStage(1);
+    } else if (activeStage > 1) {
       handleSetStage(activeStage - 1);
     }
   };
 
-  const totalCost = budget.totalProjectCost || 0;
-  const buaSqFt = area.totalBUASqFt || 0;
-  const ratePerSqFt = totalCost > 0 && buaSqFt > 0 ? Math.round(totalCost / buaSqFt) : 0;
-
   return (
-    <div className="w-full h-full flex flex-col bg-[#F8F8F6] text-[#1B3D34] overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-[#F8F8F6] text-[#18211E] overflow-hidden select-none">
       <SEO
         title={`Hutty Calculator — ${STAGE_CONFIG[activeStage - 1]?.label || 'Estimate Home Construction Cost'}`}
         description="Plan your home, estimate construction cost, check municipal setbacks, and explore materials with Hutty."
       />
 
       {/* ── TOP SLIM BRAND & PROGRESS HEADER ── */}
-      <header className="shrink-0 bg-white border-b border-[#E5E7EB] px-4 sm:px-6 py-2.5 z-30 shadow-2xs">
+      <header className="shrink-0 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] px-4 sm:px-6 py-2.5 z-30 shadow-2xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           
           {/* Logo & Home Link */}
@@ -155,10 +186,10 @@ export const PlannerPage: React.FC = () => {
             >
               <HuttyLogo variant="full" width={96} />
             </button>
-            <div className="hidden md:flex items-center gap-1.5 pl-3 border-l border-[#E5E7EB] text-xs font-semibold text-[#687770]">
+            <div className="hidden md:flex items-center gap-1.5 pl-3 border-l border-[#E5E7EB] text-xs font-semibold text-[#66716B]">
               <span>Residential Construction Calculator</span>
               <span>&bull;</span>
-              <span className="text-[#1B3D34]">Bangalore</span>
+              <span className="text-[#183B32]">Bangalore</span>
             </div>
           </div>
 
@@ -172,7 +203,7 @@ export const PlannerPage: React.FC = () => {
                   handleSetStage(1);
                 }
               }}
-              className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[#687770] hover:text-[#1B3D34] px-2.5 py-1.5 rounded-lg hover:bg-[#F8F9F7] transition-all cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[#66716B] hover:text-[#183B32] px-2.5 py-1.5 rounded-lg hover:bg-[#F8F8F6] transition-all cursor-pointer min-h-[36px]"
               title="Reset all inputs"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -182,9 +213,9 @@ export const PlannerPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/consult')}
-              className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold text-[#1B3D34] bg-[#EBF3EF] border border-[#D5E5DC] hover:bg-[#DDF0E5] px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+              className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold text-[#183B32] bg-[#E8EFE9] border border-[#B7CDBB]/80 hover:bg-[#D5E5DC] px-3 py-1.5 rounded-xl transition-all cursor-pointer min-h-[36px]"
             >
-              <User className="w-3.5 h-3.5 text-[#F28C28]" />
+              <User className="w-3.5 h-3.5 text-[#C66B4E]" />
               <span>Consult an Expert (₹1,499)</span>
             </button>
 
@@ -192,17 +223,34 @@ export const PlannerPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setMobileTab(mobileTab === 'form' ? 'preview' : 'form')}
-              className="lg:hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-[#EBF3EF] border border-[#D5E5DC] text-[#1B3D34] flex items-center gap-1.5 cursor-pointer"
+              className="lg:hidden min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-bold bg-[#E8EFE9] border border-[#B7CDBB]/80 text-[#183B32] flex items-center gap-1.5 cursor-pointer touch-manipulation"
+              aria-label={mobileTab === 'form' ? 'Switch to 3D View' : 'Switch to Planner'}
             >
-              <Eye className="w-3.5 h-3.5 text-[#F28C28]" />
+              <Eye className="w-4 h-4 text-[#C66B4E]" />
               <span>{mobileTab === 'form' ? '3D View' : 'Planner'}</span>
             </button>
           </div>
         </div>
 
-        {/* 8-Stage Pill Navigation Track */}
-        <div className="max-w-7xl mx-auto pt-2.5 pb-0.5">
-          <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+        {/* Navigation & Progress Header */}
+        <div className="max-w-7xl mx-auto pt-2 pb-0.5">
+          {/* Mobile Step Header (Compact & Clear for touch screens) */}
+          <div className="sm:hidden flex items-center justify-between py-1 px-1">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-lg bg-[#183B32] text-white flex items-center justify-center font-bold text-xs">
+                {activeStage}
+              </span>
+              <span className="text-xs font-extrabold text-[#18211E]">
+                Step {Math.min(activeStage, 7)} of 7 &bull; {STAGE_CONFIG[activeStage - 1]?.label}
+              </span>
+            </div>
+            <span className="text-[11px] font-mono font-bold text-[#183B32] bg-[#E8EFE9] px-2 py-0.5 rounded-md">
+              {Math.round((activeStage / 8) * 100)}%
+            </span>
+          </div>
+
+          {/* Desktop/Tablet Stage Pills Track */}
+          <div className="hidden sm:flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
             {STAGE_CONFIG.map((cfg) => {
               const isCurrent = activeStage === cfg.stage;
               const isPast = activeStage > cfg.stage;
@@ -213,35 +261,36 @@ export const PlannerPage: React.FC = () => {
                   key={cfg.stage}
                   type="button"
                   onClick={() => handleSetStage(cfg.stage)}
-                  className={`py-1.5 px-2.5 sm:px-3 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                  className={`py-1.5 px-3 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap min-h-[38px] ${
                     isCurrent
-                      ? 'bg-[#1B3D34] text-white shadow-2xs'
+                      ? 'bg-[#183B32] text-white shadow-xs'
                       : isPast
-                      ? 'bg-[#EBF3EF] text-[#1B3D34] hover:bg-[#DDF0E5]'
-                      : 'text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7]'
+                      ? 'bg-[#E8EFE9] text-[#183B32] hover:bg-[#D5E5DC]'
+                      : 'text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6]'
                   }`}
                   aria-label={`Jump to stage ${cfg.stage}: ${cfg.label}`}
                 >
-                  <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
-                    isCurrent
-                      ? 'bg-[#F28C28] text-white'
-                      : isPast
-                      ? 'bg-[#1B3D34] text-white'
-                      : 'bg-[#E5E7EB] text-[#4B5563]'
-                  }`}>
+                  <span
+                    className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
+                      isCurrent
+                        ? 'bg-[#C66B4E] text-white'
+                        : isPast
+                        ? 'bg-[#347A62] text-white'
+                        : 'bg-[#E5E7EB] text-[#66716B]'
+                    }`}
+                  >
                     {isPast ? <Check className="w-2.5 h-2.5" /> : cfg.stage}
                   </span>
-                  <span className="hidden sm:inline">{cfg.label}</span>
-                  <span className="sm:hidden">{cfg.shortLabel}</span>
+                  <span>{cfg.label}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* Thin Progress Line with Roof Accent Dot */}
-          <div className="w-full h-1 bg-[#E5E7EB] rounded-full mt-2 overflow-hidden relative">
+          {/* Smooth Animated Progress Bar */}
+          <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full mt-2 overflow-hidden relative">
             <div
-              className="h-full bg-[#1B3D34] transition-all duration-300 ease-out"
+              className="h-full bg-gradient-to-r from-[#183B32] via-[#245747] to-[#347A62] transition-all duration-300 ease-out"
               style={{ width: `${(activeStage / 8) * 100}%` }}
             />
           </div>
@@ -256,7 +305,7 @@ export const PlannerPage: React.FC = () => {
           {/* LEFT 7/12: GUIDED STAGE FORM CONTAINER                            */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div
-            className={`w-full h-full min-h-0 lg:col-span-7 xl:col-span-8 flex flex-col bg-white rounded-3xl border border-[#E5E7EB] shadow-xs overflow-hidden ${
+            className={`w-full h-full min-h-0 lg:col-span-7 xl:col-span-8 flex flex-col bg-white rounded-3xl border-2 border-[#E5E7EB] shadow-xs overflow-hidden ${
               mobileTab === 'preview' ? 'hidden lg:flex' : 'flex'
             }`}
           >
@@ -265,19 +314,19 @@ export const PlannerPage: React.FC = () => {
               
               {/* ── LIVE PRELIMINARY ESTIMATE BANNER (Early Feedback for Homeowners) ── */}
               {totalCost > 0 && (
-                <div className="bg-[#EBF3EF] border border-[#D5E5DC] rounded-2xl px-4 py-3 flex items-center justify-between gap-3 shadow-2xs">
+                <div className="bg-[#E8EFE9] border-2 border-[#B7CDBB]/70 rounded-2xl px-4 py-3 flex items-center justify-between gap-3 shadow-2xs">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#C66B4E] animate-pulse shrink-0" />
                     <div className="min-w-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#687770]">
-                          Live Preliminary Estimate:
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#66716B]">
+                          Estimated Cost So Far:
                         </span>
-                        <span className="text-base sm:text-lg font-black text-[#1B3D34] font-heading tabular-nums">
+                        <span className="text-base sm:text-lg font-black text-[#183B32] font-heading tabular-nums">
                           ₹ {totalCost.toLocaleString('en-IN')}
                         </span>
-                        <span className="text-xs text-[#687770] hidden xs:inline">
-                          (~₹{ratePerSqFt.toLocaleString()}/sq.ft &bull; {buaSqFt.toLocaleString()} sq.ft BUA)
+                        <span className="text-xs text-[#66716B] hidden xs:inline">
+                          (~₹{ratePerSqFt.toLocaleString()}/sq.ft &bull; {buaSqFt.toLocaleString()} sq.ft built area)
                         </span>
                       </div>
                     </div>
@@ -287,11 +336,11 @@ export const PlannerPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleSetStage(7)}
-                      className="shrink-0 bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-xs flex items-center gap-1 active:scale-95"
+                      className="shrink-0 bg-[#183B32] hover:bg-[#245747] text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-xs flex items-center gap-1 active:scale-95 min-h-[36px]"
                       title="Jump directly to your preliminary estimate"
                     >
-                      <span>See Estimate</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                      <span>Review Estimate</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
                     </button>
                   )}
                 </div>
@@ -306,20 +355,25 @@ export const PlannerPage: React.FC = () => {
                   exit="exit"
                   className="w-full"
                 >
-                  {activeStage === 1 && <Stage1Plot />}
-                  {activeStage === 2 && <Stage2Home />}
-                  {activeStage === 3 && <Stage3Rooms />}
+                  {activeStage === 1 && <Chapter1PlotSetbacks />}
+                  {activeStage === 2 && <Chapter2DreamHome />}
+                  {activeStage === 3 && <Chapter2DreamHome />}
                   {activeStage === 4 && <Stage4BuildableSpace />}
-                  {activeStage === 5 && <Stage5ConstructionStyle />}
+                  {activeStage === 5 && <Chapter3CoreMaterials />}
                   {activeStage === 6 && <Stage6FinishesMaterials />}
                   {activeStage === 7 && (
-                    <Stage7Estimate
+                    <Chapter7ReviewCommercial
+                      initialTab="review"
                       onAdjustSelections={(step) => handleSetStage(step || 1)}
-                      onProceedToDetailedBOQ={() => handleSetStage(8)}
+                      onProceedToBOQ={() => handleSetStage(8)}
                     />
                   )}
                   {activeStage === 8 && (
-                    <Stage8DetailedBOQ onBackToEstimate={() => handleSetStage(7)} />
+                    <Chapter7ReviewCommercial
+                      initialTab="boq"
+                      onAdjustSelections={(step) => handleSetStage(step || 1)}
+                      onBackToEstimate={() => handleSetStage(7)}
+                    />
                   )}
                 </motion.div>
               </AnimatePresence>
@@ -341,20 +395,20 @@ export const PlannerPage: React.FC = () => {
                   data-testid="stage-prev-btn"
                   disabled={activeStage === 1}
                   onClick={handlePrev}
-                  className="px-4 py-2.5 rounded-xl border border-[#CBD5CB] text-[#1B3D34] bg-white hover:bg-[#F8F9F7] text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
+                  className="min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] text-[#18211E] bg-white hover:bg-[#F8F8F6] text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer touch-manipulation"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <span className="hidden md:inline text-[11px] text-[#687770]">
+                  <span className="hidden md:inline text-[11px] text-[#66716B]">
                     Selections save automatically as you plan.
                   </span>
                   <button
                     type="button"
                     onClick={() => handleSetStage(7)}
-                    className="text-xs font-bold text-[#1B3D34] hover:text-[#F28C28] underline underline-offset-4 cursor-pointer"
+                    className="min-h-[44px] inline-flex items-center text-xs font-bold text-[#183B32] hover:text-[#C66B4E] underline underline-offset-4 cursor-pointer touch-manipulation"
                   >
                     Skip to Estimate (Stage 7) →
                   </button>
@@ -364,12 +418,16 @@ export const PlannerPage: React.FC = () => {
                   type="button"
                   data-testid="stage-next-btn"
                   onClick={handleNext}
-                  className="px-6 py-2.5 sm:py-3 rounded-xl bg-[#1B3D34] hover:bg-[#142E27] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-xs flex items-center gap-2 active:scale-95"
+                  className="min-h-[44px] px-6 py-2.5 sm:py-3 rounded-xl bg-[#183B32] hover:bg-[#245747] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-xs flex items-center gap-2 active:scale-95 touch-manipulation"
                 >
                   <span>
-                    {activeStage === 6 ? 'View Estimate →' : `Next: ${STAGE_CONFIG[activeStage]?.shortLabel || 'Continue'} →`}
+                    {activeStage === 6
+                      ? 'View Estimate →'
+                      : activeStage === 2
+                      ? `Next: ${STAGE_CONFIG[3]?.shortLabel || 'Buildable Space'} →`
+                      : `Next: ${STAGE_CONFIG[activeStage]?.shortLabel || 'Continue'} →`}
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
                 </button>
               </div>
             )}

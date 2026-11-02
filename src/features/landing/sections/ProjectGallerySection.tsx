@@ -13,10 +13,10 @@ export const ProjectGallerySection: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
           <div className="max-w-2xl space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-md inline-block">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] bg-[rgba(27,61,52,0.08)] border border-[#183B32]/20 px-3 py-1.5 rounded-md inline-block">
               ARCHITECTURAL PORTFOLIO
             </span>
-            <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
+            <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#183B32] tracking-tight leading-[1.12]">
               Representative residential configurations.
             </h2>
             <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
@@ -45,13 +45,13 @@ export const ProjectGallerySection: React.FC = () => {
               <div 
                 className="absolute inset-0 opacity-25 pointer-events-none"
                 style={{
-                  backgroundImage: 'linear-gradient(to right, #1B3D34 1px, transparent 1px), linear-gradient(to bottom, #1B3D34 1px, transparent 1px)',
+                  backgroundImage: 'linear-gradient(to right, #183B32 1px, transparent 1px), linear-gradient(to bottom, #183B32 1px, transparent 1px)',
                   backgroundSize: '32px 32px',
                 }}
               />
-              <Building className="w-10 h-10 text-[#1B3D34] relative z-10" />
+              <Building className="w-10 h-10 text-[#183B32] relative z-10" />
               <div className="relative z-10 space-y-0.5">
-                <span className="text-sm font-black text-[#1B3D34] tracking-wider uppercase block font-heading">
+                <span className="text-sm font-black text-[#183B32] tracking-wider uppercase block font-heading">
                   40 × 60 Residence
                 </span>
                 <span className="text-xs text-[#4B5563] font-mono">
@@ -62,7 +62,7 @@ export const ProjectGallerySection: React.FC = () => {
 
             <div className="space-y-1 border-t border-[#E5E7EB] pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
               <div>
-                <h3 className="font-bold text-[#1B3D34]">40 × 60 Residence</h3>
+                <h3 className="font-bold text-[#183B32]">40 × 60 Residence</h3>
                 <p className="text-[#4B5563]">Tata Tiscon 550D &bull; Ready Mix Concrete M25 &bull; Italian Marble</p>
               </div>
               <button
@@ -71,10 +71,10 @@ export const ProjectGallerySection: React.FC = () => {
                   useWizardStore.setState({ plotLength: 60, plotWidth: 40, floors: 4 });
                   navigate('/calculator');
                 }}
-                className="text-xs font-bold text-[#1B3D34] hover:underline inline-flex items-center gap-1 cursor-pointer shrink-0"
+                className="text-xs font-bold text-[#183B32] hover:underline inline-flex items-center gap-1 cursor-pointer shrink-0"
               >
                 <span>Estimate This</span>
-                <ArrowRight className="w-3 h-3 text-[#F28C28]" />
+                <ArrowRight className="w-3 h-3 text-[#C66B4E]" />
               </button>
             </div>
           </div>
@@ -85,20 +85,20 @@ export const ProjectGallerySection: React.FC = () => {
             {/* 30 × 40 Residence */}
             <div className="bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
               <div className="h-32 rounded-xl bg-white border border-[#E5E7EB] flex flex-col items-center justify-center p-3 text-center space-y-1 relative overflow-hidden">
-                <Building className="w-6 h-6 text-[#1B3D34]" />
-                <span className="text-xs font-bold text-[#1B3D34] uppercase font-heading">30 × 40 Residence</span>
+                <Building className="w-6 h-6 text-[#183B32]" />
+                <span className="text-xs font-bold text-[#183B32] uppercase font-heading">30 × 40 Residence</span>
                 <span className="text-[10px] text-[#4B5563] font-mono">G+1 Modern Home &bull; 1,440 sq.ft</span>
               </div>
 
               <div className="border-t border-[#E5E7EB] pt-3 flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#1B3D34]">30 × 40 Residence</span>
+                <span className="font-semibold text-[#183B32]">30 × 40 Residence</span>
                 <button
                   onClick={() => {
                     useWizardStore.getState().startNewProject();
                     useWizardStore.setState({ plotLength: 40, plotWidth: 30, floors: 2 });
                     navigate('/calculator');
                   }}
-                  className="text-xs font-bold text-[#1B3D34] hover:underline"
+                  className="text-xs font-bold text-[#183B32] hover:underline"
                 >
                   Estimate →
                 </button>
@@ -108,20 +108,20 @@ export const ProjectGallerySection: React.FC = () => {
             {/* 60 × 90 Residence */}
             <div className="bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
               <div className="h-32 rounded-xl bg-white border border-[#E5E7EB] flex flex-col items-center justify-center p-3 text-center space-y-1 relative overflow-hidden">
-                <Building className="w-6 h-6 text-[#1B3D34]" />
-                <span className="text-xs font-bold text-[#1B3D34] uppercase font-heading">60 × 90 Residence</span>
+                <Building className="w-6 h-6 text-[#183B32]" />
+                <span className="text-xs font-bold text-[#183B32] uppercase font-heading">60 × 90 Residence</span>
                 <span className="text-[10px] text-[#4B5563] font-mono">G+4 Estate Villa &bull; 16,200 sq.ft</span>
               </div>
 
               <div className="border-t border-[#E5E7EB] pt-3 flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#1B3D34]">60 × 90 Residence</span>
+                <span className="font-semibold text-[#183B32]">60 × 90 Residence</span>
                 <button
                   onClick={() => {
                     useWizardStore.getState().startNewProject();
                     useWizardStore.setState({ plotLength: 90, plotWidth: 60, floors: 5 });
                     navigate('/calculator');
                   }}
-                  className="text-xs font-bold text-[#1B3D34] hover:underline"
+                  className="text-xs font-bold text-[#183B32] hover:underline"
                 >
                   Estimate →
                 </button>

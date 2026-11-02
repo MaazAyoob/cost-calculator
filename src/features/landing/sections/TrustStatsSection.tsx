@@ -31,10 +31,10 @@ export const TrustStatsSection: React.FC = () => {
         {/* Editorial Credibility Strip Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#E5E7EB] pb-6 text-left">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] block mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] block mb-1">
               ENGINEERED PRE-CONSTRUCTION METHODOLOGY
             </span>
-            <h2 className="heading-sm text-xl sm:text-2xl font-extrabold text-[#1B3D34] tracking-tight">
+            <h2 className="heading-sm text-xl sm:text-2xl font-extrabold text-[#183B32] tracking-tight">
               From plot dimensions to structured construction certainty.
             </h2>
           </div>
@@ -52,10 +52,10 @@ export const TrustStatsSection: React.FC = () => {
                 index === 0 ? 'lg:pr-8' : index === 3 ? 'lg:pl-8' : 'lg:px-8'
               }`}
             >
-              <span className="text-[11px] font-extrabold tracking-widest text-[#1B3D34] uppercase block font-mono">
+              <span className="text-[11px] font-extrabold tracking-widest text-[#183B32] uppercase block font-mono">
                 {item.label}
               </span>
-              <h3 className="text-sm font-bold text-[#1B3D34] tracking-tight">
+              <h3 className="text-sm font-bold text-[#183B32] tracking-tight">
                 {item.title}
               </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed">

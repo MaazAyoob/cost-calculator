@@ -13,6 +13,7 @@ import { modalScaleVariant, backdropFadeVariant } from '../../animations/variant
 import { persistProject, getCachedProjectId, setCachedProjectId } from '../../services/projectApi';
 import { useCustomerAuthStore } from '../../store/useCustomerAuthStore';
 import { normalizeIndianPhoneNumber } from '../../utils/phone';
+import { analytics } from '../../utils/analytics';
 
 interface Props {
   isOpen: boolean;
@@ -240,10 +241,13 @@ export const UnlockReportModal: React.FC<Props> = ({
                 setIsProcessing(false);
                 setFormError(cfResult.error.message || 'Payment cancelled');
                 failPurchasePayment(purchase.id, cfResult.error.message);
+                analytics.trackPaymentFailed(selectedTier, cfResult.error.message || 'Payment cancelled', 'USER_CANCELLED', 'CASHFREE');
                 return;
               }
               try {
                 await verifyCashfreePayment(purchase.id, gatewayOrder.orderId);
+                const orderAmount = selectedTier === 'PREMIUM_1499' ? 1499 : 499;
+                analytics.trackPaymentSuccess(selectedTier, gatewayOrder.orderId, orderAmount, 'CASHFREE');
                 setCompletedOrderRef(purchase.publicReference);
                 grantReportAccess(targetProjectId, purchase.publicReference);
                 grantEntitlementsDirectly(selectedTier, targetProjectId, leadEmail, purchase.publicReference);
@@ -269,6 +273,7 @@ export const UnlockReportModal: React.FC<Props> = ({
               } catch (verErr: any) {
                 setIsProcessing(false);
                 setFormError(verErr.message || 'Cashfree payment verification failed. Please contact support.');
+                analytics.trackPaymentFailed(selectedTier, verErr.message || 'Verification failed', 'VERIFICATION_FAILED', 'CASHFREE');
               }
             });
           return;

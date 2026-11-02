@@ -23,7 +23,7 @@ const COST_HEADS: CostHead[] = [
     materialsPercent: 68,
     labourPercent: 32,
     includedTrades: ['Excavation & Footings', 'RCC Columns & Plinth Beams', '125mm Slab Casting', 'Fe550D TMT Rebar', 'Solid Block Masonry'],
-    color: '#1B3D34',
+    color: '#183B32',
   },
   {
     id: 'finishes',
@@ -67,7 +67,7 @@ const COST_HEADS: CostHead[] = [
     materialsPercent: 60,
     labourPercent: 40,
     includedTrades: ['Terrace Waterproofing Elastomeric Coat', 'Sunken Slab Double-Coat Treatment', 'Interior Wall Putty & Acrylic Emulsion', 'Exterior Weather-Proof Shield'],
-    color: '#F28C28',
+    color: '#C66B4E',
   },
 ];
 
@@ -77,25 +77,25 @@ export const SignatureCostMapSection: React.FC = () => {
   const totalCost = 4482200; // Illustrative benchmark 2,400 sq.ft G+2
 
   return (
-    <section className="py-20 lg:py-28 bg-[#F8F8F6] border-b border-[#E3E8E2] relative select-none">
+    <section className="py-20 lg:py-28 bg-[#F8F8F6] border-b border-[#E5E7EB] relative select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         
         {/* Section Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E3E8E2] pb-6 text-left">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#E5E7EB] pb-6 text-left">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
-              <span className="text-[#F28C28] font-bold">Budget Breakdown</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#183B32]/10 text-xs font-semibold text-[#183B32]">
+              <span className="text-[#C66B4E] font-bold">Budget Breakdown</span>
               <span>&bull;</span>
               <span>Where Your Capital Goes</span>
             </div>
 
-            <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
+            <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#183B32] tracking-tight">
               Where your capital goes.
             </h2>
           </div>
 
           <div className="space-y-1 text-left lg:text-right">
-            <span className="text-base font-extrabold text-[#1B3D34] block tabular-nums">
+            <span className="text-base font-extrabold text-[#183B32] block tabular-nums">
               Total Estimate: {formatCurrency(totalCost)}
             </span>
             <span className="text-xs text-[#4B5563] block">
@@ -108,10 +108,10 @@ export const SignatureCostMapSection: React.FC = () => {
         <div className="space-y-3 text-left">
           <div className="flex items-center justify-between text-xs">
             <span className="font-semibold text-[#4B5563]">Trade Budget Distribution</span>
-            <span className="text-[#1B3D34] font-medium">100% of construction budget itemized</span>
+            <span className="text-[#183B32] font-medium">100% of construction budget itemized</span>
           </div>
 
-          <div className="h-10 sm:h-12 w-full rounded-2xl overflow-hidden flex border border-[#E3E8E2] shadow-xs p-1 bg-white">
+          <div className="h-10 sm:h-12 w-full rounded-2xl overflow-hidden flex border border-[#E5E7EB] shadow-xs p-1 bg-white">
             {COST_HEADS.map((head) => (
               <button
                 key={head.id}
@@ -119,7 +119,7 @@ export const SignatureCostMapSection: React.FC = () => {
                 onClick={() => setSelectedHeadId(head.id)}
                 style={{ width: `${head.percentage}%`, backgroundColor: head.color }}
                 className={`h-full transition-all cursor-pointer relative group first:rounded-l-xl last:rounded-r-xl ${
-                  selectedHeadId === head.id ? 'ring-2 ring-offset-2 ring-[#1B3D34] z-10' : 'opacity-90 hover:opacity-100'
+                  selectedHeadId === head.id ? 'ring-2 ring-offset-2 ring-[#183B32] z-10' : 'opacity-90 hover:opacity-100'
                 }`}
                 title={`${head.category}: ${head.percentage}%`}
               >
@@ -139,17 +139,17 @@ export const SignatureCostMapSection: React.FC = () => {
                 onClick={() => setSelectedHeadId(head.id)}
                 className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                   selectedHeadId === head.id
-                    ? 'bg-white border-[#1B3D34] shadow-xs'
-                    : 'bg-[#F8F8F6] border-[#E3E8E2] hover:bg-white'
+                    ? 'bg-white border-[#183B32] shadow-xs'
+                    : 'bg-[#F8F8F6] border-[#E5E7EB] hover:bg-white'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: head.color }} />
-                  <span className="text-xs font-bold text-[#1B3D34]">
+                  <span className="text-xs font-bold text-[#183B32]">
                     {head.percentage}%
                   </span>
                 </div>
-                <span className="text-xs font-semibold text-[#1B3D34] block truncate">
+                <span className="text-xs font-semibold text-[#183B32] block truncate">
                   {head.category}
                 </span>
               </button>
@@ -158,20 +158,20 @@ export const SignatureCostMapSection: React.FC = () => {
         </div>
 
         {/* Selected Category Deep Dive Panel */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E3E8E2] shadow-xs text-left grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E5E7EB] shadow-xs text-left grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left Summary Metric (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#F28C28]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#C66B4E]">
               Selected Trade Category
             </span>
 
-            <h3 className="text-2xl sm:text-3xl font-black text-[#1B3D34] font-heading">
+            <h3 className="text-2xl sm:text-3xl font-black text-[#183B32] font-heading">
               {activeHead.category}
             </h3>
 
             <div className="space-y-1">
-              <div className="text-3xl sm:text-4xl font-black text-[#1B3D34] font-heading tabular-nums">
+              <div className="text-3xl sm:text-4xl font-black text-[#183B32] font-heading tabular-nums">
                 {formatCurrency(activeHead.amount)}
               </div>
               <div className="text-xs text-[#4B5563]">
@@ -180,19 +180,19 @@ export const SignatureCostMapSection: React.FC = () => {
             </div>
 
             {/* Material vs Labour Split */}
-            <div className="pt-4 border-t border-[#E3E8E2] space-y-2 text-xs">
+            <div className="pt-4 border-t border-[#E5E7EB] space-y-2 text-xs">
               <span className="text-[#4B5563] block uppercase text-[10px] font-bold">
                 Material vs Labour Split
               </span>
               <div className="flex items-center gap-3">
                 <div className="flex-1 space-y-1">
                   <div className="flex justify-between text-[11px]">
-                    <span className="text-[#1B3D34] font-bold">Materials: {activeHead.materialsPercent}%</span>
+                    <span className="text-[#183B32] font-bold">Materials: {activeHead.materialsPercent}%</span>
                     <span className="text-[#4B5563]">Labour: {activeHead.labourPercent}%</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-[#E3E8E2] overflow-hidden flex">
-                    <div style={{ width: `${activeHead.materialsPercent}%` }} className="bg-[#1B3D34] h-full" />
-                    <div style={{ width: `${activeHead.labourPercent}%` }} className="bg-[#F28C28] h-full" />
+                  <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden flex">
+                    <div style={{ width: `${activeHead.materialsPercent}%` }} className="bg-[#183B32] h-full" />
+                    <div style={{ width: `${activeHead.labourPercent}%` }} className="bg-[#C66B4E] h-full" />
                   </div>
                 </div>
               </div>
@@ -200,15 +200,15 @@ export const SignatureCostMapSection: React.FC = () => {
           </div>
 
           {/* Right Included Deliverables Schedule (7 cols) */}
-          <div className="lg:col-span-7 bg-[#F8F8F6] p-6 rounded-2xl border border-[#E3E8E2] space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] block border-b border-[#E3E8E2] pb-2">
+          <div className="lg:col-span-7 bg-[#F8F8F6] p-6 rounded-2xl border border-[#E5E7EB] space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#183B32] block border-b border-[#E5E7EB] pb-2">
               Itemized Scope in This Category
             </span>
 
             <div className="space-y-2.5">
               {activeHead.includedTrades.map((trade, i) => (
-                <div key={i} className="flex items-center gap-3 text-xs sm:text-sm text-[#1B3D34] font-medium">
-                  <span className="text-xs text-[#F28C28] font-bold shrink-0">
+                <div key={i} className="flex items-center gap-3 text-xs sm:text-sm text-[#183B32] font-medium">
+                  <span className="text-xs text-[#C66B4E] font-bold shrink-0">
                     {i + 1}.
                   </span>
                   <span>{trade}</span>
@@ -216,7 +216,7 @@ export const SignatureCostMapSection: React.FC = () => {
               ))}
             </div>
 
-            <div className="pt-3 border-t border-[#E3E8E2] text-xs text-[#4B5563]">
+            <div className="pt-3 border-t border-[#E5E7EB] text-xs text-[#4B5563]">
               &bull; Itemized in Hutty 22-Section Detailed BOQ Dossier
             </div>
           </div>

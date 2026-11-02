@@ -578,7 +578,7 @@ export function generateBOQ(
     add('Plumbing & Sanitary', 'PS', 'Sanitaryware & CP Brass Bathroom Fixture Sets', 'Sets', qty.bathroomFixtureSets, sanitaryRate, bathroomFittings?.sanitaryTier || materialBrands?.bathroom || 'Premium', 'WC + basin + diverter + shower', 'Fixture Sets × Rate');
     add('Plumbing & Sanitary', 'PS', `Overhead 4-Layer Anti-Bacterial Water Tank (${qty.overheadTankLitres}L)`, 'Units', 1, resolveOverride('plumbing.overhead_tank', rate(28000, m.mep)), 'Sintex 4-layer UV', 'with auto ball-valve & overflow line', 'Tank Units × Rate');
     add('Plumbing & Sanitary', 'PS', 'Constant Pressure Booster Pump & Sump Delivery System', 'Units', 1, resolveOverride('plumbing.booster_pump', rate(35000, m.mep)), 'Grundfos CM / Wilo', '0.75HP VFD constant pressure pump', 'Pump Units × Rate');
-    add('Plumbing & Sanitary', 'PS', 'Kitchen Double-Bowl SS 304 Sink with Swivel Mixer', 'Units', input.rooms.kitchen || 1, resolveOverride('plumbing.kitchen_sink', rate(14500, m.fixtures)), 'Nirali / Franke 304', '304 grade anti-scratch with mixer tap', 'Sink Units × Rate');
+    add('Plumbing & Sanitary', 'PS', 'Kitchen Double-Bowl SS 304 Sink with Swivel Mixer', 'Units', input.rooms?.kitchen || 1, resolveOverride('plumbing.kitchen_sink', rate(14500, m.fixtures)), 'Nirali / Franke 304', '304 grade anti-scratch with mixer tap', 'Sink Units × Rate');
   }
 
   // ── 13. Painting & Waterproofing ──
@@ -614,20 +614,130 @@ export function generateBOQ(
   }
 
   // ── 14. Fixtures & Special Equipment ──
-  if (hasElectricalSelection && (input.rooms.bedrooms || input.rooms.living || input.rooms.office)) {
-    const fanCount = (input.rooms.bedrooms || 0) + (input.rooms.living || 0) + (input.rooms.office || 0);
+  if (hasElectricalSelection && (input.rooms?.bedrooms || input.rooms?.living || input.rooms?.office)) {
+    const fanCount = (input.rooms?.bedrooms || 0) + (input.rooms?.living || 0) + (input.rooms?.office || 0);
     if (fanCount > 0) {
       add('Fixtures & Finishes', 'FF', 'Energy-Efficient BLDC 28W Ceiling Fans with Remote', 'Units', fanCount, resolveOverride('fixtures.ceiling_fan', rate(6500, m.fixtures)), 'Atomberg Renesa BLDC', '28W brushless DC motor, 5-speed', 'Fans Count × Rate');
     }
   }
-  if (hasFlooringSelection && (input.rooms.kitchen || 0) > 0) {
-    add('Fixtures & Finishes', 'FF', 'Modular Kitchen Cabinets, Marine Ply Carcass & Counter', 'RM', (input.rooms.kitchen || 0) * 12, resolveOverride('fixtures.modular_kitchen', rate(18000, m.finishing)), 'Sleek / Haecker Modular', 'Quartz countertop + BWP carcass', 'Counter Length × Rate');
+  if (hasFlooringSelection && (input.rooms?.kitchen || 0) > 0) {
+    add('Fixtures & Finishes', 'FF', 'Modular Kitchen Cabinets, Marine Ply Carcass & Counter', 'RM', (input.rooms?.kitchen || 0) * 12, resolveOverride('fixtures.modular_kitchen', rate(18000, m.finishing)), 'Sleek / Haecker Modular', 'Quartz countertop + BWP carcass', 'Counter Length × Rate');
   }
   if (input.liftRequired) {
     add('Fixtures & Finishes', 'FF', 'Residential 6-Passenger Machine-Room-Less (MRL) Lift Package', 'Units', 1, resolveOverride('fixtures.passenger_lift', rate(580000, m.fixtures)), 'Schindler / Otis 6-person', '630 kg payload with ARD safety device', 'Lift Package Allowance');
   }
   if (input.evCharging) {
     add('Fixtures & Finishes', 'FF', 'Fast AC EV Wallbox Charger (7.2 kW Type 2 Dedicated Point)', 'Units', input.carCount || 1, resolveOverride('fixtures.ev_charger', rate(38000, m.mep)), 'Tata Power EZ Charge 7.2kW', 'Type 2 AC wallbox charger', 'EV Points × Rate');
+  }
+
+  // ── 15. Metal Fabrication, Railings & Elevation Finishes ──
+  const fab = input.fabrication;
+  const floorsCount = Math.max(1, input.floors || 1);
+  const balconyCount = input.rooms?.balcony || 0;
+
+  // 15.1 Staircase Railings (Multi-Floor Residences)
+  if (floorsCount > 1) {
+    const stairRft = (floorsCount - 1) * 24;
+    const stairChoice = fab?.staircaseRailing || 'SS 304 with Toughened Glass';
+    let stairRate = 1850;
+    let stairKey = 'fabrication.staircase_railing_ss_glass';
+    let stairSpec = 'AISI SS 304 grade balusters with 10mm toughened glass panels and 50mm dia handrail';
+
+    if (stairChoice.includes('Wood') || stairChoice.includes('Designer')) {
+      stairRate = 1250;
+      stairKey = 'fabrication.staircase_railing_ms_wood';
+      stairSpec = 'Laser-cut MS balusters with PU enamel coating and polished teak wooden handrail';
+    } else if (stairChoice.includes('Pipe') || stairChoice.includes('Standard MS')) {
+      stairRate = 650;
+      stairKey = 'fabrication.staircase_railing_ms_pipe';
+      stairSpec = 'Commercial grade 40mm MS pipe with red oxide primer and synthetic enamel paint';
+    }
+    const resolvedStairRate = resolveOverride(stairKey, rate(stairRate, m.finishing));
+    add('Metal Fabrication & Railings', 'FB', `Staircase Railing (${stairChoice})`, 'Rft', stairRft, resolvedStairRate, 'SS 304 / MS Fabricated', stairSpec, 'Staircase Railing Rft × Rate');
+  }
+
+  // 15.2 Balcony Railings
+  if (balconyCount > 0) {
+    const balcRft = balconyCount * 12;
+    const balcChoice = fab?.balconyRailing || 'SS 304 with Toughened Glass';
+    let balcRate = 1650;
+    let balcKey = 'fabrication.balcony_railing_ss_glass';
+    let balcSpec = 'Weather-resistant SS 304 side spigots with 10mm clear toughened glass for balconies';
+
+    if (balcChoice.includes('Grille') || balcChoice.includes('Laser') || balcChoice.includes('CNC')) {
+      balcRate = 1150;
+      balcKey = 'fabrication.balcony_railing_ms_grille';
+      balcSpec = 'Custom CNC laser-cut MS sheet panel railing with anti-corrosion zinc primer';
+    } else if (balcChoice.includes('Square Bar') || balcChoice.includes('Standard MS')) {
+      balcRate = 550;
+      balcKey = 'fabrication.balcony_railing_ms_square';
+      balcSpec = '12mm MS square bars with anti-rust red oxide primer and exterior enamel';
+    }
+    const resolvedBalcRate = resolveOverride(balcKey, rate(balcRate, m.finishing));
+    add('Metal Fabrication & Railings', 'FB', `Balcony Safety Railing (${balcChoice})`, 'Rft', balcRft, resolvedBalcRate, 'SS 304 / MS Grille', balcSpec, 'Balcony Railing Rft × Rate');
+  }
+
+  // 15.3 Terrace Parapet Safety Extension Railing
+  const terraceChoice = fab?.terraceRailing || 'MS Parapet Safety Extension Railing';
+  if (!terraceChoice.includes('Brick Parapet Wall with Coping') && floorsCount >= 1) {
+    const terraceRft = 45;
+    const resolvedTerraceRate = resolveOverride('fabrication.terrace_safety_railing', rate(450, m.structural));
+    add('Metal Fabrication & Railings', 'FB', 'Terrace Slab Safety Parapet Railing (3.0 ft height)', 'Rft', terraceRft, resolvedTerraceRate, 'Tubular MS Railing', '3-tier horizontal MS tubular safety rail anchored on terrace slab perimeter', 'Terrace Railing Rft × Rate');
+  }
+
+  // 15.4 Main Driveway Entrance Gate
+  if ((input.plotWidth || 0) > 0) {
+    const gateSqFt = 60; // Standard 10 ft x 6 ft driveway gate
+    const gateChoice = fab?.mainGate || 'MS Designer Sliding / Swing Gate (10x6 ft)';
+    let gateRate = 420;
+    let gateKey = 'fabrication.main_gate_designer';
+    let gateSpec = 'Architectural heavy gauge MS frame with sheet accents, roller track, hinges and lock';
+
+    if (gateChoice.includes('Wrought Iron') || gateChoice.includes('Cast Style')) {
+      gateRate = 650;
+      gateKey = 'fabrication.main_gate_wrought_iron';
+      gateSpec = 'Solid wrought iron forging with ornamental spearheads and polyurethane paint finish';
+    } else if (gateChoice.includes('Tubular') || gateChoice.includes('Basic')) {
+      gateRate = 280;
+      gateKey = 'fabrication.main_gate_tubular';
+      gateSpec = 'Standard hollow MS rectangular tubular sections with primer and enamel finish';
+    }
+    const resolvedGateRate = resolveOverride(gateKey, rate(gateRate, m.structural));
+    add('Metal Fabrication & Railings', 'FB', `Main Driveway Compound Gate (${gateChoice})`, 'Sq Ft', gateSqFt, resolvedGateRate, 'MS Fabricated Gate', gateSpec, 'Gate Area × Rate');
+  }
+
+  // 15.5 Overhead Tank Cat Ladder
+  if (floorsCount >= 1) {
+    const ladderRate = resolveOverride('fabrication.oht_cat_ladder', rate(9500, m.structural));
+    add('Metal Fabrication & Railings', 'FB', 'Overhead Water Tank Access Cat Ladder with Safety Rungs', 'Units', 1, ladderRate, 'GI / MS Cat Ladder', '15 ft vertical hot-dip galvanized or MS safety caged rung ladder anchored to RCC wall', 'Ladder Units × Rate');
+  }
+
+  // 15.6 Skylight Unit (When Configured)
+  if (fab?.skylight && !fab.skylight.includes('None')) {
+    const skylightRate = resolveOverride('fabrication.skylight_glazing', rate(18500, m.finishing));
+    add('Metal Fabrication & Railings', 'FB', 'Architectural Laminated Safety Glass Skylight Unit', 'Units', 1, skylightRate, 'Toughened Laminated Glass', '24 sq.ft 11.52mm clear laminated safety glass set in custom MS/Aluminium watertight frame', 'Skylight Unit × Rate');
+  }
+
+  // 15.7 Balcony French Sliding Door (When Balconies Configured)
+  if (balconyCount > 0) {
+    const balcDoorRate = resolveOverride('doors.balcony_french_slider', rate(18500, m.finishing));
+    add('Doors & Joinery', 'DR', 'Balcony French Sliding Door Set (2.5-Track Aluminium / UPVC)', 'Sets', balconyCount, balcDoorRate, 'Fenesta / Geeta Aluminium', '5.0 ft × 7.0 ft 2.5-track sliding door with 6mm toughened glass and SS mosquito mesh', 'Balcony Door Sets × Rate');
+  }
+
+  // 15.8 Exterior Elevation Architectural Cladding (When Configured)
+  if (fab?.elevationCladding && !fab.elevationCladding.includes('Paint Only')) {
+    const cladChoice = fab.elevationCladding;
+    let cladRate = 280;
+    let cladKey = 'elevation.hpl_stone_cladding';
+    let cladSpec = 'Exterior grade 6mm High Pressure Laminate (HPL) or natural slate/travertine dry cladding';
+
+    if (cladChoice.includes('Texture') || cladChoice.includes('Louver')) {
+      cladRate = 140;
+      cladKey = 'elevation.grooved_texture_louvers';
+      cladSpec = 'Textured acrylic aggregate plaster with aluminium powder-coated architectural box louvers';
+    }
+    const resolvedCladRate = resolveOverride(cladKey, rate(cladRate, m.finishing));
+    add('Elevation & External Finishes', 'EV', `Front Façade Architectural Feature Wall Cladding (${cladChoice})`, 'Sq Ft', 180, resolvedCladRate, 'HPL / Stone Veneer', cladSpec, 'Elevation Area × Rate');
   }
 
   // Calculate total BOQ sum

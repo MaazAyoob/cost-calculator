@@ -1,0 +1,284 @@
+=== PAGE 1 ===
+Hutty Electrical UI & Final Report | Page 1
+Hutty Electrical — UI & Final Report
+Developer Implementation Guide
+This document defines what the customer should see for the Electrical section in Hutty, both in the interactive calculator UI
+and in the final BOQ/report. The calculation engine should remain point-driven and transparent, while the customer-facing
+presentation stays simple.
+1. Customer Experience Principle
+Do not expose the engineering complexity by default. The customer should immediately understand what electrical
+work is included, how much material is estimated, what specification/brand is selected, and what it costs.
+Primary customer questions should be answered in this order:
+• What am I installing? — electrical points, switches/sockets, DBs and appliance provisions.
+• What am I consuming? — wiring, conduit and other electrical materials.
+• What does it cost? — quantity × rate, with an electrical subtotal.
+• How was it calculated? — optional transparency layer showing the assumptions behind the estimate.
+2. Electrical UI — Summary Card
+The main Electrical card should show the total first, followed by a concise summary of quantities.
+FIELD
+CUSTOMER-FACING DISPLAY
+Section
+ELECTRICAL
+Specification
+Anchor • Budget Specification
+Total
+Estimated Electrical Cost — IXX,XXX
+Wiring
+~700 m
+Conduit
+~325 m
+Switch/socket modules
+~75 modules
+Light points
+~40 points
+Fan points
+~9 points
+AC points
+5 points
+Geyser points
+3 points
+TV / Data points
+5 points
+Distribution
+1 Main DB + 1 Floor/Sub DB
+Transparency
+How is this calculated? →
+3. UI — What Am I Installing?
+CATEGORY
+WHAT TO SHOW
+Lighting
+Total light points
+Fans
+Total fan points
+Switches & sockets
+Total modules
+AC
+Number of AC provisions
+
+
+=== PAGE 2 ===
+Hutty Electrical UI & Final Report | Page 2
+CATEGORY
+WHAT TO SHOW
+Geysers
+Number of geyser provisions
+TV / Data
+Number of selected points
+Distribution
+Main DB + floor/sub DB count
+Other selected appliances
+Refrigerator, washing machine, chimney, microwave, EV, etc.
+4. UI — What Am I Consuming?
+Show the principal electrical material quantities without forcing the user to read an engineering schedule.
+MATERIAL
+EXAMPLE DISPLAY
+Electrical wiring
+~700 m total conductor length
+1.5 sq.mm
+~250 m
+2.5 sq.mm
+~250 m
+4 sq.mm
+~120 m
+6 sq.mm
+~50–80 m
+Conduit
+~325 m
+Other electrical accessories
+As calculated by the engine
+Important: clearly label whether wiring quantities are individual conductor length or cable route length. Do not mix the two units.
+
+
+=== PAGE 3 ===
+Hutty Electrical UI & Final Report | Page 3
+5. UI — What Does It Cost?
+The customer should see an electrical subtotal and enough detail to understand where the money goes.
+ITEM
+QTY
+UNIT
+RATE
+AMOUNT
+Wiring
+700
+m
+IXX
+IXX,XXX
+Conduit
+325
+m
+IXX
+IXX,XXX
+Switches & sockets
+75
+modules
+IXX
+IXX,XXX
+DB & protection
+2
+nos
+IXX
+IXX,XXX
+Electrical points/accessories
+—
+—
+—
+IXX,XXX
+ELECTRICAL TOTAL
+IXX,XXX
+6. Brand / Specification UI
+Display the selected electrical brand clearly. For example:
+Electrical Specification
+Anchor — Budget
+Provide a Change Specification action. Changing Anchor to another available brand/specification should update the
+product specification and rate. It should not arbitrarily change the calculated physical quantity.
+7. 'How Is This Calculated?' — Transparency Layer
+This should be expandable, not the default presentation. It should explain the calculation in plain language.
+CUSTOMER SEES
+EXAMPLE
+Input basis
+Rooms, floors, appliances and requirements selected
+Point generation
+Example: bedroom → light + fan + socket circuit
+Routing assumption
+Preliminary average route length
+Allowance
+10% preliminary allowance
+Final quantity
+~700 m conductor length
+Conduit
+~325 m based on BUA/point-density planning parameter
+8. Final Report — Electrical Section
+The final PDF/BOQ should preserve the same structure used in the interactive UI, but can be more detailed.
+• Electrical Summary: total electrical cost, selected brand/specification and effective cost/sq.ft where appropriate.
+• What We Install: light points, fan points, switches/sockets, AC points, geyser points, TV/data, DBs and selected
+appliance provisions.
+• What We Consume: wire by size, conduit, boxes/accessories and other priced electrical materials.
+• What It Costs: item, quantity, unit, rate and amount, followed by the electrical subtotal.
+• Calculation Notes: concise explanation of the assumptions and the fact that the result is a preliminary estimate.
+9. Final Report — Recommended Table
+ITEM
+SPECIFICATION
+QTY
+UNIT
+RATE
+AMOUNT
+1.5 sq.mm wiring
+Anchor / selected spec
+250
+m
+IXX
+IXX,XXX
+
+
+=== PAGE 4 ===
+Hutty Electrical UI & Final Report | Page 4
+ITEM
+SPECIFICATION
+QTY
+UNIT
+RATE
+AMOUNT
+2.5 sq.mm wiring
+Anchor / selected spec
+250
+m
+IXX
+IXX,XXX
+4 sq.mm wiring
+Anchor / selected spec
+120
+m
+IXX
+IXX,XXX
+6 sq.mm wiring
+Anchor / selected spec
+60
+m
+IXX
+IXX,XXX
+Conduit
+PVC heavy duty
+325
+m
+IXX
+IXX,XXX
+Switches & sockets
+Anchor
+75
+modules
+IXX
+IXX,XXX
+DB & protection
+Selected specification
+2
+nos
+IXX
+IXX,XXX
+Electrical accessories
+As selected
+—
+—
+—
+IXX,XXX
+ELECTRICAL TOTAL
+IXX,XXX
+
+
+=== PAGE 5 ===
+Hutty Electrical UI & Final Report | Page 5
+10. Dynamic Behaviour Requirements
+USER CHANGE
+WHAT MUST UPDATE
+Add / remove bedroom
+Electrical points, circuits, wire, conduit and cost
+Add / remove bathroom
+Geyser/exhaust/sanitary-related electrical provisions where selected
+Add AC
+Dedicated point/circuit, wire, conduit and cost
+Add geyser
+Dedicated point/circuit, wire, conduit and cost
+Add EV
+Dedicated EV provision and related electrical quantities/cost
+Change floors
+Floor distribution, vertical/riser requirements, DBs, wire, conduit and cost
+Change BUA
+Point density/route and conduit calculations should respond appropriately
+Change Anchor → other brand
+Specification/rate/cost changes; physical quantity remains configuration-driven
+11. Recommended Customer-Facing Language
+Electrical
+Anchor • Budget Specification
+Estimated Electrical Cost: IXX,XXX
+~700 m wiring • ~325 m conduit • ~75 switch/socket modules • ~40 light points
+How is this calculated?
+Hutty estimates electrical requirements from your selected rooms, floors and appliance requirements, using preliminary
+routing and quantity parameters.
+12. Do Not Show by Default
+• Voltage-drop calculations
+• Detailed current/load calculations
+• Breaker sizing calculations
+• Circuit loading schedules
+• Phase balancing
+• Internal route assumptions and engineering formulas
+• 10% wastage arithmetic
+These may exist in the calculation engine or technical view, but should not clutter the primary customer report.
+13. Engineering / Estimation Disclaimer
+Hutty's electrical quantities are preliminary estimation quantities. They are not a substitute for final electrical design. Final conductor sizing, circuit
+loading, voltage-drop checks, protection, DB design and installation details must be verified by a qualified electrical designer/engineer for the
+actual project.
+14. Developer Acceptance Checklist
+I Electrical quantities are generated from the user's actual house configuration.
+I No universal fixed 700 m rule is used.
+I Wire is clearly identified as conductor length or cable route length.
+I Wire size quantities are separately displayed where applicable.
+I Conduit quantity is separately calculated.
+
+
+=== PAGE 6 ===
+Hutty Electrical UI & Final Report | Page 6
+I Brand selection changes specification/rate, not physical quantity.
+I UI and final report use the same calculated values.
+I Every electrical amount equals quantity × rate.
+I Electrical subtotal reconciles with the project total.
+I The 'How is this calculated?' layer explains the estimate without exposing unnecessary engineering complexity.
+I Values are stored as editable QS/admin parameters for later calibration against real BOQs.

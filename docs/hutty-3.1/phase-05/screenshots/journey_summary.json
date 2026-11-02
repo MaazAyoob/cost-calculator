@@ -1,0 +1,86 @@
+[
+  {
+    "step": 1,
+    "name": "Landing Page Hero",
+    "status": "PASS",
+    "screenshot": "01_desktop_landing_hero.png"
+  },
+  {
+    "step": 2,
+    "name": "Chapter 1 Plot & Setbacks",
+    "status": "PASS",
+    "screenshot": "02_desktop_stage1_plot.png"
+  },
+  {
+    "step": 3,
+    "name": "Chapter 2 Dream Home & Spaces",
+    "status": "PASS",
+    "screenshot": "03_desktop_stage2_dream_home.png"
+  },
+  {
+    "step": 4,
+    "name": "Stage 4 Buildable Footprint",
+    "status": "PASS",
+    "screenshot": "04_desktop_stage4_footprint.png"
+  },
+  {
+    "step": 5,
+    "name": "Chapter 3 Core Structural Materials",
+    "status": "PASS",
+    "screenshot": "05_desktop_stage5_core_materials.png"
+  },
+  {
+    "step": 6,
+    "name": "Stage 6 Flooring & Tiles",
+    "status": "PASS",
+    "screenshot": "06_desktop_stage6_flooring.png"
+  },
+  {
+    "step": 7,
+    "name": "Stage 6 Finishes & Fabrication",
+    "status": "PASS",
+    "screenshot": "07_desktop_stage6_fabrication_finishes.png"
+  },
+  {
+    "step": 8,
+    "name": "Chapter 7 Estimate Review",
+    "status": "PASS",
+    "screenshot": "08_desktop_stage7_estimate_review.png"
+  },
+  {
+    "step": 9,
+    "name": "Chapter 7 BOQ Schedule Preview",
+    "status": "PASS",
+    "screenshot": "09_desktop_stage8_boq_schedule.png"
+  },
+  {
+    "step": 10,
+    "name": "Reports & Commercial Tiers",
+    "status": "PASS",
+    "screenshot": "10_desktop_commercial_reports.png"
+  },
+  {
+    "step": 11,
+    "name": "Expert Consultation Page",
+    "status": "PASS",
+    "screenshot": "11_desktop_consultation_page.png"
+  },
+  {
+    "step": 12,
+    "name": "Tablet Responsiveness",
+    "status": "PASS",
+    "screenshot": "12_tablet_stage1_plot.png"
+  },
+  {
+    "step": 13,
+    "name": "Mobile Landing Page",
+    "status": "PASS",
+    "screenshot": "13_mobile_landing_hero.png"
+  },
+  {
+    "step": 14,
+    "name": "Mobile Calculator Estimate",
+    "status": "PASS",
+    "screenshot": "14_mobile_stage7_estimate.png"
+  }
+]

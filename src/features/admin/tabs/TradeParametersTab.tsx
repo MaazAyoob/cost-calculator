@@ -528,7 +528,7 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
             <Card
               key={field.key}
               className={`border transition-all ${
-                isOverridden ? 'border-[#F28C28] bg-amber-50/20' : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
+                isOverridden ? 'border-[#C66B4E] bg-amber-50/20' : 'border-[#E5E7EB] bg-white hover:border-[#CBD5CB]'
               }`}
             >
               <CardContent className="p-4 space-y-3">
@@ -539,7 +539,7 @@ export const TradeParametersTab: React.FC<Props> = ({ forcedTab }) => {
                         {field.label}
                       </span>
                       {isOverridden && (
-                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-[#F28C28] border border-amber-300">
+                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#C66B4E]/10 text-[#C66B4E] border border-[#C66B4E]/25">
                           DRAFT
                         </span>
                       )}

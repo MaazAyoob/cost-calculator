@@ -72,6 +72,17 @@ export interface PaintingSelection {
   brand: 'Asian Paints' | 'Berger Paints' | 'Dulux' | 'Asian Paints Royale' | string;
 }
 
+export interface FabricationSelection {
+  staircaseRailing: 'SS 304 with Toughened Glass' | 'MS Designer with Wooden Handrail' | 'Standard MS Pipe Railing' | string;
+  balconyRailing: 'SS 304 with Toughened Glass' | 'MS Laser-Cut CNC Grille' | 'Standard MS Square Bar Railing' | string;
+  terraceRailing: 'MS Parapet Safety Extension Railing' | 'Brick Parapet Wall with Coping' | string;
+  mainGate: 'MS Designer Sliding / Swing Gate (10x6 ft)' | 'Wrought Iron Cast Style Gate' | 'Tubular MS Swing Gate' | string;
+  tankLadder: 'GI / MS Cat Ladder with Safety Rungs' | 'Standard Portable Access' | string;
+  skylight: 'Laminated Safety Glass with Metal Frame (24 sq.ft)' | 'None' | string;
+  balconyDoor: 'UPVC / Aluminium 2.5-Track French Sliding Door' | 'Standard Flush Door' | string;
+  elevationCladding: 'HPL / Stone Veneer Façade Cladding' | 'Grooved Exterior Texture & Louvers' | 'Weatherproof Paint Only' | string;
+}
+
 export interface EngineInput {
   city: CityLocation;
   authority: string;
@@ -103,6 +114,7 @@ export interface EngineInput {
   electrical: ElectricalSelection;
   bathroomFittings: BathroomFittingSelection;
   painting: PaintingSelection;
+  fabrication?: FabricationSelection;
   // Setback conditions & road frontages (Plot Setback System V2)
   roadFacingBoundaries?: Array<'front' | 'rear' | 'left' | 'right'>;
   isCornerPlot?: boolean;
@@ -449,6 +461,15 @@ export interface MaterialQuantities {
   kitchenSinkCount: number;
   bathroomFixtureSets: number;
   overheadTankLitres: number;
+  // Fabrication, Railings & Elevation Quantities
+  staircaseRailingRft?: number;
+  balconyRailingRft?: number;
+  terraceRailingRft?: number;
+  mainGateSqFt?: number;
+  tankLadderCount?: number;
+  skylightAreaSqFt?: number;
+  elevationCladdingSqFt?: number;
+  balconyDoorsCount?: number;
   // Resolved calculation factors exposed from canonical modules (preserves zero UI recalculation)
   cementFactorBagsPerSqFt?: number;
   interiorPaintCoverageSqFtPerLitre?: number;
@@ -480,6 +501,8 @@ export type BOQCategory =
   | 'Electrical'
   | 'Plumbing & Sanitary'
   | 'Painting & Waterproofing'
+  | 'Metal Fabrication & Railings'
+  | 'Elevation & External Finishes'
   | 'Fixtures & Finishes';
 
 export interface BOQItem {
@@ -514,7 +537,7 @@ export interface MaterialScheduleItem {
 // SECTION C: WHAT WE INSTALL (Fixtures & Fittings Schedule)
 export interface FixtureScheduleItem {
   slNo: number;
-  category: 'Doors' | 'Windows' | 'Sanitary Fixtures' | 'Electrical Fixtures' | 'Plumbing Tanks & Pumps' | 'Special Equipment';
+  category: 'Doors' | 'Windows' | 'Sanitary Fixtures' | 'Electrical Fixtures' | 'Plumbing Tanks & Pumps' | 'Special Equipment' | 'Metal Fabrication & Railings' | 'Elevation & External Finishes';
   item: string;
   brand: string;
   specification: string;

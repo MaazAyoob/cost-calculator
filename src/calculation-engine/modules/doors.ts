@@ -22,7 +22,7 @@ export function calculateDoors(input: EngineInput): {
   doorOpeningAreaSqFt: number;
   doorSchedule: DoorScheduleItem[];
 } {
-  const { rooms, floors, houseType, doors, materialBrands } = input;
+  const { floors, houseType, doors, materialBrands } = input;
   const isZero = (!floors || floors <= 0) && (!input.plotLength || input.plotLength <= 0);
 
   if (isZero) {
@@ -35,6 +35,22 @@ export function calculateDoors(input: EngineInput): {
       doorSchedule: [],
     };
   }
+
+  const rawRooms = input.rooms || {};
+  const floorsCount = Math.max(1, floors || 1);
+  const rooms = {
+    living: rawRooms.living ?? 1,
+    dining: rawRooms.dining ?? 1,
+    kitchen: rawRooms.kitchen ?? 1,
+    bedrooms: rawRooms.bedrooms ?? floorsCount,
+    bathrooms: rawRooms.bathrooms ?? floorsCount,
+    commonToilets: rawRooms.commonToilets ?? 0,
+    balcony: rawRooms.balcony ?? (floorsCount > 1 ? floorsCount - 1 : 0),
+    utility: rawRooms.utility ?? 1,
+    pooja: rawRooms.pooja ?? 1,
+    office: rawRooms.office ?? 0,
+    storeRoom: rawRooms.storeRoom ?? 0,
+  };
 
   // 1. Main Doors Count
   const mainDoorsCount = (houseType === 'Rental Units' || houseType === 'Mixed Use')

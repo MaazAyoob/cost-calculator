@@ -306,7 +306,7 @@ describe('HUTTY 2.0 — Estimate Completeness & Mode Safety Regression Suite', (
     expect(webRatePerSqFt).toBe(pdfCostPerSqFt);
     expect(webMaterials).toBe(pdfMaterials);
     expect(webLabour).toBe(pdfLabour);
-    expect(webTotal).toBe(5014146);
+    expect(webTotal).toBe(5213600);
   });
 
 });

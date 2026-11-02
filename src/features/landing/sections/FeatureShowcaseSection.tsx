@@ -62,10 +62,10 @@ export const FeatureShowcaseSection: React.FC = () => {
   };
 
   const costBreakdown = [
-    { label: '01. Civil & Structural Frame', pct: 55, amount: '₹28,08,543', color: '#1B3D34' },
+    { label: '01. Civil & Structural Frame', pct: 55, amount: '₹28,08,543', color: '#183B32' },
     { label: '02. Architectural Finishes & Joinery', pct: 25, amount: '₹12,76,610', color: '#2B584C' },
     { label: '03. MEP (Electrical & Plumbing)', pct: 12, amount: '₹6,12,773', color: '#4B5563' },
-    { label: '04. Statutory GST (18%) & Overheads', pct: 8, amount: '₹4,08,516', color: '#F28C28' },
+    { label: '04. Statutory GST (18%) & Overheads', pct: 8, amount: '₹4,08,516', color: '#C66B4E' },
   ];
 
   return (
@@ -74,10 +74,10 @@ export const FeatureShowcaseSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-full inline-block">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] bg-[rgba(27,61,52,0.08)] border border-[#183B32]/20 px-3 py-1.5 rounded-full inline-block">
             ARCHITECTURAL SPECIFICATION &amp; BOQ
           </span>
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
+          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#183B32] tracking-tight leading-[1.12]">
             Engineering precision <br />
             across every material and trade.
           </h2>
@@ -90,10 +90,10 @@ export const FeatureShowcaseSection: React.FC = () => {
         <div className="p-6 sm:p-8 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl space-y-6 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#E5E7EB]">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] block">
                 INTERACTIVE SPECIFICATION BOARD
               </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading mt-0.5">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#183B32] font-heading mt-0.5">
                 Materials Needed &amp; Brand Choices
               </h3>
             </div>
@@ -119,8 +119,8 @@ export const FeatureShowcaseSection: React.FC = () => {
                   onClick={() => setSelectedMaterial(mat.id as any)}
                   className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer text-center ${
                     isSelected
-                      ? 'bg-[#1B3D34] text-white border-[#1B3D34] shadow-2xs'
-                      : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] hover:text-[#1B3D34]'
+                      ? 'bg-[#183B32] text-white border-[#183B32] shadow-2xs'
+                      : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-[rgba(27,61,52,0.04)] hover:text-[#183B32]'
                   }`}
                 >
                   {mat.label}
@@ -141,14 +141,14 @@ export const FeatureShowcaseSection: React.FC = () => {
               <span className="text-[10px] font-mono font-bold text-[#4B5563] uppercase block">
                 {materialsData[selectedMaterial].name}
               </span>
-              <h4 className="text-lg sm:text-xl font-extrabold text-[#1B3D34] font-heading">
+              <h4 className="text-lg sm:text-xl font-extrabold text-[#183B32] font-heading">
                 {materialsData[selectedMaterial].brand}
               </h4>
               <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
                 {materialsData[selectedMaterial].details}
               </p>
-              <div className="flex items-center gap-2 text-[11px] text-[#1B3D34] font-semibold pt-1">
-                <Check className="w-3.5 h-3.5 text-[#1B3D34]" />
+              <div className="flex items-center gap-2 text-[11px] text-[#183B32] font-semibold pt-1">
+                <Check className="w-3.5 h-3.5 text-[#183B32]" />
                 <span>{materialsData[selectedMaterial].standard}</span>
               </div>
             </div>
@@ -158,7 +158,7 @@ export const FeatureShowcaseSection: React.FC = () => {
                 <span className="text-[9px] font-bold text-[#4B5563] uppercase block">
                   STANDARD UNIT RATE
                 </span>
-                <span className="text-sm font-extrabold text-[#1B3D34] font-mono mt-0.5 block">
+                <span className="text-sm font-extrabold text-[#183B32] font-mono mt-0.5 block">
                   {materialsData[selectedMaterial].rate}
                 </span>
               </div>
@@ -166,7 +166,7 @@ export const FeatureShowcaseSection: React.FC = () => {
                 <span className="text-[9px] font-bold text-[#4B5563] uppercase block">
                   DERIVED QUANTITY
                 </span>
-                <span className="text-xs font-bold text-[#1B3D34] font-mono mt-0.5 block">
+                <span className="text-xs font-bold text-[#183B32] font-mono mt-0.5 block">
                   {materialsData[selectedMaterial].takeoff}
                 </span>
               </div>
@@ -180,10 +180,10 @@ export const FeatureShowcaseSection: React.FC = () => {
           {/* Left: Cost Buildup Composition */}
           <div className="lg:col-span-6 bg-[#F8F8F6] border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs text-left space-y-6 flex flex-col justify-between">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] block">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] block">
                 WHERE DOES YOUR MONEY GO?
               </span>
-              <h3 className="text-2xl font-extrabold text-[#1B3D34] font-heading">
+              <h3 className="text-2xl font-extrabold text-[#183B32] font-heading">
                 Cost Allocation Buildup
               </h3>
               <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
@@ -207,9 +207,9 @@ export const FeatureShowcaseSection: React.FC = () => {
                   <div key={item.label} className="p-3 bg-white rounded-xl border border-[#E5E7EB] flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                      <span className="font-semibold text-[#1B3D34]">{item.label}</span>
+                      <span className="font-semibold text-[#183B32]">{item.label}</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono font-bold text-[#1B3D34]">
+                    <div className="flex items-center gap-2 font-mono font-bold text-[#183B32]">
                       <span>{item.amount}</span>
                       <span className="text-[10px] text-[#4B5563]">({item.pct}%)</span>
                     </div>
@@ -218,7 +218,7 @@ export const FeatureShowcaseSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-white border border-[#E5E7EB] rounded-xl text-[11px] text-[#1B3D34] font-bold flex items-center justify-between">
+            <div className="p-3 bg-white border border-[#E5E7EB] rounded-xl text-[11px] text-[#183B32] font-bold flex items-center justify-between">
               <span>Total Estimated Benchmark (30×40 G+1):</span>
               <span className="font-mono text-sm font-black">₹51,06,442</span>
             </div>
@@ -228,11 +228,11 @@ export const FeatureShowcaseSection: React.FC = () => {
           <div className="lg:col-span-6 bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs text-left space-y-4 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#1B3D34] font-heading">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#183B32] font-heading">
                   13-Stage BOQ Work Schedule
                 </span>
-                <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded-full">
-                  BANK READY
+                <span className="text-[10px] font-mono font-bold text-[#183B32] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded-full">
+                  DETAILED ESTIMATE &amp; BOQ
                 </span>
               </div>
               <p className="text-xs text-[#4B5563]">
@@ -251,14 +251,14 @@ export const FeatureShowcaseSection: React.FC = () => {
                 ].map((row) => (
                   <div key={row.code} className="p-2.5 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold text-[#1B3D34] bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">
+                      <span className="text-[10px] font-mono font-bold text-[#183B32] bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">
                         {row.code}
                       </span>
-                      <span className="text-[#1B3D34] font-medium text-[11px] truncate max-w-[220px] sm:max-w-[280px]">
+                      <span className="text-[#183B32] font-medium text-[11px] truncate max-w-[220px] sm:max-w-[280px]">
                         {row.item}
                       </span>
                     </div>
-                    <span className="font-mono font-bold text-[#1B3D34] text-xs shrink-0">
+                    <span className="font-mono font-bold text-[#183B32] text-xs shrink-0">
                       {row.cost}
                     </span>
                   </div>
@@ -274,7 +274,7 @@ export const FeatureShowcaseSection: React.FC = () => {
               className="w-full hutty-btn-primary py-3 rounded-xl font-bold text-xs shadow-xs"
             >
               <span>Explore Complete 13-Stage Schedule</span>
-              <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+              <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
             </button>
           </div>
 

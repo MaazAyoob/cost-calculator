@@ -63,13 +63,13 @@ export const VisualStorytellingSection: React.FC = () => {
         
         {/* Editorial Section Statement */}
         <div className="max-w-3xl space-y-4 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#1B3D34]/10 text-xs font-semibold text-[#1B3D34]">
-            <span className="text-[#F28C28] font-bold">How It Works</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(27,61,52,0.06)] border border-[#183B32]/10 text-xs font-semibold text-[#183B32]">
+            <span className="text-[#C66B4E] font-bold">How It Works</span>
             <span>&bull;</span>
             <span>From Plot to Complete Plan</span>
           </div>
 
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight">
+          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-black text-[#183B32] tracking-tight">
             Your home is more than a square-foot number.
           </h2>
 
@@ -88,24 +88,24 @@ export const VisualStorytellingSection: React.FC = () => {
             {FLOW_NODES.map((node, idx) => (
               <div
                 key={node.step}
-                className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] hover:border-[#1B3D34] transition-all lg:ml-16"
+                className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 bg-[#F8F8F6] rounded-2xl border border-[#E5E7EB] hover:border-[#183B32] transition-all lg:ml-16"
               >
                 {/* Desktop Anchor Node on the Axis Line */}
-                <div className="hidden lg:flex absolute -left-16 w-8 h-8 rounded-full bg-[#1B3D34] text-white text-xs font-bold items-center justify-center -translate-x-1/2 border-4 border-white shadow-xs">
+                <div className="hidden lg:flex absolute -left-16 w-8 h-8 rounded-full bg-[#183B32] text-white text-xs font-bold items-center justify-center -translate-x-1/2 border-4 border-white shadow-xs">
                   {idx + 1}
                 </div>
 
                 {/* Left: Step label, title, and detail */}
                 <div className="space-y-1 max-w-2xl text-left">
                   <div className="flex items-center gap-2">
-                    <span className="lg:hidden text-xs font-bold text-[#F28C28]">
+                    <span className="lg:hidden text-xs font-bold text-[#C66B4E]">
                       Stage {idx + 1} &bull;
                     </span>
                     <span className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
                       {node.label}
                     </span>
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#1B3D34] font-heading">
+                  <h3 className="text-base sm:text-lg font-bold text-[#183B32] font-heading">
                     {node.title}
                   </h3>
                   <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
@@ -115,13 +115,13 @@ export const VisualStorytellingSection: React.FC = () => {
 
                 {/* Right: Calculated Metric Tag */}
                 <div className="shrink-0 flex items-center justify-between lg:justify-end gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 border-[#E5E7EB]">
-                  <span className="text-xs sm:text-sm font-semibold text-[#1B3D34] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-2xs">
+                  <span className="text-xs sm:text-sm font-semibold text-[#183B32] bg-white px-3 py-1.5 rounded-xl border border-[#E5E7EB] shadow-2xs">
                     {node.metric}
                   </span>
                   {idx < FLOW_NODES.length - 1 ? (
-                    <ArrowDown className="w-4 h-4 text-[#F28C28] hidden lg:block" />
+                    <ArrowDown className="w-4 h-4 text-[#C66B4E] hidden lg:block" />
                   ) : (
-                    <CheckCircle2 className="w-4 h-4 text-[#1B3D34] hidden lg:block" />
+                    <CheckCircle2 className="w-4 h-4 text-[#183B32] hidden lg:block" />
                   )}
                 </div>
               </div>

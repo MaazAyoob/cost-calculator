@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ArrowRight,
-  User,
   MapPin,
   Calculator,
   Layers,
-  MessageSquare,
+  FileCheck2,
   Home,
   Package,
   Settings,
@@ -19,6 +18,9 @@ import {
   ShieldCheck,
   IndianRupee,
   FileText,
+  Compass,
+  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import { useWizardStore } from '../../../store/useWizardStore';
 import { useCustomerAuthStore } from '../../../store/useCustomerAuthStore';
@@ -105,13 +107,17 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative bg-[#F8F8F6] pt-6 pb-0 lg:pt-8 overflow-hidden">
-      {/* Background Subtle Blueprint Ambient Texture */}
+    <section className="relative bg-[#F8F8F6] pt-6 pb-0 lg:pt-10 overflow-hidden text-[#18211E]">
+      {/* Background Architectural Grid Texture */}
       <div className="absolute inset-0 pointer-events-none arch-grid-bg opacity-30" />
+
+      {/* Subtle Architectural Atmosphere */}
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#B7CDBB]/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 -left-32 w-80 h-80 bg-[#B7CDBB]/20 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Two-Column Hero Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* LEFT COLUMN: Location Badge, Headline, Calculator & Benefits     */}
@@ -120,37 +126,41 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-6 xl:col-span-6 space-y-4 text-left"
+            className="lg:col-span-6 xl:col-span-6 space-y-5 text-left"
           >
-            {/* 1. Location Eyebrow Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EBF3EF] border border-[#D5E5DC] text-xs font-semibold text-[#1B3D34]">
-              <MapPin className="w-3.5 h-3.5 text-[#F28C28] fill-[#F28C28]" />
-              <span>Residential Construction Intelligence &bull; Bangalore</span>
+            {/* 1. Location & Confidence Eyebrow Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E8EFE9] border border-[#B7CDBB]/80 text-xs font-semibold text-[#183B32]">
+              <span className="w-2 h-2 rounded-full bg-[#C66B4E] animate-pulse shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#C66B4E]" />
+              <span className="tracking-wide">Bangalore Home Planning &bull; Clear Estimates</span>
             </div>
 
-            {/* 2. Main Headline */}
+            {/* 2. Headline & Homeowner Narrative */}
             <div className="space-y-3">
-              <h1 className="text-3.5xl sm:text-4xl lg:text-[2.85rem] xl:text-[3.25rem] font-extrabold text-[#18211E] font-heading tracking-tight leading-[1.12]">
-                Your home begins with a <br className="hidden sm:inline" />
-                <span className="text-[#1B3D34] underline decoration-[#F28C28] decoration-4 underline-offset-8">clearer plan.</span>
+              <h1 className="text-3.5xl sm:text-4xl lg:text-[2.85rem] xl:text-[3.25rem] font-extrabold text-[#18211E] font-heading tracking-tight leading-[1.14]">
+                Plan your dream home <br className="hidden sm:inline" />
+                <span className="text-[#183B32] underline decoration-[#C66B4E] decoration-4 underline-offset-8">
+                  with confidence.
+                </span>
               </h1>
-              <p className="text-[#707873] text-base sm:text-lg font-normal leading-relaxed max-w-lg">
-                Understand construction costs, material quantities, and the journey ahead before you build.
+              <p className="text-[#66716B] text-base sm:text-lg font-normal leading-relaxed max-w-lg">
+                Choose your plot size and floors. Hutty helps you understand the materials you need and the cost of building your home.
               </p>
             </div>
 
             {/* 3. Interactive Calculator Configuration Panel */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E2E8E3] shadow-xs p-5 sm:p-6 space-y-4">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E5E7EB] shadow-sm p-5 sm:p-6 space-y-4">
               
               {/* Section A: Plot Size Selection */}
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-sm font-bold text-[#18211E]">
+                  <span className="text-sm font-bold text-[#18211E] flex items-center gap-1.5">
+                    <Compass className="w-4 h-4 text-[#C66B4E]" />
                     1. Select plot size
                   </span>
-                  <span className="text-xs text-[#707873]">
-                    Area:{' '}
-                    <strong className="text-[#F28C28] font-bold">
+                  <span className="text-xs text-[#66716B]">
+                    Plot:{' '}
+                    <strong className="text-[#C66B4E] font-bold">
                       {PRESET_PLOTS[activePlotIdx].desc}
                     </strong>{' '}
                     ({PRESET_PLOTS[activePlotIdx].dimText})
@@ -165,16 +175,17 @@ export const HeroSection: React.FC = () => {
                         key={plot.label}
                         type="button"
                         onClick={() => handleSelectPlot(i)}
-                        className={`py-2.5 px-2 rounded-xl text-center transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
+                        className={`min-h-[46px] py-2 px-2 rounded-xl text-center transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183B32] ${
                           isSelected
-                            ? 'bg-[#1B3D34] text-white shadow-xs border border-[#1B3D34]'
-                            : 'bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] hover:border-[#1B3D34]/40 hover:bg-[#F2F4F2]'
+                            ? 'bg-[#183B32] text-white shadow-xs border border-[#183B32]'
+                            : 'bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] hover:border-[#183B32]/40 hover:bg-white'
                         }`}
                       >
                         <span className={`block text-xs sm:text-sm font-bold leading-tight ${isSelected ? 'text-white' : 'text-[#18211E]'}`}>
                           {plot.label}
+                          {isSelected && <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#C66B4E] ml-1 align-middle" />}
                         </span>
-                        <span className={`block text-[10px] sm:text-[11px] mt-0.5 leading-tight ${isSelected ? 'text-white/80' : 'text-[#707873]'}`}>
+                        <span className={`block text-[10px] sm:text-[11px] mt-0.5 leading-tight ${isSelected ? 'text-white/80' : 'text-[#66716B]'}`}>
                           {plot.desc}
                         </span>
                       </button>
@@ -184,10 +195,17 @@ export const HeroSection: React.FC = () => {
               </div>
 
               {/* Section B: Floors Selection */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2.5 pt-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-sm font-bold text-[#18211E]">
+                  <span className="text-sm font-bold text-[#18211E] flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-[#C66B4E]" />
                     2. Select floors
+                  </span>
+                  <span className="text-xs text-[#66716B]">
+                    Built-up:{' '}
+                    <strong className="text-[#183B32] font-bold">
+                      {buaSqFt.toLocaleString()} sq.ft
+                    </strong>
                   </span>
                 </div>
 
@@ -199,14 +217,15 @@ export const HeroSection: React.FC = () => {
                         key={f.count}
                         type="button"
                         onClick={() => handleSelectFloor(f.count)}
-                        className={`py-2.5 px-2 rounded-xl text-center transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B3D34] ${
+                        className={`min-h-[46px] py-2.5 px-2 rounded-xl text-center transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183B32] ${
                           isSelected
-                            ? 'bg-[#1B3D34] text-white shadow-xs border border-[#1B3D34]'
-                            : 'bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] hover:border-[#1B3D34]/40 hover:bg-[#F2F4F2]'
+                            ? 'bg-[#183B32] text-white shadow-xs border border-[#183B32]'
+                            : 'bg-[#F8F8F6] text-[#18211E] border border-[#E5E7EB] hover:border-[#183B32]/40 hover:bg-white'
                         }`}
                       >
                         <span className={`block text-xs sm:text-sm font-bold leading-tight ${isSelected ? 'text-white' : 'text-[#18211E]'}`}>
                           {f.label}
+                          {isSelected && <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#C66B4E] ml-1 align-middle" />}
                         </span>
                       </button>
                     );
@@ -219,10 +238,10 @@ export const HeroSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleStartEstimate('PREMIUM')}
-                  className="flex-1 bg-[#1B3D34] hover:bg-[#142E27] text-white font-bold text-sm py-3.5 px-6 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
+                  className="flex-1 bg-[#183B32] hover:bg-[#245747] text-white font-bold text-sm py-3.5 px-6 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
                 >
-                  <span>Start House Calculation</span>
-                  <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+                  <span>Plan My Home</span>
+                  <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
                 </button>
 
                 <button
@@ -235,54 +254,54 @@ export const HeroSection: React.FC = () => {
                       navigate('/how-it-works');
                     }
                   }}
-                  className="bg-white hover:bg-[#F8F9F7] text-[#18211E] border border-[#E5E7EB] font-semibold text-sm py-3.5 px-5 rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
+                  className="bg-white hover:bg-[#F8F8F6] text-[#183B32] border border-[#183B32]/40 font-semibold text-sm py-3.5 px-5 rounded-xl shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] min-h-[48px]"
                 >
-                  <span>How Hutty Works</span>
+                  <span>See How It Works</span>
                 </button>
               </div>
 
             </div>
 
-            {/* 4. Benefits below Calculator Panel */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1 text-left">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] shrink-0">
-                  <Calculator className="w-4 h-4 text-[#1B3D34]" />
+            {/* 4. Three Homeowner Trust Indicators Below Panel */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-left">
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs">
+                <div className="w-8 h-8 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/70 flex items-center justify-center text-[#183B32] shrink-0">
+                  <Calculator className="w-4 h-4 text-[#183B32]" />
                 </div>
                 <div className="min-w-0">
-                  <strong className="text-xs font-bold text-[#1B3D34] block leading-tight truncate">
-                    Accurate estimates
+                  <strong className="text-xs font-bold text-[#183B32] block leading-tight truncate">
+                    Free Instant Estimate
                   </strong>
-                  <span className="text-[11px] text-[#687770] block leading-tight mt-0.5 truncate">
-                    Based on real data
+                  <span className="text-[11px] text-[#66716B] block leading-tight mt-0.5 truncate">
+                    No signup or phone needed
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] shrink-0">
-                  <Layers className="w-4 h-4 text-[#1B3D34]" />
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs">
+                <div className="w-8 h-8 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/70 flex items-center justify-center text-[#183B32] shrink-0">
+                  <ShieldCheck className="w-4 h-4 text-[#347A62]" />
                 </div>
                 <div className="min-w-0">
-                  <strong className="text-xs font-bold text-[#1B3D34] block leading-tight truncate">
-                    Material quantities
+                  <strong className="text-xs font-bold text-[#183B32] block leading-tight truncate">
+                    Bangalore Building Rules
                   </strong>
-                  <span className="text-[11px] text-[#687770] block leading-tight mt-0.5 truncate">
-                    With brand options
+                  <span className="text-[11px] text-[#66716B] block leading-tight mt-0.5 truncate">
+                    Setbacks &amp; floors verified
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] shrink-0">
-                  <MessageSquare className="w-4 h-4 text-[#1B3D34]" />
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs">
+                <div className="w-8 h-8 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/70 flex items-center justify-center text-[#183B32] shrink-0">
+                  <FileCheck2 className="w-4 h-4 text-[#C66B4E]" />
                 </div>
                 <div className="min-w-0">
-                  <strong className="text-xs font-bold text-[#1B3D34] block leading-tight truncate">
-                    Expert guidance
+                  <strong className="text-xs font-bold text-[#183B32] block leading-tight truncate">
+                    Real Material Quantities
                   </strong>
-                  <span className="text-[11px] text-[#687770] block leading-tight mt-0.5 truncate">
-                    When you need it
+                  <span className="text-[11px] text-[#66716B] block leading-tight mt-0.5 truncate">
+                    Steel, cement &amp; blocks
                   </span>
                 </div>
               </div>
@@ -291,7 +310,7 @@ export const HeroSection: React.FC = () => {
           </motion.div>
 
           {/* ═════════════════════════════════════════════════════════════════ */}
-          {/* RIGHT COLUMN: Architectural Visualization & Metric Cards         */}
+          {/* RIGHT COLUMN: Architectural Visualization & Layered Overlay       */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           <motion.div
             style={{ scale: heroScale }}
@@ -301,19 +320,32 @@ export const HeroSection: React.FC = () => {
             className="lg:col-span-6 xl:col-span-6 relative w-full"
           >
             {/* Visualizer Framed Container */}
-            <div className="relative rounded-3xl overflow-hidden border border-[#DDE4DF] shadow-sm bg-[#112821] w-full h-[340px] sm:h-[390px] lg:h-[420px]">
+            <div className="relative rounded-3xl overflow-hidden border-2 border-[#CBD5CB] shadow-md bg-[#183B32] w-full h-[360px] sm:h-[400px] lg:h-[430px]">
               
               {/* View 1: Photorealistic Architectural Render (Default 2D Mode) */}
               {viewMode === '2D' && (
-                <div className="w-full h-full relative overflow-hidden bg-slate-900">
+                <div className="w-full h-full relative overflow-hidden bg-[#183B32]">
                   <img
                     src={heroHouseImg}
                     alt="Contemporary Bangalore Indian residential house G+2 duplex architecture"
                     className="w-full h-full object-cover transition-transform duration-500 ease-out"
                     style={{ transform: `scale(${zoomLevel})` }}
                   />
+                  {/* Subtle architectural blueprint grid overlay */}
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
+
+                  {/* Architectural Dimension Lines & Blueprint Annotations */}
+                  <div className="absolute bottom-3 left-4 right-4 pointer-events-none flex items-center justify-between text-[10px] text-white/80 font-mono tracking-wider bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-md border border-white/10">
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C66B4E]" />
+                      FRONTAGE: {PRESET_PLOTS[activePlotIdx].width}&apos;-0&quot;
+                    </span>
+                    <span>DEPTH: {PRESET_PLOTS[activePlotIdx].length}&apos;-0&quot;</span>
+                    <span>STRUCTURAL HEIGHT: {selectedFloorCount * 10 + 3}&apos;-6&quot;</span>
+                  </div>
+
                   {/* Subtle vignette gradient for readable text overlays */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/35 pointer-events-none" />
                 </div>
               )}
 
@@ -331,31 +363,49 @@ export const HeroSection: React.FC = () => {
               )}
 
               {/* Floating Top-Left Estimated Cost Card */}
-              <div className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-20 bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-lg border border-[#E5E7EB] text-left max-w-[165px] xs:max-w-[200px] sm:max-w-[220px]">
-                <span className="text-[10px] sm:text-[11px] font-semibold text-[#687770] block leading-tight">
-                  Estimated Construction Cost
-                </span>
-                <span className="text-lg sm:text-2xl font-black text-[#1B3D34] block font-heading tracking-tight mt-0.5 sm:mt-1 tabular-nums leading-none">
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-[#E5E7EB] text-left max-w-[170px] xs:max-w-[210px] sm:max-w-[230px]">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="w-2 h-2 rounded-full bg-[#C66B4E]" />
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-[#66716B] block leading-tight">
+                    Estimated Construction Cost
+                  </span>
+                </div>
+                <span className="text-lg sm:text-2xl font-black text-[#183B32] block font-heading tracking-tight mt-0.5 sm:mt-1 tabular-nums leading-none">
                   ₹ {formatNumber(totalCost)}
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-[#687770] block mt-0.5 sm:mt-1 font-medium leading-tight">
-                  ~ ₹ {ratePerSqFt.toLocaleString()} / sq.ft
+                <span className="text-[10px] sm:text-[11px] text-[#66716B] block mt-1 font-medium leading-tight">
+                  ~ ₹ {ratePerSqFt.toLocaleString()} / sq.ft &bull; {buaSqFt.toLocaleString()} sq.ft BUA
                 </span>
               </div>
 
               {/* Floating Top-Right Configuration Chips */}
-              <div className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5 sm:gap-2">
-                <span className="bg-white/95 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-[#1B3D34] shadow-sm border border-[#E5E7EB]">
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5 sm:gap-2">
+                <span className="bg-[#183B32]/90 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white shadow-sm border border-white/20">
                   {activeFloorOption.tag}
-                </span>
-                <span className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-[#1B3D34] shadow-sm border border-[#E5E7EB] hidden sm:inline-block">
-                  {buaSqFt.toLocaleString()} sq.ft built-up area
                 </span>
               </div>
 
+              {/* Floating Tactile Material Chips Overlaid on Render */}
+              {viewMode === '2D' && (
+                <div className="absolute bottom-12 left-3 sm:left-4 z-20 hidden xs:flex flex-wrap gap-2 max-w-[85%] pointer-events-none">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-medium bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C66B4E]" />
+                    Tata Tiscon Fe550D TMT
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-medium bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C5A46D]" />
+                    UltraTech 53G Cement
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-medium bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-xs hidden sm:inline-flex">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B7CDBB]" />
+                    Granite Slab &amp; Teak Joinery
+                  </span>
+                </div>
+              )}
+
               {/* Floating Vertical Control Rail (Right Edge) */}
               <div
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl shadow-md border border-[#E5E7EB] flex flex-col items-center gap-1.5"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl shadow-md border border-[#E5E7EB] flex flex-col items-center gap-1.5"
                 role="toolbar"
                 aria-label="Visualization Controls"
               >
@@ -364,8 +414,8 @@ export const HeroSection: React.FC = () => {
                   onClick={() => setViewMode('3D')}
                   className={`px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     viewMode === '3D'
-                      ? 'bg-[#1B3D34] text-white shadow-xs'
-                      : 'text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7]'
+                      ? 'bg-[#183B32] text-white shadow-xs'
+                      : 'text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6]'
                   }`}
                   title="Switch to interactive 3D model"
                 >
@@ -377,8 +427,8 @@ export const HeroSection: React.FC = () => {
                   onClick={() => setViewMode('2D')}
                   className={`px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     viewMode === '2D'
-                      ? 'bg-[#1B3D34] text-white shadow-xs'
-                      : 'text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7]'
+                      ? 'bg-[#183B32] text-white shadow-xs'
+                      : 'text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6]'
                   }`}
                   title="Switch to architectural photograph render"
                 >
@@ -390,7 +440,7 @@ export const HeroSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setViewMode(viewMode === '3D' ? '2D' : '3D')}
-                  className="p-1.5 rounded-lg text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7] transition-all cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6] transition-all cursor-pointer"
                   title="Toggle 3D View"
                 >
                   <Box className="w-3.5 h-3.5" />
@@ -399,7 +449,7 @@ export const HeroSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleZoom(1.15)}
-                  className="p-1.5 rounded-lg text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7] transition-all cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6] transition-all cursor-pointer"
                   title="Zoom In"
                 >
                   <ZoomIn className="w-3.5 h-3.5" />
@@ -408,7 +458,7 @@ export const HeroSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleZoom(0.85)}
-                  className="p-1.5 rounded-lg text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7] transition-all cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6] transition-all cursor-pointer"
                   title="Zoom Out"
                 >
                   <ZoomOut className="w-3.5 h-3.5" />
@@ -417,7 +467,7 @@ export const HeroSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="p-1.5 rounded-lg text-[#687770] hover:text-[#1B3D34] hover:bg-[#F8F9F7] transition-all cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#66716B] hover:text-[#183B32] hover:bg-[#F8F8F6] transition-all cursor-pointer"
                   title="Reset View"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
@@ -426,65 +476,65 @@ export const HeroSection: React.FC = () => {
 
             </div>
 
-            {/* Bottom 4 Metric Cards */}
+            {/* Bottom 4 Homeowner Metric Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 mt-3.5 text-left">
-              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E2E8E3] shadow-2xs">
-                <div className="w-7 h-7 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] mb-2">
-                  <Home className="w-4 h-4 text-[#1B3D34]" />
+              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E5E7EB] shadow-xs hover:border-[#183B32] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/80 flex items-center justify-center text-[#183B32] mb-2">
+                  <Home className="w-4 h-4 text-[#183B32]" />
                 </div>
-                <span className="text-[11px] font-semibold text-[#687770] block leading-tight">
-                  Built-up Area
+                <span className="text-[11px] font-semibold text-[#66716B] block leading-tight">
+                  Total Built-up Area
                 </span>
-                <span className="text-base sm:text-lg font-black text-[#1B3D34] block font-heading tabular-nums mt-0.5 leading-tight">
+                <span className="text-base sm:text-lg font-black text-[#183B32] block font-heading tabular-nums mt-0.5 leading-tight">
                   {buaSqFt.toLocaleString()} sq.ft
                 </span>
-                <span className="text-[11px] text-[#687770] block mt-0.5 leading-tight truncate">
+                <span className="text-[11px] text-[#66716B] block mt-0.5 leading-tight truncate">
                   {activeFloorOption.desc}
                 </span>
               </div>
 
-              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E2E8E3] shadow-2xs">
-                <div className="w-7 h-7 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] mb-2">
-                  <Layers className="w-4 h-4 text-[#1B3D34]" />
+              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E5E7EB] shadow-xs hover:border-[#183B32] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/80 flex items-center justify-center text-[#183B32] mb-2">
+                  <Layers className="w-4 h-4 text-[#C66B4E]" />
                 </div>
-                <span className="text-[11px] font-semibold text-[#687770] block leading-tight">
-                  Steel Required
+                <span className="text-[11px] font-semibold text-[#66716B] block leading-tight">
+                  Steel Needed
                 </span>
-                <span className="text-base sm:text-lg font-black text-[#1B3D34] block font-heading tabular-nums mt-0.5 leading-tight">
-                  {steelTonnes}T
+                <span className="text-base sm:text-lg font-black text-[#183B32] block font-heading tabular-nums mt-0.5 leading-tight">
+                  {steelTonnes} Tonnes
                 </span>
-                <span className="text-[11px] text-[#687770] block mt-0.5 leading-tight truncate">
-                  Fe550D TMT
+                <span className="text-[11px] text-[#66716B] block mt-0.5 leading-tight truncate">
+                  Columns, beams &amp; slabs
                 </span>
               </div>
 
-              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E2E8E3] shadow-2xs">
-                <div className="w-7 h-7 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] mb-2">
-                  <Package className="w-4 h-4 text-[#1B3D34]" />
+              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E5E7EB] shadow-xs hover:border-[#183B32] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/80 flex items-center justify-center text-[#183B32] mb-2">
+                  <Package className="w-4 h-4 text-[#347A62]" />
                 </div>
-                <span className="text-[11px] font-semibold text-[#687770] block leading-tight">
-                  Cement
+                <span className="text-[11px] font-semibold text-[#66716B] block leading-tight">
+                  Cement Needed
                 </span>
-                <span className="text-base sm:text-lg font-black text-[#1B3D34] block font-heading tabular-nums mt-0.5 leading-tight">
+                <span className="text-base sm:text-lg font-black text-[#183B32] block font-heading tabular-nums mt-0.5 leading-tight">
                   {cementBags.toLocaleString()} Bags
                 </span>
-                <span className="text-[11px] text-[#687770] block mt-0.5 leading-tight truncate">
-                  Grade 53
+                <span className="text-[11px] text-[#66716B] block mt-0.5 leading-tight truncate">
+                  Foundations &amp; masonry
                 </span>
               </div>
 
-              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E2E8E3] shadow-2xs">
-                <div className="w-7 h-7 rounded-lg bg-[#EBF3EF] border border-[#D5E5DC] flex items-center justify-center text-[#1B3D34] mb-2">
-                  <Settings className="w-4 h-4 text-[#1B3D34]" />
+              <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-[#E5E7EB] shadow-xs hover:border-[#183B32] transition-colors">
+                <div className="w-7 h-7 rounded-lg bg-[#E8EFE9] border border-[#B7CDBB]/80 flex items-center justify-center text-[#183B32] mb-2">
+                  <Settings className="w-4 h-4 text-[#C5A46D]" />
                 </div>
-                <span className="text-[11px] font-semibold text-[#687770] block leading-tight">
-                  Work Schedule
+                <span className="text-[11px] font-semibold text-[#66716B] block leading-tight">
+                  Building Stages
                 </span>
-                <span className="text-base sm:text-lg font-black text-[#1B3D34] block font-heading tabular-nums mt-0.5 leading-tight">
-                  13 Stages
+                <span className="text-base sm:text-lg font-black text-[#183B32] block font-heading tabular-nums mt-0.5 leading-tight">
+                  13 Milestones
                 </span>
-                <span className="text-[11px] text-[#687770] block mt-0.5 leading-tight truncate">
-                  Detailed cost report
+                <span className="text-[11px] text-[#66716B] block mt-0.5 leading-tight truncate">
+                  Turnkey plan
                 </span>
               </div>
             </div>
@@ -497,61 +547,61 @@ export const HeroSection: React.FC = () => {
       {/* ═════════════════════════════════════════════════════════════════ */}
       {/* FULL-WIDTH BOTTOM TRUST STRIP                                     */}
       {/* ═════════════════════════════════════════════════════════════════ */}
-      <div className="w-full bg-[#EFF5F1] border-y border-[#DCE5DF] py-5 px-4 sm:px-6 lg:px-8 mt-8 lg:mt-10">
+      <div className="w-full bg-[#EFF5F1] border-y border-[#DCE5DF] py-5 px-4 sm:px-6 lg:px-8 mt-10 lg:mt-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 text-left">
           
-          <div className="flex items-center gap-3.5 lg:border-r lg:border-[#D5E1D8] lg:pr-6">
-            <div className="w-9 h-9 rounded-xl bg-white/80 border border-[#D5E1D8] flex items-center justify-center text-[#1B3D34] shrink-0 shadow-2xs">
-              <Users className="w-4 h-4 text-[#1B3D34]" />
+          <div className="flex items-center gap-3.5 lg:border-r lg:border-[#DCE5DF] lg:pr-6">
+            <div className="w-9 h-9 rounded-xl bg-white border border-[#DCE5DF] flex items-center justify-center text-[#183B32] shrink-0 shadow-2xs">
+              <Users className="w-4 h-4 text-[#183B32]" />
             </div>
             <div className="min-w-0">
-              <strong className="text-xs sm:text-sm font-bold text-[#1B3D34] block leading-tight">
-                Built for clarity
+              <strong className="text-xs sm:text-sm font-bold text-[#183B32] block leading-tight">
+                Built for homeowners
               </strong>
-              <span className="text-xs text-[#52605B] block leading-tight mt-0.5">
-                Instant planning estimates
+              <span className="text-xs text-[#66716B] block leading-tight mt-0.5">
+                Instant preliminary estimates
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 lg:border-r lg:border-[#D5E1D8] lg:px-6">
-            <div className="w-9 h-9 rounded-xl bg-white/80 border border-[#D5E1D8] flex items-center justify-center text-[#1B3D34] shrink-0 shadow-2xs">
-              <ShieldCheck className="w-4 h-4 text-[#1B3D34]" />
+          <div className="flex items-center gap-3.5 lg:border-r lg:border-[#DCE5DF] lg:px-6">
+            <div className="w-9 h-9 rounded-xl bg-white border border-[#DCE5DF] flex items-center justify-center text-[#347A62] shrink-0 shadow-2xs">
+              <ShieldCheck className="w-4 h-4 text-[#347A62]" />
             </div>
             <div className="min-w-0">
-              <strong className="text-xs sm:text-sm font-bold text-[#1B3D34] block leading-tight">
-                Verified construction experts
+              <strong className="text-xs sm:text-sm font-bold text-[#183B32] block leading-tight">
+                Bangalore bye-law checks
               </strong>
-              <span className="text-xs text-[#52605B] block leading-tight mt-0.5">
-                Architects, engineers &amp; contractors
+              <span className="text-xs text-[#66716B] block leading-tight mt-0.5">
+                Permissible setbacks &amp; floor rules
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 lg:border-r lg:border-[#D5E1D8] lg:px-6">
-            <div className="w-9 h-9 rounded-xl bg-white/80 border border-[#D5E1D8] flex items-center justify-center text-[#1B3D34] shrink-0 shadow-2xs">
-              <IndianRupee className="w-4 h-4 text-[#1B3D34]" />
+          <div className="flex items-center gap-3.5 lg:border-r lg:border-[#DCE5DF] lg:px-6">
+            <div className="w-9 h-9 rounded-xl bg-white border border-[#DCE5DF] flex items-center justify-center text-[#C66B4E] shrink-0 shadow-2xs">
+              <IndianRupee className="w-4 h-4 text-[#C66B4E]" />
             </div>
             <div className="min-w-0">
-              <strong className="text-xs sm:text-sm font-bold text-[#1B3D34] block leading-tight">
-                Transparent and unbiased
+              <strong className="text-xs sm:text-sm font-bold text-[#183B32] block leading-tight">
+                Clear, unbiased advice
               </strong>
-              <span className="text-xs text-[#52605B] block leading-tight mt-0.5">
-                No hidden costs
+              <span className="text-xs text-[#66716B] block leading-tight mt-0.5">
+                Zero contractor commissions or kickbacks
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3.5 lg:pl-6">
-            <div className="w-9 h-9 rounded-xl bg-white/80 border border-[#D5E1D8] flex items-center justify-center text-[#1B3D34] shrink-0 shadow-2xs">
-              <FileText className="w-4 h-4 text-[#1B3D34]" />
+            <div className="w-9 h-9 rounded-xl bg-white border border-[#DCE5DF] flex items-center justify-center text-[#C5A46D] shrink-0 shadow-2xs">
+              <FileText className="w-4 h-4 text-[#C5A46D]" />
             </div>
             <div className="min-w-0">
-              <strong className="text-xs sm:text-sm font-bold text-[#1B3D34] block leading-tight">
-                Detailed reports
+              <strong className="text-xs sm:text-sm font-bold text-[#183B32] block leading-tight">
+                Detailed material lists
               </strong>
-              <span className="text-xs text-[#52605B] block leading-tight mt-0.5">
-                Download BOQ and material list
+              <span className="text-xs text-[#66716B] block leading-tight mt-0.5">
+                Download your bill of quantities (BOQ)
               </span>
             </div>
           </div>

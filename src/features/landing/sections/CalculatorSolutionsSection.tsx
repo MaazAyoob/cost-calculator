@@ -102,10 +102,10 @@ export const CalculatorSolutionsSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1B3D34] bg-[rgba(27,61,52,0.08)] border border-[#1B3D34]/20 px-3 py-1.5 rounded-full inline-block">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#183B32] bg-[rgba(27,61,52,0.08)] border border-[#183B32]/20 px-3 py-1.5 rounded-full inline-block">
             CONSTRUCTION PIPELINE
           </span>
-          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1B3D34] tracking-tight leading-[1.12]">
+          <h2 className="heading-xl text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#183B32] tracking-tight leading-[1.12]">
             From plot size to detailed cost report.
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed font-normal">
@@ -127,19 +127,19 @@ export const CalculatorSolutionsSection: React.FC = () => {
                   onClick={() => setActiveStage(idx)}
                   className={`hutty-tactile-card p-4 rounded-2xl border text-left cursor-pointer transition-all duration-200 flex flex-col justify-between ${
                     isActive
-                      ? 'bg-[rgba(27,61,52,0.08)] border-[#1B3D34] shadow-xs'
-                      : 'bg-[#F8F8F6] border-[#E5E7EB] hover:bg-white hover:border-[#1B3D34]/30'
+                      ? 'bg-[rgba(27,61,52,0.08)] border-[#183B32] shadow-xs'
+                      : 'bg-[#F8F8F6] border-[#E5E7EB] hover:bg-white hover:border-[#183B32]/30'
                   }`}
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className={`text-[10px] font-mono font-bold ${isActive ? 'text-[#1B3D34]' : 'text-[#4B5563]'}`}>
+                      <span className={`text-[10px] font-mono font-bold ${isActive ? 'text-[#183B32]' : 'text-[#4B5563]'}`}>
                         STAGE {stage.num}
                       </span>
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#1B3D34]' : 'text-[#4B5563]'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#183B32]' : 'text-[#4B5563]'}`} />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-[#1B3D34] tracking-tight font-heading">
+                      <h4 className="text-xs font-bold text-[#183B32] tracking-tight font-heading">
                         {stage.title}
                       </h4>
                       <p className="text-[11px] font-mono font-semibold text-[#4B5563] mt-0.5">
@@ -149,8 +149,8 @@ export const CalculatorSolutionsSection: React.FC = () => {
                   </div>
 
                   {isActive && (
-                    <div className="mt-3 pt-2 border-t border-[#1B3D34]/20 flex items-center gap-1.5 text-[10px] font-bold text-[#1B3D34]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28]" />
+                    <div className="mt-3 pt-2 border-t border-[#183B32]/20 flex items-center gap-1.5 text-[10px] font-bold text-[#183B32]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C66B4E]" />
                       <span>Active Stage</span>
                     </div>
                   )}
@@ -169,14 +169,14 @@ export const CalculatorSolutionsSection: React.FC = () => {
           >
             <div className="lg:col-span-6 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1B3D34] bg-white px-2.5 py-1 rounded-md border border-[#E5E7EB]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#183B32] bg-white px-2.5 py-1 rounded-md border border-[#E5E7EB]">
                   {pipelineStages[activeStage].visual.badge}
                 </span>
                 <span className="text-xs text-[#4B5563] font-mono">
                   STAGE {pipelineStages[activeStage].num} OF 05
                 </span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-[#183B32] font-heading tracking-tight">
                 {pipelineStages[activeStage].visual.headline}
               </h3>
               <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
@@ -190,7 +190,7 @@ export const CalculatorSolutionsSection: React.FC = () => {
                   <span className="text-[10px] font-bold text-[#4B5563] uppercase block">
                     {item.k}
                   </span>
-                  <span className="text-sm font-extrabold text-[#1B3D34] font-mono block">
+                  <span className="text-sm font-extrabold text-[#183B32] font-mono block">
                     {item.v}
                   </span>
                 </div>
@@ -207,10 +207,10 @@ export const CalculatorSolutionsSection: React.FC = () => {
               useWizardStore.getState().startNewProject();
               navigate('/calculator');
             }}
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1B3D34] hover:text-[#132C25] transition-colors cursor-pointer group"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#183B32] hover:text-[#132C25] transition-colors cursor-pointer group"
           >
             <span>Launch the full 10-step wizard</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-[#F28C28]" />
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-[#C66B4E]" />
           </button>
         </div>
 

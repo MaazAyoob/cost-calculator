@@ -1,0 +1,75 @@
+=== PAGE 1 ===
+Hutty · Build your home with clarity
+Page 1
+Hutty Calculator
+Developer UX/UI Brief · Mobile-first home construction planning experience
+Design principle: Simple for the homeowner. Intelligent behind the scenes. The calculator should feel like
+planning a future home—not filling out a technical construction form.
+Visual design reference
+The illustration is a visual direction reference. Example costs and report prices in the mockup are placeholders, not approved Hutty pricing or
+calculated estimates.
+1. Brand and visual direction
+• Primary green: #1B3D34; accent orange: #F28C28.
+• Use warm-white backgrounds, rounded cards, subtle borders and readable sans-serif typography.
+• Use visual choices for floors, rooms, construction types and finishes instead of technical dropdowns wherever possible.
+• Avoid crowded screens, excessive text, distracting animations and complex technical forms.
+2. Eight-stage calculator flow
+Stage
+What to collect / show
+1 · Your Plot
+City/location, plot dimensions or area, land status and planning authority. Include “Not sure”.
+2 · Your Home
+Floor count, purpose (family/rental/farmhouse), parking and intended start timeline.
+3 · Your Rooms
+Bedrooms, bathrooms, living/dining, kitchen/utility and optional spaces such as pooja room,
+balcony, study, store or terrace.
+4 · Your Buildable Space
+Setback knowledge, sanctioned plan/rough sketch, site conditions and demolition. Derive
+preliminary footprint and built-up area from relevant planning inputs.
+5 · Construction Style
+Structural system or “Not sure”, walling type, quality level and whether structural drawings are
+available.
+
+
+=== PAGE 2 ===
+Hutty · Build your home with clarity
+Page 2
+Stage
+What to collect / show
+6 · Finishes & Materials
+Flooring, doors/windows, electrical/plumbing, painting/elevation. Brand and model selection
+should be optional.
+7 · Your Estimate
+Preliminary cost range, estimated area, cost breakdown, material quantities where reliable,
+inclusions/exclusions and assumptions.
+8 · Detailed BOQ
+Preview work-wise BOQ, material quantities and rates, GST treatment, separate labour, fittings,
+assumptions and downloadable report.
+3. Interaction requirements
+• One primary question or decision per screen; show progress with meaningful stage names.
+• Update a simple house illustration when major design choices change.
+• Use conditional logic to avoid irrelevant questions and preserve answers when users go back.
+• Use subtle transitions around 180–300 ms; support reduced-motion preferences and keyboard navigation.
+• Make “Not sure” valid wherever possible; show clear errors and prevent accidental progress loss.
+• Do not require account creation before a useful preliminary estimate. Ask for sign-in when saving, purchasing or retrieving a
+report.
+4. Calculation and trust requirements
+• Keep the UI separate from the calculation engine. The UI collects homeowner-friendly inputs; the engine derives quantities,
+applies rates and records assumptions.
+• Never hardcode illustrative prices or quantities in production. Show actual outputs from the calculation engine.
+• Unknown planning or structural information must be visible as an assumption and reduce estimate certainty. Do not imply an
+estimate is a sanctioned design or engineer-approved structural calculation.
+• Separate material costs from labour. Show applicable GST transparently and state inclusions, exclusions and rate validity.
+5. Analytics and conversion funnel
+• Track landing visits, calculator starts, per-stage completion/abandonment, preliminary estimate views, detailed report previews,
+sign-ups, checkout starts, successful payments and report downloads.
+• Optimize first for successful completion of the preliminary estimate, then conversion to the detailed BOQ.
+6. Implementation order
+• Phase 1: Landing page, guest-first calculator and progress flow.
+• Phase 2: Calculation summary, transparent cost breakdown and editable selections.
+• Phase 3: Detailed BOQ preview, account creation, payment and report delivery.
+• Do not delay the core calculator redesign for advanced marketplace features.
+Acceptance criteria
+A first-time homeowner can enter plot details, configure a basic home and reach a preliminary estimate
+without creating an account or understanding technical construction terminology. The experience is
+responsive, reliable and connected to the real calculation engine.

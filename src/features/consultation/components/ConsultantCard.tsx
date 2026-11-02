@@ -51,7 +51,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
                 Sample Profile
               </span>
               {consultant.featured && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F28C28]/15 text-[#F28C28] flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#C66B4E]/15 text-[#C66B4E] flex items-center gap-1">
                   <Sparkles className="w-2.5 h-2.5" />
                   <span>Featured</span>
                 </span>
@@ -60,7 +60,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
 
             <h3
               onClick={handleCardClick}
-              className="text-base sm:text-lg font-bold text-[#1B3D34] mt-1 truncate hover:text-[#F28C28] transition-colors cursor-pointer font-heading"
+              className="text-base sm:text-lg font-bold text-[#1B3D34] mt-1 truncate hover:text-[#C66B4E] transition-colors cursor-pointer font-heading"
             >
               {consultant.name}
             </h3>
@@ -113,7 +113,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
         {/* Session Inclusions Strip */}
         <div className="pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-[11px] text-[#707873]">
           <span className="flex items-center gap-1 font-semibold text-[#1B3D34]">
-            <Clock className="w-3.5 h-3.5 text-[#F28C28]" /> 45-min session
+            <Clock className="w-3.5 h-3.5 text-[#C66B4E]" /> 45-min session
           </span>
           <span className="text-[#707873]">
             Includes review &amp; written advice
@@ -147,7 +147,7 @@ export const ConsultantCard: React.FC<ConsultantCardProps> = ({ consultant, onBo
             className="hutty-btn-primary px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs hover:shadow-md transition-all cursor-pointer"
           >
             <span>Book</span>
-            <ArrowRight className="w-3.5 h-3.5 text-[#F28C28]" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
           </button>
         </div>
       </div>

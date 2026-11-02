@@ -1,0 +1,138 @@
+=== PAGE 1 ===
+Hutty • Simple-language developer change request
+Page 1
+HUTTY • DEVELOPER HANDOVER
+Website Changes
+Simple words, clear pricing and an easier customer journey
+GOAL
+Make Hutty easy for any homeowner to understand—even if they know nothing
+about construction.
+1. Confirmed prices
+PRODUCT
+PRICE
+WHAT IT MEANS
+Calculator — Free
+I0
+Explore your house and see a basic estimate. Clearly show what is included for
+free.
+Calculator — Detailed BOQ
+I499
+Get a detailed report showing the work, materials and estimated costs for your
+house.
+Calculator — Premium
+I1,499
+Show exactly what extra the customer gets compared with the I499 plan.
+Confirm these extras before promising them.
+Consult an Expert
+I1,499
+A separate service to speak with a suitable professional. State the session
+length, what is covered and how it takes place.
+Pricing rules
+• The calculator has only three prices: Free, I499 and I1,499.
+• Consultation is a separate service priced at I1,499.
+• Remove the old I99 plan price from the website, checkout, payment setup and marketing materials.
+• Make it clear that the I1,499 calculator plan and I1,499 consultation are two different services.
+• Check that the website price matches the amount charged at checkout.
+2. Use simple words across the website
+CURRENT / TECHNICAL WORDS
+USE SIMPLE WORDS INSTEAD
+Built-Up Area (BUA)
+Total built-up area; explain it once in everyday language.
+Material takeoff
+Materials needed
+Structural steel physics
+Steel needed for the house
+Spatial matrix / spatial allocation
+Room layout
+Deterministic calculation
+How we calculate your estimate
+Trade labour / execution trades
+Labour and work costs
+Budget disbursement roadmap
+Payment plan
+Bank-ready BOQ dossier
+Detailed construction cost report
+Verified specification plan
+Save your choices
+Massing / geometry synthesis
+3D house view and plot layout
+Conflict-free guarantee
+Clear information to help you discuss the work with your contractor
+
+
+=== PAGE 2 ===
+Hutty • Simple-language developer change request
+Page 2
+3. Homepage wording
+Main heading
+Understand your home before you build.
+Supporting text
+Plan your house, see how much it may cost, understand the materials you may need, and get help from experts when you need
+it.
+Main buttons
+• Start Free Estimate
+• Consult an Expert — I1,499
+Avoid words that sound too technical or promise too much
+• Avoid “zero guesswork”, “calculated to the inch” or “verified quantities” unless the team can prove these claims.
+• Replace “bank-ready” with “A detailed report you can discuss with your bank or contractor.” Do not promise a bank will accept it.
+• Replace “Your contractor is oversmarting you?” with “Not sure about your contractor’s quote? Check the work and costs, or speak
+to an expert.”
+• Support the “25%–40% cost overruns” claim with a reliable source or remove it.
+4. Calculator and report
+• Explain what each plan includes and what the customer gets after paying.
+• Use clear labels: Materials, Labour, Other Costs, Total Estimated Cost and Payment Plan.
+• Explain that prices can change by location, material choice, design and site conditions.
+• Show when rates were last checked, or say they are estimates if they are not checked regularly.
+• Make sure the figures on the website and in the downloaded report match.
+Show this note near the estimate and in the PDF:
+This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings
+and material choices are checked.
+5. Consultation page
+Suggested heading
+Need help building your home? Talk to an expert.
+Supporting text
+Get help with your house plan, contractor quote, materials, structure or site questions. Not sure who you need? Tell us about
+your problem and Hutty will help you find the right person.
+Show four simple choices
+• Check my contractor’s quote
+• Find an architect or engineer
+• Get help with a problem at my site
+• I’m not sure — help me choose
+Booking steps
+• Ask the customer to describe their question, share their location and choose a suitable date and time.
+• Show the expert’s name, experience, price, session length and what the customer will receive.
+• After booking, show a confirmation and tell the customer what happens next.
+• If no expert is available, let the customer send a request and tell them when Hutty will respond.
+
+
+=== PAGE 3 ===
+Hutty • Simple-language developer change request
+Page 3
+• Only show expert profiles, qualifications, reviews and available times that are real and checked.
+
+
+=== PAGE 4 ===
+Hutty • Simple-language developer change request
+Page 4
+6. Important checks before launch
+• I All prices are correct: Calculator Free / I499 / I1,499; Consultation I1,499.
+• I Old I99 price is removed everywhere.
+• I The three calculator plans clearly explain what the customer gets.
+• I The I1,499 calculator plan and I1,499 consultation look like separate services.
+• I The same project shows the same total on the website and in the PDF.
+• I Material quantities and costs have been checked by a construction professional.
+• I The estimate note is visible before and after downloading the report.
+• I The calculator and report work on mobile phones.
+• I Every consultation request reaches the Hutty team and gets a response.
+• I Every expert shown is real, and their details have been checked.
+• I Payment success, payment failure and booking confirmation have been tested.
+• I Contact details, privacy information and cancellation/refund terms are easy to find.
+7. Developer instructions
+• Keep the current design where it works. Make the changes above instead of rebuilding the whole website.
+• Use everyday words that a first-time homeowner can understand. If a technical term is needed, explain it briefly.
+• Fix pricing and calculation problems before adding new features.
+• Test the full journey on desktop and mobile, then share the updated website link and a list of anything still pending.
+DONE WHEN
+A homeowner can understand the website, create an estimate, understand the
+report and either book an expert or ask Hutty for help—without needing
+construction knowledge.

@@ -12,6 +12,7 @@ import {
   createConsultant,
   updateConsultant,
   setConsultantStatus,
+  deleteConsultant,
   getAdminConsultations,
   getAdminConsultationById,
   assignConsultant,
@@ -101,6 +102,7 @@ consultationAdminRouter.post('/consultants', createConsultant as any);
 consultationAdminRouter.put('/consultants/:id', updateConsultant as any);
 consultationAdminRouter.patch('/consultants/:id', updateConsultant as any);
 consultationAdminRouter.patch('/consultants/:id/status', setConsultantStatus as any);
+consultationAdminRouter.delete('/consultants/:id', deleteConsultant as any);
 
 // Consultation Request Management
 consultationAdminRouter.get('/consultations', getAdminConsultations as any);

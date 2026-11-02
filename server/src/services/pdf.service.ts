@@ -38,7 +38,7 @@ export function generatePDFHTML(projectData: any): string {
       <div style="font-size: 12px; color: #64748b;">Home Construction Planning & Engineering Platform</div>
     </div>
     <div style="text-align: right;">
-      <span class="badge">BANK LOAN APPROVED SPECIFICATION</span>
+      <span class="badge">DETAILED CONSTRUCTION ESTIMATE & BOQ</span>
       <div style="font-size: 11px; color: #64748b; margin-top: 6px;">Generated: ${new Date().toLocaleDateString('en-IN')}</div>
     </div>
   </div>
@@ -93,7 +93,7 @@ export function generatePDFHTML(projectData: any): string {
 
   <div class="footer">
     <span>Cost Calculator Deterministic Engineering Engine v1.0</span>
-    <span>Certified IS 456 & NBC 2016 Compliant</span>
+    <span>Aligned with IS 456 & NBC 2016 Engineering Standards</span>
   </div>
 </body>
 </html>

@@ -294,36 +294,31 @@ interface AdminStoreState {
 const getStoredToken = (): string | null => {
   try {
     const t = localStorage.getItem('hutty_admin_token');
-    if (t) {
-      // Decode JWT payload to check if already expired
-      if (t.includes('.')) {
-        try {
-          const parts = t.split('.');
-          if (parts.length === 3) {
-            const rawPayload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
-            const payload = JSON.parse(rawPayload);
-            if (payload && typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now()) {
-              console.warn('[useAdminStore] Stored admin JWT has expired. Automatically evicting session.');
-              try { localStorage.removeItem('hutty_admin_token'); } catch {}
-              return import.meta.env.DEV ? 'dev-admin-mock-token-2026' : null;
-            }
-          }
-        } catch {
-          if (!import.meta.env.DEV) {
+    if (!t) return null;
+
+    // Decode JWT payload to check if already expired
+    if (t.includes('.')) {
+      try {
+        const parts = t.split('.');
+        if (parts.length === 3) {
+          const rawPayload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+          const payload = JSON.parse(rawPayload);
+          if (payload && typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now()) {
+            console.warn('[useAdminStore] Stored admin JWT has expired. Automatically evicting session.');
             try { localStorage.removeItem('hutty_admin_token'); } catch {}
             return null;
           }
         }
+      } catch {
+        if (!import.meta.env.DEV) {
+          try { localStorage.removeItem('hutty_admin_token'); } catch {}
+          return null;
+        }
       }
-      return t;
     }
-    // Allow dev preview token strictly in Vite dev server (import.meta.env.DEV)
-    if (import.meta.env.DEV) {
-      return 'dev-admin-mock-token-2026';
-    }
-    return null;
+    return t;
   } catch {
-    return import.meta.env.DEV ? 'dev-admin-mock-token-2026' : null;
+    return null;
   }
 };
 

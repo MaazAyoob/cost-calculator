@@ -18,7 +18,7 @@ export function calculateWindows(input: EngineInput): {
   grillAreaSqFt: number;
   windowSchedule: WindowScheduleItem[];
 } {
-  const { rooms, floors, windows, materialBrands } = input;
+  const { floors, windows, materialBrands } = input;
   const isZero = (!floors || floors <= 0) && (!input.plotLength || input.plotLength <= 0);
 
   if (isZero) {
@@ -29,6 +29,22 @@ export function calculateWindows(input: EngineInput): {
       windowSchedule: [],
     };
   }
+
+  const rawRooms = input.rooms || {};
+  const floorsCount = Math.max(1, floors || 1);
+  const rooms = {
+    living: rawRooms.living ?? 1,
+    dining: rawRooms.dining ?? 1,
+    kitchen: rawRooms.kitchen ?? 1,
+    bedrooms: rawRooms.bedrooms ?? floorsCount,
+    bathrooms: rawRooms.bathrooms ?? floorsCount,
+    commonToilets: rawRooms.commonToilets ?? 0,
+    balcony: rawRooms.balcony ?? (floorsCount > 1 ? floorsCount - 1 : 0),
+    utility: rawRooms.utility ?? 1,
+    pooja: rawRooms.pooja ?? 1,
+    office: rawRooms.office ?? 0,
+    storeRoom: rawRooms.storeRoom ?? 0,
+  };
 
   // 1. Calculate room-driven windows
   const bedCount = rooms.bedrooms || 0;

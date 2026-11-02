@@ -38,14 +38,14 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
           >
             {/* Tagline */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(27,61,52,0.08)] border border-[rgba(27,61,52,0.12)] text-[#1B3D34] text-xs font-bold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-[#F28C28] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#C66B4E] animate-pulse" />
               <span>Residential Construction Advisory &bull; Bangalore</span>
             </div>
 
             {/* Exact Headline from Developer Brief */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1B3D34] tracking-tight leading-[1.12] font-heading">
               Build with confidence.{' '}
-              <span className="text-[#F28C28]">Talk to the right expert.</span>
+              <span className="text-[#C66B4E]">Talk to the right expert.</span>
             </h1>
 
             {/* Exact Supporting Copy from Developer Brief */}
@@ -60,7 +60,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
                 <span>Verified professionals.</span>
               </div>
               <div className="flex items-center gap-2">
-                <Video className="w-4 h-4 text-[#F28C28] shrink-0" />
+                <Video className="w-4 h-4 text-[#C66B4E] shrink-0" />
                 <span>Online consultations.</span>
               </div>
               <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export const ConsultationHero: React.FC<ConsultationHeroProps> = ({
                 className="hutty-btn-primary px-6 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2.5 shadow-sm active:scale-[0.98] cursor-pointer"
               >
                 <span>Find an Expert</span>
-                <ArrowRight className="w-4 h-4 text-[#F28C28]" />
+                <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
               </button>
 
               <button
