@@ -228,7 +228,7 @@ describe('Project Persistence, Report Checkout & Save Lifecycle Robustness', () 
     expect(gatewayOrder?.amountINR).toBe(99);
   });
 
-  it('4b. Detailed BOQ (₹499 / 49900 paise) checkout creates order with authoritative price', async () => {
+  it('4b. Detailed BOQ (₹199 / 19900 paise) checkout creates order with authoritative price', async () => {
     const project = await projectService.createProject({
       name: 'Koramangala G+2',
       leadName: 'Ananya Reddy',
@@ -245,12 +245,12 @@ describe('Project Persistence, Report Checkout & Save Lifecycle Robustness', () 
       testBypassPayment: false,
     });
 
-    expect(purchase.amountMinorUnits).toBe(49900); // Server-enforced ₹499
+    expect(purchase.amountMinorUnits).toBe(19900); // Server-enforced ₹199
     expect(purchase.status).toBe('PENDING');
     expect(purchase.projectId).toBe(project.id);
     expect(requiresPayment).toBe(true);
-    expect(gatewayOrder?.amountMinorUnits).toBe(49900);
-    expect(gatewayOrder?.amountINR).toBe(499);
+    expect(gatewayOrder?.amountMinorUnits).toBe(19900);
+    expect(gatewayOrder?.amountINR).toBe(199);
   });
 
   it('4c. Premium Report (₹1,499 / 149900 paise) checkout creates order with authoritative price', async () => {

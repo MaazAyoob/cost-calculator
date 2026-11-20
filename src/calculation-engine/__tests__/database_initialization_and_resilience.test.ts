@@ -97,7 +97,7 @@ describe('Production Database Initialization & Resilience Suite', () => {
 
       const detailedTier = INITIAL_PRICING_TIERS.find((t) => t.code === PRICING_TIER_CODES.DETAILED_ESTIMATE_499);
       expect(detailedTier).toBeDefined();
-      expect(detailedTier?.priceMinorUnits).toBe(49900); // ₹499.00
+      expect(detailedTier?.priceMinorUnits).toBe(19900); // ₹199.00
       expect(detailedTier?.purchasable).toBe(true);
 
       const premiumTier = INITIAL_PRICING_TIERS.find((t) => t.code === PRICING_TIER_CODES.PREMIUM_1499);

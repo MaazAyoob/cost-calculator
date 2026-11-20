@@ -31,7 +31,7 @@ export const ReportPage: React.FC = () => {
   const isUnlocked = hasDetailedReportAccess(projectId);
   const isBasicPdfUnlocked = hasBasicPdfAccess(projectId);
   const currentTier = getProjectTier(projectId);
-  const isPremiumUnlocked = canAccessFeature('PREMIUM_COMPARISON', projectId) || currentTier === 'PREMIUM_1499';
+  const isPremiumUnlocked = isUnlocked || canAccessFeature('PREMIUM_COMPARISON', projectId) || currentTier === 'PREMIUM_1499';
   const devTestingActive = isDevPdfTestingEnabled();
 
   const totalCost = budget.totalProjectCost || budget.directConstructionBudget || 0;
@@ -301,7 +301,7 @@ export const ReportPage: React.FC = () => {
                   className="hutty-btn-primary px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                  <span>Unlock Detailed Report — ₹499</span>
+                  <span>Unlock Complete Report — ₹199</span>
                 </button>
               </div>
             )}
@@ -316,9 +316,9 @@ export const ReportPage: React.FC = () => {
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-[#1B3D34]">Your detailed report is ready.</h3>
+                <h3 className="text-xs font-bold text-[#1B3D34]">Your Complete Construction Report is Ready</h3>
                 <p className="text-[11px] text-[#707873]">
-                  All construction works, materials needed, and stage-by-stage cost schedules are fully unlocked.
+                  All construction works, bill of quantities, material takeoff, specifications, and stage-by-stage payment schedules are fully unlocked.
                 </p>
               </div>
             </div>
@@ -328,7 +328,7 @@ export const ReportPage: React.FC = () => {
               className="hutty-btn-primary px-4 py-2 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-[#F28C28]" />
-              <span>Download Detailed PDF</span>
+              <span>Download Complete Report (PDF)</span>
             </button>
           </div>
         )}
@@ -346,7 +346,7 @@ export const ReportPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-[#707873] leading-relaxed max-w-2xl">
-                Your full house configuration, estimated built-up area, and preliminary cost breakdown are visible below. Unlock the complete contractor-grade Detailed BOQ report for ₹499 to get work-wise quantities, material schedules, and downloadable PDF.
+                Your full house configuration, estimated built-up area, and preliminary cost breakdown are visible below. Unlock the Complete Construction Planning &amp; Estimation Report for ₹199 to get work-wise quantities, material schedules, and downloadable PDF.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -356,7 +356,7 @@ export const ReportPage: React.FC = () => {
                 className="hutty-btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Lock className="w-3.5 h-3.5 text-[#F28C28]" />
-                <span>Unlock Detailed Report — ₹499</span>
+                <span>Unlock Complete Report — ₹199</span>
               </button>
             </div>
           </div>
@@ -828,7 +828,7 @@ export const ReportPage: React.FC = () => {
             <div className="p-8 bg-[#F8F8F6] rounded-2xl border-2 border-dashed border-[#1B3D34]/30 space-y-6 text-center">
               <div className="space-y-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#F28C28] bg-white px-3 py-1 rounded-md border border-[#E5E7EB] inline-block">
-                  DETAILED DELIVERABLES &bull; ₹499
+                  COMPLETE REPORT DELIVERABLES &bull; ₹199
                 </span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading">
                   Want to see the complete contractor-grade bill of quantities?
@@ -880,7 +880,7 @@ export const ReportPage: React.FC = () => {
                   className="hutty-btn-primary px-8 py-3.5 rounded-xl text-xs sm:text-sm font-bold shadow-xs cursor-pointer inline-flex items-center gap-2"
                 >
                   <Lock className="w-4 h-4 text-[#F28C28]" />
-                  <span>Unlock Detailed Report — ₹499</span>
+                  <span>Unlock Complete Report — ₹199</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
@@ -921,14 +921,14 @@ export const ReportPage: React.FC = () => {
             </div>
           )}
 
-          {/* ── SECTION 05, 06, 07: PREMIUM DELIVERABLES (₹1,499) ── */}
-          {isPremiumUnlocked ? (
+          {/* ── SECTION 05, 06, 07: COMPLETE REPORT DELIVERABLES ── */}
+          {isUnlocked && (
             <div className="space-y-8 pt-4 border-t-2 border-[#1B3D34]">
-              {/* Premium Plan Unlocked Header */}
+              {/* Complete Report Unlocked Header */}
               <div className="flex items-center justify-between pb-2 border-b border-[#E5E7EB]">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-black text-white bg-[#1B3D34] px-2.5 py-1 rounded">
-                    PREMIUM TIER DELIVERABLES
+                    COMPLETE REPORT DELIVERABLES
                   </span>
                   <span className="text-xs font-bold text-[#1B3D34]">
                     Contractor Quote Audit, Finish Sensitivity &amp; Multi-Scenario Comparison
@@ -1192,62 +1192,6 @@ export const ReportPage: React.FC = () => {
                 </div>
               </section>
             </div>
-          ) : (
-            /* Premium Teaser / Upgrade Card (shown for Free or Detailed BOQ users) */
-            <section className="p-6 bg-gradient-to-br from-[rgba(27,61,52,0.04)] to-[rgba(242,140,40,0.04)] border-2 border-dashed border-[#1B3D34]/20 rounded-3xl space-y-4 text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#1B3D34] text-white">
-                      CALCULATOR — PREMIUM DELIVERABLES
-                    </span>
-                    <span className="text-xs font-mono font-black text-[#1B3D34]">₹1,499</span>
-                  </div>
-                  <h3 className="text-base font-bold text-[#1B3D34]">
-                    Contractor Quote Audit, Finish Sensitivity &amp; Multi-Scenario Comparison
-                  </h3>
-                  <p className="text-xs text-[#707873]">
-                    Upgrade your calculator package to unlock benchmark rate vetting, high-risk contractor redlines, and 1-floor vs multi-floor plot scenarios.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUnlockModalTier('PREMIUM_1499');
-                    setShowUnlockModal(true);
-                  }}
-                  className="hutty-btn-primary px-5 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Sparkles className="w-4 h-4 text-[#F28C28]" />
-                  <span>Upgrade to Premium — ₹1,499</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-                <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
-                  <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5 text-[#F28C28]" />
-                    Contractor Quote Audit
-                  </span>
-                  <p className="text-[10px] text-[#707873]">Bangalore market tolerance benchmarks for steel, cement, masonry, and civil labour.</p>
-                </div>
-                <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
-                  <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5 text-[#F28C28]" />
-                    Finish Sensitivity Matrix
-                  </span>
-                  <p className="text-[10px] text-[#707873]">Live INR cost delta across Standard, Premium, and Luxury brand specifications.</p>
-                </div>
-                <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1">
-                  <span className="font-bold text-[#1B3D34] flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5 text-[#F28C28]" />
-                    Multi-Scenario Comparison
-                  </span>
-                  <p className="text-[10px] text-[#707873]">Side-by-side plot area and budget comparison for single floor vs multi-floor variants.</p>
-                </div>
-              </div>
-            </section>
           )}
 
           {/* 7. Preliminary Estimate Disclaimers & Engineering Notice */}

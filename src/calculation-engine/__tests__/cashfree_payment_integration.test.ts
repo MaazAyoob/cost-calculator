@@ -93,7 +93,7 @@ describe('Hutty Cashfree Payment Gateway Integration Suite', () => {
     expect(gatewayOrder!.environment).toBe('TEST');
   });
 
-  it('4. Server authoritatively creates Cashfree order for Detailed BOQ (₹499 / 49900 paise)', async () => {
+  it('4. Server authoritatively creates Cashfree order for Detailed BOQ (₹199 / 19900 paise)', async () => {
     const { purchase, requiresPayment, gatewayOrder } = await pricingService.initiatePurchase({
       tierCode: PRICING_TIER_CODES.DETAILED_ESTIMATE_499,
       leadName: 'Ananya Deshmukh',
@@ -104,9 +104,9 @@ describe('Hutty Cashfree Payment Gateway Integration Suite', () => {
     });
 
     expect(requiresPayment).toBe(true);
-    expect(purchase.amountMinorUnits).toBe(49900); // Authoritative ₹499
+    expect(purchase.amountMinorUnits).toBe(19900); // Authoritative ₹199
     expect(purchase.gateway).toBe('CASHFREE');
-    expect(gatewayOrder!.amountINR).toBe(499);
+    expect(gatewayOrder!.amountINR).toBe(199);
   });
 
   it('5. Server authoritatively creates Cashfree order for Expert Consultation (₹1,499)', async () => {

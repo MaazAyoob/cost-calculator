@@ -54,23 +54,15 @@ export const WebsiteFooter: React.FC = () => {
                     onClick={handleStartEstimate}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    1. Instant Estimate (Free) <ArrowUpRight className="w-3 h-3 text-[#C66B4E]" />
+                    1. Home Planning &amp; Estimate (Free) <ArrowUpRight className="w-3 h-3 text-[#C66B4E]" />
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => navigate('/report')}
+                    onClick={() => navigate('/calculator?stage=5')}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    2. Detailed Estimate &amp; BOQ (₹499)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate('/pricing')}
-                    className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
-                  >
-                    3. Calculator — Premium (₹1,499)
+                    2. Complete Construction Report (₹199)
                   </button>
                 </li>
                 <li>
@@ -78,7 +70,7 @@ export const WebsiteFooter: React.FC = () => {
                     onClick={() => navigate('/consult')}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
                   >
-                    4. Expert Consultation (₹1,499)
+                    3. Expert Consultation (₹1,499)
                   </button>
                 </li>
               </ul>
@@ -95,8 +87,19 @@ export const WebsiteFooter: React.FC = () => {
                     onClick={handleStartEstimate}
                     className="hover:text-white transition-colors cursor-pointer text-left"
                   >
-                    Calculate Cost
+                    Plan My Home
                   </button>
+                </li>
+                <li>
+                  <a
+                    href="/Hutty-Sample-Construction-Report.pdf"
+                    download="Hutty-Sample-Construction-Report.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors cursor-pointer text-left block"
+                  >
+                    Sample Report (Free PDF)
+                  </a>
                 </li>
                 <li>
                   <button

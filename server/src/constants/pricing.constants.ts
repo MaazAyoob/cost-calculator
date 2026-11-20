@@ -8,7 +8,8 @@
 export const PRICING_TIER_CODES = {
   FREE: 'FREE',
   BASIC_ESTIMATE_PDF: 'BASIC_ESTIMATE_PDF',
-  DETAILED_ESTIMATE_499: 'DETAILED_ESTIMATE_499',
+  DETAILED_ESTIMATE_499: 'DETAILED_ESTIMATE_499', // Canonical paid report code (retained for database/entitlement schema compatibility, priced at ₹199)
+  COMPLETE_REPORT_199: 'COMPLETE_REPORT_199',     // Modern canonical code alias
   PREMIUM_1499: 'PREMIUM_1499',
   ESTIMATE_99: 'ESTIMATE_99', // Historical legacy code alias
   COMPLETE_PACKAGE: 'COMPLETE_PACKAGE',
@@ -18,10 +19,11 @@ export type PricingTierCode = typeof PRICING_TIER_CODES[keyof typeof PRICING_TIE
 
 export const PRICING_MINOR_UNITS = {
   FREE: 0,                         // ₹0 Free
-  BASIC_ESTIMATE_PDF: 9900,        // ₹99.00 Basic Estimate PDF
-  DETAILED_ESTIMATE_499: 49900,    // ₹499.00 Detailed BOQ Report
-  PREMIUM_1499: 149900,            // ₹1,499.00 Premium Calculator Package
-  ESTIMATE_99: 9900,               // ₹99.00 alias for Basic Estimate PDF
+  BASIC_ESTIMATE_PDF: 9900,        // ₹99.00 Basic Estimate PDF (Historical)
+  DETAILED_ESTIMATE_499: 19900,    // ₹199.00 Complete Construction Planning & Estimation Report (19,900 paise)
+  COMPLETE_REPORT_199: 19900,      // ₹199.00 Complete Construction Planning & Estimation Report (19,900 paise)
+  PREMIUM_1499: 149900,            // ₹1,499.00 Historical Package (Consultation is decoupled at ₹1,499)
+  ESTIMATE_99: 9900,               // ₹99.00 alias for Basic Estimate PDF (Historical)
   COMPLETE_PACKAGE: 0,
 } as const;
 
@@ -81,8 +83,8 @@ export const INITIAL_PRICING_TIERS: InitialPricingTierSeed[] = [
   },
   {
     code: PRICING_TIER_CODES.BASIC_ESTIMATE_PDF,
-    name: 'Basic Estimate PDF',
-    description: 'Concise summary of your current estimate in downloadable PDF format.',
+    name: 'Basic Estimate PDF (Historical)',
+    description: 'Historical summary tier. Superseded by the Complete Construction Planning & Estimation Report.',
     priceMinorUnits: PRICING_MINOR_UNITS.BASIC_ESTIMATE_PDF,
     currency: PRICING_CURRENCY,
     active: true,
@@ -97,8 +99,8 @@ export const INITIAL_PRICING_TIERS: InitialPricingTierSeed[] = [
   },
   {
     code: PRICING_TIER_CODES.DETAILED_ESTIMATE_499,
-    name: 'Calculator — Detailed BOQ',
-    description: 'Get a detailed report showing the work, materials, and estimated costs for your house, with downloadable PDF.',
+    name: 'Complete Construction Planning & Estimation Report',
+    description: 'Comprehensive construction planning dossier including site setback analysis, detailed works BOQ, physical material takeoff, milestone payment schedule, and contractor quotation audit with downloadable PDF.',
     priceMinorUnits: PRICING_MINOR_UNITS.DETAILED_ESTIMATE_499,
     currency: PRICING_CURRENCY,
     active: true,
@@ -123,9 +125,38 @@ export const INITIAL_PRICING_TIERS: InitialPricingTierSeed[] = [
     ],
   },
   {
+    code: PRICING_TIER_CODES.COMPLETE_REPORT_199,
+    name: 'Complete Construction Planning & Estimation Report',
+    description: 'Comprehensive construction planning dossier including site setback analysis, detailed works BOQ, physical material takeoff, milestone payment schedule, and contractor quotation audit with downloadable PDF.',
+    priceMinorUnits: PRICING_MINOR_UNITS.COMPLETE_REPORT_199,
+    currency: PRICING_CURRENCY,
+    active: true,
+    purchasable: true,
+    sortOrder: 3,
+    badge: 'Popular',
+    features: [
+      PRICING_FEATURES.BASIC_PROJECT_SUMMARY,
+      PRICING_FEATURES.BASIC_COST_SUMMARY,
+      PRICING_FEATURES.BASIC_PDF_DOWNLOAD,
+      PRICING_FEATURES.LEAD_CAPTURE,
+      PRICING_FEATURES.SAVED_PROJECT,
+      PRICING_FEATURES.ADVANCED_PROJECT_DETAILS,
+      PRICING_FEATURES.DETAILED_QUANTITIES,
+      PRICING_FEATURES.DETAILED_BOQ,
+      PRICING_FEATURES.MATERIAL_SCHEDULE,
+      PRICING_FEATURES.FIXTURES_SCHEDULE,
+      PRICING_FEATURES.LABOUR_BREAKDOWN,
+      PRICING_FEATURES.DETAILED_COST_BREAKDOWN,
+      PRICING_FEATURES.FULL_PDF_REPORT,
+      PRICING_FEATURES.REPORT_DOWNLOAD,
+      PRICING_FEATURES.PREMIUM_COMPARISON,
+      PRICING_FEATURES.PREMIUM_SPEC_CUSTOMIZATION,
+    ],
+  },
+  {
     code: PRICING_TIER_CODES.PREMIUM_1499,
-    name: 'Calculator — Premium',
-    description: 'An upgraded calculator package with multi-scenario comparison, premium specifications, and full export suite. (Note: Consultation with an expert is a separate service).',
+    name: 'Calculator — Premium (Historical)',
+    description: 'Historical package preserved for backward compatibility. (Note: Consultation with an expert is a separate service at ₹1,499).',
     priceMinorUnits: PRICING_MINOR_UNITS.PREMIUM_1499,
     currency: PRICING_CURRENCY,
     active: true,

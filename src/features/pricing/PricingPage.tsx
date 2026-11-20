@@ -1,6 +1,6 @@
 // ==============================================================================
-// Hutty Customer Pricing Page (Pricing Model V1)
-// Tiers: FREE (₹0), Detailed BOQ (₹499), Premium BOQ (₹1,499).
+// Hutty Customer Pricing Page (Pricing Model V2 — Report-First)
+// Commercial Model: Free Estimate (₹0), Complete Report (₹199 one-time).
 // Consultation (₹1,499) is strictly decoupled and displayed as a separate service.
 // Architectural, trustworthy, mobile-responsive, and brand-aligned design.
 // ==============================================================================
@@ -61,7 +61,7 @@ export const PricingPage: React.FC = () => {
     <div className="min-h-screen bg-[#F8F8F6] text-[#183B32] select-none py-10 sm:py-16">
       <SEO
         title="Plans & Pricing | Hutty Residential Construction"
-        description="Transparent pricing for residential construction planning: Free estimate, ₹499 detailed BOQ report, and ₹1,499 premium package. Expert consultation available at ₹1,499."
+        description="Transparent pricing for residential construction planning: Free on-screen estimate and ₹199 Complete Construction Planning & Estimation Report. Expert consultation available at ₹1,499."
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
@@ -74,11 +74,11 @@ export const PricingPage: React.FC = () => {
           </div>
 
           <h1 className="heading-xl text-4xl sm:text-5xl lg:text-6xl font-black text-[#183B32] font-heading tracking-tight leading-[1.08]">
-            Choose how much clarity you need.
+            Simple, honest pricing.
           </h1>
 
           <p className="body-lg text-[#66716B] leading-relaxed max-w-2xl mx-auto">
-            Explore your house plan for free, unlock a detailed construction cost report, or choose our premium planning package. Need personalized advice? Book an independent expert.
+            Plan your home and explore cost ranges for free. Unlock the complete contractor-grade construction planning report for ₹199. Independent expert consultation is available separately.
           </p>
 
           {purchases.length > 0 && (
@@ -95,54 +95,54 @@ export const PricingPage: React.FC = () => {
           )}
         </div>
 
-        {/* ── 3 CONFIRMED CALCULATOR TIERS ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch text-left">
+        {/* ── 2 CORE TIERS: FREE & ₹199 COMPLETE REPORT ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-5xl mx-auto text-left">
           
-          {/* TIER 01: CALCULATOR — FREE */}
-          <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#183B32] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+          {/* TIER 01: FREE ESTIMATE (₹0) */}
+          <div className="p-6 sm:p-8 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#183B32] transition-all flex flex-col justify-between space-y-6 tactile-card arch-bracketed shadow-2xs">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#66716B]">
-                  CALCULATOR PLAN
+                  ON-SCREEN ESTIMATE
                 </span>
                 <span className="font-mono text-xs font-bold text-[#183B32] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
                   ₹0 FREE
                 </span>
               </div>
 
-              <div className="space-y-1">
-                <h2 className="text-xl sm:text-2xl font-black text-[#183B32] font-heading">
-                  Calculator — Free
+              <div className="space-y-1.5">
+                <h2 className="text-2xl sm:text-3xl font-black text-[#183B32] font-heading">
+                  Free Construction Estimate
                 </h2>
-                <p className="text-xs text-[#66716B] leading-relaxed">
-                  Explore your house plan and see a basic estimate. Understand your plot and built-up area.
+                <p className="text-xs sm:text-sm text-[#66716B] leading-relaxed">
+                  Configure your plot and house requirements with our 5-step guided planner. Instant on-screen cost ranges and area analysis.
                 </p>
               </div>
 
-              <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
+              <div className="pt-3 pb-2 border-y border-[#E5E7EB]">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#183B32] font-heading">₹0</span>
+                  <span className="text-4xl font-black text-[#183B32] font-heading">₹0</span>
                   <span className="text-xs text-[#66716B]">/ forever</span>
                 </div>
                 <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">No credit card or login required</span>
               </div>
 
-              <div className="space-y-2 text-xs text-[#183B32]">
+              <div className="space-y-2.5 text-xs sm:text-sm text-[#183B32]">
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span>Interactive 8-stage room &amp; material choices</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span>5-step guided architectural configuration</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span>Total built-up area (BUA) and footprint estimate</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span>Total built-up area (BUA) and setback calculation</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span>Preliminary construction cost range</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span>Preliminary construction cost range &amp; trade breakdown</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span>3D house view and plot layout</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span>Instant on-screen project summary</span>
                 </div>
               </div>
             </div>
@@ -150,71 +150,71 @@ export const PricingPage: React.FC = () => {
             <button
               type="button"
               onClick={() => handleSelectTier('FREE')}
-              className="w-full py-3 px-4 rounded-xl border border-[#183B32] text-[#183B32] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-3.5 px-4 rounded-xl border border-[#183B32] text-[#183B32] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <span>Start Free Estimate</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* TIER 02: CALCULATOR — DETAILED BOQ (₹499) */}
-          <div className="p-6 sm:p-7 bg-white rounded-3xl border-2 border-[#183B32] shadow-md flex flex-col justify-between space-y-5 tactile-card arch-bracketed relative">
-            <div className="absolute -top-3 right-4 bg-[#183B32] text-white text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+          {/* TIER 02: COMPLETE CONSTRUCTION REPORT (₹199) */}
+          <div className="p-6 sm:p-8 bg-white rounded-3xl border-2 border-[#183B32] shadow-md flex flex-col justify-between space-y-6 tactile-card arch-bracketed relative">
+            <div className="absolute -top-3 right-6 bg-[#183B32] text-white text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-[#C66B4E]" />
-              <span>RECOMMENDED</span>
+              <span>COMPLETE REPORT</span>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#C66B4E]">
-                  FULL REPORT
+                  COMPLETE DELIVERABLE
                 </span>
                 <span className="font-mono text-xs font-black text-[#183B32] bg-[rgba(27,61,52,0.08)] px-2.5 py-0.5 rounded">
-                  OFFICIAL REPORT
+                  ₹199 ONE-TIME
                 </span>
               </div>
 
-              <div className="space-y-1">
-                <h2 className="text-xl sm:text-2xl font-black text-[#183B32] font-heading">
-                  Calculator — Detailed BOQ
+              <div className="space-y-1.5">
+                <h2 className="text-2xl sm:text-3xl font-black text-[#183B32] font-heading">
+                  Complete Construction Report
                 </h2>
-                <p className="text-xs text-[#66716B] leading-relaxed">
-                  Get a detailed report showing the work, materials, and estimated costs for your house.
+                <p className="text-xs sm:text-sm text-[#66716B] leading-relaxed">
+                  The complete contractor-grade residential dossier with physical takeoffs, trade schedules, and audit frameworks.
                 </p>
               </div>
 
-              <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
+              <div className="pt-3 pb-2 border-y border-[#E5E7EB]">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#183B32] font-heading">₹499</span>
+                  <span className="text-4xl font-black text-[#183B32] font-heading">₹199</span>
                   <span className="text-xs text-[#66716B]">/ project</span>
                 </div>
-                <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">One-time payment • All inclusive</span>
+                <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">One-time payment • All inclusive • Instant PDF download</span>
               </div>
 
-              <div className="space-y-2 text-xs text-[#183B32]">
+              <div className="space-y-2.5 text-xs sm:text-sm text-[#183B32]">
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
                   <span>Everything in Free Estimate</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>What We Build:</strong> Itemized civil &amp; structural works BOQ</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span><strong>Itemized Works BOQ:</strong> Structural, masonry, plaster, flooring &amp; paint</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Materials Needed:</strong> Exact steel, cement, sand, brick counts</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span><strong>Physical Material Takeoff:</strong> Fe 550D steel kg, 53G cement, sand &amp; blocks</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>What We Install:</strong> Doors, windows, and sanitary fixtures</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span><strong>Milestone Payment Schedule:</strong> 6-stage construction payment roadmap</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Labour &amp; Work Costs:</strong> Itemized trades &amp; milestone payment plan</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span><strong>Contractor Quote Audit:</strong> Benchmark rates &amp; missing scope redlines</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Downloadable PDF Report:</strong> Share with family, builders, or consultants</span>
+                  <Check className="w-4 h-4 text-[#183B32] shrink-0 mt-0.5" />
+                  <span><strong>Downloadable PDF Dossier:</strong> Comprehensive multi-page architectural report</span>
                 </div>
               </div>
             </div>
@@ -222,76 +222,10 @@ export const PricingPage: React.FC = () => {
             <button
               type="button"
               onClick={() => handleSelectTier('DETAILED_ESTIMATE_499')}
-              className="w-full hutty-btn-primary py-3.5 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+              className="w-full hutty-btn-primary py-4 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
             >
-              <span>Get Detailed BOQ — ₹499</span>
+              <span>Unlock Complete Report — ₹199</span>
               <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
-            </button>
-          </div>
-
-          {/* TIER 03: CALCULATOR — PREMIUM (₹1,499) */}
-          <div className="p-6 sm:p-7 bg-white rounded-3xl border border-[#E5E7EB] hover:border-[#183B32] transition-all flex flex-col justify-between space-y-5 tactile-card arch-bracketed shadow-2xs">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#66716B]">
-                  UPGRADED SUITE
-                </span>
-                <span className="font-mono text-xs font-bold text-[#183B32] bg-[#F8F8F6] px-2.5 py-0.5 rounded border border-[#E5E7EB]">
-                  PREMIUM
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <h2 className="text-xl sm:text-2xl font-black text-[#183B32] font-heading">
-                  Calculator — Premium
-                </h2>
-                <p className="text-xs text-[#66716B] leading-relaxed">
-                  An upgraded calculator package with multi-scenario comparison and premium material customization.
-                </p>
-              </div>
-
-              <div className="pt-2 pb-1 border-y border-[#E5E7EB]">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#183B32] font-heading">₹1,499</span>
-                  <span className="text-xs text-[#66716B]">/ project</span>
-                </div>
-                <span className="text-[10px] font-mono text-[#66716B] block mt-0.5">One-time payment • All inclusive</span>
-              </div>
-
-              <div className="space-y-2 text-xs text-[#183B32]">
-                <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span>Everything in Detailed BOQ plan (₹499)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Multi-Scenario Comparison:</strong> Compare layouts &amp; areas side by side</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Premium Specification Customizer:</strong> Fine-tune luxury finish options</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Permanent Cloud Save:</strong> Unlimited revision history</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#183B32] shrink-0 mt-0.5" />
-                  <span><strong>Priority Export Suite:</strong> Unlimited PDF &amp; spreadsheet downloads</span>
-                </div>
-                <div className="p-2 bg-amber-50 rounded-lg border border-amber-200/80 text-[10px] text-amber-900 leading-tight">
-                  <em>Note: Consultation with an expert is a separate professional service.</em>
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleSelectTier('PREMIUM_1499')}
-              className="w-full py-3 px-4 rounded-xl border border-[#183B32] text-[#183B32] bg-white hover:bg-[rgba(27,61,52,0.04)] text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <span>Get Calculator — Premium (₹1,499)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -360,20 +294,20 @@ export const PricingPage: React.FC = () => {
           <div className="space-y-3">
             {[
               {
-                q: 'How does the ₹499 Detailed Estimate differ from the Free calculator?',
-                a: 'The Free calculator provides preliminary cost brackets and built-up area geometry. The ₹499 Detailed Construction Dossier unlocks the exact civil/structural Works BOQ, physical material quantities (steel kg, cement bags, sand CFT), installed fixture schedules, and high-resolution downloadable PDF.',
+                q: 'How does the ₹199 Complete Construction Report differ from the Free calculator?',
+                a: 'The Free calculator provides preliminary cost brackets and built-up area geometry on-screen. The ₹199 Complete Construction Planning & Estimation Report unlocks the complete downloadable PDF dossier including itemized works BOQ, exact physical material quantities (steel kg, cement bags, sand CFT), contractor quotation audit benchmarks, and milestone payment schedules.',
               },
               {
                 q: 'Do the underlying construction quantities change if I pick a different pricing tier?',
-                a: 'Never. Hutty uses a single canonical calculation engine. The physical quantities of concrete, steel, blocks, and labour are purely calculated based on your architectural inputs and structural engineering rules. Your pricing tier controls commercial access to the dossier, not the physical math.',
+                a: 'Never. Hutty uses a single canonical calculation engine. The physical quantities of concrete, steel, blocks, and labour are purely calculated based on your architectural inputs and structural engineering rules. Your payment unlocks the complete dossier and PDF export; it does not alter the physical math.',
               },
               {
-                q: 'Can I upgrade from the Free Plan or Detailed BOQ to Premium later?',
-                a: 'Yes. Any customer on the Free plan can upgrade to the ₹499 Detailed BOQ or ₹1,499 Premium tier at any time to unlock the full works BOQ, materials needed schedule, and comparison tools.',
+                q: 'Can I download a PDF with the Free calculator?',
+                a: 'No. The Free calculator is designed for on-screen exploration and preliminary estimation. Downloading the formal, contractor-grade PDF report requires the one-time ₹199 purchase.',
               },
               {
-                q: 'Is the ₹1,499 Consultation included in any calculator tier?',
-                a: 'No. The ₹1,499 Expert Consultation is an independent advisory service with construction and estimation specialists and is booked separately.',
+                q: 'Is the ₹1,499 Consultation included with the report?',
+                a: 'No. The ₹1,499 Expert Consultation is an independent advisory service with licensed architects and estimation specialists, booked separately.',
               },
             ].map((faq, idx) => (
               <div key={idx} className="bg-white p-5 rounded-2xl border border-[#E5E7EB] space-y-1.5 shadow-2xs">

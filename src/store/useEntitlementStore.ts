@@ -11,9 +11,9 @@ export interface ReportEntitlement {
 }
 
 interface EntitlementState {
-  // Map of projectId -> ReportEntitlement for Detailed BOQ (₹499)
+  // Map of projectId -> ReportEntitlement for Complete Construction Report (₹199)
   unlockedReports: Record<string, ReportEntitlement>;
-  // Map of projectId -> ReportEntitlement for Basic Estimate PDF (₹99)
+  // Map of projectId -> ReportEntitlement for Basic Estimate PDF (Historical)
   basicPdfUnlockedReports: Record<string, ReportEntitlement>;
   // Global unlocked status for current project session
   isCurrentProjectUnlocked: boolean;
@@ -44,7 +44,7 @@ export const useEntitlementStore = create<EntitlementState>()(
       },
 
       hasBasicPdfAccess: (projectId?: string) => {
-        // Detailed report unlock (₹499 or ₹1,499) inherently unlocks basic PDF
+        // Detailed report unlock (₹199) inherently unlocks basic PDF
         if (get().hasDetailedReportAccess(projectId)) {
           return true;
         }
@@ -63,7 +63,7 @@ export const useEntitlementStore = create<EntitlementState>()(
           isUnlocked: true,
           unlockedAt: new Date().toISOString(),
           orderId: orderId || `ORD-HUTTY-${Date.now().toString(36).toUpperCase()}`,
-          amountPaidINR: 499, // Authoritative ₹499 Detailed Construction Dossier
+          amountPaidINR: 199, // Authoritative ₹199 Complete Construction Planning & Estimation Report
         };
 
         // Also grant in centralized pricing store

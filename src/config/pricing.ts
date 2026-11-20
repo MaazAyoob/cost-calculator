@@ -125,9 +125,9 @@ export const DEFAULT_PRICING_TIERS: PricingTier[] = [
   {
     id: 'tier-detailed-estimate-499',
     code: 'DETAILED_ESTIMATE_499',
-    name: 'Calculator — Detailed BOQ',
+    name: 'Complete Construction Planning & Estimation Report',
     description: 'Get a detailed report showing the work, materials, and estimated costs for your house, with downloadable PDF.',
-    priceMinorUnits: 49900,
+    priceMinorUnits: 19900,
     currency: 'INR',
     active: true,
     purchasable: true,

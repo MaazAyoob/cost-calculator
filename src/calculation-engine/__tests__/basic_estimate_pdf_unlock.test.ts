@@ -357,8 +357,8 @@ describe('Hutty — ₹99 Basic Estimate PDF Unlock Acceptance Suite', () => {
       leadEmail: 'c499@example.com',
       projectId: 'proj-499',
     });
-    expect(purchase499.purchase.amountMinorUnits).toBe(49900);
-    expect(purchase499.gatewayOrder?.amountMinorUnits).toBe(49900);
+    expect(purchase499.purchase.amountMinorUnits).toBe(19900);
+    expect(purchase499.gatewayOrder?.amountMinorUnits).toBe(19900);
 
     await pricingService.confirmPurchasePayment(purchase499.purchase.id, 'pay_499', purchase499.purchase.gatewayOrderId || undefined);
 
@@ -390,7 +390,7 @@ describe('Hutty — ₹99 Basic Estimate PDF Unlock Acceptance Suite', () => {
     // Backend source of truth
     expect(PRICING_MINOR_UNITS.FREE).toBe(0);
     expect(PRICING_MINOR_UNITS.BASIC_ESTIMATE_PDF).toBe(9900);
-    expect(PRICING_MINOR_UNITS.DETAILED_ESTIMATE_499).toBe(49900);
+    expect(PRICING_MINOR_UNITS.DETAILED_ESTIMATE_499).toBe(19900);
     expect(PRICING_MINOR_UNITS.PREMIUM_1499).toBe(149900);
 
     // Frontend config source of truth
@@ -401,7 +401,7 @@ describe('Hutty — ₹99 Basic Estimate PDF Unlock Acceptance Suite', () => {
 
     expect(uiFree?.priceMinorUnits).toBe(0);
     expect(uiBasic?.priceMinorUnits).toBe(9900);
-    expect(uiDetailed?.priceMinorUnits).toBe(49900);
+    expect(uiDetailed?.priceMinorUnits).toBe(19900);
     expect(uiPremium?.priceMinorUnits).toBe(149900);
 
     // Crucial rule: Basic PDF is an add-on product, NOT a general calculator plan

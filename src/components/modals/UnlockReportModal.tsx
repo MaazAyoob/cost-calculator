@@ -246,7 +246,7 @@ export const UnlockReportModal: React.FC<Props> = ({
               }
               try {
                 await verifyCashfreePayment(purchase.id, gatewayOrder.orderId);
-                const orderAmount = selectedTier === 'PREMIUM_1499' ? 1499 : 499;
+                const orderAmount = 199;
                 analytics.trackPaymentSuccess(selectedTier, gatewayOrder.orderId, orderAmount, 'CASHFREE');
                 setCompletedOrderRef(purchase.publicReference);
                 grantReportAccess(targetProjectId, purchase.publicReference);
@@ -293,7 +293,7 @@ export const UnlockReportModal: React.FC<Props> = ({
           amount: gatewayOrder.amountMinorUnits,
           currency: gatewayOrder.currency,
           name: 'Hutty Pre-Construction Platform',
-          description: selectedTier === 'PREMIUM_1499' ? 'Calculator — Premium BOQ' : 'Calculator — Detailed BOQ',
+          description: 'Complete Construction Planning & Estimation Report',
           order_id: gatewayOrder.orderId,
           prefill: {
             name: leadName,
@@ -393,7 +393,7 @@ export const UnlockReportModal: React.FC<Props> = ({
     }
   };
 
-  const selectedTierPriceDisplay = selectedTier === 'PREMIUM_1499' ? '₹1,499' : '₹499';
+  const selectedTierPriceDisplay = '₹199';
 
   return (
     <AnimatePresence>
@@ -438,120 +438,64 @@ export const UnlockReportModal: React.FC<Props> = ({
             <div className="space-y-1.5 pr-6">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28] bg-[rgba(242,140,40,0.1)] px-2 py-0.5 rounded border border-[#F28C28]/20">
-                  HUTTY ESTIMATION &bull; DETAILED REPORT UNLOCK
+                  HUTTY • COMPLETE REPORT
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-extrabold text-[#1B3D34] font-heading tracking-tight">
-                Unlock Detailed Construction Cost Report
+                Unlock Complete Construction Report
               </h2>
               <p className="text-xs text-[#707873]">
-                Get a comprehensive breakdown of the work, materials needed, estimated costs, and downloadable PDF report.
+                Get the complete list of work, exact materials needed, estimated costs, and your downloadable PDF.
               </p>
             </div>
 
-            {/* Plan Tier Selector */}
-            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setSelectedTier('DETAILED_ESTIMATE_499')}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
-                  selectedTier === 'DETAILED_ESTIMATE_499'
-                    ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E5E7EB] bg-[#F8F8F6] hover:bg-white'
-                }`}
-              >
-                <span className="absolute -top-2 right-2 bg-[#F28C28] text-white text-[9px] font-bold px-1.5 py-0.2 rounded font-mono">
-                  RECOMMENDED
-                </span>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#F28C28]">
-                    Detailed Report
-                  </span>
-                  <span className="text-xs font-mono font-black text-[#1B3D34]">₹499</span>
-                </div>
-                <div className="text-xs font-bold text-[#1B3D34] mt-1">Detailed BOQ Report</div>
-                <p className="text-[10px] text-[#707873] mt-0.5 line-clamp-1">Works BOQ + Materials + PDF</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedTier('PREMIUM_1499')}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                  selectedTier === 'PREMIUM_1499'
-                    ? 'border-[#1B3D34] bg-[rgba(27,61,52,0.04)] ring-1 ring-[#1B3D34]'
-                    : 'border-[#E5E7EB] bg-[#F8F8F6] hover:bg-white'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#707873]">
-                    Upgraded
-                  </span>
-                  <span className="text-xs font-mono font-black text-[#1B3D34]">₹1,499</span>
-                </div>
-                <div className="text-xs font-bold text-[#1B3D34] mt-1">Calculator — Premium</div>
-                <p className="text-[10px] text-[#707873] mt-0.5 line-clamp-1">Multi-scenario compare + Full suite</p>
-              </button>
-            </div>
-
-            {/* Pricing Banner */}
-            <div className="p-4 bg-[#F8F8F6] rounded-xl border border-[#E5E7EB] flex items-center justify-between">
+            {/* Single Locked Report Product Banner */}
+            <div className="p-4 bg-[rgba(27,61,52,0.04)] rounded-xl border border-[#1B3D34]/20 flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-[#707873] uppercase tracking-wider block">One-time payment</span>
-                <span className="text-2xl font-black text-[#1B3D34] font-mono">{selectedTierPriceDisplay}</span>
-                <span className="text-[10px] text-[#707873] ml-1">all inclusive</span>
+                <span className="text-2xl font-black text-[#1B3D34] font-mono">₹199</span>
+                <span className="text-[10px] text-[#707873] ml-1">all inclusive • lifetime access</span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2 py-1 rounded border border-[#E5E7EB] block font-mono">
-                  Instant PDF • Lifetime Access
+                <span className="text-[10px] font-bold text-[#1B3D34] bg-white px-2.5 py-1 rounded border border-[#E5E7EB] block font-mono">
+                  Instant Downloadable PDF
                 </span>
-                {selectedTier === 'PREMIUM_1499' && (
-                  <span className="text-[9px] text-[#707873] block mt-0.5">
-                    *Consultation is a separate service
-                  </span>
-                )}
+                <span className="text-[9px] text-[#707873] block mt-0.5">
+                  *Consultation is a separate service
+                </span>
               </div>
             </div>
 
             {/* Deliverables Checklist */}
             <div className="space-y-2 text-xs text-[#1B3D34]">
               <span className="font-bold text-[11px] uppercase tracking-wider text-[#707873] block">
-                {selectedTier === 'PREMIUM_1499'
-                  ? 'Included in ₹1,499 Calculator — Premium Plan:'
-                  : 'Included in ₹499 Detailed BOQ Report:'}
+                Included in Your ₹199 Complete Construction Planning &amp; Estimation Report:
               </span>
               <div className="grid grid-cols-1 gap-2">
                 <div className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span><strong>Works BOQ (What We Build):</strong> Detailed civil, structural, finishing, and joinery line items with estimated quantities and market rates.</span>
+                  <span><strong>List of Work &amp; Costs (BOQ):</strong> Detailed list of building and finishing tasks with clear market rates.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span><strong>Materials Needed (What We Consume):</strong> Quantities for steel needed for the house, cement bags, sand, aggregate, blocks, tiles &amp; paint.</span>
+                  <span><strong>Materials Needed:</strong> Exact steel tonnes, cement bags, sand volume, and blocks needed for your house.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span><strong>Installed Fixtures (What We Install):</strong> Doors, windows, sanitary sets, and plumbing runs.</span>
+                  <span><strong>Fittings &amp; Finishes:</strong> Doors, windows, bathroom fittings, and electrical points.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span><strong>Cost Summary &amp; Payment Plan:</strong> Labour and work costs, margin &amp; tax schedule, and milestone payment plan.</span>
+                  <span><strong>Cost Summary &amp; Payment Plan:</strong> Material and labour expenses with safe milestone payment stages.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
-                  <span><strong>Downloadable PDF Report:</strong> A detailed report you can discuss with your bank or contractor.</span>
+                  <span><strong>Plot &amp; Setback Rules:</strong> Open space required around your home and legal building area.</span>
                 </div>
-                {selectedTier === 'PREMIUM_1499' && (
-                  <>
-                    <div className="flex items-start gap-2 text-[#1B3D34] font-medium">
-                      <Sparkles className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
-                      <span><strong>Multi-Scenario Comparison:</strong> Save and compare different house plan layouts, floor areas, and finish options side by side.</span>
-                    </div>
-                    <div className="flex items-start gap-2 text-[#1B3D34] font-medium">
-                      <Sparkles className="w-4 h-4 text-[#F28C28] shrink-0 mt-0.5" />
-                      <span><strong>Premium Specification Customizer:</strong> Fine-tune luxury material brands, fixture upgrades, and custom structural specifications.</span>
-                    </div>
-                  </>
-                )}
+                <div className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-[#1B3D34] shrink-0 mt-0.5" />
+                  <span><strong>Downloadable PDF Report:</strong> Instant downloadable complete construction planning document.</span>
+                </div>
               </div>
             </div>
 
@@ -690,9 +634,7 @@ export const UnlockReportModal: React.FC<Props> = ({
                 PAYMENT CONFIRMED &bull; ACCESS GRANTED
               </span>
               <h2 className="text-2xl font-extrabold text-[#1B3D34] font-heading">
-                {selectedTier === 'DETAILED_ESTIMATE_499'
-                  ? 'Your detailed report is ready.'
-                  : 'Your project estimate is confirmed.'}
+                Your Construction Report Is Ready
               </h2>
               <p className="text-xs text-[#707873] max-w-sm mx-auto leading-relaxed">
                 Order reference: <strong>{completedOrderRef}</strong>. Linked to project ID <strong>{projectId}</strong>.
@@ -711,13 +653,13 @@ export const UnlockReportModal: React.FC<Props> = ({
               <div className="flex justify-between">
                 <span className="text-[#707873]">Plan:</span>
                 <span className="font-bold text-[#1B3D34]">
-                  {selectedTier === 'PREMIUM_1499' ? 'Calculator — Premium BOQ (₹1,499)' : 'Detailed BOQ Report (₹499)'}
+                  Complete Construction Planning &amp; Estimation Report
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#707873]">Status:</span>
                 <span className="font-bold text-[#1B3D34]">
-                  Unlocked • PDF Generated
+                  Unlocked &bull; PDF Generated
                 </span>
               </div>
             </div>

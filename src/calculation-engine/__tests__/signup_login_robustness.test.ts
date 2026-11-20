@@ -548,7 +548,7 @@ describe('Hutty — Signup & Login Robustness Audit and Fix', () => {
 
     expect(result).toBeDefined();
     expect(result.purchase.id).toBeDefined();
-    expect(result.purchase.amountMinorUnits).toBe(49900);
+    expect(result.purchase.amountMinorUnits).toBe(19900);
     // Purchase must not fail or throw foreign key error
     expect(result.requiresPayment).toBe(true);
   });

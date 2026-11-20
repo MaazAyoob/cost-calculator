@@ -130,7 +130,7 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
       const tier1499 = publicTiers.find((t) => t.code === PRICING_TIER_CODES.PREMIUM_1499);
 
       expect(freeTier?.priceMinorUnits).toBe(0);
-      expect(tier499?.priceMinorUnits).toBe(49900); // ₹499
+      expect(tier499?.priceMinorUnits).toBe(19900); // ₹199
       expect(tier1499?.priceMinorUnits).toBe(149900); // ₹1,499
       expect(tier1499?.purchasable).toBe(true);
 
@@ -208,8 +208,8 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
         leadEmail: 'ananya@example.com',
       });
 
-      expect(purchase499.purchase.amountMinorUnits).toBe(49900);
-      expect(purchase499.gatewayOrder?.amountMinorUnits).toBe(49900);
+      expect(purchase499.purchase.amountMinorUnits).toBe(19900);
+      expect(purchase499.gatewayOrder?.amountMinorUnits).toBe(19900);
 
       const purchase1499 = await pricingService.initiatePurchase({
         tierCode: PRICING_TIER_CODES.PREMIUM_1499,
@@ -240,7 +240,7 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
   // ═════════════════════════════════════════════════════════════════════════
   describe('Historical Purchase Price Invariance', () => {
     it('preserves the original amount paid even if Admin later updates current tier price', async () => {
-      // Customer buys ₹499 plan (49900 paise)
+      // Customer buys ₹199 plan (19900 paise)
       const { purchase } = await pricingService.initiatePurchase({
         tierCode: PRICING_TIER_CODES.DETAILED_ESTIMATE_499,
         leadName: 'Vikram Joshi',
@@ -248,7 +248,7 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
         leadEmail: 'vikram@example.com',
       });
 
-      expect(purchase.amountMinorUnits).toBe(49900);
+      expect(purchase.amountMinorUnits).toBe(19900);
 
       // Later, Admin changes tier price to ₹699 (69900 paise)
       const tier499 = await pricingService.getTierByCode(PRICING_TIER_CODES.DETAILED_ESTIMATE_499);
@@ -257,10 +257,10 @@ describe('Hutty Pricing Model V1 & Calculation Invariance Suite', () => {
         reason: 'Price adjustment for new fiscal year',
       });
 
-      // Historical purchase remains strictly 49900 paise (₹499)
+      // Historical purchase remains strictly 19900 paise (₹199)
       const history = await pricingService.getPurchaseHistory();
       const pastRecord = history.find((p) => p.id === purchase.id);
-      expect(pastRecord?.amountMinorUnits).toBe(49900);
+      expect(pastRecord?.amountMinorUnits).toBe(19900);
 
       // Future purchases now resolve to the new price (69900 paise)
       const newPurchase = await pricingService.initiatePurchase({

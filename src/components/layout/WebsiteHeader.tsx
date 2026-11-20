@@ -51,6 +51,18 @@ export const WebsiteHeader: React.FC = () => {
 
   const handleNav = (path: string) => {
     setMobileMenuOpen(false);
+    if (path.startsWith('#')) {
+      if (location.pathname === '/') {
+        const el = document.getElementById(path.slice(1));
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      } else {
+        navigate('/' + path);
+        return;
+      }
+    }
     navigate(path);
   };
 
@@ -83,24 +95,34 @@ export const WebsiteHeader: React.FC = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation: Elegant, Restrained & Homeowner-First */}
+          {/* Desktop Navigation: Elegant, Restrained & Report-First */}
           <nav className="hidden lg:flex items-center gap-7" aria-label="Main Navigation">
             <button
-              onClick={() => handleNav('/how-it-works')}
+              onClick={() => handleNav('#how-it-works')}
               className={`text-sm transition-colors cursor-pointer py-1 font-semibold relative ${
                 isCurrent('/how-it-works')
-                  ? 'text-[#183B32] font-bold after:content-[\'\'] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#C66B4E] after:rounded-full'
+                  ? "text-[#183B32] font-bold after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#C66B4E] after:rounded-full"
                   : 'text-[#66716B] hover:text-[#18211E]'
               }`}
             >
               How It Works
             </button>
 
+            <a
+              href="/Hutty-Sample-Construction-Report.pdf"
+              download="Hutty-Sample-Construction-Report.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm transition-colors cursor-pointer py-1 font-semibold text-[#66716B] hover:text-[#18211E]"
+            >
+              Sample Report
+            </a>
+
             <button
               onClick={() => handleNav('/pricing')}
               className={`text-sm transition-colors cursor-pointer py-1 font-semibold relative ${
                 isCurrent('/pricing')
-                  ? 'text-[#183B32] font-bold after:content-[\'\'] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#C66B4E] after:rounded-full'
+                  ? "text-[#183B32] font-bold after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#C66B4E] after:rounded-full"
                   : 'text-[#66716B] hover:text-[#18211E]'
               }`}
             >
@@ -111,7 +133,7 @@ export const WebsiteHeader: React.FC = () => {
               onClick={() => handleNav('/consult')}
               className={`text-sm transition-colors cursor-pointer py-1 font-semibold relative ${
                 isCurrent('/consult')
-                  ? 'text-[#183B32] font-bold after:content-[\'\'] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#C66B4E] after:rounded-full'
+                  ? "text-[#183B32] font-bold after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#C66B4E] after:rounded-full"
                   : 'text-[#66716B] hover:text-[#18211E]'
               }`}
             >
@@ -219,8 +241,8 @@ export const WebsiteHeader: React.FC = () => {
               }}
               className="bg-[#183B32] hover:bg-[#245747] text-white text-xs sm:text-sm font-bold px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all cursor-pointer shadow-xs active:scale-[0.98] flex items-center gap-1.5 shrink-0 min-h-[44px]"
             >
-              <span className="hidden xs:inline">Plan Your Home</span>
-              <span className="xs:hidden">Plan</span>
+              <span className="hidden xs:inline">Plan My Home</span>
+              <span className="xs:hidden">Plan Home</span>
               <ArrowRight className="w-3.5 h-3.5 text-[#C66B4E]" />
             </button>
 
@@ -329,13 +351,30 @@ export const WebsiteHeader: React.FC = () => {
                 }`}
               >
                 <div className="space-y-0.5">
-                  <span className="text-base font-bold font-heading block">Start Free Estimate</span>
+                  <span className="text-base font-bold font-heading block">Plan My Home</span>
                   <p className={`text-xs ${isCurrent('/calculator') ? 'text-white/80' : 'text-[#66716B]'}`}>
-                    Plot sizing, rooms &amp; real-time cost calculation (no login required)
+                    Plot sizing, room selection &amp; free construction estimate
                   </p>
                 </div>
                 <ArrowRight className={`w-4 h-4 ${isCurrent('/calculator') ? 'text-[#C66B4E]' : 'text-[#66716B]'}`} />
               </button>
+
+              <a
+                href="/Hutty-Sample-Construction-Report.pdf"
+                download="Hutty-Sample-Construction-Report.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full min-h-[52px] text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer bg-white text-[#18211E] border-[#E5E7EB] hover:bg-[#F8F8F6]"
+              >
+                <div className="space-y-0.5">
+                  <span className="text-base font-bold font-heading block">Sample Report (PDF)</span>
+                  <p className="text-xs text-[#66716B]">
+                    Download an actual 10-page sample report for a Bangalore duplex home
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-[#66716B]" />
+              </a>
 
               <button
                 onClick={() => handleNav('/how-it-works')}
@@ -348,14 +387,14 @@ export const WebsiteHeader: React.FC = () => {
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">How It Works</span>
                   <p className={`text-xs ${isCurrent('/how-it-works') ? 'text-white/80' : 'text-[#66716B]'}`}>
-                    Step-by-step home planning and cost estimation
+                    3-step guide: plot details, specifications &amp; report generation
                   </p>
                 </div>
                 <ArrowRight className={`w-4 h-4 ${isCurrent('/how-it-works') ? 'text-[#C66B4E]' : 'text-[#66716B]'}`} />
               </button>
 
               <button
-                onClick={() => handleNav('/pricing')}
+                onClick={() => handleNav('#pricing')}
                 className={`w-full min-h-[52px] text-left p-4 rounded-xl transition-all border flex items-center justify-between cursor-pointer ${
                   isCurrent('/pricing')
                     ? 'bg-[#183B32] text-white border-[#183B32] shadow-xs'
@@ -363,9 +402,9 @@ export const WebsiteHeader: React.FC = () => {
                 }`}
               >
                 <div className="space-y-0.5">
-                  <span className="text-base font-bold font-heading block">Pricing &amp; Plans</span>
+                  <span className="text-base font-bold font-heading block">Pricing</span>
                   <p className={`text-xs ${isCurrent('/pricing') ? 'text-white/80' : 'text-[#66716B]'}`}>
-                    Free estimate, ₹499 detailed BOQ, ₹1,499 premium
+                    Free estimate &bull; Complete PDF report for ₹199
                   </p>
                 </div>
                 <ArrowRight className={`w-4 h-4 ${isCurrent('/pricing') ? 'text-[#C66B4E]' : 'text-[#66716B]'}`} />
@@ -382,7 +421,7 @@ export const WebsiteHeader: React.FC = () => {
                 <div className="space-y-0.5">
                   <span className="text-base font-bold font-heading block">Consult an Expert</span>
                   <p className={`text-xs ${isCurrent('/consult') ? 'text-white/80' : 'text-[#66716B]'}`}>
-                    Independent architectural reviews &bull; Flat ₹1,499
+                    Independent architectural reviews &bull; Separate service
                   </p>
                 </div>
                 <ArrowRight className={`w-4 h-4 ${isCurrent('/consult') ? 'text-[#C66B4E]' : 'text-[#66716B]'}`} />
@@ -433,7 +472,7 @@ export const WebsiteHeader: React.FC = () => {
                 }}
                 className="w-full bg-[#183B32] hover:bg-[#245747] text-white py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm min-h-[50px] cursor-pointer"
               >
-                <span>Plan Your Home</span>
+                <span>Get My Report</span>
                 <ArrowRight className="w-4 h-4 text-[#C66B4E]" />
               </button>
             </div>

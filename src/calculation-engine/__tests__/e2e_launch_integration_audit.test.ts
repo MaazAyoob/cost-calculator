@@ -213,10 +213,10 @@ describe('HUTTY E2E Integration Audit & Launch Readiness Test Suite', () => {
       expect(pdfTier).toBeDefined();
       expect(pdfTier?.priceMinorUnits).toBe(9900);
 
-      // 3. Detailed BOQ — ₹499 (49,900 paise)
+      // 3. Detailed BOQ — ₹199 (19,900 paise)
       const boqTier = DEFAULT_PRICING_TIERS.find((p) => p.code === 'DETAILED_ESTIMATE_499');
       expect(boqTier).toBeDefined();
-      expect(boqTier?.priceMinorUnits).toBe(49900);
+      expect(boqTier?.priceMinorUnits).toBe(19900);
 
       // 4. Premium BOQ — ₹1,499 (149,900 paise)
       const premiumTier = DEFAULT_PRICING_TIERS.find((p) => p.code === 'PREMIUM_1499');

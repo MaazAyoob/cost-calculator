@@ -4,7 +4,7 @@
 // Consultation (₹1,499) is strictly decoupled and governed separately.
 // ==============================================================================
 
-export type PricingTierCode = 'FREE' | 'BASIC_ESTIMATE_PDF' | 'DETAILED_ESTIMATE_499' | 'PREMIUM_1499' | 'ESTIMATE_99' | 'COMPLETE_PACKAGE';
+export type PricingTierCode = 'FREE' | 'BASIC_ESTIMATE_PDF' | 'DETAILED_ESTIMATE_499' | 'COMPLETE_REPORT_199' | 'PREMIUM_1499' | 'ESTIMATE_99' | 'COMPLETE_PACKAGE';
 
 export type PricingFeatureCode =
   | 'BASIC_PROJECT_SUMMARY'

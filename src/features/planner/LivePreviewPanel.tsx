@@ -15,6 +15,11 @@ import { formatCurrency } from '../../utils/cn';
 import { AnimatedNumber } from '../../components/common/AnimatedNumber';
 import { Architectural3DViewer } from '../../components/3d/Architectural3DViewer';
 import {
+  getHouseTypeLabel,
+  getFloorLabel,
+  getConstructionQualityLabel,
+} from './plannerLabels';
+import {
   TrendingUp,
   TrendingDown,
   Info,
@@ -26,12 +31,10 @@ import {
 } from 'lucide-react';
 
 interface LivePreviewPanelProps {
-  onOpenPackageComparison?: () => void;
   onReviewAllSelections?: () => void;
 }
 
 export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
-  onOpenPackageComparison,
   onReviewAllSelections,
 }) => {
   const store = useWizardStore();
@@ -55,6 +58,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
     bikeCount,
     houseType,
     qualityTier,
+    specificationTier,
     rooms,
     parkingType,
     selectedPackage,
@@ -103,14 +107,9 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
     result: string;
   } | null>(null);
 
-  const floorDesc =
-    floors === 1
-      ? 'Ground floor'
-      : floors === 2
-      ? 'G + 1 floor'
-      : floors === 3
-      ? 'G + 2 floors'
-      : `G + ${floors - 1} floors`;
+  const effectiveFloors = floors && floors > 0 ? floors : 2;
+  const effectiveHouseType = houseType || 'Duplex';
+  const floorDesc = getFloorLabel(effectiveFloors);
 
   const isZeroState = totalCost === 0;
 
@@ -142,13 +141,13 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
           city={city === 'Other' ? 'Bangalore' : city}
           plotLength={plotLength || 30}
           plotWidth={plotWidth || 40}
-          floors={floors || 1}
+          floors={effectiveFloors}
           parkingType={parkingType}
           carCount={carCount}
           bikeCount={bikeCount}
           evCharging={evCharging}
           liftRequired={liftRequired}
-          houseType={houseType}
+          houseType={effectiveHouseType}
           qualityTier={qualityTier}
           rooms={rooms}
           materialBrands={materialBrands}
@@ -210,12 +209,14 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
       {/* ── 4. SNAPSHOT KEY PARAMETERS (Prototype Clean Stats) ── */}
       <div className="space-y-2 pt-1 border-t border-[#E5E7EB] text-xs">
         
-        {/* Selected Package */}
+        {/* Construction Quality */}
         <div className="flex items-center justify-between py-1.5 border-b border-[#E5E7EB]/70">
           <div>
-            <span className="text-[10px] text-[#66716B] block">Selected package</span>
+            <span className="text-[10px] text-[#66716B] block">Construction Quality</span>
             <div className="flex items-center gap-1.5">
-              <b className="text-[13px] text-[#183B32]">{pkgConfig.title}</b>
+              <b className="text-[13px] text-[#183B32]">
+                {getConstructionQualityLabel(specificationTier || qualityTier || selectedPackage)}
+              </b>
               {customizations.length > 0 && (
                 <span className="text-[9px] font-bold text-[#C66B4E] bg-[#C66B4E]/10 px-1 py-0.2 rounded">
                   {customizations.length} custom
@@ -223,16 +224,6 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
               )}
             </div>
           </div>
-          {onOpenPackageComparison && (
-            <button
-              type="button"
-              onClick={onOpenPackageComparison}
-              className="text-[11px] font-bold text-[#183B32] hover:text-[#245747] flex items-center gap-0.5 cursor-pointer min-h-[32px]"
-            >
-              <Sparkles className="w-3 h-3 text-[#C66B4E]" />
-              <span>Tiers</span>
-            </button>
-          )}
         </div>
 
         {/* Plot Area */}
@@ -253,7 +244,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
           <div>
             <span className="text-[10px] text-[#66716B] block">Home configuration</span>
             <b className="text-[13px] text-[#18211E]">
-              {houseType || 'Independent house'} &bull; {floorDesc}
+              {getHouseTypeLabel(effectiveHouseType)} &bull; {floorDesc}
             </b>
           </div>
         </div>
@@ -263,7 +254,7 @@ export const LivePreviewPanel: React.FC<LivePreviewPanelProps> = ({
           <div>
             <span className="text-[10px] text-[#66716B] block">Rooms</span>
             <b className="text-[13px] text-[#18211E]">
-              {rooms.bedrooms || 0} bedrooms &bull; {rooms.bathrooms || 0} bathrooms
+              {rooms.bedrooms || 3} bedrooms &bull; {rooms.bathrooms || 3} bathrooms
             </b>
           </div>
           <span className="text-[11px] text-[#66716B]">

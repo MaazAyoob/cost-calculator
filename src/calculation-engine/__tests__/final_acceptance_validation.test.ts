@@ -267,7 +267,7 @@ describe('HUTTY 2.0 — Final Acceptance & Calculator Correctness Suite', () => 
     expect(freeTier?.priceMinorUnits).toBe(0);
 
     expect(boq499Tier).toBeDefined();
-    expect(boq499Tier?.priceMinorUnits).toBe(49900);
+    expect(boq499Tier?.priceMinorUnits).toBe(19900);
 
     expect(premium1499Tier).toBeDefined();
     expect(premium1499Tier?.priceMinorUnits).toBe(149900);

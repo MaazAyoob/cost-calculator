@@ -156,7 +156,7 @@ describe('Hutty 2.0 UX, Progressive Disclosure & Calculation Invariance Suite', 
     expect(freeTier?.priceMinorUnits).toBe(0);
 
     expect(detailedTier).toBeDefined();
-    expect(detailedTier?.priceMinorUnits).toBe(49900); // ₹499 in paise
+    expect(detailedTier?.priceMinorUnits).toBe(19900); // ₹199 in paise
 
     expect(premiumTier).toBeDefined();
     expect(premiumTier?.priceMinorUnits).toBe(149900); // ₹1,499 in paise

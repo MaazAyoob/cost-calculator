@@ -1,15 +1,9 @@
 import React, { useEffect } from 'react';
 import { SEO } from '../../components/common/SEO';
 import { HeroSection } from './sections/HeroSection';
-import { IntroductionSection } from './sections/IntroductionSection';
-import { FourOfferingsSection } from './sections/FourOfferingsSection';
+import { WhatYourReportIncludesSection } from './sections/WhatYourReportIncludesSection';
+import { WhatHuttyHelpsYouUnderstandSection } from './sections/WhatHuttyHelpsYouUnderstandSection';
 import { ThreeEasyStepsSection } from './sections/ThreeEasyStepsSection';
-import { InteractiveDemoSection } from './sections/InteractiveDemoSection';
-import { SignaturePlanningTimelineSection } from './sections/SignaturePlanningTimelineSection';
-import { SignatureConstructionBreakdownSection } from './sections/SignatureConstructionBreakdownSection';
-import { WhyPlanningSection } from './sections/WhyPlanningSection';
-import { EngineeringStandardsSection } from './sections/EngineeringStandardsSection';
-import { SignatureExpertSection } from './sections/SignatureExpertSection';
 import { SignaturePricingSection } from './sections/SignaturePricingSection';
 import { FaqSection } from './sections/FaqSection';
 import { FinalCtaSection } from './sections/FinalCtaSection';
@@ -23,47 +17,29 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="w-full min-h-screen font-sans bg-[#F8F8F6] text-[#18211E]">
       <SEO
-        title="Hutty — Build your home with clarity"
-        description="Residential construction planning and estimation platform for Bangalore. Calculate permissible setbacks, material quantities, and costs before you build."
+        title="Hutty — Residential Construction Planning & Estimation Report"
+        description="Understand your estimated construction costs, physical material quantities, municipal setbacks, and 22-package works BOQ before building in Bangalore."
       />
 
-      {/* 01. Hero Experience — Architectural Split Statement + Interactive Planning Panel */}
+      {/* Section 1 — Hero: Clear home planning pitch, sample download & primary CTA */}
       <HeroSection />
 
-      {/* 02. Introduction to Hutty — Editorial Technical Architecture & Platform Mission */}
-      <IntroductionSection />
+      {/* Section 2 — Report Showcase: Everything you need to plan your home */}
+      <WhatYourReportIncludesSection />
 
-      {/* 03. Construction Intelligence Features — Free Estimate, Detailed BOQ (₹499), Expert Consultation (₹1,499) */}
-      <FourOfferingsSection />
+      {/* Section 3 — Key Benefits: What Hutty helps you understand (costs, materials, stages, report) */}
+      <WhatHuttyHelpsYouUnderstandSection />
 
-      {/* 04. How Hutty Works — Three Clear Steps + Family Photographic Storytelling */}
+      {/* Section 4 — How Hutty Works: 3 simple steps (Plot details, Estimate, Full report) */}
       <ThreeEasyStepsSection />
 
-      {/* 05. Calculator Showcase — Live Interactive Demo with Real Mathematical Takeoffs */}
-      <InteractiveDemoSection />
-
-      {/* 06. Construction Stages — 13-Milestone Residential Project Roadmap */}
-      <SignaturePlanningTimelineSection />
-
-      {/* 07. Materials & Cost Transparency — Steel Tonnage, Cement Bags, Sand, Blocks, and Rates */}
-      <SignatureConstructionBreakdownSection />
-
-      {/* 08. Why Homeowners Should Use Hutty — Conventional Pitfalls vs. Quantity-First Planning */}
-      <WhyPlanningSection />
-
-      {/* 09. Trust & Credibility — Indian Civil Codes (IS 456, IS 1786, NBC 2016) & Formulas */}
-      <EngineeringStandardsSection />
-
-      {/* 10. Consultation Call-to-Action — Unbiased Independent Advisory (₹1,499) */}
-      <SignatureExpertSection />
-
-      {/* 11. Plans & Pricing Transparency — Free vs Paid Options */}
+      {/* Section 5 — Simple Pricing: Free preview (₹0) vs Complete PDF Report (₹199 one-time) */}
       <SignaturePricingSection />
 
-      {/* 12. FAQ Section — Clear Homeowner Answers on Municipal Bye-Laws & Cost Variances */}
+      {/* Section 6 — Compact FAQ: 4 essential homeowner questions */}
       <FaqSection />
 
-      {/* Closing Action Anchor */}
+      {/* Section 7 — Final CTA: Start planning your home today */}
       <FinalCtaSection />
     </div>
   );

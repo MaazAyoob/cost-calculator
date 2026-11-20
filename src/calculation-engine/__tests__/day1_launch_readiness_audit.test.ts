@@ -176,8 +176,8 @@ describe('DAY 1 LAUNCH-READINESS AUDIT SUITE', () => {
       expect(formatPaiseToINR(freeTier!.priceMinorUnits)).toBe('Free');
 
       expect(detailedTier).toBeDefined();
-      expect(detailedTier?.priceMinorUnits).toBe(49900);
-      expect(formatPaiseToINR(detailedTier!.priceMinorUnits)).toBe('₹499');
+      expect(detailedTier?.priceMinorUnits).toBe(19900);
+      expect(formatPaiseToINR(detailedTier!.priceMinorUnits)).toBe('₹199');
 
       expect(premiumTier).toBeDefined();
       expect(premiumTier?.priceMinorUnits).toBe(149900);
@@ -186,7 +186,7 @@ describe('DAY 1 LAUNCH-READINESS AUDIT SUITE', () => {
 
     it('confirms backend authoritative minor units agree with frontend', () => {
       expect(PRICING_MINOR_UNITS.FREE).toBe(0);
-      expect(PRICING_MINOR_UNITS.DETAILED_ESTIMATE_499).toBe(49900);
+      expect(PRICING_MINOR_UNITS.DETAILED_ESTIMATE_499).toBe(19900);
       expect(PRICING_MINOR_UNITS.PREMIUM_1499).toBe(149900);
     });
 
@@ -361,7 +361,7 @@ describe('DAY 1 LAUNCH-READINESS AUDIT SUITE', () => {
 
       // Only 2 purchasable calculator plan tiers: Detailed BOQ (₹499) and Premium BOQ (₹1,499)
       expect(purchasablePlans.length).toBe(2);
-      expect(purchasablePlans.find((t) => t.code === 'DETAILED_ESTIMATE_499')?.priceMinorUnits).toBe(49900);
+      expect(purchasablePlans.find((t) => t.code === 'DETAILED_ESTIMATE_499')?.priceMinorUnits).toBe(19900);
       expect(purchasablePlans.find((t) => t.code === 'PREMIUM_1499')?.priceMinorUnits).toBe(149900);
 
       // ₹99 Basic Estimate PDF is a separate PDF-download entitlement, not a calculator plan
@@ -381,7 +381,7 @@ describe('DAY 1 LAUNCH-READINESS AUDIT SUITE', () => {
 
     it('Criteria 3: Backend-authoritative product pricing cannot be tampered by client', async () => {
       // In server constants, authoritatively defined in integer minor units
-      expect(PRICING_MINOR_UNITS[PRICING_TIER_CODES.DETAILED_ESTIMATE_499]).toBe(49900);
+      expect(PRICING_MINOR_UNITS[PRICING_TIER_CODES.DETAILED_ESTIMATE_499]).toBe(19900);
       expect(PRICING_MINOR_UNITS[PRICING_TIER_CODES.PREMIUM_1499]).toBe(149900);
       expect(PRICING_MINOR_UNITS[PRICING_TIER_CODES.FREE]).toBe(0);
     });

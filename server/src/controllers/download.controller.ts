@@ -61,13 +61,13 @@ async function verifyDownloadEntitlement(
         return { authorized: true };
       }
     } else {
-      if (tier && (tier.code === 'DETAILED_ESTIMATE_499' || tier.code === 'PREMIUM_1499')) {
+      if (tier && (tier.code === 'DETAILED_ESTIMATE_499' || tier.code === 'COMPLETE_REPORT_199' || tier.code === 'PREMIUM_1499')) {
         return { authorized: true };
       }
       if (tier && (tier.code === 'BASIC_ESTIMATE_PDF' || tier.code === 'ESTIMATE_99')) {
         return {
           authorized: false,
-          reason: 'A ₹99 purchase entitles you to the Basic Estimate PDF summary only. Please unlock Detailed BOQ (₹499) or Premium BOQ (₹1,499) to download detailed BOQ, material takeoff, CSV, or Excel schedules.',
+          reason: 'A basic estimate purchase entitles you to the summary only. Please unlock the Complete Construction Planning & Estimation Report (₹199) to download detailed BOQ, material takeoff, CSV, or Excel schedules.',
         };
       }
     }
@@ -95,8 +95,8 @@ async function verifyDownloadEntitlement(
     authorized: false,
     reason:
       requiredType === 'basic'
-        ? 'Valid entitlement required. Please provide a verified order reference (e.g. HT-PUR-...) or unlock the Basic Estimate PDF (₹99).'
-        : 'Paid entitlement required. Please provide a verified order reference (e.g. HT-PUR-...) or unlock Detailed BOQ (₹499) to download this report.',
+        ? 'Valid entitlement required. Please provide a verified order reference (e.g. HT-PUR-...) to access this summary.'
+        : 'Paid entitlement required. Please provide a verified order reference (e.g. HT-PUR-...) or unlock the Complete Construction Planning & Estimation Report (₹199) to download this report.',
   };
 }
 

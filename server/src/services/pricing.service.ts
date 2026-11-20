@@ -140,7 +140,16 @@ export class PricingService {
       for (const t of this.inMemoryTiers) {
         await (this.prisma as any).pricingTier.upsert({
           where: { code: t.code },
-          update: {},
+          update: {
+            name: t.name,
+            description: t.description,
+            priceMinorUnits: t.priceMinorUnits,
+            active: t.active,
+            purchasable: t.purchasable,
+            sortOrder: t.sortOrder,
+            badge: t.badge,
+            features: t.features,
+          },
           create: {
             id: t.id,
             code: t.code,
@@ -444,6 +453,10 @@ export class PricingService {
     const tier = await this.getTierByCode(payload.tierCode);
     if (!tier) {
       throw new Error(`Invalid pricing tier code: "${payload.tierCode}"`);
+    }
+
+    if (!payload.leadName?.trim() || !payload.leadPhone?.trim() || !payload.leadEmail?.trim()) {
+      throw new Error('Contact details (leadName, leadPhone, leadEmail) are required for purchase');
     }
 
     // Complete package safety rule: unpurchasable until admin configures price > 0 and purchasable = true

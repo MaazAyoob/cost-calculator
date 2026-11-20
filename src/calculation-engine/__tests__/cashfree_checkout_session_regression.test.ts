@@ -281,12 +281,12 @@ describe('Cashfree Checkout Session & API Resilience Regression Suite', () => {
         cf_payment_id: 'cf_pay_998811',
         order_id: orderId,
         payment_status: 'SUCCESS',
-        payment_amount: 499.0,
+        payment_amount: 199.0,
         payment_currency: 'INR',
       },
     ]);
 
-    const verification = await cashfreeService.verifyOrderPayment(orderId, 499.0);
+    const verification = await cashfreeService.verifyOrderPayment(orderId, 199.0);
     expect(verification.verified).toBe(true);
     expect(verification.paymentStatus).toBe('PAID');
 

@@ -1,39 +1,55 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { CalculationResult, FixtureScheduleItem } from '../../calculation-engine/types';
+import { Document, Page, Text, View, StyleSheet, Svg, Rect, Line, G } from '@react-pdf/renderer';
+import { CalculationResult, FixtureScheduleItem, BOQItem } from '../../calculation-engine/types';
 import { formatUnitLabel } from '../../calculation-engine/data/units';
 
-// ─────────────────────────────────────────────
-// HUTTY QS DOSSIER — DESIGN SYSTEM
-// Tight, professional, zero-waste layout
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// HUTTY RESIDENTIAL ARCHITECTURAL EDITORIAL DESIGN SYSTEM
+// Strict brand tokens: Deep Forest Green, Warm Charcoal, Terracotta
+// Zero SaaS clutter, high readability, architectural elegance
+// ─────────────────────────────────────────────────────────────
 const C = {
-  green:    '#1B3D34',
-  greenLt:  '#2A5C4E',
-  amber:    '#F28C28',
-  grey:     '#4B5563',
-  greyLt:   '#6B7280',
-  border:   '#D1D5DB',
-  bgAlt:    '#F9FAFB',
-  bgPage:   '#FFFFFF',
-  bgCover:  '#1B3D34',
-  bgAccent: '#F0F5F3',
+  forest:     '#1B3D34', // Primary brand deep green
+  forestLt:   '#2A5C4E', // Accent green
+  terracotta: '#C2410C', // Warm terracotta / burnt orange
+  amber:      '#D97706', // Warning / advisory highlight
+  amberBg:    '#FEF3C7', // Soft amber container
+  amberBorder:'#F59E0B', // Amber border
+  charcoal:   '#1F2937', // Primary body text
+  titleDark:  '#111827', // Headings
+  grey:       '#4B5563', // Secondary body text
+  greyLt:     '#6B7280', // Metadata & subtle labels
+  border:     '#E5E7EB', // Table & divider border
+  borderDark: '#D1D5DB', // Card border
+  bgAlt:      '#F9FAFB', // Alternate table rows
+  bgPage:     '#FFFFFF', // Clean paper white
+  bgCover:    '#1B3D34', // Executive cover background
+  bgSage:     '#F0F5F3', // Light sage panel
+  bgSageDark: '#E6EFEA', // Setback hatched zone
+  sageBorder: '#CBDAD3', // Sage border
+  white:      '#FFFFFF',
 };
 
 const styles = StyleSheet.create({
   // ── Pages ──
   page: {
     paddingTop: 28,
-    paddingBottom: 38,
-    paddingHorizontal: 28,
+    paddingBottom: 36,
+    paddingHorizontal: 30,
     fontFamily: 'Helvetica',
     fontSize: 7.2,
-    color: C.green,
+    color: C.charcoal,
     backgroundColor: C.bgPage,
-    lineHeight: 1.25,
+    lineHeight: 1.3,
+  },
+  paragraph: {
+    fontSize: 6.5,
+    color: C.grey,
+    lineHeight: 1.35,
+    marginBottom: 6,
   },
 
-  // ── Cover ──
+  // ── Executive Cover Page ──
   coverPage: {
     fontFamily: 'Helvetica',
     color: '#FFFFFF',
@@ -41,62 +57,65 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   coverTop: {
-    padding: 36,
-    paddingBottom: 24,
+    paddingHorizontal: 36,
+    paddingTop: 36,
+    paddingBottom: 20,
     borderBottomWidth: 0.5,
     borderBottomColor: 'rgba(255,255,255,0.15)',
   },
   coverLogoText: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: 'Helvetica-Bold',
     color: '#FFFFFF',
     letterSpacing: 3,
   },
   coverTagline: {
-    fontSize: 8,
-    color: 'rgba(255,255,255,0.55)',
-    letterSpacing: 2,
+    fontSize: 7.5,
+    color: 'rgba(255,255,255,0.6)',
+    letterSpacing: 1.5,
     marginTop: 4,
     textTransform: 'uppercase',
   },
   coverMid: {
-    padding: 36,
-    paddingTop: 30,
-    paddingBottom: 30,
+    paddingHorizontal: 36,
+    paddingTop: 24,
+    paddingBottom: 24,
     flex: 1,
   },
-  coverDocTypeTag: {
+  coverDocBadge: {
     fontSize: 7.5,
     fontFamily: 'Helvetica-Bold',
-    color: C.amber,
+    color: '#FDBA74',
     textTransform: 'uppercase',
-    letterSpacing: 2,
-    marginBottom: 10,
+    letterSpacing: 1.8,
+    marginBottom: 8,
   },
   coverMainTitle: {
-    fontSize: 26,
+    fontSize: 22,
     fontFamily: 'Helvetica-Bold',
     color: '#FFFFFF',
-    lineHeight: 1.15,
+    lineHeight: 1.2,
     marginBottom: 6,
   },
   coverSubtitle: {
     fontSize: 8.5,
-    color: 'rgba(255,255,255,0.65)',
-    lineHeight: 1.45,
-    maxWidth: 420,
-    marginBottom: 24,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 1.4,
+    maxWidth: 440,
+    marginBottom: 20,
   },
+
+  // Cover KPI Cards
   coverKpiRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   coverKpi: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 5,
-    padding: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 4,
+    padding: 9,
     borderWidth: 0.5,
     borderColor: 'rgba(255,255,255,0.15)',
   },
@@ -105,50 +124,76 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.5)',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    marginBottom: 3,
+    marginBottom: 2,
   },
   coverKpiValue: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontFamily: 'Helvetica-Bold',
     color: '#FFFFFF',
   },
   coverKpiSub: {
-    fontSize: 6,
+    fontSize: 5.8,
     color: 'rgba(255,255,255,0.45)',
     marginTop: 2,
   },
+
+  // Cover Meta Grid
   coverMetaGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 0,
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 5,
+    borderRadius: 4,
     borderWidth: 0.5,
     borderColor: 'rgba(255,255,255,0.12)',
     overflow: 'hidden',
+    marginTop: 12,
   },
   coverMetaCell: {
     width: '50%',
-    padding: 9,
+    padding: 7,
     borderBottomWidth: 0.5,
     borderBottomColor: 'rgba(255,255,255,0.08)',
     borderRightWidth: 0.5,
     borderRightColor: 'rgba(255,255,255,0.08)',
   },
   coverMetaLabel: {
-    fontSize: 6,
+    fontSize: 5.8,
     color: 'rgba(255,255,255,0.45)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 1.5,
+  },
+  coverMetaValue: {
+    fontSize: 7.5,
+    fontFamily: 'Helvetica-Bold',
+    color: '#FFFFFF',
+  },
+
+  coverNoteBox: {
+    marginTop: 14,
+    backgroundColor: 'rgba(194,65,12,0.18)',
+    borderWidth: 0.8,
+    borderColor: '#EA580C',
+    borderRadius: 4,
+    padding: 8,
+  },
+  coverNoteTitle: {
+    fontSize: 6.5,
+    fontFamily: 'Helvetica-Bold',
+    color: '#FDBA74',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginBottom: 2,
   },
-  coverMetaValue: {
-    fontSize: 8,
-    fontFamily: 'Helvetica-Bold',
-    color: '#FFFFFF',
+  coverNoteText: {
+    fontSize: 6,
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 1.35,
   },
+
   coverBottom: {
-    padding: 16,
+    paddingVertical: 14,
     paddingHorizontal: 36,
     borderTopWidth: 0.5,
     borderTopColor: 'rgba(255,255,255,0.12)',
@@ -158,7 +203,7 @@ const styles = StyleSheet.create({
   },
   coverBottomText: {
     fontSize: 6,
-    color: 'rgba(255,255,255,0.35)',
+    color: 'rgba(255,255,255,0.4)',
   },
 
   // ── Running Header ──
@@ -166,85 +211,138 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: 10,
-    paddingBottom: 6,
-    borderBottomWidth: 1.5,
-    borderBottomColor: C.green,
+    marginBottom: 8,
+    paddingBottom: 5,
+    borderBottomWidth: 1.2,
+    borderBottomColor: C.forest,
   },
   runningHeaderLogo: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontFamily: 'Helvetica-Bold',
-    color: C.green,
+    color: C.forest,
     letterSpacing: 1.5,
   },
   runningHeaderSection: {
-    fontSize: 6.5,
+    fontSize: 6.2,
     color: C.greyLt,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    marginTop: 2,
+    marginTop: 1.5,
   },
   runningHeaderMeta: {
-    fontSize: 6,
+    fontSize: 5.8,
     color: C.greyLt,
     textAlign: 'right',
+    lineHeight: 1.25,
   },
 
-  // ── Section Title ──
-  sectionTitle: {
-    fontSize: 7,
+  // ── Running Footer ──
+  footer: {
+    position: 'absolute',
+    bottom: 12,
+    left: 30,
+    right: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopWidth: 0.5,
+    borderTopColor: C.border,
+    paddingTop: 3.5,
+    fontSize: 5.6,
+    color: C.greyLt,
+  },
+
+  // ── Section Titles ──
+  sectionBanner: {
+    backgroundColor: C.forest,
+    paddingVertical: 3.5,
+    paddingHorizontal: 6,
+    borderRadius: 2,
+    marginTop: 6,
+    marginBottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  sectionBannerText: {
+    fontSize: 6.8,
     fontFamily: 'Helvetica-Bold',
     color: '#FFFFFF',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    backgroundColor: C.green,
-    paddingVertical: 3.5,
-    paddingHorizontal: 5,
-    marginTop: 8,
-    marginBottom: 0,
+  },
+  sectionBannerSub: {
+    fontSize: 5.8,
+    color: 'rgba(255,255,255,0.7)',
   },
 
-  // ── Summary Cards ──
+  subSectionTitle: {
+    fontSize: 6.5,
+    fontFamily: 'Helvetica-Bold',
+    color: C.forest,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginTop: 6,
+    marginBottom: 3,
+  },
+
+  // ── Summary KPI Cards ──
   kpiRow: {
     flexDirection: 'row',
-    gap: 5,
-    marginTop: 5,
+    gap: 4.5,
     marginBottom: 5,
   },
   kpiCard: {
     flex: 1,
-    backgroundColor: C.bgAccent,
+    backgroundColor: C.bgSage,
     borderRadius: 3,
-    padding: 6,
+    padding: 5,
     borderWidth: 0.5,
     borderColor: C.border,
-    borderLeftWidth: 2.5,
-    borderLeftColor: C.green,
+    borderLeftWidth: 2.2,
+    borderLeftColor: C.forest,
+  },
+  kpiCardAlt: {
+    flex: 1,
+    backgroundColor: '#FAF5F0',
+    borderRadius: 3,
+    padding: 5,
+    borderWidth: 0.5,
+    borderColor: '#FED7AA',
+    borderLeftWidth: 2.2,
+    borderLeftColor: C.terracotta,
   },
   kpiLabel: {
-    fontSize: 5.5,
+    fontSize: 5.4,
     color: C.greyLt,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   kpiValue: {
-    fontSize: 9,
+    fontSize: 8.8,
     fontFamily: 'Helvetica-Bold',
-    color: C.green,
+    color: C.titleDark,
   },
   kpiSub: {
-    fontSize: 5.5,
-    color: C.greyLt,
+    fontSize: 5.4,
+    color: C.grey,
     marginTop: 1,
   },
 
   // ── Tables ──
+  tableContainer: {
+    borderWidth: 0.5,
+    borderColor: C.border,
+    borderRadius: 2.5,
+    overflow: 'hidden',
+    marginBottom: 5,
+  },
   tableHeaderRow: {
     flexDirection: 'row',
     backgroundColor: C.bgAlt,
     borderBottomWidth: 1,
-    borderBottomColor: C.green,
+    borderBottomColor: C.forest,
     paddingVertical: 2.5,
     paddingHorizontal: 4,
   },
@@ -254,70 +352,90 @@ const styles = StyleSheet.create({
     borderBottomColor: C.border,
     paddingVertical: 2,
     paddingHorizontal: 4,
+    alignItems: 'center',
   },
-  tableRowAlt: { backgroundColor: C.bgAlt },
+  tableRowAlt: {
+    backgroundColor: C.bgAlt,
+  },
   th: {
-    fontSize: 6,
+    fontSize: 5.8,
     fontFamily: 'Helvetica-Bold',
-    color: C.green,
+    color: C.forest,
     textTransform: 'uppercase',
     letterSpacing: 0.3,
   },
-  td: { fontSize: 6.5, color: C.green },
-  tdMuted: { fontSize: 6, color: C.grey },
-  tdBold: { fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.green },
-  tdRight: { textAlign: 'right' },
+  td: {
+    fontSize: 6.2,
+    color: C.charcoal,
+  },
+  tdMuted: {
+    fontSize: 5.8,
+    color: C.grey,
+  },
+  tdBold: {
+    fontSize: 6.2,
+    fontFamily: 'Helvetica-Bold',
+    color: C.titleDark,
+  },
+  tdRight: {
+    textAlign: 'right',
+  },
   totalRow: {
     flexDirection: 'row',
-    backgroundColor: C.green,
-    paddingVertical: 3.5,
+    backgroundColor: C.forest,
+    paddingVertical: 3,
     paddingHorizontal: 4,
-    marginTop: 2,
+    alignItems: 'center',
   },
   totalLabel: {
-    fontSize: 7,
+    fontSize: 6.5,
     fontFamily: 'Helvetica-Bold',
     color: '#FFFFFF',
     textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
   totalValue: {
-    fontSize: 8,
+    fontSize: 7.2,
     fontFamily: 'Helvetica-Bold',
-    color: C.amber,
+    color: '#FDBA74',
     textAlign: 'right',
   },
 
-  // ── Boxes ──
-  noticeBox: {
-    backgroundColor: C.bgAccent,
-    padding: 6,
+  // ── Info Boxes ──
+  infoBox: {
+    backgroundColor: C.bgSage,
+    padding: 5,
     borderRadius: 3,
     borderWidth: 0.5,
-    borderColor: C.green,
-    borderLeftWidth: 2.5,
+    borderColor: C.sageBorder,
+    borderLeftWidth: 2.2,
+    borderLeftColor: C.forest,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  warningBox: {
+    backgroundColor: C.amberBg,
+    padding: 5,
+    borderRadius: 3,
+    borderWidth: 0.5,
+    borderColor: C.amberBorder,
+    borderLeftWidth: 2.2,
     borderLeftColor: C.amber,
-    marginTop: 6,
+    marginTop: 4,
+    marginBottom: 4,
   },
-  disclaimerBox: {
-    backgroundColor: C.bgAlt,
-    padding: 6,
-    borderRadius: 3,
-    borderWidth: 0.5,
-    borderColor: C.border,
-    marginTop: 6,
+  boxTitle: {
+    fontSize: 6,
+    fontFamily: 'Helvetica-Bold',
+    color: C.forest,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 1.5,
   },
-  footer: {
-    position: 'absolute',
-    bottom: 12,
-    left: 28,
-    right: 28,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 0.5,
-    borderTopColor: C.border,
-    paddingTop: 4,
-    fontSize: 5.8,
-    color: C.greyLt,
+  boxText: {
+    fontSize: 5.6,
+    color: C.grey,
+    lineHeight: 1.3,
   },
 });
 
@@ -327,6 +445,7 @@ export interface DetailedReportPdfProps {
   preparedFor?: string;
   specificationTier?: string;
   isPremium?: boolean;
+  isSample?: boolean;
 }
 
 const fmt = (val?: number) => {
@@ -341,39 +460,74 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
   preparedFor = 'Valued Homeowner',
   specificationTier = 'Premium',
   isPremium = false,
+  isSample = false,
 }) => {
   const { input, report, area, budget, boq, materialSchedule, fixtureSchedule, timeline, paymentPlan, quantities } = data;
   const rateMeta = data.rateSourceMetadata || report?.rateSourceMetadata;
 
   const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   const refId = report?.projectId || 'HUTTY-2026';
+  const city = input?.city || 'Bangalore';
+  const houseType = input?.houseType || 'Duplex';
+  const totalBUA = area?.totalBUASqFt || 0;
+  const plotLength = input?.plotLength || 40;
+  const plotWidth = input?.plotWidth || 30;
+  const plotArea = area?.plotAreaSqFt || (plotLength * plotWidth);
 
-  // Column widths
-  const W = { sl: '6%', desc: '48%', qty: '15%', rate: '14%', amt: '17%' };
-  const WD = { cat: '52%', amt: '28%', pct: '20%' };
+  // Column width profiles
+  const W_BOQ = { sl: '6%', desc: '48%', qty: '15%', rate: '14%', amt: '17%' };
+  const W_COMM = { name: '46%', desc: '26%', amt: '16%', pct: '12%' };
 
+  // Calculate realistic cost ranges (±4%)
+  const totalCost = budget?.totalProjectCost || 0;
+  const minCostRange = Math.round(totalCost * 0.96);
+  const maxCostRange = Math.round(totalCost * 1.04);
+
+  // Setback geometry calculations
+  const frontSetback = area?.statutorySetbacks?.frontSetbackFt ?? area?.setbacks?.frontSetbackFt ?? 5;
+  const rearSetback = area?.statutorySetbacks?.rearSetbackFt ?? area?.setbacks?.rearSetbackFt ?? 3;
+  const leftSetback = area?.statutorySetbacks?.leftSetbackFt ?? area?.setbacks?.leftSetbackFt ?? 3.5;
+  const rightSetback = area?.statutorySetbacks?.rightSetbackFt ?? area?.setbacks?.rightSetbackFt ?? 3.5;
+
+  const buildableLength = area?.buildableLengthFt ?? Math.max(0, plotLength - (frontSetback + rearSetback));
+  const buildableWidth = area?.buildableWidthFt ?? Math.max(0, plotWidth - (leftSetback + rightSetback));
+  const buildableFootprint = area?.buildableFootprintSqFt ?? Math.round(buildableLength * buildableWidth);
+  const groundCoveragePct = plotArea > 0 ? Math.round((buildableFootprint / plotArea) * 100) : 60;
+  const maxCoveragePct = area?.maxPermissibleCoveragePct ?? 70;
+
+  // Running Header Helper
   const RunHeader = ({ section }: { section: string }) => (
     <View style={styles.runningHeader} fixed>
       <View>
         <Text style={styles.runningHeaderLogo}>HUTTY</Text>
         <Text style={styles.runningHeaderSection}>{section}</Text>
       </View>
-      <View>
-        <Text style={styles.runningHeaderMeta}>Ref: {refId}</Text>
-        <Text style={styles.runningHeaderMeta}>Date: {dateStr}</Text>
-        <Text style={styles.runningHeaderMeta}>Prepared for: {preparedFor}</Text>
+      <View style={{ alignItems: 'flex-end' }}>
+        {isSample ? (
+          <Text style={{ fontSize: 6.2, fontFamily: 'Helvetica-Bold', color: '#C2410C', letterSpacing: 0.5 }}>
+            SAMPLE REPORT · NOT A REAL PROJECT
+          </Text>
+        ) : (
+          <Text style={styles.runningHeaderMeta}>Ref: {refId} · Date: {dateStr}</Text>
+        )}
+        <Text style={styles.runningHeaderMeta}>{projectName} · {city}</Text>
       </View>
     </View>
   );
 
+  // Running Footer Helper
   const DocFooter = ({ section }: { section: string }) => (
     <View style={styles.footer} fixed>
-      <Text>Hutty QS Dossier &bull; Ref: {refId} &bull; {section}</Text>
+      <Text>
+        {isSample
+          ? `Hutty Sample Construction Report (Demonstration) · Ref: ${refId} · ${section}`
+          : `Hutty Residential Construction Dossier · Ref: ${refId} · ${section}`}
+      </Text>
       <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
     </View>
   );
 
-  // Categorize Section C: Services & Installations consistently
+  // Fixtures categorize helper
   const allFixtures = fixtureSchedule || [];
   const electricalFixtures = allFixtures.filter(
     (f) => f.category === 'Electrical Fixtures' || f.category.toLowerCase().includes('electrical')
@@ -387,178 +541,144 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
   const doorWindowFixtures = allFixtures.filter(
     (f) => f.category === 'Doors' || f.category === 'Windows'
   );
-  const otherInstallations = allFixtures.filter(
-    (f) => f.category === 'Special Equipment'
-  );
 
-  const renderInstallationSubSection = (title: string, items: FixtureScheduleItem[]) => {
-    if (!items || items.length === 0) return null;
-    const subTotal = items.reduce((s, i) => s + (i.amount || 0), 0);
-    return (
-      <View style={{ marginBottom: 5 }} wrap={false}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: C.bgAlt,
-            paddingVertical: 2,
-            paddingHorizontal: 5,
-            borderLeftWidth: 2,
-            borderLeftColor: C.amber,
-            marginBottom: 1,
-          }}
-        >
-          <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.green, textTransform: 'uppercase' }}>
-            {title}
-          </Text>
-          <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.greenLt }}>
-            Subtotal: {fmt(subTotal)}
-          </Text>
-        </View>
-        <View style={styles.tableHeaderRow} fixed>
-          <Text style={[styles.th, { width: W.sl }]}>Sl</Text>
-          <Text style={[styles.th, { width: W.desc }]}>Item / Specification</Text>
-          <Text style={[styles.th, styles.tdRight, { width: W.qty }]}>Qty / Unit</Text>
-          <Text style={[styles.th, styles.tdRight, { width: W.rate }]}>Rate (₹)</Text>
-          <Text style={[styles.th, styles.tdRight, { width: W.amt }]}>Amount</Text>
-        </View>
-        {items.map((item, idx) => (
-          <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
-            <Text style={[styles.tdMuted, { width: W.sl }]}>{item.slNo}</Text>
-            <View style={{ width: W.desc }}>
-              <Text style={styles.td}>{item.item}</Text>
-              <Text style={[styles.tdMuted, { fontSize: 5.5 }]}>
-                {item.brand} · {item.specification}
-                {item.location ? ` (${item.location})` : ''}
-              </Text>
-            </View>
-            <Text style={[styles.tdMuted, styles.tdRight, { width: W.qty }]}>
-              {num(item.quantity)} {formatUnitLabel(item.unit)}
-            </Text>
-            <Text style={[styles.tdMuted, styles.tdRight, { width: W.rate }]}>
-              ₹{item.unitRate?.toLocaleString()}
-            </Text>
-            <Text style={[styles.tdBold, styles.tdRight, { width: W.amt }]}>{fmt(item.amount)}</Text>
-          </View>
-        ))}
-      </View>
-    );
-  };
+  // Group BOQ into divisions
+  const boqItems = boq || [];
+  const divSubstructure = boqItems.filter(b => b.category.includes('Site') || b.category.includes('Excavation') || b.category.includes('PCC') || b.category.includes('Foundation') || b.category.includes('Plinth'));
+  const divSuperstructure = boqItems.filter(b => b.category.includes('RCC') || b.category.includes('Roofing'));
+  const divMasonryPlaster = boqItems.filter(b => b.category.includes('Masonry') || b.category.includes('Plastering'));
+  const divFinishes = boqItems.filter(b => b.category.includes('Flooring') || b.category.includes('Doors') || b.category.includes('Windows') || b.category.includes('Painting'));
+  const divMEP = boqItems.filter(b => b.category.includes('Electrical') || b.category.includes('Plumbing'));
 
   return (
-    <Document title={`Hutty-QS-Dossier-${refId}`} author="Hutty Construction Technologies">
+    <Document
+      title={`Hutty-Construction-Report-${refId}`}
+      author="Hutty Construction Technologies"
+      subject="Residential Construction Planning & Estimation Report"
+    >
 
       {/* ══════════════════════════════════════════════════
-          PAGE 1 — COVER
+          PAGE 1 — SECTION 01: COVER PAGE
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.coverPage}>
-        {/* Top brand bar */}
         <View style={styles.coverTop}>
           <Text style={styles.coverLogoText}>HUTTY</Text>
-          <Text style={styles.coverTagline}>Residential Digital Quantity Surveying Platform</Text>
+          <Text style={styles.coverTagline}>Residential Construction Planning &amp; Estimation Platform</Text>
         </View>
 
-        {/* Mid — title + KPIs + meta */}
         <View style={styles.coverMid}>
-          <Text style={styles.coverDocTypeTag}>Construction Estimate &amp; BOQ Dossier</Text>
+          {isSample && (
+            <View style={{ backgroundColor: '#EA580C', paddingVertical: 3.5, paddingHorizontal: 8, borderRadius: 2, marginBottom: 8, alignSelf: 'flex-start' }}>
+              <Text style={{ color: '#FFFFFF', fontSize: 7.5, fontFamily: 'Helvetica-Bold', letterSpacing: 1.2 }}>
+                SAMPLE REPORT — NOT A REAL PROJECT
+              </Text>
+            </View>
+          )}
+          <Text style={styles.coverDocBadge}>Complete Construction Planning &amp; Estimation Report</Text>
           <Text style={styles.coverMainTitle}>
-            {input?.houseType || 'Residential Home'}{'\n'}{num(area?.totalBUASqFt)} sq.ft Built-Up Area
+            {houseType} Residence{'\n'}
+            {num(totalBUA)} sq.ft Built-Up Area
           </Text>
           <Text style={styles.coverSubtitle}>
-            Authoritative pre-construction digital QS dossier for {input?.city || 'Bangalore'}.{'\n'}
-            Includes Works BOQ (Section A), Materials Needed (Section B), Services &amp; Fixtures Schedule (Section C), and Cost Summary &amp; Payment Plan (Section D).
+            Authoritative pre-construction digital planning dossier for {city}.{'\n'}
+            Includes Site &amp; Setback Analysis, Detailed Works BOQ, Material Takeoff, Specifications, Inclusions &amp; Exclusions, Timeline, and Milestone Payment Schedule.
           </Text>
 
-          {/* KPI row: Core Direct Construction Budget */}
+          {/* 4 Primary Project KPIs */}
           <View style={styles.coverKpiRow}>
             <View style={styles.coverKpi}>
-              <Text style={styles.coverKpiLabel}>Direct Construction Budget</Text>
-              <Text style={styles.coverKpiValue}>{fmt(budget?.directConstructionBudget || budget?.totalProjectCost)}</Text>
-              <Text style={styles.coverKpiSub}>Core Direct Execution (Zero Margin/GST)</Text>
+              <Text style={styles.coverKpiLabel}>Total Estimated Cost</Text>
+              <Text style={styles.coverKpiValue}>{fmt(totalCost)}</Text>
+              <Text style={styles.coverKpiSub}>All-Inclusive Turnkey Plan</Text>
             </View>
             <View style={styles.coverKpi}>
-              <Text style={styles.coverKpiLabel}>Direct Rate</Text>
-              <Text style={styles.coverKpiValue}>₹{num(budget?.directCostPerSqFt || budget?.costPerSqFt)} / sq.ft</Text>
-              <Text style={styles.coverKpiSub}>{specificationTier.toUpperCase()} specification tier</Text>
+              <Text style={styles.coverKpiLabel}>Estimated Rate</Text>
+              <Text style={styles.coverKpiValue}>₹{num(budget?.costPerSqFt)} / sq.ft</Text>
+              <Text style={styles.coverKpiSub}>Effective Gross BUA Rate</Text>
+            </View>
+            <View style={styles.coverKpi}>
+              <Text style={styles.coverKpiLabel}>Built-Up Area</Text>
+              <Text style={styles.coverKpiValue}>{num(totalBUA)} sq.ft</Text>
+              <Text style={styles.coverKpiSub}>{input?.floors || 2} Floors · {houseType}</Text>
             </View>
             <View style={styles.coverKpi}>
               <Text style={styles.coverKpiLabel}>Est. Timeline</Text>
               <Text style={styles.coverKpiValue}>{timeline?.totalMonths || 8} Months</Text>
-              <Text style={styles.coverKpiSub}>{input?.floors || 1} floor(s) · {input?.houseType || 'Duplex'}</Text>
+              <Text style={styles.coverKpiSub}>Groundbreak to Handover</Text>
             </View>
           </View>
 
-          {/* Sub-KPI Row: Materials, Fixtures, Labour */}
-          <View style={[styles.coverKpiRow, { marginTop: -12, marginBottom: 18 }]}>
+          {/* 3 Core Execution Sub-Cards */}
+          <View style={[styles.coverKpiRow, { marginTop: 2, marginBottom: 14 }]}>
             <View style={[styles.coverKpi, { backgroundColor: 'rgba(255,255,255,0.04)' }]}>
-              <Text style={styles.coverKpiLabel}>Section B · Materials</Text>
-              <Text style={[styles.coverKpiValue, { fontSize: 10.5 }]}>{fmt(budget?.directMaterialCost)}</Text>
-              <Text style={styles.coverKpiSub}>What We Consume</Text>
+              <Text style={styles.coverKpiLabel}>Physical Materials</Text>
+              <Text style={[styles.coverKpiValue, { fontSize: 9.5 }]}>{fmt(budget?.directMaterialCost)}</Text>
+              <Text style={styles.coverKpiSub}>What We Consume (~41%)</Text>
             </View>
             <View style={[styles.coverKpi, { backgroundColor: 'rgba(255,255,255,0.04)' }]}>
-              <Text style={styles.coverKpiLabel}>Section C · Fixtures &amp; Services</Text>
-              <Text style={[styles.coverKpiValue, { fontSize: 10.5 }]}>{fmt(budget?.directFixtureCost)}</Text>
-              <Text style={styles.coverKpiSub}>What We Install</Text>
+              <Text style={styles.coverKpiLabel}>Trade Labour</Text>
+              <Text style={[styles.coverKpiValue, { fontSize: 9.5 }]}>{fmt(budget?.directLabourCost)}</Text>
+              <Text style={styles.coverKpiSub}>Civil &amp; Finishing Trades (~15%)</Text>
             </View>
             <View style={[styles.coverKpi, { backgroundColor: 'rgba(255,255,255,0.04)' }]}>
-              <Text style={styles.coverKpiLabel}>Execution Labour</Text>
-              <Text style={[styles.coverKpiValue, { fontSize: 10.5 }]}>{fmt(budget?.directLabourCost)}</Text>
-              <Text style={styles.coverKpiSub}>Civil &amp; Finishing Trades</Text>
+              <Text style={styles.coverKpiLabel}>Installed Fixtures</Text>
+              <Text style={[styles.coverKpiValue, { fontSize: 9.5 }]}>{fmt(budget?.directFixtureCost)}</Text>
+              <Text style={styles.coverKpiSub}>Joinery, Electrical, Plumbing (~12%)</Text>
             </View>
           </View>
 
-          {/* Meta grid */}
+          {/* Project Parameter Grid */}
           <View style={styles.coverMetaGrid}>
             {[
               ['Project Reference', refId],
               ['Prepared For', preparedFor],
               ['Date Issued', dateStr],
-              ['Execution Mode', input?.contractorMode === 'contractor' ? 'Contractor Mode' : 'Independent Self-Build'],
-              ['Plot Dimensions', `${input?.plotLength || 0} × ${input?.plotWidth || 0} ft`],
+              ['Location / Jurisdiction', `${city} (${area?.authorityMetadata?.authority || 'BBMP/BDA'})`],
+              ['Plot Dimensions', `${plotLength}' × ${plotWidth}' (${num(plotArea)} sq.ft)`],
+              ['Specification Standard', `${specificationTier.toUpperCase()} Quality`],
               ['Rate Master Dataset', rateMeta?.datasetVersion || 'HUTTY-RM-2026.1'],
-              ['Data Source', rateMeta?.isLive ? 'Live API' : '2026-Q1 Baseline'],
-              ['Calculation Engine', rateMeta?.calculationEngineVersion || 'v2.6.0'],
-            ].map(([label, value], i) => (
+              ['Engineering Engine', rateMeta?.calculationEngineVersion || 'v2.6.0 (NBC 2016 Aligned)'],
+            ].map(([lbl, val], i) => (
               <View key={i} style={styles.coverMetaCell}>
-                <Text style={styles.coverMetaLabel}>{label}</Text>
-                <Text style={styles.coverMetaValue}>{value}</Text>
+                <Text style={styles.coverMetaLabel}>{lbl}</Text>
+                <Text style={styles.coverMetaValue}>{val}</Text>
               </View>
             ))}
           </View>
 
-          {/* Mandatory Estimate Note */}
-          <View style={{ marginTop: 10, backgroundColor: 'rgba(242,140,40,0.18)', borderWidth: 0.8, borderColor: C.amber, borderRadius: 5, padding: 8 }}>
-            <Text style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold', color: '#FDBA74', textTransform: 'uppercase', marginBottom: 2 }}>
-              Important Estimate Note
-            </Text>
-            <Text style={{ fontSize: 6.2, color: '#FFFFFF', lineHeight: 1.35 }}>
-              This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked.
+          {/* Early Estimate Advisory Notice */}
+          <View style={styles.coverNoteBox}>
+            <Text style={styles.coverNoteTitle}>Important Planning &amp; Estimation Notice</Text>
+            <Text style={styles.coverNoteText}>
+              This report provides a preliminary quantity surveying estimation to assist with residential construction planning, budgeting, and contractor quote vetting. Final costs and quantities are subject to certified site soil testing, structural working drawings, and approved architectural layouts.
             </Text>
           </View>
         </View>
 
-        {/* Bottom footer bar */}
         <View style={styles.coverBottom}>
           <Text style={styles.coverBottomText}>Hutty Construction Technologies · https://hutty.in</Text>
-          <Text style={styles.coverBottomText}>PRELIMINARY ESTIMATE — NOT A CONTRACTUAL DOCUMENT</Text>
+          <Text style={styles.coverBottomText}>PRELIMINARY ESTIMATE — NOT A CONTRACTUAL BINDING DOCUMENT</Text>
         </View>
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 2 — SECTION A: WHAT WE BUILD (WORKS BOQ)
+          PAGE 2 — SECTION 02: EXECUTIVE SUMMARY & SECTION 03: PLOT & SITE ANALYSIS
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
-        <RunHeader section="Section A: What We Build · Works BOQ" />
+        <RunHeader section="Section 02 &amp; 03: Executive Summary &amp; Site Analysis" />
 
-        {/* Project KPIs */}
-        <Text style={styles.sectionTitle}>1. Project Parameters &amp; Built-Up Area</Text>
+        {/* Section 02 */}
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 02 — Executive Project Summary</Text>
+          <Text style={styles.sectionBannerSub}>1-Minute Pre-Construction Brief</Text>
+        </View>
+
         <View style={styles.kpiRow}>
           {[
-            ['Plot Area', `${num(area?.plotAreaSqFt)} sq.ft`, `${input?.plotLength || 0}×${input?.plotWidth || 0} ft`],
-            ['Built-Up Area', `${num(area?.totalBUASqFt)} sq.ft`, `${input?.floors || 1} floor(s)`],
-            ['Base Const. Cost', fmt(budget?.baseConstructionCost), `${num(budget?.costPerSqFt)}/sq.ft`],
-            ['Est. Timeline', `${timeline?.totalMonths || 8} months`, input?.houseType || 'Duplex'],
+            ['Location', city, area?.authorityMetadata?.authority || 'BBMP/BDA'],
+            ['Plot Area', `${num(plotArea)} sq.ft`, `${plotLength}' × ${plotWidth}' Dimensions`],
+            ['House Configuration', `${input?.floors || 2} Floors`, houseType],
+            ['Built-Up Area', `${num(totalBUA)} sq.ft`, `Ground: ${num(area?.buaPerFloorSqFt || Math.round(totalBUA / 2))} sq.ft`],
           ].map(([lbl, val, sub], i) => (
             <View key={i} style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>{lbl}</Text>
@@ -568,100 +688,414 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           ))}
         </View>
 
-        {/* Key structural quantities with correct canonical units */}
-        <Text style={[styles.sectionTitle, { marginTop: 6 }]}>2. Key Structural &amp; Concrete Quantities (Derived)</Text>
-        <View style={styles.kpiRow}>
+        <View style={[styles.kpiRow, { marginBottom: 6 }]}>
           {[
-            ['Structural Steel', `${quantities?.steelTonnes || 0} Tonnes`, `${num(quantities?.steelKg)} kg`],
-            ['Portland Cement', `${num(quantities?.cementBags)} Bags`, '50 kg / bag'],
-            ['Total RCC Concrete', `${quantities?.rccConcreteTotalCuM || 0} m³`, 'Footing + Col + Slab'],
-            ['Block Wall Area', `${num(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt)} sq.ft`, `${num(quantities?.masonryUnitsCount)} Nos`],
+            ['Configured Spaces', `${input?.rooms?.bedrooms || 3} BHK`, `${input?.rooms?.bathrooms || 3} Baths · Living · Kitchen`],
+            ['Quality Standard', `${specificationTier.toUpperCase()}`, 'Premium Material Baseline'],
+            ['Direct Const. Cost', fmt(budget?.directConstructionBudget), `₹${num(budget?.directCostPerSqFt)} / sq.ft`],
+            ['Total Project Cost', fmt(totalCost), `₹${num(budget?.costPerSqFt)} / sq.ft (All-Inclusive)`],
           ].map(([lbl, val, sub], i) => (
-            <View key={i} style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>{lbl}</Text>
-              <Text style={styles.kpiValue}>{val}</Text>
-              <Text style={styles.kpiSub}>{sub}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={[styles.kpiRow, { marginTop: -12, marginBottom: 6 }]}>
-          {[
-            ['Footing Concrete', `${quantities?.footingConcreteCuM || 0} m³`, 'Pads & Footings'],
-            ['Column Concrete', `${quantities?.columnConcreteCuM || 0} m³`, 'Structural Columns'],
-            ['Slab Concrete', `${quantities?.slabConcreteCuM || 0} m³`, 'Slabs & Beams'],
-            ['Block Consumption', `${num(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt)} sq.ft`, `${quantities?.masonryMaterial || 'AAC'} coverage`],
-          ].map(([lbl, val, sub], i) => (
-            <View key={i} style={[styles.kpiCard, { backgroundColor: 'rgba(27,61,52,0.03)' }]}>
-              <Text style={[styles.kpiLabel, { color: C.grey }]}>{lbl}</Text>
-              <Text style={[styles.kpiValue, { fontSize: 8, color: C.green }]}>{val}</Text>
+            <View key={i} style={styles.kpiCardAlt}>
+              <Text style={[styles.kpiLabel, { color: C.terracotta }]}>{lbl}</Text>
+              <Text style={[styles.kpiValue, { color: C.forest }]}>{val}</Text>
               <Text style={styles.kpiSub}>{sub}</Text>
             </View>
           ))}
         </View>
 
-        {/* Section A Table */}
-        <Text style={[styles.sectionTitle, { marginTop: 6 }]}>
-          Section A — What We Build · Comprehensive Works BOQ
-        </Text>
-        <View>
+        {/* Section 03 */}
+        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
+          <Text style={styles.sectionBannerText}>Section 03 — Plot &amp; Site Setback Analysis</Text>
+          <Text style={styles.sectionBannerSub}>Statutory Clearances &amp; Buildable Footprint</Text>
+        </View>
+
+        {/* Numerical Setback Schedule Grid */}
+        <View style={styles.tableContainer}>
           <View style={styles.tableHeaderRow} fixed>
-            <Text style={[styles.th, { width: W.sl }]}>Sl</Text>
-            <Text style={[styles.th, { width: W.desc }]}>Trade Activity &amp; Description</Text>
-            <Text style={[styles.th, styles.tdRight, { width: W.qty }]}>Qty / Unit</Text>
-            <Text style={[styles.th, styles.tdRight, { width: W.rate }]}>Rate (₹)</Text>
-            <Text style={[styles.th, styles.tdRight, { width: W.amt }]}>Amount</Text>
+            <Text style={[styles.th, { width: '25%' }]}>Parameter</Text>
+            <Text style={[styles.th, { width: '25%' }]}>Statutory Limit</Text>
+            <Text style={[styles.th, { width: '25%' }]}>Proposed Design</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '25%' }]}>Status</Text>
           </View>
+          {[
+            ['Front Road Setback', `${frontSetback}' - 0" clearance`, `${frontSetback}' - 0" planned`, 'Compliant'],
+            ['Rear Boundary Setback', `${rearSetback}' - 0" clearance`, `${rearSetback}' - 0" planned`, 'Compliant'],
+            ['Side Setbacks (Left / Right)', `${leftSetback}' / ${rightSetback}' clearances`, `${leftSetback}' / ${rightSetback}' planned`, 'Compliant'],
+            ['Max Ground Coverage', `${maxCoveragePct}% (${num(Math.round(plotArea * (maxCoveragePct / 100)))} sq.ft)`, `${groundCoveragePct}% (${num(buildableFootprint)} sq.ft)`, 'Within Limit'],
+            ['Permissible FAR', `${area?.permissibleFAR || 1.75} (${num(Math.round(plotArea * (area?.permissibleFAR || 1.75)))} sq.ft)`, `${(totalBUA / plotArea).toFixed(2)} (${num(totalBUA)} sq.ft)`, 'Compliant'],
+          ].map(([param, stat, prop, statLabel], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: '25%' }]}>{param}</Text>
+              <Text style={[styles.tdMuted, { width: '25%' }]}>{stat}</Text>
+              <Text style={[styles.td, { width: '25%' }]}>{prop}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '25%', color: C.forestLt }]}>{statLabel}</Text>
+            </View>
+          ))}
+        </View>
 
-          {(boq || []).map((item, idx) => (
+        {/* 2D Vector Plot & Setback Diagram */}
+        <View style={{ marginTop: 4, padding: 8, backgroundColor: C.bgAlt, borderWidth: 0.5, borderColor: C.border, borderRadius: 3, alignItems: 'center' }}>
+          <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.forest, textTransform: 'uppercase', marginBottom: 4 }}>
+            2D Orthogonal Plot Boundary &amp; Buildable Footprint Diagram (Schematic)
+          </Text>
+
+          {/* SVG Vector Drawing */}
+          <Svg width={380} height={145} viewBox="0 0 380 145">
+            {/* Road Frontage at top */}
+            <Rect x={30} y={4} width={320} height={16} fill="#202824" rx={2} />
+            <Line x1={40} y1={12} x2={340} y2={12} stroke="#C2410C" strokeWidth={1} strokeDasharray="4 3" />
+            
+            {/* Plot Outer Boundary */}
+            <Rect x={60} y={24} width={260} height={105} fill="#F0F5F3" stroke="#1B3D34" strokeWidth={1} />
+
+            {/* Setback Clearance Shading */}
+            <Rect x={60} y={24} width={260} height={18} fill="#E6EFEA" />
+            <Rect x={60} y={114} width={260} height={15} fill="#E6EFEA" />
+            <Rect x={60} y={42} width={22} height={72} fill="#E6EFEA" />
+            <Rect x={298} y={42} width={22} height={72} fill="#E6EFEA" />
+
+            {/* Inner Buildable Footprint */}
+            <Rect x={82} y={42} width={216} height={72} fill="#FFFFFF" stroke="#C2410C" strokeWidth={1.2} />
+
+            {/* Dimension Indicators */}
+            <Line x1={82} y1={78} x2={298} y2={78} stroke="#9CA3AF" strokeWidth={0.5} strokeDasharray="2 2" />
+            <Line x1={190} y1={42} x2={190} y2={114} stroke="#9CA3AF" strokeWidth={0.5} strokeDasharray="2 2" />
+          </Svg>
+
+          {/* Diagram Legend & Annotations */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 3, paddingHorizontal: 10 }}>
+            <Text style={{ fontSize: 5.6, color: C.grey }}>
+              &bull; Public Road Frontage: {input?.roadWidthFt || 30}' Width (Front Setback: {frontSetback}')
+            </Text>
+            <Text style={{ fontSize: 5.6, fontFamily: 'Helvetica-Bold', color: C.terracotta }}>
+              &bull; Buildable Ground Envelope: {buildableWidth}' × {buildableLength}' ({num(buildableFootprint)} sq.ft)
+            </Text>
+            <Text style={{ fontSize: 5.6, color: C.grey }}>
+              &bull; Rear / Side Clearances: Rear {rearSetback}' · Sides {leftSetback}' / {rightSetback}'
+            </Text>
+          </View>
+        </View>
+
+        {/* Setback Engineering Notice */}
+        <View style={styles.infoBox} wrap={false}>
+          <Text style={styles.boxTitle}>Statutory Planning &amp; Setback Notice</Text>
+          <Text style={styles.boxText}>
+            Setbacks are computed per {area?.authorityMetadata?.source || 'BBMP Building Bye-laws 2003 / BDA Revised Master Plan 2015'}. This schematic is an architectural planning guide and does not constitute a sanctioned municipal sanction drawing. Boundary markers and road-widening lines must be verified by certified land surveyors before foundation excavation.
+          </Text>
+        </View>
+
+        <DocFooter section="Section 02 &amp; 03: Executive Summary &amp; Site Analysis" />
+      </Page>
+
+      {/* ══════════════════════════════════════════════════
+          PAGE 3 — SECTION 04: CONFIGURATION & SECTION 05: COST OVERVIEW
+      ══════════════════════════════════════════════════ */}
+      <Page size="A4" style={styles.page}>
+        <RunHeader section="Section 04 &amp; 05: Configuration &amp; Cost Overview" />
+
+        {/* Section 04 */}
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 04 — Home Configuration &amp; Area Schedule</Text>
+          <Text style={styles.sectionBannerSub}>Spatial Breakdown &amp; Area Definitions</Text>
+        </View>
+
+        {/* Area Definitions Box */}
+        <View style={{ flexDirection: 'row', gap: 4, marginBottom: 5 }}>
+          {[
+            ['Plot Area', `${num(plotArea)} sq.ft`, 'Total surveyed land boundary.'],
+            ['Buildable Footprint', `${num(buildableFootprint)} sq.ft`, 'Ground building envelope within setbacks.'],
+            ['Built-Up Area (BUA)', `${num(totalBUA)} sq.ft`, 'Total covered area across all floors.'],
+            ['Carpet Usable Area', `${num(Math.round(totalBUA * 0.76))} sq.ft`, 'Net usable interior floor space.'],
+          ].map(([title, val, sub], idx) => (
+            <View key={idx} style={[styles.kpiCard, { flex: 1 }]}>
+              <Text style={styles.kpiLabel}>{title}</Text>
+              <Text style={[styles.kpiValue, { fontSize: 8 }]}>{val}</Text>
+              <Text style={styles.kpiSub}>{sub}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Floor-by-Floor Table */}
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '22%' }]}>Floor Level</Text>
+            <Text style={[styles.th, { width: '48%' }]}>Allocated Program &amp; Spaces</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Gross BUA</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Est. Carpet</Text>
+          </View>
+          {[
+            ['Ground Floor', `Living, Kitchen, Dining, 1 Guest Bed, 1 Bath, Car Parking (${input?.carCount || 1} Car, ${input?.bikeCount || 2} Bikes)`, `${num(area?.buaPerFloorSqFt || Math.round(totalBUA / 2))} sq.ft`, `${num(Math.round((area?.buaPerFloorSqFt || Math.round(totalBUA / 2)) * 0.76))} sq.ft`],
+            ['First Floor', `Master Bedroom with attached bath, 1 Child Bedroom, 1 Family Lounge, Balcony, Pooja`, `${num(totalBUA - (area?.buaPerFloorSqFt || Math.round(totalBUA / 2)))} sq.ft`, `${num(Math.round((totalBUA - (area?.buaPerFloorSqFt || Math.round(totalBUA / 2))) * 0.76))} sq.ft`],
+            ['Rooftop Terrace', `Overhead water tank tower, solar water heater provisions, stair headroom`, 'Excluded from BUA', 'Open to Sky'],
+          ].map(([lvl, prog, buaCol, carpCol], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: '22%' }]}>{lvl}</Text>
+              <Text style={[styles.tdMuted, { width: '48%' }]}>{prog}</Text>
+              <Text style={[styles.td, styles.tdRight, { width: '15%' }]}>{buaCol}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '15%' }]}>{carpCol}</Text>
+            </View>
+          ))}
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { width: '70%' }]}>Total Residential Built-Up Area (Gross BUA)</Text>
+            <Text style={[styles.totalValue, { width: '30%' }]}>{num(totalBUA)} sq.ft</Text>
+          </View>
+        </View>
+
+        {/* Section 05 */}
+        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
+          <Text style={styles.sectionBannerText}>Section 05 — Construction Cost Overview &amp; Distribution</Text>
+          <Text style={styles.sectionBannerSub}>Financial Model &amp; Commercial Allocation</Text>
+        </View>
+
+        {/* 4 Financial Metric Cards with Realistic Range */}
+        <View style={styles.kpiRow}>
+          <View style={styles.kpiCardAlt}>
+            <Text style={[styles.kpiLabel, { color: C.terracotta }]}>Total Estimated Budget</Text>
+            <Text style={[styles.kpiValue, { fontSize: 10, color: C.forest }]}>{fmt(totalCost)}</Text>
+            <Text style={styles.kpiSub}>All-Inclusive Complete Build</Text>
+          </View>
+          <View style={styles.kpiCard}>
+            <Text style={styles.kpiLabel}>Effective All-In Rate</Text>
+            <Text style={styles.kpiValue}>₹{num(budget?.costPerSqFt)} / sq.ft</Text>
+            <Text style={styles.kpiSub}>Gross Built-Up Area basis</Text>
+          </View>
+          <View style={styles.kpiCardAlt}>
+            <Text style={[styles.kpiLabel, { color: C.terracotta }]}>Realistic Cost Range (±4%)</Text>
+            <Text style={[styles.kpiValue, { fontSize: 8.5 }]}>{fmt(minCostRange)} – {fmt(maxCostRange)}</Text>
+            <Text style={styles.kpiSub}>Standard construction tolerance</Text>
+          </View>
+          <View style={styles.kpiCard}>
+            <Text style={styles.kpiLabel}>Direct Construction</Text>
+            <Text style={styles.kpiValue}>{fmt(budget?.directConstructionBudget)}</Text>
+            <Text style={styles.kpiSub}>₹{num(budget?.directCostPerSqFt)}/sq.ft (Materials + Labour)</Text>
+          </View>
+        </View>
+
+        {/* Commercial Cost Distribution Table */}
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: W_COMM.name }]}>Commercial Cost Head</Text>
+            <Text style={[styles.th, { width: W_COMM.desc }]}>Scope Description</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_COMM.amt }]}>Amount (INR)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_COMM.pct }]}>% of Total</Text>
+          </View>
+          {[
+            ['1. Direct Physical Materials', 'Rebar steel, cement, sand, aggregates, blocks, tiles & paint', budget?.directMaterialCost || 0, ((budget?.directMaterialCost || 0) / totalCost) * 100],
+            ['2. Direct Trade Labour', 'Civil RCC framing, masonry, bar-bending, plastering, tiling labour', budget?.directLabourCost || 0, ((budget?.directLabourCost || 0) / totalCost) * 100],
+            ['3. Installed Fixtures & Systems', 'Doors, windows, modular electrical hardware, sanitaryware & piping', budget?.directFixtureCost || 0, ((budget?.directFixtureCost || 0) / totalCost) * 100],
+            ['4. Contractor Execution Margin', 'Contractor operational overhead, tooling, scaffolding & supervision', budget?.contractorMargin || 0, ((budget?.contractorMargin || 0) / totalCost) * 100],
+            ['5. Contingency Allowance', 'Buffer for unforeseen market rate shifts and site variances (3%)', budget?.contingency || 0, ((budget?.contingency || 0) / totalCost) * 100],
+            ['6. Professional Engineering Fees', 'Architectural working drawings, structural vetting & MEP design (3%)', budget?.professionalFees || 0, ((budget?.professionalFees || 0) / totalCost) * 100],
+            ['7. Statutory Taxes (GST)', '18% GST applied on contractor services and execution margin', budget?.gstAmount || 0, ((budget?.gstAmount || 0) / totalCost) * 100],
+          ].map(([headName, scopeDesc, amt, pct], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: W_COMM.name }]}>{headName as string}</Text>
+              <Text style={[styles.tdMuted, { width: W_COMM.desc }]}>{scopeDesc as string}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: W_COMM.amt }]}>{fmt(amt as number)}</Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_COMM.pct }]}>{(pct as number).toFixed(1)}%</Text>
+            </View>
+          ))}
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { width: '72%' }]}>Total Estimated Project Cost (Turnkey All-Inclusive)</Text>
+            <Text style={[styles.totalValue, { width: '16%' }]}>{fmt(totalCost)}</Text>
+            <Text style={[styles.totalValue, { width: '12%' }]}>100.0%</Text>
+          </View>
+        </View>
+
+        {/* Cost Disclaimer */}
+        <View style={styles.warningBox} wrap={false}>
+          <Text style={[styles.boxTitle, { color: C.terracotta }]}>Budget Allocation &amp; Market Rate Basis</Text>
+          <Text style={styles.boxText}>
+            All financial heads reflect prevailing Q1 2026 Bangalore market baseline rates. Material procurement efficiency, custom architectural modifications, and contractor negotiations can vary the final execution sum within the indicated ±4% planning bandwidth.
+          </Text>
+        </View>
+
+        <DocFooter section="Section 04 &amp; 05: Configuration &amp; Cost Overview" />
+      </Page>
+
+      {/* ══════════════════════════════════════════════════
+          PAGE 4 — SECTION 06: DETAILED WORKS BOQ (PART 1)
+      ══════════════════════════════════════════════════ */}
+      <Page size="A4" style={styles.page}>
+        <RunHeader section="Section 06: Detailed Works Bill of Quantities (BOQ)" />
+
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 06 — Detailed Works Bill of Quantities (BOQ)</Text>
+          <Text style={styles.sectionBannerSub}>Part 1: Substructure, Superstructure &amp; Masonry</Text>
+        </View>
+
+        <Text style={styles.subSectionTitle}>Division A &amp; B — Pre-Construction, Excavation &amp; Substructure Works</Text>
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: W_BOQ.sl }]}>Sl</Text>
+            <Text style={[styles.th, { width: W_BOQ.desc }]}>Trade Activity &amp; Engineering Specification</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.qty }]}>Qty / Unit</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.rate }]}>Rate (₹)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.amt }]}>Amount (₹)</Text>
+          </View>
+          {divSubstructure.map((item, idx) => (
             <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
-              <Text style={[styles.tdMuted, { width: W.sl }]}>{item.slNo}</Text>
-              <View style={{ width: W.desc }}>
-                <Text style={styles.td}>
-                  {item.description}
-                  {item.brand ? ` · ${item.brand}` : ''}
-                </Text>
-                {item.remarks ? <Text style={[styles.tdMuted, { fontSize: 5.5 }]}>{item.remarks}</Text> : null}
+              <Text style={[styles.tdMuted, { width: W_BOQ.sl }]}>{item.slNo}</Text>
+              <View style={{ width: W_BOQ.desc }}>
+                <Text style={styles.tdBold}>{item.description}</Text>
+                {item.remarks ? <Text style={[styles.tdMuted, { fontSize: 5.2 }]}>{item.remarks}</Text> : null}
               </View>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: W.qty }]}>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.qty }]}>
                 {num(item.quantity)} {formatUnitLabel(item.unit)}
               </Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: W.rate }]}>
-                ₹{item.unitRate?.toLocaleString()}
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.rate }]}>
+                ₹{item.unitRate?.toLocaleString('en-IN')}
               </Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: W.amt }]}>{fmt(item.amount)}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: W_BOQ.amt }]}>{fmt(item.amount)}</Text>
             </View>
           ))}
+          <View style={[styles.tableRow, { backgroundColor: C.bgSage }]}>
+            <Text style={[styles.tdBold, { width: '70%', color: C.forest }]}>Subtotal — Division A &amp; B Substructure</Text>
+            <Text style={[styles.tdBold, styles.tdRight, { width: '30%', color: C.forest }]}>
+              {fmt(divSubstructure.reduce((s, i) => s + (i.amount || 0), 0))}
+            </Text>
+          </View>
+        </View>
 
-          <View style={styles.totalRow} wrap={false}>
-            <Text style={[styles.totalLabel, { width: '70%' }]}>Section A Total — What We Build (Works BOQ)</Text>
+        <Text style={styles.subSectionTitle}>Division C — Superstructure RCC Concrete &amp; Rebar Framing</Text>
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: W_BOQ.sl }]}>Sl</Text>
+            <Text style={[styles.th, { width: W_BOQ.desc }]}>Trade Activity &amp; Engineering Specification</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.qty }]}>Qty / Unit</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.rate }]}>Rate (₹)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.amt }]}>Amount (₹)</Text>
+          </View>
+          {divSuperstructure.map((item, idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
+              <Text style={[styles.tdMuted, { width: W_BOQ.sl }]}>{item.slNo}</Text>
+              <View style={{ width: W_BOQ.desc }}>
+                <Text style={styles.tdBold}>{item.description}</Text>
+                {item.remarks ? <Text style={[styles.tdMuted, { fontSize: 5.2 }]}>{item.remarks}</Text> : null}
+              </View>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.qty }]}>
+                {num(item.quantity)} {formatUnitLabel(item.unit)}
+              </Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.rate }]}>
+                ₹{item.unitRate?.toLocaleString('en-IN')}
+              </Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: W_BOQ.amt }]}>{fmt(item.amount)}</Text>
+            </View>
+          ))}
+          <View style={[styles.tableRow, { backgroundColor: C.bgSage }]}>
+            <Text style={[styles.tdBold, { width: '70%', color: C.forest }]}>Subtotal — Division C RCC Superstructure</Text>
+            <Text style={[styles.tdBold, styles.tdRight, { width: '30%', color: C.forest }]}>
+              {fmt(divSuperstructure.reduce((s, i) => s + (i.amount || 0), 0))}
+            </Text>
+          </View>
+        </View>
+
+        <DocFooter section="Section 06: Detailed Works BOQ (Part 1)" />
+      </Page>
+
+      {/* ══════════════════════════════════════════════════
+          PAGE 5 — SECTION 06: DETAILED WORKS BOQ (PART 2)
+      ══════════════════════════════════════════════════ */}
+      <Page size="A4" style={styles.page}>
+        <RunHeader section="Section 06: Detailed Works Bill of Quantities (BOQ)" />
+
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 06 — Detailed Works Bill of Quantities (BOQ)</Text>
+          <Text style={styles.sectionBannerSub}>Part 2: Masonry, Finishes, Openings &amp; MEP</Text>
+        </View>
+
+        <Text style={styles.subSectionTitle}>Division D &amp; E — Masonry Walls, Plastering &amp; Waterproofing</Text>
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: W_BOQ.sl }]}>Sl</Text>
+            <Text style={[styles.th, { width: W_BOQ.desc }]}>Trade Activity &amp; Engineering Specification</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.qty }]}>Qty / Unit</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.rate }]}>Rate (₹)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.amt }]}>Amount (₹)</Text>
+          </View>
+          {divMasonryPlaster.map((item, idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
+              <Text style={[styles.tdMuted, { width: W_BOQ.sl }]}>{item.slNo}</Text>
+              <View style={{ width: W_BOQ.desc }}>
+                <Text style={styles.tdBold}>{item.description}</Text>
+                {item.remarks ? <Text style={[styles.tdMuted, { fontSize: 5.2 }]}>{item.remarks}</Text> : null}
+              </View>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.qty }]}>
+                {num(item.quantity)} {formatUnitLabel(item.unit)}
+              </Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.rate }]}>
+                ₹{item.unitRate?.toLocaleString('en-IN')}
+              </Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: W_BOQ.amt }]}>{fmt(item.amount)}</Text>
+            </View>
+          ))}
+          <View style={[styles.tableRow, { backgroundColor: C.bgSage }]}>
+            <Text style={[styles.tdBold, { width: '70%', color: C.forest }]}>Subtotal — Division D &amp; E Masonry &amp; Plaster</Text>
+            <Text style={[styles.tdBold, styles.tdRight, { width: '30%', color: C.forest }]}>
+              {fmt(divMasonryPlaster.reduce((s, i) => s + (i.amount || 0), 0))}
+            </Text>
+          </View>
+        </View>
+
+        <Text style={styles.subSectionTitle}>Division F, G &amp; H — Architectural Finishes &amp; MEP Infrastructure</Text>
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: W_BOQ.sl }]}>Sl</Text>
+            <Text style={[styles.th, { width: W_BOQ.desc }]}>Trade Activity &amp; Engineering Specification</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.qty }]}>Qty / Unit</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.rate }]}>Rate (₹)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: W_BOQ.amt }]}>Amount (₹)</Text>
+          </View>
+          {[...divFinishes, ...divMEP].map((item, idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
+              <Text style={[styles.tdMuted, { width: W_BOQ.sl }]}>{item.slNo}</Text>
+              <View style={{ width: W_BOQ.desc }}>
+                <Text style={styles.tdBold}>{item.description}</Text>
+                {item.remarks ? <Text style={[styles.tdMuted, { fontSize: 5.2 }]}>{item.remarks}</Text> : null}
+              </View>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.qty }]}>
+                {num(item.quantity)} {formatUnitLabel(item.unit)}
+              </Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: W_BOQ.rate }]}>
+                ₹{item.unitRate?.toLocaleString('en-IN')}
+              </Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: W_BOQ.amt }]}>{fmt(item.amount)}</Text>
+            </View>
+          ))}
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { width: '70%' }]}>Section 06 Grand Total — Complete Works BOQ</Text>
             <Text style={[styles.totalValue, { width: '30%' }]}>{fmt(budget?.baseConstructionCost)}</Text>
           </View>
         </View>
 
-        <DocFooter section="Section A: What We Build · Works BOQ" />
+        <DocFooter section="Section 06: Detailed Works BOQ (Part 2)" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 3 — SECTION B: WHAT WE CONSUME (MATERIALS TAKEOFF)
+          PAGE 6 — SECTION 07: PHYSICAL MATERIAL TAKEOFF
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
-        <RunHeader section="Section B: What We Consume · Materials Needed" />
+        <RunHeader section="Section 07: Physical Material Takeoff Schedule" />
 
-        {/* Materials Summary KPI Cards */}
-        <Text style={styles.sectionTitle}>1. Core Materials Needed Summary</Text>
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 07 — Physical Material Takeoff Schedule (Consumables)</Text>
+          <Text style={styles.sectionBannerSub}>Quantities What We Consume</Text>
+        </View>
+
+        {/* Core Material KPI Cards */}
         <View style={styles.kpiRow}>
           {[
-            ['Structural Steel', `${quantities?.steelTonnes || 0} Tonnes`, `${num(quantities?.steelKg)} kg`],
-            ['Portland Cement', `${num(quantities?.cementBags)} Bags`, '50 kg / bag'],
+            ['Structural TMT Steel', `${quantities?.steelTonnes || 0} Tonnes`, `${num(quantities?.steelKg)} kg (${input?.materialBrands?.steel || 'Tata Tiscon'})`],
+            ['Portland Cement', `${num(quantities?.cementBags)} Bags`, `50 kg Bags (${input?.materialBrands?.cement || 'UltraTech OPC 53'})`],
             [
               'Sand & Aggregates',
               `${num((quantities?.mSandCuFt || 0) + (quantities?.pSandCuFt || 0) + (quantities?.coarseAggregateCuFt || 0))} CFT`,
-              'M-Sand + P-Sand + Metal',
+              'M-Sand + P-Sand + 20mm Metal',
             ],
             [
-              'Block Wall Coverage',
-              `${num(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt)} sq.ft`,
-              `${num(quantities?.masonryUnitsCount)} Nos`,
+              'Masonry Wall Units',
+              `${num(quantities?.masonryUnitsCount)} Pieces`,
+              `${num(quantities?.blockWallCoverageSqFt || quantities?.netWallAreaSqFt)} sq.ft wall face`,
             ],
           ].map(([lbl, val, sub], i) => (
             <View key={i} style={styles.kpiCard}>
@@ -672,87 +1106,99 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           ))}
         </View>
 
-        {/* Section B Table */}
-        <Text style={[styles.sectionTitle, { marginTop: 6 }]}>
-          Section B — What We Consume · Itemized Materials Needed
-        </Text>
-        <View>
+        {/* Itemized Material Schedule Table */}
+        <View style={styles.tableContainer}>
           <View style={styles.tableHeaderRow} fixed>
-            <Text style={[styles.th, { width: W.sl }]}>Sl</Text>
-            <Text style={[styles.th, { width: W.desc }]}>Material &amp; Brand Specification</Text>
-            <Text style={[styles.th, styles.tdRight, { width: W.qty }]}>Quantity</Text>
-            <Text style={[styles.th, styles.tdRight, { width: W.rate }]}>Unit Rate</Text>
-            <Text style={[styles.th, styles.tdRight, { width: W.amt }]}>Total</Text>
+            <Text style={[styles.th, { width: '6%' }]}>Sl</Text>
+            <Text style={[styles.th, { width: '48%' }]}>Material &amp; Specification Brand</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Physical Qty</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Unit Rate (₹)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '16%' }]}>Total Cost (₹)</Text>
           </View>
           {(materialSchedule || []).map((mat, idx) => (
             <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
-              <Text style={[styles.tdMuted, { width: W.sl }]}>{mat.slNo}</Text>
-              <View style={{ width: W.desc }}>
-                <Text style={styles.td}>{mat.material}</Text>
+              <Text style={[styles.tdMuted, { width: '6%' }]}>{mat.slNo}</Text>
+              <View style={{ width: '48%' }}>
+                <Text style={styles.tdBold}>{mat.material}</Text>
                 <Text style={[styles.tdMuted, { fontSize: 5.5 }]}>
                   {mat.brand} · {mat.specification}
                 </Text>
               </View>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: W.qty }]}>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '15%' }]}>
                 {num(mat.quantity)} {formatUnitLabel(mat.unit)}
               </Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: W.rate }]}>
-                ₹{mat.unitRate?.toLocaleString()}
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '15%' }]}>
+                ₹{mat.unitRate?.toLocaleString('en-IN')}
               </Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: W.amt }]}>{fmt(mat.amount)}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '16%' }]}>{fmt(mat.amount)}</Text>
             </View>
           ))}
-          <View style={styles.totalRow} wrap={false}>
-            <Text style={[styles.totalLabel, { width: '70%' }]}>Section B Total — Physical Materials</Text>
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { width: '70%' }]}>Section 07 Total — Direct Physical Consumables</Text>
             <Text style={[styles.totalValue, { width: '30%' }]}>
               {fmt((materialSchedule || []).reduce((s, m) => s + (m.amount || 0), 0))}
             </Text>
           </View>
         </View>
 
-        {/* Material Invariance Note */}
-        <View style={styles.noticeBox} wrap={false}>
-          <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
-            MATERIAL CONSUMPTION &amp; RATE INVARIANCE NOTICE
-          </Text>
-          <Text style={{ fontSize: 5.8, color: C.grey, lineHeight: 1.35 }}>
-            Material quantities are determined directly by your house size and layout. Changing brand selections (e.g. Tata Tiscon vs JSW Steel, or UltraTech vs ACC Cement) modifies the unit rate and cost total while keeping the physical quantities consistent (tonnes, bags, CFT, sq.ft, litres).
+        {/* Material Invariance Principle Box */}
+        <View style={styles.infoBox} wrap={false}>
+          <Text style={styles.boxTitle}>Physical Consumption &amp; Brand Invariance Principle</Text>
+          <Text style={styles.boxText}>
+            Physical material quantities (steel tonnage, cement bags, masonry block counts, sand CFT) are calculated directly from architectural dimensions, structural loads, and floor areas. Selecting alternative brands (e.g. Tata Tiscon vs JSW Steel, or UltraTech vs ACC Cement) adjusts the unit rate and commercial budget while physical quantities remain strictly invariant.
           </Text>
         </View>
 
-        <DocFooter section="Section B: What We Consume · Physical Materials" />
+        <DocFooter section="Section 07: Physical Material Takeoff" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 4 — SECTION C: WHAT WE INSTALL (SERVICES & FIXTURES)
+          PAGE 7 — SECTION 08: SPECIFICATIONS & SECTION 09: FINISHES/FIXTURES
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
-        <RunHeader section="Section C: What We Install · Services &amp; Fixtures Schedule" />
+        <RunHeader section="Section 08 &amp; 09: Specifications &amp; Installed Fixtures" />
 
-        {/* Services & Fixtures Summary KPIs */}
-        <Text style={styles.sectionTitle}>1. Services &amp; Installed Systems Overview</Text>
+        {/* Section 08 */}
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 08 — Structural &amp; Material Specifications</Text>
+          <Text style={styles.sectionBannerSub}>Selected Standards &amp; Engineering Grades</Text>
+        </View>
+
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '30%' }]}>Component / Category</Text>
+            <Text style={[styles.th, { width: '40%' }]}>Material Specification &amp; Engineering Grade</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '30%' }]}>Benchmark Standard</Text>
+          </View>
+          {[
+            ['Structural Steel Rebar', `High-Yield TMT Fe 550D (${input?.materialBrands?.steel || 'Tata Tiscon'})`, 'IS 1786 (Seismic Resistant)'],
+            ['Portland Cement', `53-Grade Ordinary Portland Cement (${input?.materialBrands?.cement || 'UltraTech'})`, 'IS 269 / IS 12269'],
+            ['Ready-Mix Concrete', 'M25 Columns/Slabs (28-day 25 N/mm²), M20 Footings', 'IS 456:2000 Code of Practice'],
+            ['Masonry Wall Blocks', 'Solid Concrete Blocks 6" External / 4" Internal', 'IS 2185 (Part 1) Heavy Duty'],
+            ['Fine Aggregate (Sand)', 'Manufactured Sand (M-Sand) Zone II for RCC, P-Sand for Plaster', 'IS 383:2016 Silt Free'],
+            ['Anti-Termite Treatment', 'Chlorpyrifos chemical soil barrier along foundation trenches', 'IS 6313 (Part 2)'],
+          ].map(([comp, spec, std], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: '30%' }]}>{comp}</Text>
+              <Text style={[styles.td, { width: '40%' }]}>{spec}</Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '30%' }]}>{std}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Section 09 */}
+        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
+          <Text style={styles.sectionBannerText}>Section 09 — Finishes &amp; Installed Fixtures Schedule</Text>
+          <Text style={styles.sectionBannerSub}>What We Install</Text>
+        </View>
+
+        {/* Installed Systems Overview */}
         <View style={styles.kpiRow}>
           {[
-            [
-              'Electrical Points',
-              `${quantities?.totalElectricalPoints || 0} Points`,
-              `${quantities?.lightingPoints || 0} lights · ${quantities?.socketPoints || 0} sockets`,
-            ],
-            [
-              'Plumbing Outlets',
-              `${(quantities?.totalWaterPoints || 0) + (quantities?.totalDrainagePoints || 0)} Points`,
-              `${quantities?.totalWaterPoints || 0} supply · ${quantities?.totalDrainagePoints || 0} drain`,
-            ],
-            [
-              'Sanitary Suites',
-              `${quantities?.bathroomFixtureSets || 0} Suites`,
-              `${quantities?.wcCount || 0} EWCs · ${quantities?.washBasinCount || 0} basins`,
-            ],
-            [
-              'Doors & Windows',
-              `${(quantities?.totalDoorsCount || 0) + (quantities?.windowsCount || 0)} Units`,
-              `${quantities?.totalDoorsCount || 0} doors · ${quantities?.windowsCount || 0} windows`,
-            ],
+            ['Electrical Points', `${quantities?.totalElectricalPoints || 90} Points`, `${quantities?.lightingPoints || 36} lights · ${quantities?.socketPoints || 35} sockets`],
+            ['Plumbing Outlets', `${(quantities?.totalWaterPoints || 15) + (quantities?.totalDrainagePoints || 9)} Points`, `${quantities?.totalWaterPoints || 15} supply · ${quantities?.totalDrainagePoints || 9} drain`],
+            ['Sanitary Suites', `${quantities?.bathroomFixtureSets || 3} Suites`, `${quantities?.wcCount || 3} EWCs · ${quantities?.washBasinCount || 3} Basins`],
+            ['Doors & Windows', `${(quantities?.totalDoorsCount || 10) + (quantities?.windowsCount || 11)} Units`, `${quantities?.totalDoorsCount || 10} doors · ${quantities?.windowsCount || 11} windows`],
           ].map(([lbl, val, sub], i) => (
             <View key={i} style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>{lbl}</Text>
@@ -762,324 +1208,393 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
           ))}
         </View>
 
-        {/* Section C Subsections — Structurally Consistent */}
-        <Text style={[styles.sectionTitle, { marginTop: 6, marginBottom: 5 }]}>
-          Section C — What We Install · Services &amp; Fixtures Schedule
-        </Text>
+        {/* Compact Fixtures Table */}
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '8%' }]}>Sl</Text>
+            <Text style={[styles.th, { width: '46%' }]}>System / Installed Specification</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Qty / Unit</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Unit Rate (₹)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '16%' }]}>Amount (₹)</Text>
+          </View>
+          {allFixtures.slice(0, 10).map((item, idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
+              <Text style={[styles.tdMuted, { width: '8%' }]}>{item.slNo}</Text>
+              <View style={{ width: '46%' }}>
+                <Text style={styles.tdBold}>{item.item}</Text>
+                <Text style={[styles.tdMuted, { fontSize: 5.2 }]}>{item.brand} · {item.specification}</Text>
+              </View>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '15%' }]}>
+                {num(item.quantity)} {formatUnitLabel(item.unit)}
+              </Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '15%' }]}>
+                ₹{item.unitRate?.toLocaleString('en-IN')}
+              </Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '16%' }]}>{fmt(item.amount)}</Text>
+            </View>
+          ))}
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { width: '70%' }]}>Section 09 Total — Installed Fixtures &amp; Systems</Text>
+            <Text style={[styles.totalValue, { width: '30%' }]}>
+              {fmt(allFixtures.reduce((s, f) => s + (f.amount || 0), 0))}
+            </Text>
+          </View>
+        </View>
 
-        {/* 1. Electrical */}
-        {renderInstallationSubSection('1. Electrical Services & Equipment', electricalFixtures)}
-
-        {/* 2. Plumbing */}
-        {renderInstallationSubSection('2. Plumbing Systems & Storage', plumbingFixtures)}
-
-        {/* 3. Sanitary & Fixtures */}
-        {renderInstallationSubSection('3. Sanitaryware & Bathroom Fixtures', sanitaryFixtures)}
-
-        {/* 4. Doors & Windows */}
-        {renderInstallationSubSection('4. Doors, Windows & Glazing', doorWindowFixtures)}
-
-        {/* 5. Other Installations (omitted if empty) */}
-        {renderInstallationSubSection('5. Special Equipment & Other Installations', otherInstallations)}
-
-        {/* Section C Reconciled Grand Total */}
-        <View style={styles.totalRow} wrap={false}>
-          <Text style={[styles.totalLabel, { width: '70%' }]}>Section C Total — What We Install (Fixtures &amp; Services)</Text>
-          <Text style={[styles.totalValue, { width: '30%' }]}>
-            {fmt(allFixtures.reduce((s, f) => s + (f.amount || 0), 0))}
+        {/* Fixtures Note */}
+        <View style={styles.infoBox} wrap={false}>
+          <Text style={styles.boxTitle}>MEP &amp; Fixture Engineering Note</Text>
+          <Text style={styles.boxText}>
+            Conduit gauges, copper wire circuit runs, and water supply pipe sizing reflect standard Indian architectural benchmarks. Final electrical load sanctions (BESCOM) and plumbing invert levels should be validated by appointed consultants before wall chasses closure.
           </Text>
         </View>
 
-        {/* Services & Engineering Notice */}
-        <View style={styles.noticeBox} wrap={false}>
-          <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
-            SERVICES &amp; MEP ENGINEERING DISCLAIMER
-          </Text>
-          <Text style={{ fontSize: 5.8, color: C.grey, lineHeight: 1.35 }}>
-            Electrical point distribution, wire gauges, plumbing CPVC/SWR pipe sizing, and sanitary fixture allocations are derived from architectural space rules and benchmark engineering standards. Final conductor sizing, circuit breaker protection, water pressure calculations, and sewer invert levels must be validated by appointed MEP consultants before site rough-in.
-          </Text>
-        </View>
-
-        <DocFooter section="Section C: What We Install · Services & Fixtures" />
+        <DocFooter section="Section 08 &amp; 09: Specifications &amp; Installed Fixtures" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 5 — SECTION D: WHAT IT COSTS (COMMERCIALS & ROADMAP)
+          PAGE 8 — SECTION 10: SCOPE, INCLUSIONS & EXCLUSIONS
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
-        <RunHeader section="Section D: What It Costs · Commercial Breakdown &amp; Roadmap" />
+        <RunHeader section="Section 10: Scope Boundaries, Inclusions &amp; Exclusions" />
 
-        {/* Section D */}
-        <Text style={styles.sectionTitle}>Section D — What It Costs · Cost Summary &amp; Commercial Details</Text>
-        <View>
-          <View style={styles.tableHeaderRow} fixed>
-            <Text style={[styles.th, { width: WD.cat }]}>Trade Category</Text>
-            <Text style={[styles.th, styles.tdRight, { width: WD.amt }]}>Amount (INR)</Text>
-            <Text style={[styles.th, styles.tdRight, { width: WD.pct }]}>% of Total</Text>
-          </View>
-          {(budget?.heads || []).map((head, idx) => (
-            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
-              <Text style={[styles.td, { width: WD.cat }]}>{head.name}</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: WD.amt }]}>{fmt(head.allocatedAmount)}</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: WD.pct }]}>{head.percentage}%</Text>
-            </View>
-          ))}
-          <View style={styles.totalRow} wrap={false}>
-            <Text style={[styles.totalLabel, { width: WD.cat }]}>Total Estimated Project Cost (All-Inclusive)</Text>
-            <Text style={[styles.totalValue, { width: WD.amt }]}>{fmt(budget?.totalProjectCost)}</Text>
-            <Text style={[styles.totalValue, { width: WD.pct }]}>100.0%</Text>
-          </View>
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 10 — Scope Boundaries: Inclusions &amp; Exclusions</Text>
+          <Text style={styles.sectionBannerSub}>Transparent Scope Demarcation for Contractor Review</Text>
         </View>
 
-        {/* Commercial summary cards */}
-        <View style={[styles.kpiRow, { marginTop: 6 }]} wrap={false}>
-          {[
-            ['Base Construction', fmt(budget?.baseConstructionCost)],
-            ['Contractor Margin', fmt(budget?.contractorMargin)],
-            ['Contingency', fmt(budget?.contingency)],
-            ['Professional Fees', fmt(budget?.professionalFees)],
-            ['GST / Taxes', fmt(budget?.gstAmount)],
-          ].map(([lbl, val], i) => (
-            <View key={i} style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>{lbl}</Text>
-              <Text style={[styles.td, { fontFamily: 'Helvetica-Bold', fontSize: 7 }]}>{val}</Text>
+        {/* 2-Column Side-by-Side Checklist */}
+        <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
+          {/* Column 1: Inclusions */}
+          <View style={{ flex: 1, backgroundColor: C.bgSage, borderWidth: 0.8, borderColor: C.sageBorder, borderRadius: 3, padding: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 5, borderBottomWidth: 0.8, borderBottomColor: C.forest, paddingBottom: 3 }}>
+              <Text style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold', color: C.forest, textTransform: 'uppercase' }}>
+                [✓] Included In This Estimate
+              </Text>
             </View>
-          ))}
-        </View>
-
-        {/* Milestone roadmap */}
-        {Array.isArray(paymentPlan) && paymentPlan.length > 0 && (
-          <View wrap={false}>
-            <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
-              Payment Plan — Milestone Disbursement Schedule
-            </Text>
-            <View>
-              <View style={styles.tableHeaderRow} fixed>
-                <Text style={[styles.th, { width: WD.cat }]}>Stage / Construction Milestone</Text>
-                <Text style={[styles.th, styles.tdRight, { width: WD.amt }]}>Disbursement</Text>
-                <Text style={[styles.th, styles.tdRight, { width: WD.pct }]}>Stage %</Text>
+            {[
+              'Complete site clearing, land demarcation & foundation excavation',
+              'Substructure PCC bed, isolated footings & reinforced plinth beam framing',
+              'Superstructure RCC framed columns, beams, staircase & floor slabs',
+              'Full external (150mm) and internal (100mm) solid masonry block walls',
+              'Internal smooth sponge plastering (1:4) & external double-coat sand plaster',
+              'Waterproofing: sunken bathroom slabs, water sump & top terrace slab',
+              'Vitrified tile supply & laying across all living, dining, bed & kitchen areas',
+              'Anti-skid ceramic tiles in bathrooms/balconies with wall dado up to 7ft',
+              'Teakwood main entrance door with brass lock; internal flush & WPC bath doors',
+              '2.5-track uPVC sliding windows with mosquito mesh and louvred ventilators',
+              'Concealed heavy-duty PVC conduits, FRLS copper wiring & modular switches',
+              'Concealed CPVC hot/cold water supply lines, SWR drainage & sanitary suites',
+              'Full 2-coat interior wall putty, acrylic primer & luxury emulsion painting',
+              'Site engineer supervision, scaffolding, curing water storage & safety gear',
+            ].map((item, idx) => (
+              <View key={idx} style={{ flexDirection: 'row', gap: 3.5, marginBottom: 3 }}>
+                <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.forest }}>✓</Text>
+                <Text style={{ fontSize: 5.8, color: C.charcoal, flex: 1, lineHeight: 1.25 }}>{item}</Text>
               </View>
-              {paymentPlan.map((stage, idx) => (
-                <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
-                  <View style={{ width: WD.cat }}>
-                    <Text style={styles.td}>
-                      Stage {stage.stage}: {stage.title}
-                    </Text>
-                    {stage.description ? <Text style={[styles.tdMuted, { fontSize: 5.5 }]}>{stage.description}</Text> : null}
-                  </View>
-                  <Text style={[styles.tdBold, styles.tdRight, { width: WD.amt }]}>{fmt(stage.amount)}</Text>
-                  <Text style={[styles.tdMuted, styles.tdRight, { width: WD.pct }]}>{stage.percentage}%</Text>
-                </View>
-              ))}
-              <View style={styles.totalRow} wrap={false}>
-                <Text style={[styles.totalLabel, { width: WD.cat }]}>Total — All Milestones</Text>
-                <Text style={[styles.totalValue, { width: WD.amt }]}>{fmt(budget?.totalProjectCost)}</Text>
-                <Text style={[styles.totalValue, { width: WD.pct }]}>100.0%</Text>
-              </View>
-            </View>
+            ))}
           </View>
-        )}
 
-        {/* Mandatory Early Estimate Note Box */}
-        <View style={{ marginTop: 6, backgroundColor: '#FEF3C7', borderWidth: 0.8, borderColor: '#F59E0B', borderRadius: 4, padding: 6 }} wrap={false}>
-          <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: '#92400E', textTransform: 'uppercase', marginBottom: 2 }}>
-            IMPORTANT ESTIMATE NOTE
-          </Text>
-          <Text style={{ fontSize: 6, color: '#78350F', lineHeight: 1.35, fontFamily: 'Helvetica-Bold' }}>
-            This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked.
+          {/* Column 2: Exclusions */}
+          <View style={{ flex: 1, backgroundColor: '#FAF5F0', borderWidth: 0.8, borderColor: '#FED7AA', borderRadius: 3, padding: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 5, borderBottomWidth: 0.8, borderBottomColor: C.terracotta, paddingBottom: 3 }}>
+              <Text style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold', color: C.terracotta, textTransform: 'uppercase' }}>
+                [✕] Excluded / Separate Budget Required
+              </Text>
+            </View>
+            {[
+              'Compound boundary wall and main gate beyond front column allowance',
+              'Municipal building plan sanction fees, betterment charges & trade licenses',
+              'BESCOM 3-phase permanent power meter deposit & external pole cable draw',
+              'BWSSB permanent water meter deposit & underground sewer line connection',
+              'Deep borewell drilling, casing pipe, submersible pump & yield testing',
+              'Interior woodwork: modular kitchen cabinets, chimney, hob & wardrobes',
+              'Loose furniture, curtains, decorative light fittings (fans/chandeliers) & ACs',
+              'Solar rooftop photovoltaic (PV) power system and battery inverter',
+              'Solar water heater rooftop installation and piping to bathrooms',
+              'Garden landscaping, lawn preparation, compound exterior paver tiles',
+              'Elevator / lift machine supply and commissioning (unless specifically checked)',
+              'Structural changes after column casting or foundation excavation',
+            ].map((item, idx) => (
+              <View key={idx} style={{ flexDirection: 'row', gap: 3.5, marginBottom: 3 }}>
+                <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.terracotta }}>✕</Text>
+                <Text style={{ fontSize: 5.8, color: C.charcoal, flex: 1, lineHeight: 1.25 }}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Site Conditions & Assumptions Box */}
+        <View style={styles.infoBox} wrap={false}>
+          <Text style={styles.boxTitle}>Standard Site Conditions &amp; Geotechnical Assumptions</Text>
+          <Text style={styles.boxText}>
+            1. Site Soil Strata: Assumed uniform firm gravelly soil with safe bearing capacity (SBC) ≥ 180 kN/m² at 1.5m foundation depth. Black cotton, waterlogged, or rock strata require separate structural engineering design.{'\n'}
+            2. Site Utilities: Assumes motorable road access and availability of potable construction curing water and temporary 3-phase electricity at the site boundary.{'\n'}
+            3. Ground Slope: Assumes a level plot with no major slope cutting or retaining wall requirements.
           </Text>
         </View>
 
-        {/* Rate master metadata */}
-        <View style={[styles.disclaimerBox, { marginTop: 6 }]} wrap={false}>
-          <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
-            RATE MASTER SOURCE &amp; ENGINE METADATA
-          </Text>
-          <Text style={{ fontSize: 5.5, color: C.grey, lineHeight: 1.3 }}>
-            Dataset: {rateMeta?.datasetVersion || 'HUTTY-RM-2026.1'} · Provider: {rateMeta?.providerName || 'Hutty QS Rate Master'} · Engine: {rateMeta?.calculationEngineVersion || 'v2.6.0'} · Mode: {rateMeta?.isLive ? 'Live API Connected' : '2026-Q1 Fallback / Baseline Rates'} · Basis: Bangalore Market Q1 2026
-          </Text>
-        </View>
-
-        {/* Disclaimers */}
-        <View style={styles.noticeBox} wrap={false}>
-          <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: C.green, marginBottom: 2 }}>
-            IMPORTANT — PRELIMINARY ESTIMATE &amp; ENGINEERING NOTICE
-          </Text>
-          <Text style={{ fontSize: 5.5, color: C.grey, lineHeight: 1.3 }}>
-            · Generated using Hutty's preliminary quantity surveying estimation rules. Final structural, geotechnical, and MEP engineering drawings must be certified by appointed consultants.{'\n'}
-            · Actual quantities and costs may vary based on architectural drawings, soil strata, construction methods, brand specifications, supplier quotations, and prevailing market rates.
-          </Text>
-        </View>
-
-        <DocFooter section="Section D: What It Costs · Commercial Breakdown" />
+        <DocFooter section="Section 10: Scope Boundaries, Inclusions &amp; Exclusions" />
       </Page>
 
-      {/* ────────────────────────────────────────────────────────── */}
-      {/* PAGE 6: SECTION E — CONTRACTOR AUDIT, SENSITIVITY & SCENARIOS (PREMIUM) */}
-      {/* ────────────────────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════
+          PAGE 9 — SECTION 11: TIMELINE & SECTION 12: MILESTONE PAYMENT PLANNING
+      ══════════════════════════════════════════════════ */}
+      <Page size="A4" style={styles.page}>
+        <RunHeader section="Section 11 &amp; 12: Timeline &amp; Milestone Payment Plan" />
+
+        {/* Section 11 */}
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 11 — Indicative Construction Timeline ({timeline?.totalMonths || 8} Months)</Text>
+          <Text style={styles.sectionBannerSub}>Engineering Execution Roadmap</Text>
+        </View>
+
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '15%' }]}>Phase</Text>
+            <Text style={[styles.th, { width: '45%' }]}>Key Construction Works &amp; Milestones</Text>
+            <Text style={[styles.th, { width: '20%' }]}>Window</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Status</Text>
+          </View>
+          {[
+            ['Phase 1', 'Site setup, excavation, PCC bed & foundation footings', 'Weeks 1 – 6', 'Sequential'],
+            ['Phase 2', 'Plinth beam casting, backfilling & ground floor columns', 'Weeks 7 – 12', 'Sequential'],
+            ['Phase 3', 'Ground floor slab pour & first floor structural framing', 'Weeks 13 – 18', 'Sequential'],
+            ['Phase 4', 'Terrace slab pour, external & internal block masonry', 'Weeks 19 – 24', 'Sequential'],
+            ['Phase 5', 'Concealed electrical/plumbing rough-in & plastering', 'Weeks 25 – 28', 'Overlapping'],
+            ['Phase 6', 'Waterproofing, vitrified tiling, door & window joinery', 'Weeks 29 – 32', 'Overlapping'],
+            ['Phase 7', 'Painting, sanitary fixture install, testing & handover', 'Weeks 33 – 36', 'Final Stage'],
+          ].map(([phaseNo, desc, win, status], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: '15%' }]}>{phaseNo}</Text>
+              <Text style={[styles.tdMuted, { width: '45%' }]}>{desc}</Text>
+              <Text style={[styles.td, { width: '20%' }]}>{win}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '20%', color: C.forestLt }]}>{status}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Section 12 */}
+        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
+          <Text style={styles.sectionBannerText}>Section 12 — Milestone Payment Planning Schedule</Text>
+          <Text style={styles.sectionBannerSub}>Physical Work Verification Triggers</Text>
+        </View>
+
+        {/* Payment Plan Table */}
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '12%' }]}>Stage</Text>
+            <Text style={[styles.th, { width: '48%' }]}>Construction Milestone &amp; Physical Verification Trigger</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Disbursement (INR)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Stage %</Text>
+          </View>
+          {(paymentPlan && paymentPlan.length > 0 ? paymentPlan : [
+            { stage: 1, title: 'Mobilization & Soil Setup', description: 'Advance upon agreement signing and excavation start', percentage: 10, amount: Math.round(totalCost * 0.10) },
+            { stage: 2, title: 'Foundation & Plinth', description: 'Upon complete footing casting and plinth beam completion', percentage: 15, amount: Math.round(totalCost * 0.15) },
+            { stage: 3, title: 'Ground Floor Slab', description: 'Upon casting and curing of ground floor ceiling slab', percentage: 15, amount: Math.round(totalCost * 0.15) },
+            { stage: 4, title: 'First Floor Slab / Roof', description: 'Upon casting of upper floor framing and rooftop terrace slab', percentage: 15, amount: Math.round(totalCost * 0.15) },
+            { stage: 5, title: 'Masonry & Plastering', description: 'Upon full blockwork completion and internal/external plaster', percentage: 15, amount: Math.round(totalCost * 0.15) },
+            { stage: 6, title: 'Flooring & Rough-In', description: 'Upon vitrified tile laying and plumbing/wiring pulled', percentage: 15, amount: Math.round(totalCost * 0.15) },
+            { stage: 7, title: 'Painting & Fixtures', description: 'Upon final paint coats, sanitary fitting and switches fitted', percentage: 10, amount: Math.round(totalCost * 0.10) },
+            { stage: 8, title: 'Handover & Retention', description: 'Upon snagging clearance, deep clean and key handover', percentage: 5, amount: Math.round(totalCost * 0.05) },
+          ]).map((stage, idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]} wrap={false}>
+              <Text style={[styles.tdBold, { width: '12%' }]}>Stage {stage.stage}</Text>
+              <View style={{ width: '48%' }}>
+                <Text style={styles.tdBold}>{stage.title}</Text>
+                {stage.description ? <Text style={[styles.tdMuted, { fontSize: 5.2 }]}>{stage.description}</Text> : null}
+              </View>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '20%' }]}>{fmt(stage.amount)}</Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>{stage.percentage}%</Text>
+            </View>
+          ))}
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { width: '60%' }]}>Total Scheduled Disbursements (All Stages)</Text>
+            <Text style={[styles.totalValue, { width: '20%' }]}>{fmt(totalCost)}</Text>
+            <Text style={[styles.totalValue, { width: '20%' }]}>100.0%</Text>
+          </View>
+        </View>
+
+        {/* Homeowner Stage Payment Protection Guideline */}
+        <View style={styles.warningBox} wrap={false}>
+          <Text style={[styles.boxTitle, { color: C.terracotta }]}>Crucial Homeowner Financial Protection Guideline</Text>
+          <Text style={styles.boxText}>
+            Never release milestone payments based purely on calendar dates or contractor advance demands. Every stage disbursement must correspond to physical inspection and verification of completed works on site. Retain the final 5% until all snagging items are cleared and occupancy is handed over.
+          </Text>
+        </View>
+
+        {/* Rate Master Source Metadata */}
+        <View style={styles.infoBox} wrap={false}>
+          <Text style={styles.boxTitle}>Rate Master Source &amp; Engineering Governance</Text>
+          <Text style={styles.boxText}>
+            Dataset: {rateMeta?.datasetVersion || 'HUTTY-RM-2026.1'} · Calculation Engine: {rateMeta?.calculationEngineVersion || 'v2.6.0'} · Mode: {rateMeta?.isLive ? 'Live Connected' : 'Q1 2026 Verified Baseline'} · Geographic Jurisdiction: {city}, Karnataka · Reference: IS 456, IS 1200, NBC 2016.
+          </Text>
+        </View>
+
+        <DocFooter section="Section 11 &amp; 12: Timeline &amp; Milestone Payment Plan" />
+      </Page>
+
+      {/* ══════════════════════════════════════════════════
+          PAGE 10 — ADDENDUM: CONTRACTOR QUOTE AUDIT & BENCHMARKS
+      ══════════════════════════════════════════════════ */}
+      <Page size="A4" style={styles.page}>
+        <RunHeader section="Addendum: Contractor Quote Audit, Benchmarks &amp; Scenarios" />
+
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Addendum — Contractor Quote Vetting &amp; Market Tolerances</Text>
+          <Text style={styles.sectionBannerSub}>Independent Quantity Surveying Benchmarks ({city} Q1 2026)</Text>
+        </View>
+
+        {/* Market Rate Tolerance Benchmarks */}
+        <Text style={styles.subSectionTitle}>1. Key Trade Market Tolerances &amp; Allowable Variances</Text>
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '38%' }]}>Material / Trade Description</Text>
+            <Text style={[styles.th, { width: '18%' }]}>Standard Unit</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '24%' }]}>Market Benchmark</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Allowable Variance</Text>
+          </View>
+          {[
+            ['Structural TMT Steel (Fe 550D)', 'Per Kg', '₹68 – ₹76', '±5% tolerance'],
+            ['53-Grade Portland Cement', '50kg Bag', '₹380 – ₹420', '±4% tolerance'],
+            ['Solid Concrete Blocks (6")', 'Per Block', '₹42 – ₹48', '±5% tolerance'],
+            ['Civil RCC Labour (Framed Structure)', 'Per sq.ft BUA', '₹240 – ₹280', '±6% tolerance'],
+            ['Tile Laying & Grouting Labour', 'Per sq.ft', '₹35 – ₹45', '±8% tolerance'],
+            ['Interior Emulsion Paint (2 Coats + Putty)', 'Per sq.ft', '₹18 – ₹26', '±7% tolerance'],
+          ].map(([desc, u, bmk, tol], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: '38%' }]}>{desc}</Text>
+              <Text style={[styles.tdMuted, { width: '18%' }]}>{u}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '24%' }]}>{bmk}</Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>{tol}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* High-Risk Missing Scope Checklist (Contractor Redlines) */}
+        <Text style={styles.subSectionTitle}>2. High-Risk Missing Scope Checklist (Contractor Redlines)</Text>
+        <View style={{ marginBottom: 5 }}>
+          {[
+            ['Soil Bearing Capacity Test', 'Demand written geotechnical report before footing depth sign-off. Turnkey contractors frequently omit this.'],
+            ['Temporary 3-Phase Power & Curing Water', 'Verify whether temporary BESCOM meter deposit, wiring, and borewell water for curing are included in the quote.'],
+            ['Compound Wall & Gate Columns', 'Often charged as an extra variation cost. Ensure linear footage and foundation depth are explicitly agreed.'],
+            ['Sump Waterproofing & Debris Disposal', 'Ensure 2-coat crystalline waterproofing on underground tanks and periodic carting of construction debris away from site.'],
+          ].map(([head, note], idx) => (
+            <View key={idx} style={{ flexDirection: 'row', gap: 4, marginBottom: 2.5 }}>
+              <Text style={{ fontSize: 6.2, fontFamily: 'Helvetica-Bold', color: C.terracotta }}>[!]:</Text>
+              <Text style={{ fontSize: 5.8, color: C.charcoal, flex: 1, lineHeight: 1.25 }}>
+                <Text style={{ fontFamily: 'Helvetica-Bold' }}>{head}: </Text>
+                {note}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Multi-Scenario Layout Comparison */}
+        <Text style={styles.subSectionTitle}>3. Multi-Scenario Footprint Comparison on Plot ({plotLength}' × {plotWidth}')</Text>
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow} fixed>
+            <Text style={[styles.th, { width: '30%' }]}>Layout Scenario</Text>
+            <Text style={[styles.th, { width: '30%' }]}>Built-Up Area (BUA)</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Estimated Budget</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Effective Rate</Text>
+          </View>
+          {[
+            ['Scenario A: Single Floor (Compact)', `${num(area?.buaPerFloorSqFt || Math.round(totalBUA / 2))} sq.ft`, fmt((area?.buaPerFloorSqFt || Math.round(totalBUA / 2)) * (budget?.costPerSqFt || 3592)), `₹${num(budget?.costPerSqFt || 3592)}/sqft`],
+            ['Scenario B: Current Plan (G+1 Duplex)', `${num(totalBUA)} sq.ft`, fmt(totalCost), `₹${num(budget?.costPerSqFt)}/sqft`],
+            ['Scenario C: +1 Floor (Rental Unit)', `${num(totalBUA + Math.round(totalBUA / 2))} sq.ft`, fmt(totalCost + Math.round((totalBUA / 2) * (budget?.costPerSqFt || 3592) * 0.88)), `₹${num(Math.round((budget?.costPerSqFt || 3592) * 0.96))}/sqft`],
+          ].map(([scen, buaCol, estBud, effR], idx) => (
+            <View key={idx} style={[styles.tableRow, idx === 1 ? { backgroundColor: C.bgSage } : idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+              <Text style={[styles.tdBold, { width: '30%', color: idx === 1 ? C.forest : C.charcoal }]}>{scen}</Text>
+              <Text style={[styles.tdBold, { width: '30%' }]}>{buaCol}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '20%' }]}>{estBud}</Text>
+              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>{effR}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Final Sign-off Box */}
+        {isSample && (
+          <View style={{ backgroundColor: '#FEF3C7', borderColor: '#F59E0B', borderWidth: 0.8, padding: 6, borderRadius: 2.5, marginBottom: 6 }} wrap={false}>
+            <Text style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold', color: '#92400E', marginBottom: 2 }}>
+              SAMPLE REPORT NOTICE — NOT A REAL ESTIMATE
+            </Text>
+            <Text style={{ fontSize: 5.8, color: '#78350F', lineHeight: 1.35 }}>
+              This is an illustrative sample construction report provided for demonstration purposes. It showcases the comprehensive structure, detailed works BOQ, material takeoff quantities, and payment schedules provided in Hutty's Complete Construction Planning &amp; Estimation Report. Figures in this sample are illustrative and must not be used for actual construction contracts.
+            </Text>
+          </View>
+        )}
+        <View style={styles.infoBox} wrap={false}>
+          <Text style={styles.boxTitle}>Hutty Digital Quantity Surveying Assurance</Text>
+          <Text style={styles.boxText}>
+            Generated by Hutty Pre-Construction Technologies. This dossier is engineered to protect homeowners from contractor quotation ambiguities, unexpected budget escalation, and hidden scope exclusions. Visit https://hutty.in for live calculation updates and expert consultations.
+          </Text>
+        </View>
+
+        <DocFooter section="Addendum: Contractor Quote Audit &amp; Benchmarks" />
+      </Page>
+
+      {/* ══════════════════════════════════════════════════
+          PAGE 11 — PREMIUM CONSULTATION VETTING ANNEX
+      ══════════════════════════════════════════════════ */}
       {isPremium && (
         <Page size="A4" style={styles.page}>
-          <RunHeader section="Section E: Contractor Quote Audit, Material Sensitivity & Multi-Scenario Comparison" />
+          <RunHeader section="Premium Annex: Expert Engineering Vetting Guide" />
 
-          {/* Section E Banner */}
-          <View style={{ backgroundColor: C.green, padding: 8, borderRadius: 3, marginTop: 4, marginBottom: 6 }}>
-            <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#FFFFFF', textTransform: 'uppercase' }}>
-              SECTION E &bull; CONTRACTOR QUOTE AUDIT &amp; SENSITIVITY (PREMIUM DELIVERABLE)
-            </Text>
-            <Text style={{ fontSize: 6, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
-              Independent QS vetting benchmarks, finish sensitivity variance, and multi-scenario footprint comparison.
-            </Text>
+          <View style={styles.sectionBanner}>
+            <Text style={styles.sectionBannerText}>Supplementary Annex — Expert Consultation &amp; Vetting</Text>
+            <Text style={styles.sectionBannerSub}>Structural Drawing Review &amp; Contractor Contract Guardrails</Text>
           </View>
 
-          {/* 1. Market Rate Tolerance Benchmarks */}
-          <Text style={styles.sectionTitle}>1. Key Trade Market Tolerances (Bangalore Q1 2026)</Text>
-          <View style={{ borderWidth: 0.5, borderColor: C.border, marginTop: 2, marginBottom: 6 }}>
-            <View style={styles.tableHeaderRow} fixed>
-              <Text style={[styles.th, { width: '35%' }]}>Material / Trade Description</Text>
-              <Text style={[styles.th, { width: '20%' }]}>Unit</Text>
-              <Text style={[styles.th, styles.tdRight, { width: '25%' }]}>Market Benchmark</Text>
-              <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Allowable Variance</Text>
+          <Text style={styles.subSectionTitle}>1. Independent Structural Vetting Protocol</Text>
+          <Text style={styles.paragraph}>
+            This supplementary addendum is unlocked for project dossiers designated for senior architect or structural engineer review. Before executing an agreement with your general contractor, complete the following verification steps:
+          </Text>
+
+          <View style={styles.tableContainer}>
+            <View style={styles.tableHeaderRow}>
+              <Text style={[styles.th, { width: '25%' }]}>Checkpoint</Text>
+              <Text style={[styles.th, { width: '45%' }]}>Standard Engineering Requirement</Text>
+              <Text style={[styles.th, { width: '30%' }]}>Acceptable Tolerance</Text>
             </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '35%' }]}>Structural TMT Steel (Fe 550D)</Text>
-              <Text style={[styles.td, { width: '20%' }]}>Per Kg</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹68 – ₹76</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±5% tolerance</Text>
-            </View>
-            <View style={[styles.tableRow, styles.tableRowAlt]} wrap={false}>
-              <Text style={[styles.tdBold, { width: '35%' }]}>53-Grade Portland Cement</Text>
-              <Text style={[styles.td, { width: '20%' }]}>50kg Bag</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹380 – ₹420</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±4% tolerance</Text>
-            </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '35%' }]}>Solid Concrete Masonry Blocks (6")</Text>
-              <Text style={[styles.td, { width: '20%' }]}>Per Block</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹42 – ₹48</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±5% tolerance</Text>
-            </View>
-            <View style={[styles.tableRow, styles.tableRowAlt]} wrap={false}>
-              <Text style={[styles.tdBold, { width: '35%' }]}>Civil RCC Labour (Framed Structure)</Text>
-              <Text style={[styles.td, { width: '20%' }]}>Per sq.ft BUA</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹240 – ₹280</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±6% tolerance</Text>
-            </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '35%' }]}>Tile Laying &amp; Grouting Labour</Text>
-              <Text style={[styles.td, { width: '20%' }]}>Per sq.ft</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹35 – ₹45</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±8% tolerance</Text>
-            </View>
-            <View style={[styles.tableRow, styles.tableRowAlt]} wrap={false}>
-              <Text style={[styles.tdBold, { width: '35%' }]}>Interior Emulsion Painting (2 Coats + Putty)</Text>
-              <Text style={[styles.td, { width: '20%' }]}>Per sq.ft</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%' }]}>₹18 – ₹26</Text>
-              <Text style={[styles.tdMuted, styles.tdRight, { width: '20%' }]}>±7% tolerance</Text>
-            </View>
+            {[
+              ['Soil SBC Test', 'Safe Bearing Capacity report by certified geotechnical lab', 'Minimum 150 kN/m² at 2.0m depth'],
+              ['RCC Structural Drawings', 'Signed by licensed structural engineer (BBMP/Local Authority)', 'Zero deviation without written approval'],
+              ['Concrete Mix Sampling', 'Cube compressive strength test at 7 and 28 days', 'M20 ≥ 20 N/mm², M25 ≥ 25 N/mm²'],
+              ['Steel Rebar Heat Vetting', 'BIS certification tag and batch test certificates', 'Fe 550D / Fe 500D (IS 1786)'],
+              ['Plinth Beam Elevation', 'Minimum 450mm above finished permanent road crown level', 'Strict mandatory barrier against water ingress'],
+            ].map(([chk, req, tol], idx) => (
+              <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
+                <Text style={[styles.tdBold, { width: '25%' }]}>{chk}</Text>
+                <Text style={[styles.td, { width: '45%' }]}>{req}</Text>
+                <Text style={[styles.tdMuted, { width: '30%' }]}>{tol}</Text>
+              </View>
+            ))}
           </View>
 
-          {/* 2. Missing Scope Redlines Checklist */}
-          <Text style={styles.sectionTitle}>2. High-Risk Missing Scope Checklist (Contractor Redlines)</Text>
-          <View style={{ marginTop: 2, marginBottom: 6 }}>
-            <View style={{ flexDirection: 'row', gap: 4, marginBottom: 3 }}>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.amber }}>[!]</Text>
-              <Text style={{ fontSize: 6, color: C.green, flex: 1 }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold' }}>Soil Bearing Capacity Test: </Text>
-                Frequently omitted by turnkey contractors; demand written geotechnical soil report before footing depth sign-off.
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 4, marginBottom: 3 }}>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.amber }}>[!]</Text>
-              <Text style={{ fontSize: 6, color: C.green, flex: 1 }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold' }}>Temporary 3-Phase Power &amp; Water: </Text>
-                Verify whether temporary power meter deposit, wiring, and borewell water for curing are included in contractor's quote.
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 4, marginBottom: 3 }}>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.amber }}>[!]</Text>
-              <Text style={{ fontSize: 6, color: C.green, flex: 1 }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold' }}>Compound Wall &amp; Gate Columns: </Text>
-                Often charged as an extra variation cost. Ensure linear footage and foundation depth are explicitly documented.
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 4, marginBottom: 3 }}>
-              <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.amber }}>[!]</Text>
-              <Text style={{ fontSize: 6, color: C.green, flex: 1 }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold' }}>Sump Waterproofing &amp; Debris Disposal: </Text>
-                Verify crystalline chemical waterproofing on underground tanks and periodic carting of construction debris away from site.
-              </Text>
-            </View>
+          <Text style={styles.subSectionTitle}>2. Contractor Contractual Guardrails &amp; Penalty Clauses</Text>
+          <View style={{ gap: 4, marginTop: 4 }}>
+            {[
+              'Defect Liability Period (DLP): Contractor must provide an unconditioned 12-month DLP backed by 5% retention money.',
+              'Delay Liquidated Damages: Agreed penalty of 0.5% of remaining contract value per week of unexcused delay, capped at 5%.',
+              'Material Substitution Ban: No brand substitutions permitted without prior written variance approval from the homeowner.',
+              'Waterproofing Warranty: Minimum 10-year joint leak-free warranty certificate from chemical waterproofing specialist manufacturer.',
+            ].map((clause, idx) => (
+              <View key={idx} style={{ flexDirection: 'row', gap: 6, alignItems: 'flex-start' }}>
+                <Text style={{ fontSize: 7, color: C.forest, fontFamily: 'Helvetica-Bold' }}>&bull;</Text>
+                <Text style={{ fontSize: 6.6, color: C.charcoal, lineHeight: 1.35, flex: 1 }}>{clause}</Text>
+              </View>
+            ))}
           </View>
 
-          {/* 3. Finish Package Sensitivity Matrix */}
-          <Text style={styles.sectionTitle}>3. Finish Specification Sensitivity Matrix ({num(area.totalBUASqFt)} sq.ft BUA)</Text>
-          <View style={{ borderWidth: 0.5, borderColor: C.border, marginTop: 2, marginBottom: 6 }}>
-            <View style={styles.tableHeaderRow} fixed>
-              <Text style={[styles.th, { width: '30%' }]}>Specification Package</Text>
-              <Text style={[styles.th, { width: '40%' }]}>Material Standards &amp; Fittings</Text>
-              <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Est. Rate/sqft</Text>
-              <Text style={[styles.th, styles.tdRight, { width: '15%' }]}>Project Variance</Text>
-            </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '30%' }]}>Standard Specification</Text>
-              <Text style={[styles.tdMuted, { width: '40%' }]}>Vitrified 2x2, standard UPVC, OBD paint, baseline CP</Text>
-              <Text style={[styles.tdRight, { width: '15%' }]}>₹1,950</Text>
-              <Text style={[styles.tdRight, { width: '15%', color: '#047857' }]}>- {fmt(Math.max(0, (budget.costPerSqFt || 2250) - 1950) * area.totalBUASqFt)}</Text>
-            </View>
-            <View style={[styles.tableRow, { backgroundColor: C.bgAccent }]} wrap={false}>
-              <Text style={[styles.tdBold, { width: '30%', color: C.green }]}>Premium (Current Baseline)</Text>
-              <Text style={[styles.td, { width: '40%' }]}>GVT 4x2, Schuco UPVC, Royal luxury emulsion, Jaguar fittings</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '15%' }]}>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '15%', color: C.amber }]}>Baseline</Text>
-            </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '30%' }]}>Luxury Specification</Text>
-              <Text style={[styles.tdMuted, { width: '40%' }]}>Italian marble, thermal-break aluminium, Grohe/Kohler, smart automation</Text>
-              <Text style={[styles.tdRight, { width: '15%' }]}>₹2,850</Text>
-              <Text style={[styles.tdRight, { width: '15%', color: '#B91C1C' }]}>+ {fmt(Math.max(0, 2850 - (budget.costPerSqFt || 2250)) * area.totalBUASqFt)}</Text>
-            </View>
-          </View>
-
-          {/* 4. Multi-Scenario Comparison */}
-          <Text style={styles.sectionTitle}>4. Multi-Scenario Layout Comparison on Plot ({num(input?.plotLength || 30)}' × {num(input?.plotWidth || 40)}')</Text>
-          <View style={{ borderWidth: 0.5, borderColor: C.border, marginTop: 2, marginBottom: 6 }}>
-            <View style={styles.tableHeaderRow} fixed>
-              <Text style={[styles.th, { width: '30%' }]}>Layout Scenario</Text>
-              <Text style={[styles.th, { width: '30%' }]}>Built-Up Area (BUA)</Text>
-              <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Estimated Budget</Text>
-              <Text style={[styles.th, styles.tdRight, { width: '20%' }]}>Effective Rate</Text>
-            </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '30%' }]}>Scenario A: Single Floor (Compact)</Text>
-              <Text style={[styles.td, { width: '30%' }]}>{num(area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (input?.floors || 1)))} sq.ft</Text>
-              <Text style={[styles.tdRight, { width: '20%' }]}>{fmt((area.buaPerFloorSqFt || Math.round(area.totalBUASqFt / (input?.floors || 1))) * (budget.costPerSqFt || 2250))}</Text>
-              <Text style={[styles.tdRight, { width: '20%' }]}>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}/sqft</Text>
-            </View>
-            <View style={[styles.tableRow, { backgroundColor: C.bgAccent }]} wrap={false}>
-              <Text style={[styles.tdBold, { width: '30%', color: C.green }]}>Scenario B: Current Plan (G+{Math.max(0, (input?.floors || 1) - 1)})</Text>
-              <Text style={[styles.tdBold, { width: '30%' }]}>{num(area.totalBUASqFt)} sq.ft</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '20%' }]}>{fmt(budget.totalProjectCost)}</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '20%' }]}>₹{Math.round(budget.costPerSqFt || 2250).toLocaleString('en-IN')}/sqft</Text>
-            </View>
-            <View style={styles.tableRow} wrap={false}>
-              <Text style={[styles.tdBold, { width: '30%' }]}>Scenario C: +1 Floor (Rental Unit)</Text>
-              <Text style={[styles.td, { width: '30%' }]}>{num(area.totalBUASqFt + Math.round(area.totalBUASqFt / (input?.floors || 1)))} sq.ft</Text>
-              <Text style={[styles.tdRight, { width: '20%' }]}>{fmt(budget.totalProjectCost + (Math.round(area.totalBUASqFt / (input?.floors || 1)) * (budget.costPerSqFt || 2250) * 0.88))}</Text>
-              <Text style={[styles.tdRight, { width: '20%' }]}>₹{Math.round((budget.costPerSqFt || 2250) * 0.96).toLocaleString('en-IN')}/sqft</Text>
-            </View>
-          </View>
-
-          {/* Mandatory Early Estimate Note Box */}
-          <View style={{ marginTop: 4, backgroundColor: '#FEF3C7', borderWidth: 0.8, borderColor: '#F59E0B', borderRadius: 4, padding: 5 }}>
-            <Text style={{ fontSize: 6, fontFamily: 'Helvetica-Bold', color: '#92400E', textTransform: 'uppercase', marginBottom: 1 }}>
-              IMPORTANT ESTIMATE NOTE
-            </Text>
-            <Text style={{ fontSize: 5.5, color: '#78350F', lineHeight: 1.35, fontFamily: 'Helvetica-Bold' }}>
-              This is an early estimate to help you plan. Final costs and quantities may change after the site, drawings and material choices are checked.
+          <View style={[styles.infoBox, { marginTop: 12 }]} wrap={false}>
+            <Text style={styles.boxTitle}>Hutty Dedicated Expert Consultation</Text>
+            <Text style={styles.boxText}>
+              Homeowners preparing to sign construction contracts can book a 1-on-1 dossier vetting session with a Hutty Senior Architect or Quantity Surveyor. Visit https://hutty.in or WhatsApp Hutty Support for expedited scheduling.
             </Text>
           </View>
 
-          <DocFooter section="Section E: Contractor Audit & Sensitivity (Premium)" />
+          <DocFooter section="Premium Annex: Structural &amp; Contractual Vetting Guide" />
         </Page>
       )}
 

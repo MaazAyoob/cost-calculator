@@ -206,9 +206,9 @@ export class CustomerAccountController {
 
           for (const ent of entitlements) {
             const isDetailed = ent.featureCode === 'FULL_PDF_REPORT' || ent.featureCode === 'DETAILED_BOQ_ACCESS';
-            const reportTitle = isDetailed ? 'Detailed BOQ & Construction Dossier' : 'Hutty Verified Basic Estimate Report';
+            const reportTitle = isDetailed ? 'Complete Construction Planning & Estimation Report' : 'Hutty Verified Basic Estimate Report';
             const tierCode = isDetailed ? 'DETAILED_ESTIMATE_499' : 'ESTIMATE_99';
-            const cost = isDetailed ? 499 : 99;
+            const cost = ent.sourcePurchase?.amountMinorUnits ? Math.round(ent.sourcePurchase.amountMinorUnits / 100) : (isDetailed ? 199 : 99);
 
             reports.push({
               id: ent.id,

@@ -254,7 +254,7 @@ describe('Customer Account & Profile System Test Suite', () => {
         testBypassPayment: true,
       });
 
-      expect(purchase.amountMinorUnits).toBe(49900); // exactly ₹499
+      expect(purchase.amountMinorUnits).toBe(19900); // exactly ₹199
       expect(purchase.projectId).toBe(project.id);
       expect(purchase.status).toBe('PAID');
     });

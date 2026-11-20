@@ -1,17 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import {
-  RotateCw,
-  ZoomIn,
-  ZoomOut,
-  RefreshCw,
-  Box,
-  Eye,
-  Sun,
-  Moon,
-  Layers,
-  PaintBucket,
-} from 'lucide-react';
+import { Box } from 'lucide-react';
 import {
   QualityTier,
   HouseType,
@@ -78,11 +67,11 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
   const floorGroupsRef = useRef<THREE.Group[]>([]);
   const animationFrameId = useRef<number | null>(null);
 
-  const [isAutoRotating, setIsAutoRotating] = useState(false);
-  const [isNightMode, setIsNightMode] = useState(false);
-  const [isExplodedView, setIsExplodedView] = useState(false);
-  const [isPaintedMode, setIsPaintedMode] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
+  const isAutoRotating = false;
+  const isNightMode = false;
+  const isExplodedView = false;
+  const isPaintedMode = false;
+  const zoomLevel = 1;
 
   const isDraggingRef = useRef(false);
   const previousMousePositionRef = useRef({ x: 0, y: 0 });
@@ -684,19 +673,9 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
     isDraggingRef.current = false;
   };
 
-  const handleResetView = () => {
-    rotationRef.current = { x: 0.28, y: -0.75 };
-    setZoomLevel(1);
-    setIsExplodedView(false);
-  };
-
-  const handleZoom = (factor: number) => {
-    setZoomLevel((prev) => Math.max(0.6, Math.min(1.8, prev * factor)));
-  };
-
   return (
     <div className={`relative rounded-2xl overflow-hidden bg-[#1B3D34] border border-[#1B3D34] select-none shadow-xs ${className}`}>
-      {/* 3D Canvas Viewport */}
+      {/* 3D Canvas Viewport (Unobtrusive Drag-to-Rotate Orbit) */}
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
@@ -709,124 +688,19 @@ export const Architectural3DViewer: React.FC<Architectural3DViewerProps> = ({
         className="w-full h-full min-h-[160px] cursor-grab active:cursor-grabbing"
       />
 
-      {!hideInternalControls && (
-        <>
-          {/* Floating Badges */}
-          <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 flex items-center gap-1.5 sm:gap-2 bg-[#1B3D34]/90 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-lg border border-white/10 text-white pointer-events-none">
-            <Box className="w-3.5 h-3.5 text-[#F28C28] shrink-0" />
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
-              <span className="hidden xs:inline">{city || 'Bangalore'} &bull; </span>{houseType || 'Duplex'}
-            </span>
-          </div>
+      {/* Clean Architectural Tag Overlay — No floating toolbar or cluttered controls */}
+      <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-[#1B3D34]/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-white pointer-events-none">
+        <Box className="w-3.5 h-3.5 text-[#F28C28] shrink-0" />
+        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
+          <span className="hidden xs:inline">{city || 'Bangalore'} &bull; </span>{houseType || 'Duplex'}
+        </span>
+      </div>
 
-          <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1 sm:gap-1.5">
-            {isExplodedView && (
-              <span className="bg-[#1B3D34]/90 backdrop-blur-md px-2 sm:px-2.5 py-0.5 rounded-md text-[#F28C28] text-[9px] sm:text-[10px] font-extrabold border border-white/10 shadow-xs pointer-events-none">
-                Exploded
-              </span>
-            )}
-            {isPaintedMode && (
-              <span className="bg-white/90 backdrop-blur-md px-2 sm:px-2.5 py-0.5 rounded-md text-[#1B3D34] text-[9px] sm:text-[10px] font-extrabold border border-white/20 shadow-xs pointer-events-none hidden xs:inline-block">
-                Painted
-              </span>
-            )}
-            <span className="bg-[#F28C28] px-2 sm:px-2.5 py-0.5 rounded-md text-[#1B3D34] text-[9px] sm:text-[10px] font-extrabold shadow-xs pointer-events-none">
-              {floors === 1 ? 'Ground' : `G+${(floors || 2) - 1}`}
-            </span>
-          </div>
-
-          {/* 3D Floating Controls Toolbar */}
-          <div
-            className="absolute bottom-2.5 right-2.5 flex items-center gap-0.5 bg-[#112821]/90 backdrop-blur-md p-1 rounded-lg border border-white/15 z-10 shadow-md"
-            role="toolbar"
-            aria-label="3D Model Viewer Controls"
-          >
-            <button
-              type="button"
-              onClick={() => setIsExplodedView(!isExplodedView)}
-              aria-label={isExplodedView ? 'Collapse floor slices' : 'Explode floor slices'}
-              className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
-                isExplodedView ? 'bg-[#F28C28] text-[#112821]' : 'text-white/75 hover:text-white hover:bg-white/10'
-              }`}
-              title="Toggle Exploded Floor Slice View"
-            >
-              <Layers className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsPaintedMode(!isPaintedMode)}
-              aria-label={isPaintedMode ? 'Switch to raw concrete texture' : 'Switch to painted plaster finish'}
-              className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
-                isPaintedMode ? 'bg-[#F28C28] text-[#112821]' : 'text-white/75 hover:text-white hover:bg-white/10'
-              }`}
-              title={isPaintedMode ? 'Raw Concrete Finish' : 'Painted Plaster Finish'}
-            >
-              <PaintBucket className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsNightMode(!isNightMode)}
-              aria-label={isNightMode ? 'Switch to daylight lighting' : 'Switch to evening lighting'}
-              className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
-                isNightMode ? 'bg-white/20 text-[#F28C28]' : 'text-white/75 hover:text-white hover:bg-white/10'
-              }`}
-              title={isNightMode ? 'Day Sunlight' : 'Evening Lighting'}
-            >
-              {isNightMode ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsAutoRotating(!isAutoRotating)}
-              aria-label={isAutoRotating ? 'Stop turntable rotation' : 'Start turntable rotation'}
-              className={`p-1.5 rounded-md text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none ${
-                isAutoRotating ? 'bg-white/20 text-[#F28C28]' : 'text-white/75 hover:text-white hover:bg-white/10'
-              }`}
-              title="Toggle Turntable Rotation"
-            >
-              <RotateCw className={`w-3.5 h-3.5 ${isAutoRotating ? 'animate-spin' : ''}`} />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleZoom(1.15)}
-              aria-label="Zoom in model"
-              className="p-1.5 rounded-md text-white/75 hover:text-white hover:bg-white/10 text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none"
-              title="Zoom In"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleZoom(0.85)}
-              aria-label="Zoom out model"
-              className="p-1.5 rounded-md text-white/75 hover:text-white hover:bg-white/10 text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none"
-              title="Zoom Out"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResetView}
-              aria-label="Reset 3D camera view"
-              className="p-1.5 rounded-md text-white/75 hover:text-white hover:bg-white/10 text-xs transition-all duration-150 ease-out active:scale-90 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#F28C28] select-none"
-              title="Reset View"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Drag Hint (Compact Pill, never collides with toolbar) */}
-          <div className="absolute bottom-2.5 left-2.5 text-[9px] text-white/75 font-medium pointer-events-none hidden xs:flex items-center gap-1 bg-[#112821]/80 backdrop-blur-xs px-2 py-1 rounded-md border border-white/10">
-            <Eye className="w-2.5 h-2.5 text-[#F28C28]" />
-            <span>Orbit 360°</span>
-          </div>
-        </>
-      )}
+      <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
+        <span className="bg-[#F28C28] px-2 sm:px-2.5 py-0.5 rounded-md text-[#1B3D34] text-[9px] sm:text-[10px] font-extrabold shadow-xs pointer-events-none">
+          {floors === 1 ? 'Ground' : `G+${(floors || 2) - 1}`}
+        </span>
+      </div>
     </div>
   );
 };

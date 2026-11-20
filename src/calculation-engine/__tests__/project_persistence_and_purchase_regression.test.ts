@@ -312,7 +312,7 @@ describe('Project Persistence & Purchase Resilience Regression Suite', () => {
       gateway: 'CASHFREE',
     });
 
-    expect(purchase.amountMinorUnits).toBe(49900); // ₹499
+    expect(purchase.amountMinorUnits).toBe(19900); // ₹199
     expect(purchase.projectId).toBe(validProject.id);
 
     vi.spyOn(cashfreeService, 'verifyOrderPayment').mockResolvedValueOnce({

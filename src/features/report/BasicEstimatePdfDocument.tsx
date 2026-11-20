@@ -456,11 +456,11 @@ export const BasicEstimatePdfDocument: React.FC<BasicEstimatePdfDocumentProps> =
           </View>
         </View>
 
-        {/* Scope Notice: Distinguishes summary estimate from ₹499 Detailed BOQ */}
+        {/* Scope Notice: Distinguishes summary estimate from Complete Construction Report */}
         <View style={styles.scopeBox}>
           <Text style={styles.scopeTitle}>Report Deliverables Notice</Text>
           <Text style={styles.scopeText}>
-            This Basic Estimate PDF provides an executive planning summary of your preliminary project scope. It intentionally excludes item-by-item trade bills of quantities (BOQ), granular material takeoff schedules (steel tonnage, cement bag counts, sand volumes), and contractor quote audits, which are provided exclusively in the Hutty Detailed BOQ report (₹499).
+            This Basic Estimate PDF provides an executive planning summary of your preliminary project scope. It intentionally excludes item-by-item trade bills of quantities (BOQ), granular material takeoff schedules (steel tonnage, cement bag counts, sand volumes), and contractor quote audits, which are provided exclusively in the Hutty Complete Construction Planning &amp; Estimation Report (₹199).
           </Text>
         </View>
 
