@@ -101,12 +101,12 @@ describe('Hutty 3.1 — Chapter 1: Plot & Setbacks Architecture & Integration Su
     expect(authEval).toBeDefined();
     expect(authEval.city).toBe('Mysuru');
     expect(authEval.authority).toBe('MUDA');
-    // MUDA CDP 2031 Schedule II for 30x40 (1,200 sq.ft): 1.2m (3.94ft) front, 1.0m (3.28ft) rear/sides
-    expect(authEval.statutoryFrontSetbackFt).toBeCloseTo(3.94, 2);
-    expect(authEval.statutoryRearSetbackFt).toBeCloseTo(3.28, 2);
-    expect(authEval.statutoryLeftSetbackFt).toBeCloseTo(3.28, 2);
-    expect(authEval.statutoryRightSetbackFt).toBeCloseTo(3.28, 2);
-    expect(authEval.maxGroundCoveragePct).toBe(70);
+    // Mysuru cheat sheet for 30x40 (1,200 sq.ft, 60-150 sq.m): 0.90m (2.95ft) front, 0.70m (2.30ft) rear, 0.70m (2.30ft) on one side, 0ft other side
+    expect(authEval.statutoryFrontSetbackFt).toBeCloseTo(2.95, 2);
+    expect(authEval.statutoryRearSetbackFt).toBeCloseTo(2.30, 2);
+    expect(authEval.statutoryLeftSetbackFt).toBeCloseTo(2.30, 2);
+    expect(authEval.statutoryRightSetbackFt).toBeCloseTo(0, 2);
+    expect(authEval.maxGroundCoveragePct).toBe(75);
     expect(authEval.verificationStatus).toBe('INDEPENDENTLY_VERIFIED');
   });
 

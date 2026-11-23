@@ -52,6 +52,7 @@ export interface EvaluatePlotSetbacksParams {
   customSetbacks?: Partial<SetbackGeometry>;
   rules?: PlotSetbackRule[];
   overrideReason?: string;
+  selectedSideSetback?: 'left' | 'right';
 }
 
 export interface EvaluatePlotSetbacksResult {
@@ -89,6 +90,7 @@ export function evaluatePlotSetbacks(params: EvaluatePlotSetbacksParams): Evalua
     customSetbacks,
     rules = GBA_2026_SETBACK_RULES,
     overrideReason,
+    selectedSideSetback = 'left',
   } = params;
 
   const plotAreaSqFt = Math.max(0, plotLength * plotWidth);
@@ -109,6 +111,9 @@ export function evaluatePlotSetbacks(params: EvaluatePlotSetbacksParams): Evalua
 
   if (!matchedRule) {
     unresolvedReasons.push(`No setback rule configured for plot area ${plotAreaSqFt} sq.ft.`);
+    isAuthoritativeBuildableResolved = false;
+  } else if (matchedRule.isOutOfScope) {
+    unresolvedReasons.push('Plots exceeding 250 sq.m (approx. 2,691 sq.ft) require customized municipal assessment under applicable planning guidelines. Standard simplified rules do not automatically apply.');
     isAuthoritativeBuildableResolved = false;
   }
 
@@ -199,6 +204,13 @@ export function evaluatePlotSetbacks(params: EvaluatePlotSetbacksParams): Evalua
   let statutoryRear  = rearEval.valueFt;
   let statutoryLeft  = leftEval.valueFt;
   let statutoryRight = rightEval.valueFt;
+
+  // If one side rule and user selected right side, allocate clearance to right
+  if (selectedSideSetback === 'right' && (matchedRule?.sideConditionNote === 'one_side' || (statutoryRight === 0 && statutoryLeft > 0))) {
+    const temp = statutoryLeft;
+    statutoryLeft = statutoryRight;
+    statutoryRight = temp;
+  }
 
   // Road-facing side / Corner plot conditions
   // When side boundaries face roads, enforce road-clearance (standard front setback requirement)
@@ -350,6 +362,7 @@ export interface EvaluateAuthorityLimitsParams {
   prescribedBuildingLineFt?: number;
   overrideReason?: string;
   activeRules?: PlotSetbackRule[];
+  selectedSideSetback?: 'left' | 'right';
 }
 
 /**
@@ -369,6 +382,7 @@ export function evaluateAuthorityLimits(params: EvaluateAuthorityLimitsParams): 
     prescribedBuildingLineFt = 0,
     overrideReason,
     activeRules,
+    selectedSideSetback,
   } = params;
 
   const rules = getAuthorityRules(city);
@@ -405,6 +419,7 @@ export function evaluateAuthorityLimits(params: EvaluateAuthorityLimitsParams): 
       customSetbacks,
       rules: setbackRules,
       overrideReason,
+      selectedSideSetback,
     });
 
     statutoryFront = setbackEval.statutoryFrontFt;
@@ -426,10 +441,16 @@ export function evaluateAuthorityLimits(params: EvaluateAuthorityLimitsParams): 
       (slab) => plotAreaSqFt >= slab.minPlotAreaSqFt && plotAreaSqFt <= slab.maxPlotAreaSqFt
     ) || rules.setbackSlabs[rules.setbackSlabs.length - 1];
 
-    statutoryFront = matchedSlab?.frontSetbackFt || 3.28;
-    statutoryRear  = matchedSlab?.rearSetbackFt || 3.28;
-    statutoryLeft  = matchedSlab?.sideLeftSetbackFt || 3.28;
-    statutoryRight = matchedSlab?.sideRightSetbackFt || 3.28;
+    statutoryFront = typeof matchedSlab?.frontSetbackFt === 'number' ? matchedSlab.frontSetbackFt : 3.28;
+    statutoryRear  = typeof matchedSlab?.rearSetbackFt === 'number' ? matchedSlab.rearSetbackFt : 3.28;
+    statutoryLeft  = typeof matchedSlab?.sideLeftSetbackFt === 'number' ? matchedSlab.sideLeftSetbackFt : 3.28;
+    statutoryRight = typeof matchedSlab?.sideRightSetbackFt === 'number' ? matchedSlab.sideRightSetbackFt : 3.28;
+
+    if (selectedSideSetback === 'right' && statutoryRight === 0 && statutoryLeft > 0) {
+      const temp = statutoryLeft;
+      statutoryLeft = statutoryRight;
+      statutoryRight = temp;
+    }
     setbackCoveragePct = matchedSlab?.maxGroundCoveragePct || 70;
 
     let appliedFront = typeof customSetbacks?.frontSetbackFt === 'number' ? customSetbacks.frontSetbackFt : statutoryFront;

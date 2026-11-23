@@ -24,6 +24,7 @@ function buildInput(): EngineInput {
     rearSetback:     s.rearSetback !== null && s.rearSetback !== undefined ? s.rearSetback : undefined,
     leftSetback:     s.leftSetback !== null && s.leftSetback !== undefined ? s.leftSetback : undefined,
     rightSetback:    s.rightSetback !== null && s.rightSetback !== undefined ? s.rightSetback : undefined,
+    selectedSideSetback: s.selectedSideSetback || 'left',
     roadFacingBoundaries: s.roadFacingBoundaries || ['front'],
     isCornerPlot:    Boolean(s.isCornerPlot),
     roadWideningFt:  s.roadWideningFt || 0,

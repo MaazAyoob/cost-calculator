@@ -31,8 +31,8 @@ describe('Stage 4 Buildable Space & Setback Regression Suite', () => {
     expect(result.appliedRightFt.toFixed(1)).toBe('0.0');
   });
 
-  // ── 2. 40 × 60 ft Plot (2,400 sq.ft — Medium & Large Category) ──
-  it('correctly evaluates 40 × 60 ft plot under GBA 2026 percentage rules', () => {
+  // ── 2. 40 × 60 ft Plot (2,400 sq.ft — Category C: > 150 to 250 sq.m) ──
+  it('correctly evaluates 40 × 60 ft plot under Category C fixed rules', () => {
     const result = evaluatePlotSetbacks({
       plotLength: 60,
       plotWidth: 40,
@@ -40,26 +40,26 @@ describe('Stage 4 Buildable Space & Setback Regression Suite', () => {
     });
 
     expect(result).toBeDefined();
-    // Front: 12% of 60 ft depth = 7.20 ft
-    expect(result.appliedFrontFt).toBeCloseTo(7.20, 2);
-    // Rear: 8% of 60 ft depth = 4.80 ft
-    expect(result.appliedRearFt).toBeCloseTo(4.80, 2);
-    // Left: 8% of 40 ft width = 3.20 ft
-    expect(result.appliedLeftFt).toBeCloseTo(3.20, 2);
-    // Right: 8% of 40 ft width = 3.20 ft
-    expect(result.appliedRightFt).toBeCloseTo(3.20, 2);
+    // Front: 1.00m = 3.28 ft
+    expect(result.appliedFrontFt).toBeCloseTo(3.28, 2);
+    // Rear: 0.80m = 2.62 ft
+    expect(result.appliedRearFt).toBeCloseTo(2.62, 2);
+    // Left: 0.80m = 2.62 ft
+    expect(result.appliedLeftFt).toBeCloseTo(2.62, 2);
+    // Right: 0.80m = 2.62 ft
+    expect(result.appliedRightFt).toBeCloseTo(2.62, 2);
 
-    // Buildable width = 40 - 3.20 - 3.20 = 33.60 ft
-    expect(result.buildableWidthFt).toBeCloseTo(33.60, 2);
-    // Buildable depth = 60 - 7.20 - 4.80 = 48.00 ft
-    expect(result.buildableLengthFt).toBeCloseTo(48.00, 2);
-    // Buildable footprint = 33.60 * 48.00 = 1612.8 -> 1613 sq.ft
-    expect(result.buildableFootprintSqFt).toBe(1613);
+    // Buildable width = 40 - 2.62 - 2.62 = 34.76 ft
+    expect(result.buildableWidthFt).toBeCloseTo(34.76, 2);
+    // Buildable depth = 60 - 3.28 - 2.62 = 54.10 ft
+    expect(result.buildableLengthFt).toBeCloseTo(54.10, 2);
+    // Buildable footprint = 34.76 * 54.10 = 1880.5 -> 1881 sq.ft
+    expect(result.buildableFootprintSqFt).toBe(1881);
 
-    expect(result.appliedFrontFt.toFixed(1)).toBe('7.2');
-    expect(result.appliedRearFt.toFixed(1)).toBe('4.8');
-    expect(result.appliedLeftFt.toFixed(1)).toBe('3.2');
-    expect(result.appliedRightFt.toFixed(1)).toBe('3.2');
+    expect(result.appliedFrontFt.toFixed(2)).toBe('3.28');
+    expect(result.appliedRearFt.toFixed(2)).toBe('2.62');
+    expect(result.appliedLeftFt.toFixed(2)).toBe('2.62');
+    expect(result.appliedRightFt.toFixed(2)).toBe('2.62');
   });
 
   // ── 3. Edge Case: Missing, Zero, or Boundary Inputs ──
@@ -136,8 +136,8 @@ describe('Stage 4 Buildable Space & Setback Regression Suite', () => {
     expect(permissibleGroundFootprintSqFt).toBeLessThan(geometricEnvelopeSqFt);
   });
 
-  // ── 6. Critical Distinction: Geometric Envelope vs 65% Coverage Limit (40 × 60 ft) ──
-  it('enforces stricter 65% ground coverage cap (1,560 sq.ft) over geometric envelope (1,613 sq.ft) on 40 × 60 ft plot', () => {
+  // ── 6. Critical Distinction: Geometric Envelope vs 70% Coverage Limit (40 × 60 ft) ──
+  it('enforces stricter 70% ground coverage cap (1,680 sq.ft) over geometric envelope (1,881 sq.ft) on 40 × 60 ft plot', () => {
     const plotLength = 60;
     const plotWidth = 40;
     const plotAreaSqFt = plotLength * plotWidth; // 2,400 sq.ft
@@ -149,17 +149,17 @@ describe('Stage 4 Buildable Space & Setback Regression Suite', () => {
     });
 
     const geometricEnvelopeSqFt = setbackEval.buildableFootprintSqFt;
-    expect(geometricEnvelopeSqFt).toBe(1613);
+    expect(geometricEnvelopeSqFt).toBe(1881);
 
     const maxCoveragePct = setbackEval.maxGroundCoveragePct;
-    expect(maxCoveragePct).toBe(65);
+    expect(maxCoveragePct).toBe(70);
 
     const statutoryCoverageCapSqFt = Math.round(plotAreaSqFt * (maxCoveragePct / 100));
-    expect(statutoryCoverageCapSqFt).toBe(1560);
+    expect(statutoryCoverageCapSqFt).toBe(1680);
 
     // Permissible construction footprint is strictly governed by the smaller limit
     const permissibleGroundFootprintSqFt = Math.min(geometricEnvelopeSqFt, statutoryCoverageCapSqFt);
-    expect(permissibleGroundFootprintSqFt).toBe(1560);
+    expect(permissibleGroundFootprintSqFt).toBe(1680);
     expect(permissibleGroundFootprintSqFt).toBeLessThan(geometricEnvelopeSqFt);
   });
 });

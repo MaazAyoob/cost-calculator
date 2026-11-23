@@ -197,8 +197,8 @@ describe('HUTTY 2.0 — Final Acceptance & Calculator Correctness Suite', () => 
     expect(result.area.plotAreaSqFt).toBe(2400);
     expect(input.floors).toBe(5);
 
-    // 2. Setback scaling for larger plot & taller building
-    expect(result.area.setbacks.frontSetbackFt).toBeGreaterThanOrEqual(3.5);
+    // 2. Setback under Category C (150-250 sq.m / 2400 sq.ft)
+    expect(result.area.setbacks.frontSetbackFt).toBe(3.28);
 
     // 3. Built-Up Area reflects 5 floors
     expect(result.area.totalBUASqFt).toBe(7200);

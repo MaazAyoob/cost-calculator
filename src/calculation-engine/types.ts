@@ -116,6 +116,7 @@ export interface EngineInput {
   painting: PaintingSelection;
   fabrication?: FabricationSelection;
   // Setback conditions & road frontages (Plot Setback System V2)
+  selectedSideSetback?: 'left' | 'right';
   roadFacingBoundaries?: Array<'front' | 'rear' | 'left' | 'right'>;
   isCornerPlot?: boolean;
   roadWideningFt?: number;

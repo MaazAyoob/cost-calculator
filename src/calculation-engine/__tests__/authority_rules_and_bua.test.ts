@@ -108,9 +108,9 @@ describe('Authority-Based BUA & Setback Engine Suite', () => {
     expect(area.authorityMetadata.city).toBe('Mysuru');
     expect(area.authorityMetadata.ruleId).toBe('MYS-MUDA-CDP2031-RES-V1.8');
 
-    // 30x40 in MUDA has 1.2m front (~3.94ft)
-    expect(area.statutorySetbacks.frontSetbackFt).toBeCloseTo(3.94, 1);
-    expect(area.statutorySetbacks.rearSetbackFt).toBeCloseTo(3.28, 1);
+    // 30x40 in Mysuru cheat sheet (Category B: 60 to 150 sq.m): 0.90m front (2.95ft), 0.70m rear (2.30ft)
+    expect(area.statutorySetbacks.frontSetbackFt).toBeCloseTo(2.95, 1);
+    expect(area.statutorySetbacks.rearSetbackFt).toBeCloseTo(2.30, 1);
   });
 
   it('3. Respects road width dependent FAR regulations', () => {

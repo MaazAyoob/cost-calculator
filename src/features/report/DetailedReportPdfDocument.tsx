@@ -2,6 +2,11 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Svg, Rect, Line, G } from '@react-pdf/renderer';
 import { CalculationResult, FixtureScheduleItem, BOQItem } from '../../calculation-engine/types';
 import { formatUnitLabel } from '../../calculation-engine/data/units';
+import {
+  evaluatePlotSetbackDetails,
+  evaluateBuildingHeight,
+  getCityPlanningLimits,
+} from '../../calculation-engine/data/setbackRules';
 
 // ─────────────────────────────────────────────────────────────
 // HUTTY RESIDENTIAL ARCHITECTURAL EDITORIAL DESIGN SYSTEM
@@ -9,25 +14,25 @@ import { formatUnitLabel } from '../../calculation-engine/data/units';
 // Zero SaaS clutter, high readability, architectural elegance
 // ─────────────────────────────────────────────────────────────
 const C = {
-  forest:     '#1B3D34', // Primary brand deep green
-  forestLt:   '#2A5C4E', // Accent green
+  forest: '#1B3D34', // Primary brand deep green
+  forestLt: '#2A5C4E', // Accent green
   terracotta: '#C2410C', // Warm terracotta / burnt orange
-  amber:      '#D97706', // Warning / advisory highlight
-  amberBg:    '#FEF3C7', // Soft amber container
-  amberBorder:'#F59E0B', // Amber border
-  charcoal:   '#1F2937', // Primary body text
-  titleDark:  '#111827', // Headings
-  grey:       '#4B5563', // Secondary body text
-  greyLt:     '#6B7280', // Metadata & subtle labels
-  border:     '#E5E7EB', // Table & divider border
+  amber: '#D97706', // Warning / advisory highlight
+  amberBg: '#FEF3C7', // Soft amber container
+  amberBorder: '#F59E0B', // Amber border
+  charcoal: '#1F2937', // Primary body text
+  titleDark: '#111827', // Headings
+  grey: '#4B5563', // Secondary body text
+  greyLt: '#6B7280', // Metadata & subtle labels
+  border: '#E5E7EB', // Table & divider border
   borderDark: '#D1D5DB', // Card border
-  bgAlt:      '#F9FAFB', // Alternate table rows
-  bgPage:     '#FFFFFF', // Clean paper white
-  bgCover:    '#1B3D34', // Executive cover background
-  bgSage:     '#F0F5F3', // Light sage panel
+  bgAlt: '#F9FAFB', // Alternate table rows
+  bgPage: '#FFFFFF', // Clean paper white
+  bgCover: '#1B3D34', // Executive cover background
+  bgSage: '#F0F5F3', // Light sage panel
   bgSageDark: '#E6EFEA', // Setback hatched zone
   sageBorder: '#CBDAD3', // Sage border
-  white:      '#FFFFFF',
+  white: '#FFFFFF',
 };
 
 const styles = StyleSheet.create({
@@ -483,17 +488,80 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
   const minCostRange = Math.round(totalCost * 0.96);
   const maxCostRange = Math.round(totalCost * 1.04);
 
-  // Setback geometry calculations
-  const frontSetback = area?.statutorySetbacks?.frontSetbackFt ?? area?.setbacks?.frontSetbackFt ?? 5;
-  const rearSetback = area?.statutorySetbacks?.rearSetbackFt ?? area?.setbacks?.rearSetbackFt ?? 3;
-  const leftSetback = area?.statutorySetbacks?.leftSetbackFt ?? area?.setbacks?.leftSetbackFt ?? 3.5;
-  const rightSetback = area?.statutorySetbacks?.rightSetbackFt ?? area?.setbacks?.rightSetbackFt ?? 3.5;
+  // Authoritative Setback & Planning limits
+  const selectedSideSetback = (input as any)?.selectedSideSetback || 'left';
+  const setbackDetails = evaluatePlotSetbackDetails({
+    city,
+    plotLength,
+    plotWidth,
+    selectedSideSetback,
+  });
 
-  const buildableLength = area?.buildableLengthFt ?? Math.max(0, plotLength - (frontSetback + rearSetback));
-  const buildableWidth = area?.buildableWidthFt ?? Math.max(0, plotWidth - (leftSetback + rightSetback));
-  const buildableFootprint = area?.buildableFootprintSqFt ?? Math.round(buildableLength * buildableWidth);
-  const groundCoveragePct = plotArea > 0 ? Math.round((buildableFootprint / plotArea) * 100) : 60;
-  const maxCoveragePct = area?.maxPermissibleCoveragePct ?? 70;
+  const planningLimits = getCityPlanningLimits(city);
+
+  const frontSetback = setbackDetails.front.feet;
+  const rearSetback = setbackDetails.rear.feet;
+  const leftSetback = setbackDetails.left.feet;
+  const rightSetback = setbackDetails.right.feet;
+
+  const buildableLength = setbackDetails.buildableDepthFt;
+  const buildableWidth = setbackDetails.buildableWidthFt;
+  const buildableFootprint = setbackDetails.buildableFootprintSqFt;
+  const groundCoveragePct = setbackDetails.groundCoveragePct;
+  const maxCoveragePct = planningLimits.maxGroundCoveragePct;
+
+  // One-side setback detection
+  const isOneSideSetback = setbackDetails.sideCondition === 'one_side';
+  const requiredSideSetback = isOneSideSetback ? (setbackDetails.left.feet || setbackDetails.right.feet) : setbackDetails.left.feet;
+
+  // Site plan SVG scaling calculations (515 x 300 box - substantially enlarged)
+  const SVG_SITE_W = 515;
+  const SVG_SITE_H = 300;
+  const aspect = plotWidth / (plotLength || 1);
+  let pw = 300;
+  let pl = 195;
+  if (aspect <= 1) {
+    // Standard residential plot (e.g. 20x30, 30x40, 30x50, 40x60)
+    pl = 195;
+    pw = Math.max(275, Math.min(325, Math.round(pl * Math.max(0.75, aspect))));
+  } else {
+    // Wide frontage plot
+    pw = 325;
+    pl = Math.max(150, Math.min(195, Math.round(pw / Math.min(1.5, aspect))));
+  }
+  const px = (SVG_SITE_W - pw) / 2;
+  const py = 54 + (195 - pl) / 2;
+
+  const siteScaleX = pw / (plotWidth || 1);
+  const siteScaleY = pl / (plotLength || 1);
+
+  const fsPx = Math.min(pl * 0.35, Math.max(16, frontSetback * siteScaleY));
+  const rsPx = rearSetback === 0 ? 0 : Math.min(pl * 0.35, Math.max(16, rearSetback * siteScaleY));
+  const lsPx = leftSetback === 0 ? 0 : Math.min(pw * 0.35, Math.max(16, leftSetback * siteScaleX));
+  const rsbPx = rightSetback === 0 ? 0 : Math.min(pw * 0.35, Math.max(16, rightSetback * siteScaleX));
+
+  const bx = px + lsPx;
+  const by = py + fsPx;
+  const bw = Math.max(0, pw - (lsPx + rsbPx));
+  const bh = Math.max(0, pl - (fsPx + rsPx));
+
+  // Authoritative Building height evaluation
+  const numFloors = input?.floors || 2;
+  const roadWidthFt = input?.roadWidthFt || 30;
+  const hasStilt = input?.parkingType === 'Stilt' || input?.parkingType === 'Stilt Parking';
+  const heightDetails = evaluateBuildingHeight({
+    city,
+    numFloors,
+    hasStilt,
+    roadWidthFt,
+  });
+
+  const plinthHt = heightDetails.plinthHtFt;
+  const floorHt = heightDetails.floorHtFt;
+  const stairHt = heightDetails.stairHtFt;
+  const terraceLevel = plinthHt + (numFloors * floorHt);
+  const totalStructureHeight = heightDetails.totalProposedHeightFt;
+  const maxStatutoryHeight = heightDetails.maxPermittedHeightFt;
 
   // Running Header Helper
   const RunHeader = ({ section }: { section: string }) => (
@@ -662,133 +730,396 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 2 — SECTION 02: EXECUTIVE SUMMARY & SECTION 03: PLOT & SITE ANALYSIS
+          PAGE 2 — SECTION 02: ARCHITECTURAL SITE PLAN & STATUTORY SETBACKS
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
-        <RunHeader section="Section 02 &amp; 03: Executive Summary &amp; Site Analysis" />
+        <RunHeader section="Section 02: Site Plan &amp; Statutory Setback Analysis" />
 
-        {/* Section 02 */}
         <View style={styles.sectionBanner}>
-          <Text style={styles.sectionBannerText}>Section 02 — Executive Project Summary</Text>
-          <Text style={styles.sectionBannerSub}>1-Minute Pre-Construction Brief</Text>
+          <Text style={styles.sectionBannerText}>Section 02 — Architectural Site Plan &amp; Statutory Setbacks</Text>
+          <Text style={styles.sectionBannerSub}>Land Boundary, Road Frontage &amp; Permissible Footprint</Text>
         </View>
 
-        <View style={styles.kpiRow}>
-          {[
-            ['Location', city, area?.authorityMetadata?.authority || 'BBMP/BDA'],
-            ['Plot Area', `${num(plotArea)} sq.ft`, `${plotLength}' × ${plotWidth}' Dimensions`],
-            ['House Configuration', `${input?.floors || 2} Floors`, houseType],
-            ['Built-Up Area', `${num(totalBUA)} sq.ft`, `Ground: ${num(area?.buaPerFloorSqFt || Math.round(totalBUA / 2))} sq.ft`],
-          ].map(([lbl, val, sub], i) => (
-            <View key={i} style={styles.kpiCard}>
-              <Text style={styles.kpiLabel}>{lbl}</Text>
-              <Text style={styles.kpiValue}>{val}</Text>
-              <Text style={styles.kpiSub}>{sub}</Text>
+        <Text style={styles.paragraph}>
+          Before construction, municipal planning authorities mandate open space buffers (setbacks) along plot boundaries to protect natural light, cross-ventilation, emergency fire access, and planned public road expansion. Below is the scaled 2D orthogonal site plan showing your property boundary, road access, statutory setback zones, and the permissible ground building footprint.
+        </Text>
+
+        {/* Large Architectural Site Plan */}
+        <View style={{ backgroundColor: '#FAF9F6', borderWidth: 0.5, borderColor: '#D1D5DB', borderRadius: 3, padding: 4, alignItems: 'center' }}>
+          <Svg width={SVG_SITE_W} height={SVG_SITE_H} viewBox={`0 0 ${SVG_SITE_W} ${SVG_SITE_H}`}>
+            {/* 1. Road Frontage at top */}
+            <Rect x={20} y={6} width={475} height={22} fill="#202824" rx={2} />
+            <Line x1={30} y1={17} x2={485} y2={17} stroke="#C2410C" strokeWidth={1} strokeDasharray="5 4" />
+            <Text x={257.5} y={15} textAnchor="middle" fill="#FFFFFF" style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold' }}>
+              {`PUBLIC ROAD FRONTAGE: ${roadWidthFt} FT WIDE MUNICIPAL ACCESS ROAD`}
+            </Text>
+
+            {/* Frontage line */}
+            <Line x1={px - 20} y1={36} x2={px + pw + 20} y2={36} stroke="#1B3D34" strokeWidth={0.8} strokeDasharray="3 2" />
+            <Text x={257.5} y={33} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>
+              PROPERTY FRONTAGE &amp; DEMARCATION LINE
+            </Text>
+
+            {/* 2. Outer Plot Boundary */}
+            <Rect x={px} y={py} width={pw} height={pl} fill="#FAF7F2" stroke="#1B3D34" strokeWidth={1.6} rx={2} />
+
+            {/* Plot Dimensions */}
+            {/* Top dimension (Plot Width) */}
+            <Line x1={px} y1={py - 6} x2={px + pw} y2={py - 6} stroke="#1B3D34" strokeWidth={0.8} />
+            <Line x1={px} y1={py - 9} x2={px} y2={py - 3} stroke="#1B3D34" strokeWidth={0.8} />
+            <Line x1={px + pw} y1={py - 9} x2={px + pw} y2={py - 3} stroke="#1B3D34" strokeWidth={0.8} />
+            <Text x={px + pw / 2} y={py - 8} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold' }}>
+              {`PLOT WIDTH: ${plotWidth} FT (${(plotWidth * 0.3048).toFixed(2)}m)`}
+            </Text>
+
+            {/* Far Left dimension (Plot Depth) */}
+            <Line x1={px - 62} y1={py} x2={px - 62} y2={py + pl} stroke="#1B3D34" strokeWidth={0.8} />
+            <Line x1={px - 65} y1={py} x2={px - 59} y2={py} stroke="#1B3D34" strokeWidth={0.8} />
+            <Line x1={px - 65} y1={py + pl} x2={px - 59} y2={py + pl} stroke="#1B3D34" strokeWidth={0.8} />
+            <Text x={px - 67} y={py + pl / 2 + 2} textAnchor="end" fill="#1B3D34" style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold' }}>
+              {`${plotLength} FT DEPTH`}
+            </Text>
+
+            {/* 3. Setback Clearances (Distinct Soft Amber Hatch/Fill) */}
+            {/* Front Setback */}
+            <Rect x={px} y={py} width={pw} height={fsPx} fill="#FEF3C7" stroke="#F59E0B" strokeWidth={0.6} />
+            <Text x={px + pw / 2} y={py + fsPx / 2 + 2} textAnchor="middle" fill="#92400E" style={{ fontSize: 6.6, fontFamily: 'Helvetica-Bold' }}>
+              {`FRONT SETBACK CLEARANCE: ${frontSetback.toFixed(2)} FT (${(frontSetback * 0.3048).toFixed(2)}m)`}
+            </Text>
+
+            {/* Rear Setback */}
+            {rsPx > 0 && (
+              <Rect x={px} y={py + pl - rsPx} width={pw} height={rsPx} fill="#FEF3C7" stroke="#F59E0B" strokeWidth={0.6} />
+            )}
+            <Text x={px + pw / 2} y={py + pl - (rsPx > 0 ? rsPx / 2 : 4) + 2} textAnchor="middle" fill="#92400E" style={{ fontSize: 6.6, fontFamily: 'Helvetica-Bold' }}>
+              {rearSetback === 0
+                ? 'REAR: 0 FT — CAN BUILD TO BOUNDARY'
+                : `REAR SETBACK CLEARANCE: ${rearSetback.toFixed(2)} FT (${(rearSetback * 0.3048).toFixed(2)}m)`}
+            </Text>
+
+            {/* Left Setback */}
+            {lsPx > 0 && (
+              <Rect x={px} y={py + fsPx} width={lsPx} height={pl - fsPx - rsPx} fill="#FEF3C7" stroke="#F59E0B" strokeWidth={0.6} />
+            )}
+
+            {/* Right Setback */}
+            {rsbPx > 0 && (
+              <Rect x={px + pw - rsbPx} y={py + fsPx} width={rsbPx} height={pl - fsPx - rsPx} fill="#FEF3C7" stroke="#F59E0B" strokeWidth={0.6} />
+            )}
+
+            {/* 4. Permissible Buildable Footprint */}
+            <Rect x={bx} y={by} width={bw} height={bh} fill="#FFFFFF" stroke="#1B3D34" strokeWidth={2} rx={2} />
+            <Rect x={bx + 2} y={by + 2} width={bw - 4} height={bh - 4} fill="#EAF2EE" />
+
+            {/* Center Labels inside Buildable Area */}
+            <Text x={bx + bw / 2} y={by + bh / 2 - 16} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 8.2, fontFamily: 'Helvetica-Bold' }}>
+              PERMISSIBLE BUILDABLE FOOTPRINT
+            </Text>
+            <Text x={bx + bw / 2} y={by + bh / 2 - 3} textAnchor="middle" fill="#C2410C" style={{ fontSize: 7.8, fontFamily: 'Helvetica-Bold' }}>
+              {`${buildableWidth.toFixed(2)} FT (${(buildableWidth * 0.3048).toFixed(2)}m) WIDTH × ${buildableLength.toFixed(2)} FT (${(buildableLength * 0.3048).toFixed(2)}m) DEPTH`}
+            </Text>
+            <Text x={bx + bw / 2} y={by + bh / 2 + 10} textAnchor="middle" fill="#374151" style={{ fontSize: 7, fontFamily: 'Helvetica-Bold' }}>
+              {`~${buildableFootprint.toLocaleString()} SQ.FT GROUND ENVELOPE (${groundCoveragePct}% COVERAGE)`}
+            </Text>
+            <Text x={bx + bw / 2} y={by + bh / 2 + 22} textAnchor="middle" fill="#6B7280" style={{ fontSize: 6 }}>
+              (Approximate area available for your house)
+            </Text>
+
+            {/* 5. Side Setback Descriptive Labels (Positioned outside plot with clear callouts) */}
+            {/* Left Boundary Callout */}
+            <Line x1={px - 22} y1={py + pl / 2} x2={px} y2={py + pl / 2} stroke="#C2410C" strokeWidth={0.8} />
+            <Text x={px - 25} y={py + pl / 2 - 2} textAnchor="end" fill="#C2410C" style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold' }}>
+              {leftSetback > 0 ? `LEFT: ${setbackDetails.left.displayFeet}` : 'LEFT: 0 FT'}
+            </Text>
+            <Text x={px - 25} y={py + pl / 2 + 8} textAnchor="end" fill="#6B7280" style={{ fontSize: 5.2 }}>
+              {leftSetback > 0 ? `(${setbackDetails.left.displayMeters} Open Side)` : '(Can Build to Boundary)'}
+            </Text>
+
+            {/* Right Boundary Callout */}
+            <Line x1={px + pw} y1={py + pl / 2} x2={px + pw + 22} y2={py + pl / 2} stroke="#C2410C" strokeWidth={0.8} />
+            <Text x={px + pw + 25} y={py + pl / 2 - 2} textAnchor="start" fill="#C2410C" style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold' }}>
+              {rightSetback > 0 ? `RIGHT: ${setbackDetails.right.displayFeet}` : 'RIGHT: 0 FT'}
+            </Text>
+            <Text x={px + pw + 25} y={py + pl / 2 + 8} textAnchor="start" fill="#6B7280" style={{ fontSize: 5.2 }}>
+              {rightSetback > 0 ? `(${setbackDetails.right.displayMeters} Open Side)` : '(Can Build to Boundary)'}
+            </Text>
+
+            {/* Total Area Callout Box in Bottom Right */}
+            <Rect x={px + pw - 130} y={py + pl + 14} width={130} height={16} fill="#F3F4F6" stroke="#D1D5DB" strokeWidth={0.5} rx={2} />
+            <Text x={px + pw - 65} y={py + pl + 25} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 5.8, fontFamily: 'Helvetica-Bold' }}>
+              {`TOTAL LAND: ${plotWidth}' × ${plotLength}' = ${plotArea.toLocaleString()} SQ.FT`}
+            </Text>
+          </Svg>
+
+          {/* SVG Legend */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 15, width: '100%', marginTop: 2, paddingVertical: 2 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+              <View style={{ width: 8, height: 8, backgroundColor: '#FEF3C7', borderWidth: 0.5, borderColor: '#F59E0B' }} />
+              <Text style={{ fontSize: 5.4, color: C.grey }}>Required Open Space Buffer (Setback)</Text>
             </View>
-          ))}
-        </View>
-
-        <View style={[styles.kpiRow, { marginBottom: 6 }]}>
-          {[
-            ['Configured Spaces', `${input?.rooms?.bedrooms || 3} BHK`, `${input?.rooms?.bathrooms || 3} Baths · Living · Kitchen`],
-            ['Quality Standard', `${specificationTier.toUpperCase()}`, 'Premium Material Baseline'],
-            ['Direct Const. Cost', fmt(budget?.directConstructionBudget), `₹${num(budget?.directCostPerSqFt)} / sq.ft`],
-            ['Total Project Cost', fmt(totalCost), `₹${num(budget?.costPerSqFt)} / sq.ft (All-Inclusive)`],
-          ].map(([lbl, val, sub], i) => (
-            <View key={i} style={styles.kpiCardAlt}>
-              <Text style={[styles.kpiLabel, { color: C.terracotta }]}>{lbl}</Text>
-              <Text style={[styles.kpiValue, { color: C.forest }]}>{val}</Text>
-              <Text style={styles.kpiSub}>{sub}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+              <View style={{ width: 8, height: 8, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#1B3D34' }} />
+              <Text style={{ fontSize: 5.4, fontFamily: 'Helvetica-Bold', color: C.forest }}>Permissible Ground Footprint</Text>
             </View>
-          ))}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+              <View style={{ width: 14, height: 6, backgroundColor: '#202824' }} />
+              <Text style={{ fontSize: 5.4, color: C.grey }}>Public Road Access</Text>
+            </View>
+          </View>
         </View>
 
-        {/* Section 03 */}
-        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
-          <Text style={styles.sectionBannerText}>Section 03 — Plot &amp; Site Setback Analysis</Text>
-          <Text style={styles.sectionBannerSub}>Statutory Clearances &amp; Buildable Footprint</Text>
-        </View>
-
-        {/* Numerical Setback Schedule Grid */}
+        {/* Compact Setback Schedule Table */}
         <View style={styles.tableContainer}>
-          <View style={styles.tableHeaderRow} fixed>
-            <Text style={[styles.th, { width: '25%' }]}>Parameter</Text>
+          <View style={styles.tableHeaderRow}>
+            <Text style={[styles.th, { width: '25%' }]}>Setback Zone</Text>
             <Text style={[styles.th, { width: '25%' }]}>Statutory Limit</Text>
-            <Text style={[styles.th, { width: '25%' }]}>Proposed Design</Text>
-            <Text style={[styles.th, styles.tdRight, { width: '25%' }]}>Status</Text>
+            <Text style={[styles.th, { width: '22%' }]}>Proposed Design</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '28%' }]}>Compliance &amp; Purpose</Text>
           </View>
           {[
-            ['Front Road Setback', `${frontSetback}' - 0" clearance`, `${frontSetback}' - 0" planned`, 'Compliant'],
-            ['Rear Boundary Setback', `${rearSetback}' - 0" clearance`, `${rearSetback}' - 0" planned`, 'Compliant'],
-            ['Side Setbacks (Left / Right)', `${leftSetback}' / ${rightSetback}' clearances`, `${leftSetback}' / ${rightSetback}' planned`, 'Compliant'],
-            ['Max Ground Coverage', `${maxCoveragePct}% (${num(Math.round(plotArea * (maxCoveragePct / 100)))} sq.ft)`, `${groundCoveragePct}% (${num(buildableFootprint)} sq.ft)`, 'Within Limit'],
-            ['Permissible FAR', `${area?.permissibleFAR || 1.75} (${num(Math.round(plotArea * (area?.permissibleFAR || 1.75)))} sq.ft)`, `${(totalBUA / plotArea).toFixed(2)} (${num(totalBUA)} sq.ft)`, 'Compliant'],
+            [
+              'Front Road Setback',
+              `${setbackDetails.front.displayFeet} (${setbackDetails.front.displayMeters})`,
+              `${setbackDetails.front.displayFeet} planned`,
+              'Compliant · Protects road alignment',
+            ],
+            [
+              'Rear Boundary Setback',
+              setbackDetails.rear.isZero ? '0 ft (Zero setback permitted)' : `${setbackDetails.rear.displayFeet} (${setbackDetails.rear.displayMeters})`,
+              setbackDetails.rear.isZero ? '0 ft (Built to boundary)' : `${setbackDetails.rear.displayFeet} planned`,
+              setbackDetails.rear.isZero ? 'Compliant · Micro-plot boundary' : 'Compliant · Ventilation & pipeline buffer',
+            ],
+            [
+              'Side Setbacks (Left / Right)',
+              setbackDetails.sideCondition === 'one_side'
+                ? `${(setbackDetails.left.feet || setbackDetails.right.feet).toFixed(2)} ft on one side / 0 ft other`
+                : `${setbackDetails.left.displayFeet} / ${setbackDetails.right.displayFeet}`,
+              `L: ${setbackDetails.left.displayFeet} · R: ${setbackDetails.right.displayFeet}`,
+              setbackDetails.sideCondition === 'one_side'
+                ? `Compliant · Clearance on ${setbackDetails.selectedSide} side`
+                : 'Compliant · Air circulation gap',
+            ],
+            [
+              'Ground Coverage (Footprint)',
+              planningLimits.isCoverageStatutory
+                ? `Max ${planningLimits.maxGroundCoveragePct}% (${Math.round(plotArea * (planningLimits.maxGroundCoveragePct / 100)).toLocaleString()} sq.ft)`
+                : `Baseline: ~${planningLimits.maxGroundCoveragePct}% (${planningLimits.coverageSourceNote})`,
+              `${setbackDetails.groundCoveragePct}% (${setbackDetails.buildableFootprintSqFt.toLocaleString()} sq.ft)`,
+              planningLimits.isCoverageStatutory
+                ? (setbackDetails.groundCoveragePct <= planningLimits.maxGroundCoveragePct ? 'Within Permissible Limit' : 'Exceeds Statutory Ceiling')
+                : (setbackDetails.groundCoveragePct <= planningLimits.maxGroundCoveragePct ? 'Within Assumed Baseline (~70%)' : 'Exceeds Assumed Baseline (~70%) · Subject to Sanction'),
+            ],
+            [
+              'Floor Area Ratio (FAR)',
+              planningLimits.isFARStatutory
+                ? `Base FAR ${planningLimits.baseFAR.toFixed(2)} (${Math.round(plotArea * planningLimits.baseFAR).toLocaleString()} sq.ft)`
+                : `Baseline: ~${planningLimits.baseFAR.toFixed(2)} (${planningLimits.farSourceNote})`,
+              `${(totalBUA / (plotArea || 1)).toFixed(2)} (${totalBUA.toLocaleString()} sq.ft)`,
+              planningLimits.isFARStatutory
+                ? ((totalBUA / (plotArea || 1)) <= planningLimits.baseFAR ? 'Compliant with Zonal Master Plan' : 'Requires Premium FAR Sanction')
+                : ((totalBUA / (plotArea || 1)) <= planningLimits.baseFAR ? 'Within Assumed Baseline (~1.75)' : 'Exceeds Assumed Baseline (~1.75) · Subject to Sanction'),
+            ],
           ].map(([param, stat, prop, statLabel], idx) => (
             <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
               <Text style={[styles.tdBold, { width: '25%' }]}>{param}</Text>
               <Text style={[styles.tdMuted, { width: '25%' }]}>{stat}</Text>
-              <Text style={[styles.td, { width: '25%' }]}>{prop}</Text>
-              <Text style={[styles.tdBold, styles.tdRight, { width: '25%', color: C.forestLt }]}>{statLabel}</Text>
+              <Text style={[styles.td, { width: '22%' }]}>{prop}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '28%', color: C.forestLt }]}>{statLabel}</Text>
             </View>
           ))}
         </View>
 
-        {/* 2D Vector Plot & Setback Diagram */}
-        <View style={{ marginTop: 4, padding: 8, backgroundColor: C.bgAlt, borderWidth: 0.5, borderColor: C.border, borderRadius: 3, alignItems: 'center' }}>
-          <Text style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: C.forest, textTransform: 'uppercase', marginBottom: 4 }}>
-            2D Orthogonal Plot Boundary &amp; Buildable Footprint Diagram (Schematic)
-          </Text>
-
-          {/* SVG Vector Drawing */}
-          <Svg width={380} height={145} viewBox="0 0 380 145">
-            {/* Road Frontage at top */}
-            <Rect x={30} y={4} width={320} height={16} fill="#202824" rx={2} />
-            <Line x1={40} y1={12} x2={340} y2={12} stroke="#C2410C" strokeWidth={1} strokeDasharray="4 3" />
-            
-            {/* Plot Outer Boundary */}
-            <Rect x={60} y={24} width={260} height={105} fill="#F0F5F3" stroke="#1B3D34" strokeWidth={1} />
-
-            {/* Setback Clearance Shading */}
-            <Rect x={60} y={24} width={260} height={18} fill="#E6EFEA" />
-            <Rect x={60} y={114} width={260} height={15} fill="#E6EFEA" />
-            <Rect x={60} y={42} width={22} height={72} fill="#E6EFEA" />
-            <Rect x={298} y={42} width={22} height={72} fill="#E6EFEA" />
-
-            {/* Inner Buildable Footprint */}
-            <Rect x={82} y={42} width={216} height={72} fill="#FFFFFF" stroke="#C2410C" strokeWidth={1.2} />
-
-            {/* Dimension Indicators */}
-            <Line x1={82} y1={78} x2={298} y2={78} stroke="#9CA3AF" strokeWidth={0.5} strokeDasharray="2 2" />
-            <Line x1={190} y1={42} x2={190} y2={114} stroke="#9CA3AF" strokeWidth={0.5} strokeDasharray="2 2" />
-          </Svg>
-
-          {/* Diagram Legend & Annotations */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 3, paddingHorizontal: 10 }}>
-            <Text style={{ fontSize: 5.6, color: C.grey }}>
-              &bull; Public Road Frontage: {input?.roadWidthFt || 30}' Width (Front Setback: {frontSetback}')
-            </Text>
-            <Text style={{ fontSize: 5.6, fontFamily: 'Helvetica-Bold', color: C.terracotta }}>
-              &bull; Buildable Ground Envelope: {buildableWidth}' × {buildableLength}' ({num(buildableFootprint)} sq.ft)
-            </Text>
-            <Text style={{ fontSize: 5.6, color: C.grey }}>
-              &bull; Rear / Side Clearances: Rear {rearSetback}' · Sides {leftSetback}' / {rightSetback}'
-            </Text>
-          </View>
-        </View>
-
-        {/* Setback Engineering Notice */}
-        <View style={styles.infoBox} wrap={false}>
+        {/* Small Compliance Notice */}
+        <View style={styles.infoBox}>
           <Text style={styles.boxTitle}>Statutory Planning &amp; Setback Notice</Text>
           <Text style={styles.boxText}>
-            Setbacks are computed per {area?.authorityMetadata?.source || 'BBMP Building Bye-laws 2003 / BDA Revised Master Plan 2015'}. This schematic is an architectural planning guide and does not constitute a sanctioned municipal sanction drawing. Boundary markers and road-widening lines must be verified by certified land surveyors before foundation excavation.
+            Setbacks are computed per applicable municipal building byelaws ({area?.authorityMetadata?.source || 'BBMP Building Bye-laws 2003 / BDA Revised Master Plan'}). This schematic is an architectural planning guide. Exact property boundary markers and road crown levels should be verified on-site by a licensed land surveyor before foundation excavation.
           </Text>
         </View>
 
-        <DocFooter section="Section 02 &amp; 03: Executive Summary &amp; Site Analysis" />
+        <DocFooter section="Section 02: Site Plan &amp; Statutory Setback Analysis" />
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 3 — SECTION 04: CONFIGURATION & SECTION 05: COST OVERVIEW
+          PAGE 3 — SECTION 03: BUILDING HEIGHT & VERTICAL ELEVATION PROFILE
+      ══════════════════════════════════════════════════ */}
+      <Page size="A4" style={styles.page}>
+        <RunHeader section="Section 03: Building Height &amp; Vertical Stacking" />
+
+        <View style={styles.sectionBanner}>
+          <Text style={styles.sectionBannerText}>Section 03 — Permissible Building Height &amp; Vertical Elevation Profile</Text>
+          <Text style={styles.sectionBannerSub}>Vertical Stacking Rules, Floor Heights &amp; Road Width Ceilings</Text>
+        </View>
+
+        <Text style={styles.paragraph}>
+          Under applicable municipal building regulations ({heightDetails.ruleTitle}), permissible residential building height is determined by zoning framework and stilt parking provision. {heightDetails.ruleDescription} For an abutting road width of {roadWidthFt} ft in {city}, the maximum permissible building height is {heightDetails.maxPermittedHeightFt.toFixed(2)} ft ({heightDetails.maxPermittedHeightM.toFixed(2)}m). Proposed total building height is {heightDetails.totalProposedHeightFt.toFixed(2)} ft ({heightDetails.totalProposedHeightM.toFixed(2)}m). Below is the scaled architectural elevation profile displaying every level from road datum to rooftop stair enclosure.
+        </Text>
+
+        {/* Large Architectural Building Height Elevation */}
+        <View style={{ backgroundColor: '#FAF9F6', borderWidth: 0.5, borderColor: '#D1D5DB', borderRadius: 3, padding: 4, alignItems: 'center' }}>
+          <Svg width={515} height={270} viewBox="0 0 515 270">
+            {/* Ground / Road Level Line */}
+            <Line x1={150} y1={230} x2={500} y2={230} stroke="#1B3D34" strokeWidth={2} />
+            {/* Earth hatching lines */}
+            {[160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480].map((hx, i) => (
+              <Line key={i} x1={hx} y1={230} x2={hx - 7} y2={240} stroke="#9CA3AF" strokeWidth={0.8} />
+            ))}
+            <Text x={325} y={242} textAnchor="middle" fill="#6B7280" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>
+              STREET LEVEL / NATURAL GROUND LEVEL DATUM (± 0.00 FT)
+            </Text>
+
+            {/* Plinth Level (y = 212 to 230, height 18) */}
+            <Rect x={180} y={212} width={200} height={18} fill="#E5E7EB" stroke="#4B5563" strokeWidth={0.8} />
+            <Text x={280} y={223} textAnchor="middle" fill="#4B5563" style={{ fontSize: 6.2, fontFamily: 'Helvetica-Bold' }}>
+              PLINTH LEVEL (+2.5 FT ABOVE ROAD) · RAIN SURFACE DEFENSE
+            </Text>
+
+            {/* Ground Floor (y = 146 to 212, height 66) */}
+            <Rect x={180} y={146} width={200} height={66} fill="#FFFFFF" stroke="#1B3D34" strokeWidth={1.4} />
+            {/* Columns */}
+            <Rect x={180} y={146} width={9} height={66} fill="#1B3D34" />
+            <Rect x={371} y={146} width={9} height={66} fill="#1B3D34" />
+            {/* Entrance Door */}
+            <Rect x={205} y={166} width={26} height={46} fill="#FAF5F0" stroke="#C2410C" strokeWidth={0.9} />
+            <Line x1={218} y1={166} x2={218} y2={212} stroke="#C2410C" strokeWidth={0.6} />
+            {/* Ground Floor Window */}
+            <Rect x={302} y={168} width={42} height={32} fill="#F0F5F3" stroke="#2A5C4E" strokeWidth={0.9} />
+            <Line x1={323} y1={168} x2={323} y2={200} stroke="#2A5C4E" strokeWidth={0.6} />
+            {/* Ground Floor Label */}
+            <Text x={280} y={158} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 7, fontFamily: 'Helvetica-Bold' }}>
+              GROUND FLOOR
+            </Text>
+            <Text x={280} y={206} textAnchor="middle" fill="#6B7280" style={{ fontSize: 5.5 }}>
+              10' 0" Floor-to-Floor · 9' 0" Clear Headroom
+            </Text>
+
+            {/* Ground Floor Slab (y = 141 to 146) */}
+            <Rect x={178} y={141} width={204} height={5} fill="#1B3D34" />
+
+            {/* First Floor (y = 75 to 141, height 66) */}
+            <Rect x={180} y={75} width={200} height={66} fill="#FFFFFF" stroke="#1B3D34" strokeWidth={1.4} />
+            {/* Columns */}
+            <Rect x={180} y={75} width={9} height={66} fill="#1B3D34" />
+            <Rect x={371} y={75} width={9} height={66} fill="#1B3D34" />
+            {/* Balcony Projection on Left */}
+            <Rect x={150} y={105} width={30} height={36} fill="none" stroke="#C2410C" strokeWidth={0.9} />
+            <Line x1={150} y1={105} x2={180} y2={105} stroke="#C2410C" strokeWidth={1.2} />
+            <Text x={165} y={124} textAnchor="middle" fill="#C2410C" style={{ fontSize: 5.5 }}>Balcony</Text>
+            {/* First Floor Windows */}
+            <Rect x={218} y={93} width={38} height={32} fill="#F0F5F3" stroke="#2A5C4E" strokeWidth={0.9} />
+            <Rect x={306} y={93} width={38} height={32} fill="#F0F5F3" stroke="#2A5C4E" strokeWidth={0.9} />
+            {/* First Floor Label */}
+            <Text x={280} y={87} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 7, fontFamily: 'Helvetica-Bold' }}>
+              FIRST FLOOR
+            </Text>
+            <Text x={280} y={135} textAnchor="middle" fill="#6B7280" style={{ fontSize: 5.5 }}>
+              10' 0" Floor-to-Floor · 9' 0" Clear Headroom
+            </Text>
+
+            {/* Roof Slab / Terrace Level (y = 70 to 75) */}
+            <Rect x={178} y={70} width={204} height={5} fill="#1B3D34" />
+
+            {/* Rooftop Parapet Wall (y = 52 to 70, height 18 = 3 ft) */}
+            <Rect x={180} y={52} width={46} height={18} fill="#D1D5DB" stroke="#4B5563" strokeWidth={0.8} />
+            <Text x={203} y={63} textAnchor="middle" fill="#1F2937" style={{ fontSize: 5.5 }}>3' Parapet</Text>
+            <Rect x={334} y={52} width={46} height={18} fill="#D1D5DB" stroke="#4B5563" strokeWidth={0.8} />
+            <Text x={357} y={63} textAnchor="middle" fill="#1F2937" style={{ fontSize: 5.5 }}>3' Parapet</Text>
+
+            {/* Staircase Headroom Enclosure (y = 24 to 70, height 46 = 7.5 ft) */}
+            <Rect x={228} y={24} width={104} height={46} fill="#F9FAFB" stroke="#1B3D34" strokeWidth={1.4} />
+            {/* Overhead Water Tank Tower */}
+            <Rect x={248} y={10} width={64} height={14} fill="#0284C7" stroke="#0369A1" strokeWidth={0.9} rx={1} />
+            <Text x={280} y={20} textAnchor="middle" fill="#FFFFFF" style={{ fontSize: 5.5, fontFamily: 'Helvetica-Bold' }}>
+              WATER TANK
+            </Text>
+            <Text x={280} y={48} textAnchor="middle" fill="#1B3D34" style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold' }}>
+              STAIR HEADROOM (+7.5 FT)
+            </Text>
+
+            {/* ── Left Elevation Datum Spine (x = 75) ── */}
+            <Line x1={75} y1={230} x2={75} y2={24} stroke="#1B3D34" strokeWidth={1.2} />
+            {/* Level tick markers & labels */}
+            {[
+              { y: 230, lbl: '± 0.00 FT', desc: 'Road Level Datum' },
+              { y: 212, lbl: '+ 2.50 FT', desc: 'Plinth Beam Top' },
+              { y: 141, lbl: '+ 12.50 FT', desc: 'Ground Floor Slab' },
+              { y: 70, lbl: '+ 22.50 FT', desc: 'First Floor Slab' },
+              { y: 52, lbl: '+ 25.50 FT', desc: 'Terrace Parapet' },
+              { y: 24, lbl: '+ 30.00 FT', desc: 'Stair Headroom Top' },
+            ].map((lm, i) => (
+              <G key={i}>
+                <Line x1={67} y1={lm.y} x2={83} y2={lm.y} stroke="#1B3D34" strokeWidth={0.9} />
+                <Text x={65} y={lm.y + 2.5} textAnchor="end" fill="#1B3D34" style={{ fontSize: 6.5, fontFamily: 'Helvetica-Bold' }}>
+                  {lm.lbl}
+                </Text>
+                <Text x={85} y={lm.y + 2.5} fill="#6B7280" style={{ fontSize: 5.4 }}>
+                  {lm.desc}
+                </Text>
+              </G>
+            ))}
+
+            {/* ── Prominent Total Height Callout Badge on Right (x = 390) ── */}
+            <Rect x={390} y={48} width={118} height={96} fill="#1B3D34" stroke="#2A5C4E" strokeWidth={1} rx={3} />
+            <Text x={449} y={62} textAnchor="middle" fill="#FDBA74" style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold', letterSpacing: 0.8 }}>
+              TOTAL BUILDING HEIGHT
+            </Text>
+            <Text x={449} y={81} textAnchor="middle" fill="#FFFFFF" style={{ fontSize: 18, fontFamily: 'Helvetica-Bold' }}>
+              {`${heightDetails.totalProposedHeightFt.toFixed(1)} FT`}
+            </Text>
+            <Text x={449} y={94} textAnchor="middle" fill="#FDBA74" style={{ fontSize: 6.8, fontFamily: 'Helvetica-Bold' }}>
+              {`${heightDetails.totalProposedHeightM.toFixed(2)} METERS OVERALL`}
+            </Text>
+            <Line x1={400} y1={101} x2={498} y2={101} stroke="rgba(255,255,255,0.2)" strokeWidth={0.8} />
+            <Text x={449} y={112} textAnchor="middle" fill="#CBD5E1" style={{ fontSize: 6 }}>
+              {`Statutory Ceiling: ${heightDetails.maxPermittedHeightFt.toFixed(1)} FT`}
+            </Text>
+            <Text x={449} y={125} textAnchor="middle" fill={heightDetails.isCompliant ? '#86EFAC' : '#FCA5A5'} style={{ fontSize: 7, fontFamily: 'Helvetica-Bold' }}>
+              {heightDetails.statusBadge}
+            </Text>
+          </Svg>
+        </View>
+
+        {/* Vertical Stacking & Level Schedule Table */}
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeaderRow}>
+            <Text style={[styles.th, { width: '22%' }]}>Building Level</Text>
+            <Text style={[styles.th, { width: '20%' }]}>Finished Level</Text>
+            <Text style={[styles.th, { width: '16%' }]}>Floor Height</Text>
+            <Text style={[styles.th, { width: '26%' }]}>Clear Headroom &amp; Purpose</Text>
+            <Text style={[styles.th, styles.tdRight, { width: '16%' }]}>Bylaw Status</Text>
+          </View>
+          {[
+            ['Road Crown Datum', '± 0.00 FT (0.00m)', '—', 'Permanent street datum reference', 'Datum Reference'],
+            ['Finished Plinth Top', '+ 2.50 FT (0.76m)', '2.5 FT', 'Rainwater runoff defense & plinth beam', 'Mandatory Buffer'],
+            ['Ground Floor Slab', '+ 12.50 FT (3.81m)', '10.0 FT', '9.0 ft clear living headroom (NBC min 2.75m)', 'Compliant'],
+            ['First Floor Slab', '+ 22.50 FT (6.86m)', '10.0 FT', '9.0 ft clear living headroom (NBC min 2.75m)', 'Compliant'],
+            ['Terrace & Parapet', '+ 25.50 FT (7.77m)', '3.0 FT', 'Safety parapet wall (exceeds 1.0m safety rule)', 'Permitted'],
+            ['Staircase Headroom', '+ 30.00 FT (9.14m)', '7.5 FT', 'Weather enclosure & water tank tower', 'Permitted Feature'],
+            ['TOTAL STRUCTURE HEIGHT', `${heightDetails.totalProposedHeightFt.toFixed(2)} FT (${heightDetails.totalProposedHeightM.toFixed(2)}m)`, '—', `Statutory ceiling: ${heightDetails.maxPermittedHeightFt.toFixed(2)} FT (${heightDetails.maxPermittedHeightM.toFixed(2)}m)`, heightDetails.isCompliant ? 'STRICTLY COMPLIANT' : 'NON-COMPLIANT'],
+          ].map(([lvl, fin, flHt, purp, stat], idx) => (
+            <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}, idx === 6 ? { backgroundColor: '#F0F5F3' } : {}]}>
+              <Text style={[styles.tdBold, { width: '22%', color: idx === 6 ? C.forest : C.charcoal }]}>{lvl}</Text>
+              <Text style={[styles.tdBold, { width: '20%', color: idx === 6 ? C.terracotta : C.charcoal }]}>{fin}</Text>
+              <Text style={[styles.td, { width: '16%' }]}>{flHt}</Text>
+              <Text style={[styles.tdMuted, { width: '26%' }]}>{purp}</Text>
+              <Text style={[styles.tdBold, styles.tdRight, { width: '16%', color: C.forestLt }]}>{stat}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Small Building Height Assumption Note */}
+        <View style={styles.infoBox}>
+          <Text style={styles.boxTitle}>Municipal Building Height Framework &amp; Safety Notice</Text>
+          <Text style={styles.boxText}>
+            {heightDetails.ruleTitle}: {heightDetails.ruleDescription} {heightDetails.roadWidthConditionNote ? `${heightDetails.roadWidthConditionNote}. ` : ''}Building height is measured from the permanent center crown of the abutting public road to the top of the roof slab / stair headroom. Any residential structure proposed above 15m (49.21 ft) triggers mandatory high-rise categorization and requires Fire and Emergency Services Department statutory clearance.
+          </Text>
+        </View>
+
+        <DocFooter section="Section 03: Building Height &amp; Vertical Stacking" />
+      </Page>
+
+      {/* ══════════════════════════════════════════════════
+          PAGE 4 — SECTION 04: CONFIGURATION & SECTION 05: COST OVERVIEW
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
         <RunHeader section="Section 04 &amp; 05: Configuration &amp; Cost Overview" />
@@ -914,7 +1245,7 @@ export const DetailedReportPdfDocument: React.FC<DetailedReportPdfProps> = ({
       </Page>
 
       {/* ══════════════════════════════════════════════════
-          PAGE 4 — SECTION 06: DETAILED WORKS BOQ (PART 1)
+          PAGE 5 — SECTION 06: DETAILED WORKS BOQ (PART 1)
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={styles.page}>
         <RunHeader section="Section 06: Detailed Works Bill of Quantities (BOQ)" />

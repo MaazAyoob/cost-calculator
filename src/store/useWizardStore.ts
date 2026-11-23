@@ -89,6 +89,7 @@ export interface ConfiguratorState {
   rearSetback: number | null;
   leftSetback: number | null;
   rightSetback: number | null;
+  selectedSideSetback: 'left' | 'right';
   roadFacingBoundaries: Array<'front' | 'rear' | 'left' | 'right'>;
   isCornerPlot: boolean;
   roadWideningFt: number;
@@ -155,6 +156,7 @@ export interface ConfiguratorState {
   setBuiltUpAreaPerFloor: (bua: number) => void;
   setUserSelectedBUA: (bua: number | null) => void;
   setCustomSetbacks: (front?: number | null, rear?: number | null, left?: number | null, right?: number | null) => void;
+  setSelectedSideSetback: (side: 'left' | 'right') => void;
   setRoadFacingBoundaries: (boundaries: Array<'front' | 'rear' | 'left' | 'right'>) => void;
   setIsCornerPlot: (isCorner: boolean) => void;
   setRoadWideningFt: (wideningFt: number) => void;
@@ -236,6 +238,7 @@ export function getFreshZeroState() {
     rearSetback: null as number | null,
     leftSetback: null as number | null,
     rightSetback: null as number | null,
+    selectedSideSetback: 'left' as 'left' | 'right',
     roadFacingBoundaries: ['front'] as Array<'front' | 'rear' | 'left' | 'right'>,
     isCornerPlot: false,
     roadWideningFt: 0,
@@ -440,6 +443,10 @@ export const useWizardStore = create<ConfiguratorState>()(
           rightSetback: right !== undefined ? right : get().rightSetback,
           hasStartedSelection: true,
         });
+      },
+
+      setSelectedSideSetback: (side) => {
+        set({ selectedSideSetback: side, hasStartedSelection: true });
       },
 
       setRoadFacingBoundaries: (boundaries) => {

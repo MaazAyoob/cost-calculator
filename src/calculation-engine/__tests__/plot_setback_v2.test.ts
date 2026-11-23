@@ -50,13 +50,10 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       expect(res.plotAreaSqFt).toBe(600);
       expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-MICRO');
       expect(res.statutorySetbacks.frontSetbackFt).toBe(2.46);
+      expect(res.statutorySetbacks.rearSetbackFt).toBe(0.0);
       expect(res.statutorySetbacks.leftSetbackFt).toBe(1.97);
       expect(res.statutorySetbacks.rightSetbackFt).toBe(0.0);
-      // Rear is not specified in Gazette Table 1 summary row
-      expect(res.authorityMetadata.rearMethod).toBe('UNSPECIFIED');
-      expect(res.authorityMetadata.isAuthoritativeBuildableResolved).toBe(false);
-      expect(res.authorityMetadata.unresolvedReasons?.length).toBeGreaterThan(0);
-      expect(res.requiresClientConfirmation).toBe(true);
+      expect(res.authorityMetadata.isAuthoritativeBuildableResolved).toBe(true);
     });
 
     it('Fixture 2: 30 × 40 ft (1,200 sq.ft) — Small Plot row', () => {
@@ -97,7 +94,7 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       expect(res.buildableWidthFt).toBe(27.70);
     });
 
-    it('Fixture 4: 40 × 60 ft (2,400 sq.ft) — Medium Plot percentage calculations', () => {
+    it('Fixture 4: 40 × 60 ft (2,400 sq.ft) — Category C Medium Plot', () => {
       const res = calculateArea({
         ...baseInput,
         plotLength: 60, // depth = 60 ft
@@ -105,22 +102,19 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       });
 
       expect(res.plotAreaSqFt).toBe(2400);
-      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-MEDIUM-LARGE');
-      // Front: 12% of depth (60ft) = 7.20 ft
-      expect(res.statutorySetbacks.frontSetbackFt).toBe(7.20);
-      // Rear: 8% of depth (60ft) = 4.80 ft
-      expect(res.statutorySetbacks.rearSetbackFt).toBe(4.80);
-      // Left: 8% of width (40ft) = 3.20 ft
-      expect(res.statutorySetbacks.leftSetbackFt).toBe(3.20);
-      // Right: 8% of width (40ft) = 3.20 ft
-      expect(res.statutorySetbacks.rightSetbackFt).toBe(3.20);
-      // Buildable envelope: (60 - 7.20 - 4.80) × (40 - 3.20 - 3.20) = 48.00 × 33.60
-      expect(res.buildableLengthFt).toBe(48.00);
-      expect(res.buildableWidthFt).toBe(33.60);
-      expect(res.buildableFootprintSqFt).toBe(Math.round(48.00 * 33.60));
+      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-MEDIUM');
+      // Category C: Front: 3.28 ft (1.00m), Rear: 2.62 ft (0.80m), Left/Right: 2.62 ft (0.80m)
+      expect(res.statutorySetbacks.frontSetbackFt).toBe(3.28);
+      expect(res.statutorySetbacks.rearSetbackFt).toBe(2.62);
+      expect(res.statutorySetbacks.leftSetbackFt).toBe(2.62);
+      expect(res.statutorySetbacks.rightSetbackFt).toBe(2.62);
+      // Buildable envelope: (60 - 3.28 - 2.62) × (40 - 2.62 - 2.62) = 54.10 × 34.76
+      expect(res.buildableLengthFt).toBe(54.10);
+      expect(res.buildableWidthFt).toBe(34.76);
+      expect(res.buildableFootprintSqFt).toBe(Math.round(54.10 * 34.76));
     });
 
-    it('Fixture 5: 50 × 80 ft (4,000 sq.ft) — Medium/Large percentage calculations', () => {
+    it('Fixture 5: 50 × 80 ft (4,000 sq.ft) — Out of Scope (> 250 sq.m)', () => {
       const res = calculateArea({
         ...baseInput,
         plotLength: 80, // depth = 80 ft
@@ -128,20 +122,11 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       });
 
       expect(res.plotAreaSqFt).toBe(4000);
-      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-MEDIUM-LARGE');
-      // Front: 12% of 80ft = 9.60 ft
-      expect(res.statutorySetbacks.frontSetbackFt).toBe(9.60);
-      // Rear: 8% of 80ft = 6.40 ft
-      expect(res.statutorySetbacks.rearSetbackFt).toBe(6.40);
-      // Sides: 8% of 50ft = 4.00 ft each side
-      expect(res.statutorySetbacks.leftSetbackFt).toBe(4.00);
-      expect(res.statutorySetbacks.rightSetbackFt).toBe(4.00);
-      // Buildable envelope: (80 - 9.60 - 6.40) × (50 - 4.00 - 4.00) = 64.00 × 42.00
-      expect(res.buildableLengthFt).toBe(64.00);
-      expect(res.buildableWidthFt).toBe(42.00);
+      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-OUT-OF-SCOPE');
+      expect(res.authorityMetadata.isAuthoritativeBuildableResolved).toBe(false);
     });
 
-    it('Fixture 6: 60 × 80 ft (4,800 sq.ft) — Medium/Large percentage calculations', () => {
+    it('Fixture 6: 60 × 80 ft (4,800 sq.ft) — Out of Scope (> 250 sq.m)', () => {
       const res = calculateArea({
         ...baseInput,
         plotLength: 80, // depth = 80 ft
@@ -149,20 +134,11 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       });
 
       expect(res.plotAreaSqFt).toBe(4800);
-      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-MEDIUM-LARGE');
-      // Front: 12% of 80ft = 9.60 ft
-      expect(res.statutorySetbacks.frontSetbackFt).toBe(9.60);
-      // Rear: 8% of 80ft = 6.40 ft
-      expect(res.statutorySetbacks.rearSetbackFt).toBe(6.40);
-      // Sides: 8% of 60ft = 4.80 ft each side
-      expect(res.statutorySetbacks.leftSetbackFt).toBe(4.80);
-      expect(res.statutorySetbacks.rightSetbackFt).toBe(4.80);
-      // Buildable envelope: (80 - 9.60 - 6.40) × (60 - 4.80 - 4.80) = 64.00 × 50.40
-      expect(res.buildableLengthFt).toBe(64.00);
-      expect(res.buildableWidthFt).toBe(50.40);
+      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-OUT-OF-SCOPE');
+      expect(res.authorityMetadata.isAuthoritativeBuildableResolved).toBe(false);
     });
 
-    it('Large Estate Fixture: > 43,056 sq.ft (e.g. 210 × 210 = 44,100 sq.ft)', () => {
+    it('Large Estate Fixture: > 250 sq.m (e.g. 210 × 210 = 44,100 sq.ft)', () => {
       const res = calculateArea({
         ...baseInput,
         plotLength: 210,
@@ -170,14 +146,8 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       });
 
       expect(res.plotAreaSqFt).toBe(44100);
-      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-ESTATE');
-      // Minimum 16.40 ft on all sides
-      expect(res.statutorySetbacks.frontSetbackFt).toBe(16.40);
-      expect(res.statutorySetbacks.rearSetbackFt).toBe(16.40);
-      expect(res.statutorySetbacks.leftSetbackFt).toBe(16.40);
-      expect(res.statutorySetbacks.rightSetbackFt).toBe(16.40);
-      expect(res.buildableLengthFt).toBe(210 - 16.40 - 16.40);
-      expect(res.buildableWidthFt).toBe(210 - 16.40 - 16.40);
+      expect(res.authorityMetadata.matchedRuleId).toBe('GBA-2026-OUT-OF-SCOPE');
+      expect(res.authorityMetadata.isAuthoritativeBuildableResolved).toBe(false);
     });
   });
 
@@ -225,44 +195,35 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
       expect(at.matchedRule?.id).toBe('GBA-2026-SMALL');
       expect(at.statutoryFrontFt).toBe(2.95);
 
-      // 3. Immediately above 1,615: 1,616 sq.ft
+      // 3. Immediately above 1,615: 1,616 sq.ft (Category C)
       const above = evaluatePlotSetbacks({
         plotLength: 101,
         plotWidth: 16, // 1616 sq.ft
         rules: GBA_2026_SETBACK_RULES,
       });
-      expect(above.matchedRule?.id).toBe('GBA-2026-MEDIUM-LARGE');
-      // Front is 12% of depth (101 ft) = 12.12 ft
-      expect(above.statutoryFrontFt).toBe(12.12);
+      expect(above.matchedRule?.id).toBe('GBA-2026-MEDIUM');
+      // Category C front is 3.28 ft (1.00m)
+      expect(above.statutoryFrontFt).toBe(3.28);
     });
 
-    it('Threshold 43,056 sq.ft: tests 43,050 (below), 43,056 (at), and 43,060 (above)', () => {
-      // 1. Below 43,056: 40,000 sq.ft (200 × 200)
+    it('Threshold 2,691 sq.ft (> 250 sq.m out of scope)', () => {
+      // 1. Below 2,691 sq.ft: Category C (e.g. 2,400 sq.ft)
       const below = evaluatePlotSetbacks({
-        plotLength: 200,
-        plotWidth: 200,
+        plotLength: 60,
+        plotWidth: 40,
         rules: GBA_2026_SETBACK_RULES,
       });
-      expect(below.matchedRule?.id).toBe('GBA-2026-MEDIUM-LARGE');
-      expect(below.statutoryFrontFt).toBe(24.00); // 12% of 200ft
+      expect(below.matchedRule?.id).toBe('GBA-2026-MEDIUM');
+      expect(below.statutoryFrontFt).toBe(3.28);
 
-      // 2. Exactly at 43,056 sq.ft
-      const at = evaluatePlotSetbacks({
-        plotLength: 215.28,
-        plotWidth: 200,
-        rules: GBA_2026_SETBACK_RULES,
-      });
-      expect(at.matchedRule?.id).toBe('GBA-2026-MEDIUM-LARGE');
-
-      // 3. Above 43,056 sq.ft: 44,000 sq.ft
+      // 2. Above 2,691 sq.ft (> 250 sq.m): Out of scope
       const above = evaluatePlotSetbacks({
-        plotLength: 220,
-        plotWidth: 200,
+        plotLength: 70,
+        plotWidth: 40, // 2800 sq.ft
         rules: GBA_2026_SETBACK_RULES,
       });
-      expect(above.matchedRule?.id).toBe('GBA-2026-ESTATE');
-      expect(above.statutoryFrontFt).toBe(16.40);
-      expect(above.statutoryRearFt).toBe(16.40);
+      expect(above.matchedRule?.id).toBe('GBA-2026-OUT-OF-SCOPE');
+      expect(above.isAuthoritativeBuildableResolved).toBe(false);
     });
   });
 
@@ -271,18 +232,37 @@ describe('Plot Setback System V2 — Regression & Verification Suite', () => {
   // ─────────────────────────────────────────────────────────────
   describe('3. Width vs Depth Percentage Integrity', () => {
     it('Never substitutes plot area for dimensions when calculating percentage setbacks', () => {
+      const pctRules: PlotSetbackRule[] = [
+        {
+          id: 'TEST-PERCENTAGE-RULE',
+          name: 'Test Percentage Rule',
+          authority: 'Test Authority',
+          jurisdiction: 'Bangalore',
+          sourceDocument: 'Test Reference',
+          sourceDate: '2026-01-01',
+          verificationStatus: 'INDEPENDENTLY_VERIFIED',
+          minPlotAreaSqFt: 0,
+          maxPlotAreaSqFt: 10000,
+          front: { method: 'PERCENT_OF_DEPTH', value: 12, unit: '%' },
+          rear: { method: 'PERCENT_OF_DEPTH', value: 8, unit: '%' },
+          left: { method: 'PERCENT_OF_WIDTH', value: 8, unit: '%' },
+          right: { method: 'PERCENT_OF_WIDTH', value: 8, unit: '%' },
+          isActive: true,
+        },
+      ];
+
       // Rectangular plot: Depth 60 ft, Width 40 ft (2,400 sq.ft)
       const orientation1 = evaluatePlotSetbacks({
         plotLength: 60, // Depth
         plotWidth: 40,  // Width
-        rules: GBA_2026_SETBACK_RULES,
+        rules: pctRules,
       });
 
       // Swapped orientation: Depth 40 ft, Width 60 ft (same 2,400 sq.ft area)
       const orientation2 = evaluatePlotSetbacks({
         plotLength: 40, // Depth
         plotWidth: 60,  // Width
-        rules: GBA_2026_SETBACK_RULES,
+        rules: pctRules,
       });
 
       // Front is 12% of depth

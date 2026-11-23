@@ -129,6 +129,7 @@ export function calculateArea(input: EngineInput): AreaResult {
     prescribedBuildingLineFt: input.prescribedBuildingLineFt,
     overrideReason: input.overrideReason,
     activeRules: matchingRules && matchingRules.length > 0 ? matchingRules : undefined,
+    selectedSideSetback: input.selectedSideSetback,
   });
 
   const statutorySetbacks: SetbackGeometry = {

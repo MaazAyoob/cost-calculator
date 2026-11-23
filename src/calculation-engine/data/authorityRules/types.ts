@@ -59,6 +59,7 @@ export interface PlotSetbackRule {
   // Configuration Lifecycle
   precedence?: number;           // Higher precedence resolves overlapping applicability
   isActive: boolean;
+  isOutOfScope?: boolean;
   adminNotes?: string;
 }
 

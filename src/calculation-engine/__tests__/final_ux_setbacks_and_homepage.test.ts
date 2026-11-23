@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   evaluatePlotSetbackDetails,
+  evaluateBuildingHeight,
+  getCityPlanningLimits,
   getCitySetbackConfig,
   BENGALURU_SETBACK_CONFIG,
   MYSURU_SETBACK_CONFIG,
@@ -374,6 +376,114 @@ describe('Hutty 3.2 — Final UX Improvement: Central Setback Rules Engine', () 
       expect(content).not.toContain('aria-label="3D Model Viewer Controls"');
       expect(content).not.toContain('Reset 3D camera view');
       expect(content).not.toContain('Toggle Turntable Rotation');
+    });
+  });
+
+  describe('Authoritative Building Height & Planning Limits Verification', () => {
+    describe('Bengaluru Height Rules (Jan 2026 Gazette)', () => {
+      it('enforces 39.37 ft (12.0m) without stilt regardless of road width', () => {
+        const h20 = evaluateBuildingHeight({ city: 'Bangalore', numFloors: 2, hasStilt: false, roadWidthFt: 20 });
+        expect(h20.maxPermittedHeightFt).toBe(39.37);
+        expect(h20.maxPermittedHeightM).toBe(12.0);
+        expect(h20.isCompliant).toBe(true); // Proposed: 2.5 + 20 + 7.5 = 30.0 ft <= 39.37 ft
+        expect(h20.statusBadge).toBe('STATUS: FULLY COMPLIANT');
+
+        const h40 = evaluateBuildingHeight({ city: 'Bangalore', numFloors: 2, hasStilt: false, roadWidthFt: 40 });
+        expect(h40.maxPermittedHeightFt).toBe(39.37);
+        expect(h40.maxPermittedHeightM).toBe(12.0);
+      });
+
+      it('permits 49.21 ft (15.0m) with stilt parking in Bengaluru', () => {
+        const hStilt = evaluateBuildingHeight({ city: 'Bangalore', numFloors: 3, hasStilt: true, roadWidthFt: 30 });
+        expect(hStilt.maxPermittedHeightFt).toBe(49.21);
+        expect(hStilt.maxPermittedHeightM).toBe(15.0);
+        expect(hStilt.isCompliant).toBe(true);
+      });
+
+      it('flags structures exceeding 49.21 ft (15.0m) as non-compliant / high-rise fire NOC required', () => {
+        const hTall = evaluateBuildingHeight({ city: 'Bangalore', numFloors: 5, hasStilt: true, roadWidthFt: 30 });
+        // Proposed: 2.5 + 50 + 7.5 = 60.0 ft > 49.21 ft
+        expect(hTall.isCompliant).toBe(false);
+        expect(hTall.statusBadge).toContain('HIGH-RISE REVIEW REQUIRED');
+      });
+    });
+
+    describe('Mysuru Height Rules (Master Plan II-2031)', () => {
+      it('caps height at 37.73 ft (11.5m) when road width < 9.0m (29.5 ft)', () => {
+        const hNarrowRoad = evaluateBuildingHeight({ city: 'Mysore', numFloors: 2, hasStilt: false, roadWidthFt: 25 });
+        expect(hNarrowRoad.maxPermittedHeightFt).toBe(37.73);
+        expect(hNarrowRoad.maxPermittedHeightM).toBe(11.5);
+        expect(hNarrowRoad.roadWidthConditionNote).toContain('less than 9.0m (29.5 ft)');
+        expect(hNarrowRoad.isCompliant).toBe(true); // 30.0 ft <= 37.73 ft
+      });
+
+      it('permits 39.37 ft (12.0m) when road width >= 9.0m (29.5 ft) without stilt', () => {
+        const hWideRoad = evaluateBuildingHeight({ city: 'Mysore', numFloors: 2, hasStilt: false, roadWidthFt: 30 });
+        expect(hWideRoad.maxPermittedHeightFt).toBe(39.37);
+        expect(hWideRoad.maxPermittedHeightM).toBe(12.0);
+      });
+
+      it('permits 49.21 ft (15.0m) when road width >= 9.0m with stilt', () => {
+        const hWideStilt = evaluateBuildingHeight({ city: 'Mysore', numFloors: 3, hasStilt: true, roadWidthFt: 40 });
+        expect(hWideStilt.maxPermittedHeightFt).toBe(49.21);
+        expect(hWideStilt.maxPermittedHeightM).toBe(15.0);
+      });
+    });
+
+    describe('City Planning Limits (Ground Coverage & FAR)', () => {
+      it('verifies Mysuru statutory status for 75% coverage and 1.50 FAR', () => {
+        const limits = getCityPlanningLimits('Mysore');
+        expect(limits.maxGroundCoveragePct).toBe(75);
+        expect(limits.isCoverageStatutory).toBe(true);
+        expect(limits.baseFAR).toBe(1.50);
+        expect(limits.isFARStatutory).toBe(true);
+        expect(limits.coverageSourceNote).toContain('MUDA Master Plan II-2031');
+      });
+
+      it('verifies Bengaluru planning assumption status (not statutory in Jan 2026 Gazette)', () => {
+        const limits = getCityPlanningLimits('Bangalore');
+        expect(limits.maxGroundCoveragePct).toBe(70);
+        expect(limits.isCoverageStatutory).toBe(false);
+        expect(limits.baseFAR).toBe(1.75);
+        expect(limits.isFARStatutory).toBe(false);
+        expect(limits.coverageSourceNote).toContain('planning assumption');
+      });
+    });
+
+    describe('Interactive Left vs Right Side Setback Selection', () => {
+      it('dynamically switches open space from left to right for 30x40 plot', () => {
+        // Left side selected (default)
+        const resLeft = evaluatePlotSetbackDetails({
+          city: 'Bangalore',
+          plotLength: 40,
+          plotWidth: 30,
+          selectedSideSetback: 'left',
+        });
+        expect(resLeft.selectedSide).toBe('left');
+        expect(resLeft.left.feet).toBe(2.30);
+        expect(resLeft.left.isZero).toBe(false);
+        expect(resLeft.right.feet).toBe(0);
+        expect(resLeft.right.isZero).toBe(true);
+        expect(resLeft.buildableWidthFt).toBe(27.70);
+        expect(resLeft.buildableDepthFt).toBe(34.75);
+        expect(resLeft.buildableFootprintSqFt).toBe(963);
+
+        // Right side selected
+        const resRight = evaluatePlotSetbackDetails({
+          city: 'Bangalore',
+          plotLength: 40,
+          plotWidth: 30,
+          selectedSideSetback: 'right',
+        });
+        expect(resRight.selectedSide).toBe('right');
+        expect(resRight.left.feet).toBe(0);
+        expect(resRight.left.isZero).toBe(true);
+        expect(resRight.right.feet).toBe(2.30);
+        expect(resRight.right.isZero).toBe(false);
+        expect(resRight.buildableWidthFt).toBe(27.70);
+        expect(resRight.buildableDepthFt).toBe(34.75);
+        expect(resRight.buildableFootprintSqFt).toBe(963);
+      });
     });
   });
 });

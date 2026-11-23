@@ -56,11 +56,13 @@ export const Step1Plot: React.FC = () => {
     rearSetback,
     leftSetback,
     rightSetback,
+    selectedSideSetback,
     setCity,
     setAuthority,
     setPlotDimensions,
     setRoadWidth,
     setCustomSetbacks,
+    setSelectedSideSetback,
   } = store;
 
   const area = useArea();
@@ -79,6 +81,7 @@ export const Step1Plot: React.FC = () => {
     city: currentCity,
     plotLength: currentLength,
     plotWidth: currentWidth,
+    selectedSideSetback: selectedSideSetback || 'left',
   });
 
   const handleSelectPreset = (preset: PresetPlot) => {
@@ -302,11 +305,22 @@ export const Step1Plot: React.FC = () => {
               <span className="text-[10px] text-[#66716B] block">Side</span>
               <strong className="font-mono font-bold text-xs sm:text-sm text-[#183B32]">
                 {setbackEval.sideCondition === 'one_side'
-                  ? `${setbackEval.left.feet} ft on one side`
+                  ? `${(setbackEval.left.feet || setbackEval.right.feet).toFixed(2)} ft on one side`
                   : `${setbackEval.left.feet} ft each side`}
               </strong>
             </div>
           </div>
+        )}
+
+        {/* ── Visible Architectural Setback Diagram (Compact, always visible) ── */}
+        {setbackEval.isSupportedLocation && !setbackEval.isOutOfScope && (
+          <PlotSetbackDiagram
+            evaluation={setbackEval}
+            compact={true}
+            selectedSide={selectedSideSetback || 'left'}
+            onSelectSide={setSelectedSideSetback}
+            roadWidthFt={currentRoadWidth}
+          />
         )}
 
         {/* ── Case A: Unsupported Location Message ── */}
@@ -394,25 +408,67 @@ export const Step1Plot: React.FC = () => {
               </div>
 
               <div className="p-2.5 bg-white rounded-xl border border-[#CBD5CB] text-xs space-y-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-[#66716B] block">Left Side</span>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#66716B] block">
+                  Left Side {setbackEval.sideCondition === 'one_side' && ((selectedSideSetback || 'left') === 'left' ? '★ (Open)' : '(Boundary)')}
+                </span>
                 <strong className="text-sm font-bold font-mono text-[#183B32] block">
                   {setbackEval.left.displayFeet}
                 </strong>
                 <span className="text-[10px] text-[#66716B] block">
-                  {setbackEval.sideCondition === 'one_side' ? 'Required on one side' : `Side open (${setbackEval.left.displayMeters})`}
+                  {setbackEval.sideCondition === 'one_side'
+                    ? ((selectedSideSetback || 'left') === 'left' ? `Required open side (${setbackEval.left.displayMeters})` : 'Can build to boundary (0m)')
+                    : `Side open (${setbackEval.left.displayMeters})`}
                 </span>
               </div>
 
               <div className="p-2.5 bg-white rounded-xl border border-[#CBD5CB] text-xs space-y-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-[#66716B] block">Right Side</span>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#66716B] block">
+                  Right Side {setbackEval.sideCondition === 'one_side' && (selectedSideSetback === 'right' ? '★ (Open)' : '(Boundary)')}
+                </span>
                 <strong className="text-sm font-bold font-mono text-[#183B32] block">
-                  {setbackEval.right.displayText}
+                  {setbackEval.right.displayFeet}
                 </strong>
                 <span className="text-[10px] text-[#66716B] block">
-                  {setbackEval.right.isZero ? 'Build to boundary' : `Side open (${setbackEval.right.displayMeters})`}
+                  {setbackEval.sideCondition === 'one_side'
+                    ? (selectedSideSetback === 'right' ? `Required open side (${setbackEval.right.displayMeters})` : 'Can build to boundary (0m)')
+                    : `Side open (${setbackEval.right.displayMeters})`}
                 </span>
               </div>
             </div>
+
+            {/* Interactive Side Selector (when one-side setback applies) */}
+            {setbackEval.sideCondition === 'one_side' && (
+              <div className="p-3 bg-[#E8EFE9]/60 rounded-xl border border-[#B7CDBB] flex items-center justify-between flex-wrap gap-2 text-xs">
+                <div>
+                  <span className="font-bold text-[#183B32] block">One-Side Setback Rule Active</span>
+                  <span className="text-[11px] text-[#66716B]">Choose which side to leave open; build to boundary on the other:</span>
+                </div>
+                <div className="inline-flex rounded-lg border border-[#CBD5CB] p-0.5 bg-white shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSideSetback('left')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer ${
+                      (selectedSideSetback || 'left') === 'left'
+                        ? 'bg-[#183B32] text-white shadow-xs'
+                        : 'text-[#66716B] hover:text-[#18211E]'
+                    }`}
+                  >
+                    Open on Left
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSideSetback('right')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer ${
+                      selectedSideSetback === 'right'
+                        ? 'bg-[#183B32] text-white shadow-xs'
+                        : 'text-[#66716B] hover:text-[#18211E]'
+                    }`}
+                  >
+                    Open on Right
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Side Clearance Note */}
             {setbackEval.sideConditionNote && (
@@ -420,9 +476,6 @@ export const Step1Plot: React.FC = () => {
                 💡 <span className="font-bold">Side Clearance:</span> {setbackEval.sideConditionNote}
               </p>
             )}
-
-            {/* Visual Top-View Architectural Diagram */}
-            <PlotSetbackDiagram evaluation={setbackEval} />
 
             {/* Space Calculation Summary */}
             <div className="p-3.5 bg-white rounded-xl border border-[#CBD5CB] space-y-2.5">
@@ -447,7 +500,7 @@ export const Step1Plot: React.FC = () => {
                 <div className="p-2 bg-[#F8F8F6] rounded-lg border border-[#E5E7EB]">
                   <span className="text-[10px] text-[#66716B] block">Buildable Dimensions</span>
                   <strong className="text-xs font-mono font-bold text-[#183B32] block mt-0.5">
-                    {setbackEval.buildableWidthFt} × {setbackEval.buildableDepthFt} ft
+                    {setbackEval.buildableWidthFt.toFixed(2)} × {setbackEval.buildableDepthFt.toFixed(2)} ft
                   </strong>
                 </div>
 
